@@ -3113,7 +3113,7 @@ exports.Formats = [
 			}
 		},
 	},
-	
+
 	{
 		name: "Uber Tier Shift",
 		desc: [
