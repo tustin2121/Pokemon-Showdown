@@ -1567,7 +1567,7 @@ exports.BattleMovedex = {
 		flags: {contact: 1, protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add('-anim', source, 'Head Smash', source);
+			this.add('-anim', source, 'Head Smash', target);
 		},
 		recoil: [1, 8],
 		num: 677,
@@ -1588,7 +1588,7 @@ exports.BattleMovedex = {
 		},
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add('-anim', source, 'Quiver Dance', source);
+			this.add('-anim', source, 'Quiver Dance', target);
 		},
 		onAfterMove: function (pokemon) {
 			if (pokemon.volatiles['lockedmove'] && pokemon.volatiles['lockedmove'].duration === 1) {
