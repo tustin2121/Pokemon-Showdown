@@ -313,23 +313,3 @@ if (config.loggerid) {
 		connection.join(room);
 	}, 120000);
 }
-
-if (!Config.irclog) {
-	Config.irclog = [];
-}
-
-for (let i = 0; i < Config.irclog.length; i++) {
-	let server = Config.irclog[i];
-	let channels = server.channels;
-	server.channels = server.channels.map(function (channel) {
-		return channel.name;
-	});
-	let logConnection = new irc.Client(server.server, server.nickname, server);
-	for (let j = 0; j < channels.length; j++) {
-		let channel = channels[j];
-		listenForLogs(logConnection, channel.name, channel.loggerid);
-		logConnection.on('message' + channel.name, function (nick, text, message) {
-			log(channel.loggerid, 1, message.prefix, text);
-		});
-	}
-}
