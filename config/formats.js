@@ -465,7 +465,7 @@ exports.Formats = [
 		section: "OM of the Month",
 		column: 2,
 
-		mod: 'extremets',
+		mod: 'extremetiershift',
 		ruleset: ['Ubers', 'Baton Pass Clause'],
 		banlist: ['Eviolite'],
 	},
