@@ -808,98 +808,9 @@ exports.Formats = [
 		banlist: ['Uber'],
 	},
 
-	// Randomized Metas
-	///////////////////////////////////////////////////////////////////
-
-	{
-		name: "[Seasonal] Fireworks Frenzy",
-		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3491902/\">Seasonal Ladder</a>"],
-		section: "Randomized Metas",
-		column: 2,
-
-		team: 'randomSeasonalFireworks',
-		ruleset: ['Sleep Clause Mod', 'Freeze Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
-		onBegin: function () {
-			this.add('message', "A fireworks show is starting!");
-			// this.add('-weather', 'Fireworks'); // un-comment when the client supports custom named weathers
-		},
-		onResidual: function () {
-			if (this.isWeather('')) this.eachEvent('Weather');
-		},
-		onWeather: function (target) {
-			if (!target.hasType('Fire')) this.damage(target.maxhp / 16, target, null, 'exploding fireworks');
-		},
-	},
-	{
-		name: "Battle Factory",
-		section: "Randomized Metas",
-
-		team: 'randomFactory',
-		ruleset: ['Pokemon', 'Sleep Clause Mod', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Mega Rayquaza Clause'],
-	},
-	{
-		name: "Challenge Cup 1v1",
-		section: "Randomized Metas",
-
-		team: 'randomCC',
-		teamLength: {
-			battle: 1,
-		},
-		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
-	},
-	{
-		name: "Monotype Random Battle",
-		section: "Randomized Metas",
-
-		team: 'random',
-		searchShow: false,
-		ruleset: ['Pokemon', 'Same Type Clause', 'Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
-	},
-	{
-		name: "Hackmons Cup",
-		desc: ["Randomized teams of level-balanced Pok&eacute;mon with absolutely any ability, moves, and item."],
-		section: "Randomized Metas",
-
-		team: 'randomHC',
-		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
-	},
-	{
-		name: "Doubles Hackmons Cup",
-		section: "Randomized Metas",
-
-		gameType: 'doubles',
-		team: 'randomHC',
-		searchShow: false,
-		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
-	},
-	{
-		name: "Triples Hackmons Cup",
-		section: "Randomized Metas",
-
-		gameType: 'triples',
-		team: 'randomHC',
-		searchShow: false,
-		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
-	},
-
-	// RoA Spotlight
-	///////////////////////////////////////////////////////////////////
-
-	{
-		name: "[Gen 1] UU",
-		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3573896/\">RBY UU</a>"],
-		section: "RoA Spotlight",
-		column: 3,
-
-		mod: 'gen1',
-		ruleset: ['[Gen 1] OU'],
-		banlist: ['OU'],
-	},
-
 	{
 		name: "Mix and Mega",
 		section: "Other Metagames",
-		column: 2,
 
 		mod: 'mixandmega',
 		ruleset: ['Ubers'],
@@ -1099,6 +1010,95 @@ exports.Formats = [
 			}
 		},
 	},
+
+	// Randomized Metas
+	///////////////////////////////////////////////////////////////////
+
+	{
+		name: "[Seasonal] Fireworks Frenzy",
+		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3491902/\">Seasonal Ladder</a>"],
+		section: "Randomized Metas",
+		column: 2,
+
+		team: 'randomSeasonalFireworks',
+		ruleset: ['Sleep Clause Mod', 'Freeze Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
+		onBegin: function () {
+			this.add('message', "A fireworks show is starting!");
+			// this.add('-weather', 'Fireworks'); // un-comment when the client supports custom named weathers
+		},
+		onResidual: function () {
+			if (this.isWeather('')) this.eachEvent('Weather');
+		},
+		onWeather: function (target) {
+			if (!target.hasType('Fire')) this.damage(target.maxhp / 16, target, null, 'exploding fireworks');
+		},
+	},
+	{
+		name: "Battle Factory",
+		section: "Randomized Metas",
+
+		team: 'randomFactory',
+		ruleset: ['Pokemon', 'Sleep Clause Mod', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Mega Rayquaza Clause'],
+	},
+	{
+		name: "Challenge Cup 1v1",
+		section: "Randomized Metas",
+
+		team: 'randomCC',
+		teamLength: {
+			battle: 1,
+		},
+		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
+	},
+	{
+		name: "Monotype Random Battle",
+		section: "Randomized Metas",
+
+		team: 'random',
+		searchShow: false,
+		ruleset: ['Pokemon', 'Same Type Clause', 'Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
+	},
+	{
+		name: "Hackmons Cup",
+		desc: ["Randomized teams of level-balanced Pok&eacute;mon with absolutely any ability, moves, and item."],
+		section: "Randomized Metas",
+
+		team: 'randomHC',
+		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
+	},
+	{
+		name: "Doubles Hackmons Cup",
+		section: "Randomized Metas",
+
+		gameType: 'doubles',
+		team: 'randomHC',
+		searchShow: false,
+		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
+	},
+	{
+		name: "Triples Hackmons Cup",
+		section: "Randomized Metas",
+
+		gameType: 'triples',
+		team: 'randomHC',
+		searchShow: false,
+		ruleset: ['Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
+	},
+
+	// RoA Spotlight
+	///////////////////////////////////////////////////////////////////
+
+	{
+		name: "[Gen 1] UU",
+		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3573896/\">RBY UU</a>"],
+		section: "RoA Spotlight",
+		column: 3,
+
+		mod: 'gen1',
+		ruleset: ['[Gen 1] OU'],
+		banlist: ['OU'],
+	},
+
 	// BW2 Singles
 	///////////////////////////////////////////////////////////////////
 
@@ -1272,7 +1272,7 @@ exports.Formats = [
 			"&bullet; <a href=\"https://www.smogon.com/forums/posts/6431088/\">DPP Sample Teams</a>",
 		],
 		section: "DPP Singles",
-		column: 4,
+		column: 3,
 
 		mod: 'gen4',
 		ruleset: ['Pokemon', 'Standard', 'Evasion Abilities Clause'],
@@ -1335,7 +1335,7 @@ exports.Formats = [
 	{
 		name: "[Gen 4] Doubles Custom Game",
 		section: "DPP Doubles",
-		column: 4,
+		column: 3,
 
 		mod: 'gen4',
 		gameType: 'doubles',
@@ -1358,7 +1358,7 @@ exports.Formats = [
 			"&bullet; <a href=\"https://www.smogon.com/forums/posts/6431087/\">ADV Sample Teams</a>",
 		],
 		section: "Past Generations",
-		column: 4,
+		column: 3,
 
 		mod: 'gen3',
 		ruleset: ['Pokemon', 'Standard'],
