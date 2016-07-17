@@ -508,19 +508,6 @@ exports.Formats = [
 			this.add('-start', pokemon, 'typechange', pokemon.types.join('/'), null);
 		},
 	},
-	{
-		name: "Triples Custom Game",
-		section: "ORAS Triples",
-
-		gameType: 'triples',
-		searchShow: false,
-		canUseRandomTeam: true,
-		maxLevel: 9999,
-		defaultLevel: 100,
-		debug: true,
-		// no restrictions, for serious (other than team preview)
-		ruleset: ['Team Preview', 'Cancel Mod'],
-	},
 
 	// Other Metagames
 	///////////////////////////////////////////////////////////////////
