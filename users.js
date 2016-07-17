@@ -349,7 +349,7 @@ class User {
 			return '‽' + this.name;
 		}
 		if (this.namelocked) {
-			return '✖' + this.name;
+			return '‽' + this.name;
 		}
 		if (roomid) {
 			let room = Rooms.rooms[roomid];
@@ -359,44 +359,32 @@ class User {
 			if (room.isMuted(this)) {
 				return '!' + this.name;
 			}
-			if (room && room.auth) {
-				if (room.auth[this.userid]) {
-					return room.auth[this.userid] + this.name;
-				}
-				if (room.isPrivate === true) return ' ' + this.name;
-			}
+			return room.getAuth(this) + this.name;
 		}
 		return this.group + this.name;
 	}
 	can(permission, target, room) {
 		if (this.hasSysopAccess()) return true;
 
-		let group = this.group;
-		let targetGroup = '';
-		if (target) targetGroup = target.group;
-		let groupData = Config.groups[group];
+		let group, targetGroup;
 
-		if (groupData && groupData['root']) {
-			return true;
+		if (typeof target === 'string') {
+			target = null;
+			targetGroup = target;
 		}
 
 		if (room && room.auth) {
-			if (room.auth[this.userid]) {
-				group = room.auth[this.userid];
-			} else if (room.isPrivate === true) {
-				group = ' ';
-			}
-			groupData = Config.groups[group];
-			if (target) {
-				if (room.auth[target.userid]) {
-					targetGroup = room.auth[target.userid];
-				} else if (room.isPrivate === true) {
-					targetGroup = ' ';
-				}
-			}
+			group = room.getAuth(this);
+			if (target) targetGroup = room.getAuth(target);
+		} else {
+			group = this.group;
+			if (target) targetGroup = target.group;
 		}
 
-		if (typeof target === 'string') targetGroup = target;
+		let groupData = Config.groups[group];
+		if (groupData && groupData['root']) {
+			return true;
+		}
 
 		if (groupData && groupData[permission]) {
 			let jurisdiction = groupData[permission];
@@ -525,7 +513,6 @@ class User {
 		}
 	}
 	filterName(name) {
-		name = name.substr(0, 30);
 		if (!Config.disablebasicnamefilter) {
 			// whitelist
 			// \u00A1-\u00BF\u00D7\u00F7  Latin punctuation/symbols
@@ -548,11 +535,19 @@ class User {
 			// e-mail address
 			if (name.includes('@') && name.includes('.')) return '';
 		}
+		name = name.replace(/^[^A-Za-z0-9]+/, ""); // remove symbols from start
+
+		// cut name length down to 18 chars
+		if (/[A-Za-z0-9]/.test(name.slice(18))) {
+			name = name.replace(/[^A-Za-z0-9]+/g, "");
+		} else {
+			name = name.slice(0, 18);
+		}
+
+		name = Tools.getName(name);
 		if (Config.namefilter) {
 			name = Config.namefilter(name, this);
 		}
-		name = Tools.getName(name);
-		name = name.replace(/^[^A-Za-z0-9]+/, "");
 		return name;
 	}
 	/**
@@ -563,12 +558,11 @@ class User {
 	 * @param connection       The connection asking for the rename
 	 */
 	rename(name, token, newlyRegistered, connection) {
-		for (let i in this.roomCount) {
-			let room = Rooms(i);
-			if (room && room.rated && (this.userid in room.game.players)) {
-				this.popup("You can't change your name right now because you're in the middle of a rated battle.");
-				return false;
-			}
+		for (let id in this.games) {
+			if (this.games[id].ended) continue;
+			if (this.games[id].allowRenames) continue;
+			this.popup("You can't change your name right now because you're in the middle of a rated game.");
+			return false;
 		}
 
 		let challenge = '';
@@ -589,8 +583,15 @@ class User {
 			return false;
 		}
 
-		name = this.filterName(name);
 		let userid = toId(name);
+		if (userid.length > 18) {
+			this.send('|nametaken|' + "|Your name must be 18 characters or shorter.");
+			return false;
+		}
+		name = this.filterName(name);
+		if (userid !== toId(name)) {
+			name = userid;
+		}
 		if (this.registered) newlyRegistered = false;
 
 		if (!userid) {
@@ -695,9 +696,9 @@ class User {
 			} else if (userType === '4') {
 				this.autoconfirmed = userid;
 			} else if (userType === '5') {
-				Punishments.lock(this, Date.now() + PERMALOCK_CACHE_TIME, "Permalock", userid);
+				Punishments.lock(this, Date.now() + PERMALOCK_CACHE_TIME, userid, "Permalocked as " + name);
 			} else if (userType === '6') {
-				Punishments.ban(this, Date.now() + PERMALOCK_CACHE_TIME, "Permaban", userid);
+				Punishments.ban(this, Date.now() + PERMALOCK_CACHE_TIME, userid, "Permabanned as " + name);
 			}
 		}
 		let user = users.get(userid);
@@ -1091,18 +1092,13 @@ class User {
 				return false;
 			}
 		}
-		if (room.modjoin) {
-			let userGroup = this.group;
-			if (room.auth && !makeRoom) {
-				if (room.isPrivate === true) {
-					userGroup = ' ';
-				}
-				userGroup = room.auth[this.userid] || userGroup;
-			}
-			if (Config.groupsranking.indexOf(userGroup) < Config.groupsranking.indexOf(room.modjoin !== true ? room.modjoin : room.modchat)) {
+		if (room.modjoin && !makeRoom) {
+			let userGroup = room.getAuth(this);
+			let modjoinGroup = room.modjoin !== true ? room.modjoin : room.modchat;
+			if (Config.groupsranking.indexOf(userGroup) < Config.groupsranking.indexOf(modjoinGroup)) {
 				if (!this.named) {
 					return null;
-				} else if (!this.can('bypassall')) {
+				} else {
 					connection.sendTo(roomid, "|noinit|nonexistent|The room '" + roomid + "' does not exist.");
 					return false;
 				}
@@ -1380,10 +1376,10 @@ class User {
 				);
 				return false;
 			} else {
-				this.chatQueue.push([message, room, connection]);
+				this.chatQueue.push([message, room.id, connection]);
 			}
 		} else if (now < this.lastChatMessage + throttleDelay) {
-			this.chatQueue = [[message, room, connection]];
+			this.chatQueue = [[message, room.id, connection]];
 			this.chatQueueTimeout = setTimeout(
 				() => this.processChatQueue(),
 				throttleDelay - (now - this.lastChatMessage));
@@ -1407,9 +1403,10 @@ class User {
 
 		this.lastChatMessage = new Date().getTime();
 
-		if (toChat[1].users) {
+		let room = Rooms(toChat[1]);
+		if (room) {
 			Monitor.activeIp = toChat[2].ip;
-			toChat[1].chat(this, toChat[0], toChat[2]);
+			room.chat(this, toChat[0], toChat[2]);
 			Monitor.activeIp = null;
 		} else {
 			// room is expired, do nothing
@@ -1428,21 +1425,18 @@ class User {
 	}
 	destroy() {
 		// deallocate user
+		for (let id in this.games) {
+			if (this.games[id].ended) continue;
+			if (this.games[id].forfeit) {
+				this.games[id].forfeit(this);
+			}
+		}
 		this.clearChatQueue();
 		users.delete(this.userid);
 		prevUsers.delete('guest' + this.guestNum);
 	}
 	toString() {
 		return this.userid;
-	}
-	static pruneInactive(threshold) {
-		let now = Date.now();
-		users.forEach(user => {
-			if (user.connected) return;
-			if ((now - user.lastConnected) > threshold) {
-				user.destroy();
-			}
-		});
 	}
 }
 
@@ -1453,12 +1447,18 @@ Users.Connection = Connection;
  * Inactive user pruning
  *********************************************************/
 
-Users.pruneInactive = User.pruneInactive;
-Users.pruneInactiveTimer = setInterval(
-	User.pruneInactive,
-	1000 * 60 * 30,
-	Config.inactiveuserthreshold || 1000 * 60 * 60
-);
+Users.pruneInactive = function (threshold) {
+	let now = Date.now();
+	users.forEach(user => {
+		if (user.connected) return;
+		if ((now - user.lastConnected) > threshold) {
+			user.destroy();
+		}
+	});
+};
+Users.pruneInactiveTimer = setInterval(() => {
+	Users.pruneInactive(Config.inactiveuserthreshold || 1000 * 60 * 60);
+}, 1000 * 60 * 30);
 
 /*********************************************************
  * Routing
@@ -1538,7 +1538,8 @@ Users.socketReceive = function (worker, workerid, socketid, message) {
 	if (!room) room = Rooms.lobby || Rooms.global;
 	let user = connection.user;
 	if (!user) return;
-	if (lines.substr(0, 3) === '>> ' || lines.substr(0, 4) === '>>> ') {
+
+	if (CommandParser.multiLinePattern.test(lines)) {
 		user.chat(lines, room, connection);
 		return;
 	}
