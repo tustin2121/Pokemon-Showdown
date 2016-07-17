@@ -1824,8 +1824,6 @@ exports.Formats = [
 				this.add('c|%Zodiax|We need to go full out again soon...');
 			}
 		},
-		ruleset: ['Pokemon', 'Standard GBU', 'Team Preview'],
-		requirePentagon: true,
 	},
 	{
 		name: "Triples Custom Game",
