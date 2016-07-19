@@ -1,40 +1,60 @@
-"use strict";
+'use strict';
 
-global.toId = require('./tools.js').includeMods().getId;
 exports.BattleScripts = {
-	init: function () {
-		for (let i in this.data.Pokedex) {
-			let tier = null;
-			let adjustment = 0;
+	pokemon: {
+		formeChange: function (template, dontRecalculateStats) {
+			template = this.battle.getTemplate(template);
 
-			if (this.data.FormatsData[i]) tier = this.data.FormatsData[i].tier;
-			if (!tier && this.data.Pokedex[i].baseSpecies) tier = this.data.FormatsData[toId(this.data.Pokedex[i].baseSpecies)].tier;
+			if (!template.abilities) return false;
+			this.illusion = null;
+			this.template = template;
 
-			switch (tier) {
-			case 'UU':
-			case 'BL2':
-				adjustment = 10;
-				break;
-			case 'RU':
-			case 'BL3':
-				adjustment = 20;
-				break;
-			case 'NU':
-			case 'BL4':
-				adjustment = 30;
-				break;
-			case 'PU':
-			case 'NFE':
-			case 'LC Uber':
-			case 'LC':
-				adjustment = 40;
-			}
+			this.types = template.types;
+			this.addedType = '';
 
-			if (adjustment) {
-				for (let j in this.data.Pokedex[i].baseStats) {
-					this.modData('Pokedex', i).baseStats[j] = this.clampIntRange(this.data.Pokedex[i].baseStats[j] + adjustment, 1, 255);
+			if (!dontRecalculateStats) {
+				let boosts = {
+					'UU': 10,
+					'BL2': 10,
+					'RU': 20,
+					'BL3': 20,
+					'NU': 30,
+					'BL4': 30,
+					'PU': 40,
+					'NFE': 40,
+					'LC Uber': 40,
+					'LC': 40,
+				};
+				let tier = template.tier;
+				if (this.set.item) {
+					let item = this.battle.getItem(this.set.item);
+					if (item.megaEvolves === template.species) tier = this.battle.getTemplate(item.megaStone).tier;
 				}
+				if (tier.charAt(0) === '(') tier = tier.slice(1, -1);
+				let boost = (tier in boosts) ? boosts[tier] : 0;
+				if (this.set.ability in {'Drizzle': 1, 'Drought': 1}) {
+					boost = 0;
+				} else if (this.set.moves.indexOf('chatter') >= 0) {
+					boost = 30;
+				}
+
+				let hp = this.battle.clampIntRange(this.template.baseStats['hp'] + boost, 1, 255);
+				hp = Math.floor(Math.floor(2 * hp + this.set.ivs['hp'] + Math.floor(this.set.evs['hp'] / 4) + 100) * this.level / 100 + 10);
+				if (this.maxhp > 1 && this.maxhp < hp) this.hp = this.maxhp = hp;
+
+				for (let statName in this.stats) {
+					let stat = this.template.baseStats[statName];
+					stat = this.battle.clampIntRange(stat + boost, 1, 255);
+					stat = Math.floor(Math.floor(2 * stat + this.set.ivs[statName] + Math.floor(this.set.evs[statName] / 4)) * this.level / 100 + 5);
+
+					let nature = this.battle.getNature(this.set.nature);
+					if (statName === nature.plus) stat *= 1.1;
+					if (statName === nature.minus) stat *= 0.9;
+					this.baseStats[statName] = this.stats[statName] = Math.floor(stat);
+				}
+				this.speed = this.stats.spe;
 			}
-		}
+			return true;
+		},
 	},
 };
