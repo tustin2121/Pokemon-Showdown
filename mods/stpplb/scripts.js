@@ -119,8 +119,8 @@ exports.BattleScripts = {
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
 			"Soma Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute'],
+				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
 				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 			},
@@ -357,8 +357,8 @@ exports.BattleScripts = {
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
 			"Soma Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute'],
+				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
 				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 			},
@@ -607,8 +607,8 @@ exports.BattleScripts = {
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
 			"Soma Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute'],
+				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
 				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 			},
