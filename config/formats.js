@@ -1634,6 +1634,8 @@ exports.Formats = [
 				this.add("c|Kap'n Kooma|Hoist the black flag lads!");
 			} else if (name === 'kooma9') {
 				this.add("c|Kooma9|ello");
+			} else if (name === 'sohippy') {
+				this.add("c|sohippy|Here I come WAHAHAHAHAHAHAHAHAHAHA! KAPOW");
 			} else if (name === 'best') {
 				this.add("raw|<big>GO AWAY</big>");
 			} else if (name === 'poomph') {
@@ -1732,6 +1734,8 @@ exports.Formats = [
 				this.add("c|Kap'n Kooma|Avast! I be needing a pint of grog after this.");
 			} else if (name === 'kooma9') {
 				this.add("c|Kooma9|Most Disappointing Player 2015");
+			} else if (name === 'sohippy') {
+				this.add("c|sohippy|The WAHAHA never dies! KAPOW");
 			} else if (name === 'best') {
 				this.add("raw|<big>BEST? FALLED</big>");
 			} else if (name === 'poomph') {
