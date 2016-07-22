@@ -341,7 +341,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		onFoeTryMove: function (target, source, effect) {
 			if (this.random(10) === 0) {
 				this.attrLastMove('[still]');
-				this.add("c|DictatorMantis|This move doesn't work because I say so!");
+				this.add("c|" + target.name + "|This move doesn't work because I say so!");
 				return false;
 			}
 		},
@@ -364,7 +364,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				return;
 			}
 			if (this.random(10) === 1) {
-				this.add("c|PikalaxALT|KAPOW");
+				this.add("c|" + target.name + "|KAPOW");
 				let newMove = this.getMoveCopy("explosion");
 				this.useMove(newMove, target, source);
 				return null;
@@ -396,7 +396,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: "banevade",
 		name: "Ban Evade",
 		rating: 3,
-		num: 208,
+		num: 209,
 	},
 	'incinerate': {
 		desc: "This Pokemon's Normal type moves become Fire type and have their power multiplied by 1.3. This effect comes after other effects that change a move's type, but before Ion Deluge and Electrify's effects.",
@@ -418,7 +418,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: "incinerate",
 		name: "Incinerate",
 		rating: 3.5,
-		num: 209,
+		num: 210,
 	},
 	'physicalakazam': { // Makes Alakazam into a physical tank
 		shortDesc: "This Pokemon's Attack is doubled and its Defense is increased 1.5x.",
@@ -433,7 +433,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: "physicalakazam",
 		name: "Physicalakazam",
 		rating: 3.5,
-		num: 210,
+		num: 211,
 	},
 	"defiantplus": {
 		desc: "This Pokemon's Attack and Speed is raised by 2 stages for each of its stat stages that is lowered by an opposing Pokemon. If this Pokemon has a major status condition, its Speed is multiplied by 1.5; the Speed drop from paralysis is ignored.",
@@ -460,7 +460,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: "defiantplus",
 		name: "Defiant Plus",
 		rating: 2.5,
-		num: 211,
+		num: 212,
 	},
 	'silverscale': { // Abyll's Milotic's ability: Upgraded marvel scale
 		desc: "If this Pokemon has a major status condition, its Sp Defense is multiplied by 1.5, and Speed by 1.25.",
@@ -480,13 +480,13 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: "silverscale",
 		name: "Silver Scale",
 		rating: 2.5,
-		num: 212,
+		num: 213,
 	},
 	'gottagofast': { // Pokson's speedboost
 		id: 'gottagofast',
 		name: 'Gotta Go Fast',
 		rating: 2.5,
-		num: 213,
+		num: 214,
 		desc: "Chance of boosting speed when using signature move",
 		shortDesc: "Chance of boost when using special move",
 		onSourceHit: function (target, source, move) {
@@ -501,7 +501,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: 'drawingrequest',
 		name: 'Drawing Request',
 		rating: 3,
-		num: 214,
+		num: 215,
 		desc: "At the end of each turn, replaces this Pokemon's first move with a random move from the pool of all Special attacks >= 60 BP and all status moves, minus the ones that boost the user's Attack stat, and the ones this Pokemon already has.",
 		shortDesc: 'TL;DR',
 		onResidualOrder: 26,
@@ -553,7 +553,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: "mindgames",
 		name: "Mind Games",
 		rating: 4.5,
-		num: 149,
+		num: 216,
 	},
 	'jackyofalltrades': {
 		desc: '',
@@ -561,7 +561,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: 'jackyofalltrades',
 		name: 'Jack(y) of All Trades',
 		rating: 4,
-		num: 150,
+		num: 217,
 		onBasePowerPriority: 8,
 		onBasePower: function (basePower, attacker, defender, move) {
 			if (basePower <= 80) {
@@ -592,7 +592,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		// Would be totally broken on something holding Toxic Orb.
 		// Good thing I haven't done that, right?
 		rating: 5,
-		num: 151,
+		num: 218,
 	},
 	'superprotean': {
 		desc: 'Adds the type of every move used to the pokemon.',
@@ -612,7 +612,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: 'superprotean',
 		name: 'Super Protean',
 		rating: 4,
-		num: 152,
+		num: 219,
 	},
 	'invocation': {
 		desc: 'Randomly transforms into a fossil god on switch-in.',
@@ -675,6 +675,49 @@ exports.BattleAbilities = { // define custom abilities here.
 		name: 'Invocation',
 		id: 'invocation',
 		rating: 1,
-		num: 153,
+		num: 220,
+	},
+	'heraldofdeath': {
+		desc: "On switch-in, each adjacent opposing active Pokemon receives a perish count of 4 if it doesn't already have a perish count. At the end of each turn including the turn used, the perish count of all active Pokemon lowers by 1 and Pokemon faint if the number reaches 0. The perish count is removed from Pokemon that switch out. If a Pokemon uses Baton Pass while it has a perish count, the replacement will gain the perish count and continue to count down.",
+		shortDesc: 'On switch-in, all adjacent opponents will faint in 3 turns.',
+		onStart: function (pokemon) {
+			let foeactive = pokemon.side.foe.active;
+			let result = false;
+			for (let i = 0; i < foeactive.length; i++) {
+				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
+				if (!foeactive[i].volatiles['perishsong']) {
+					foeactive[i].addVolatile('perishsong');
+					this.add('-start', foeactive[i], 'perish3', '[silent]');
+					result = true;
+				}
+			}
+			if (result) this.add('message', 'The Herald of Death has arrived. All opposing Pokemon will perish in 3 turns!');
+		},
+		id: 'heraldofdeath',
+		name: 'Herald of Death',
+		rating: 3.5,
+		num: 221,
+	},
+	"beatmisty": {
+		desc: "This Pokemon is immune to Water-type moves and restores 1/4 of its maximum HP, rounded down, when hit by a Water-type move. This Pokemon has a 10% chance to survive an attack that would KO it with 1 HP.",
+		shortDesc: "This Pokemon heals 1/4 of its max HP when hit by Water moves; Water immunity. This Pokemon has a 10% chance to survive an attack that would KO it with 1 HP.",
+		onTryHit: function (target, source, move) {
+			if (target !== source && move.type === 'Water') {
+				if (!this.heal(target.maxhp / 4)) {
+					this.add('-immune', target, '[msg]', '[from] ability: Water Absorb');
+				}
+				return null;
+			}
+		},
+		onDamage: function (damage, target, source, effect) {
+			if (this.random(10) === 0 && damage >= target.hp && effect && effect.effectType === 'Move') {
+				this.add("-activate", target, "ability: Beat Misty");
+				return target.hp - 1;
+			}
+		},
+		id: "beatmisty",
+		name: "Beat Misty",
+		rating: 3.5,
+		num: 222,
 	},
 };
