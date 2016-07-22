@@ -1664,6 +1664,8 @@ exports.Formats = [
 				this.add("c|Speedy Pokson|YOU'RE TOO SLOW!");
 			} else if (name === 'pokson') {
 				this.add("c|Pokson|You won't be able to beat me!");
+			} else if (name === 'lorewritercole') {
+				this.add("c|Lorewriter Cole|I fight this battle in the name of the gods of TPP!");
 			} else if (name === 'cerebralharlot') {
 				this.add("c|Cerebral_Harlot|Yo.");
 			} else if (name === 'masterleozangetsu') {
@@ -1764,6 +1766,8 @@ exports.Formats = [
 				this.add("c|Speedy Pokson|C'MON, STEP IT UP!");
 			} else if (name === 'pokson') {
 				this.add("c|Pokson|Ech, fine, you Beat Me...");
+			} else if (name === 'lorewritercole') {
+				this.add("c|Lorewriter Cole|Dammit, mental block, I have no idea how to continue this story...");
 			} else if (name === 'masterleozangetsu') {
 				this.add("c|MasterLeoZangetsu|I didn't want to win anyways, was gonna forfeit");
 			}
