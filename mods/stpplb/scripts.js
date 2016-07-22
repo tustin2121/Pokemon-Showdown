@@ -118,7 +118,7 @@ exports.BattleScripts = {
 				signatureMove: 'typeroulette',
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
-			"Soma's Ghost": {
+			"Soma Ghost": {
 				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
 				moves: ['playrough', 'swordsdance', 'substitute'],
 				signatureMove: 'shadowrush',
@@ -252,12 +252,12 @@ exports.BattleScripts = {
 				signatureMoves: ['rainbowspray'],
 				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
 			},
-			'Speedy Pokson': {
-				species: 'Serperior', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
-				moves: ['flyingpress', 'bulletpunch', 'rollout', 'extremespeed', 'quickattack', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere'],
+			/*'Speedy Pokson': {
+				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
 				signatureMoves: ['spindash', 'boost'],
-				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Jolly',
-			},
+				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
+			},*/
 			'ColeWalski': {
 				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
 				moves: ['hydropump', 'flashcannon'],
@@ -352,11 +352,11 @@ exports.BattleScripts = {
 			},
 			'TieSoul': {
 				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'knockoff', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'acrobatics', 'xscissor', 'poisonjab'],
+				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
 				signatureMove: 'typeroulette',
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
-			"Soma's Ghost": {
+			"Soma Ghost": {
 				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
 				moves: ['playrough', 'swordsdance', 'substitute'],
 				signatureMove: 'shadowrush',
@@ -496,6 +496,12 @@ exports.BattleScripts = {
 				signatureMoves: ['rainbowspray'],
 				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
 			},
+			'Speedy Pokson': {
+				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
+				signatureMoves: ['spindash', 'boost'],
+				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
+			},
 			'ColeWalski': {
 				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
 				moves: ['hydropump', 'flashcannon'],
@@ -596,11 +602,11 @@ exports.BattleScripts = {
 			},
 			'TieSoul': {
 				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'knockoff', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'acrobatics', 'xscissor', 'poisonjab'],
+				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
 				signatureMove: 'typeroulette',
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
-			"Soma's Ghost": {
+			"Soma Ghost": {
 				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
 				moves: ['playrough', 'swordsdance', 'substitute'],
 				signatureMove: 'shadowrush',
@@ -745,6 +751,12 @@ exports.BattleScripts = {
 				moves: ['dragontail', 'mirrorcoat', 'icebeam', 'recover'],
 				signatureMoves: ['rainbowspray'],
 				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
+			},
+			'Speedy Pokson': {
+				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
+				signatureMoves: ['spindash', 'boost'],
+				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
 			},
 			'ColeWalski': {
 				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
