@@ -1170,6 +1170,9 @@ exports.BattleMovedex = {
 			if (source.hasAbility('noguard') || target.hasAbility('noguard')) return true;
 			return false;
 		},
+		onHit: function (target, source) {
+			this.add('c|' + source.name + '|Bye!');
+		},
 		target: 'normal',
 		type: 'Steel',
 	},
@@ -1413,7 +1416,8 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Confuse Ray', target);
 		},
-		onHit: function (target) {
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|ANARCHY, BITCH!");
 			target.clearBoosts();
 			this.add('-clearboost', target);
 		},
@@ -1434,6 +1438,9 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Close Combat', target);
+		},
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|The time for democracy's rise is here, motherf***er!");
 		},
 		num: 672,
 	},
@@ -1468,6 +1475,9 @@ exports.BattleMovedex = {
 			target.setBoost(boostTarget);
 			this.add('-anim', source, 'Sky Attack', target);
 		},
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|Time to untip the scales!");
+		},
 		num: 673,
 	},
 	'texttospeech': {
@@ -1485,22 +1495,23 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Hyper Voice', target);
 		},
-		onHit: function (pokemon) {
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|I shall smite thee with potatoes of doom! WHEEEEEE");
 			let bannedAbilities = {insomnia:1, multitype:1, stancechange:1, truant:1};
-			if (!bannedAbilities[pokemon.ability]) {
-				let oldAbility = pokemon.setAbility('insomnia');
+			if (!bannedAbilities[target.ability]) {
+				let oldAbility = target.setAbility('insomnia');
 				if (oldAbility) {
-					this.add('-endability', pokemon, oldAbility, '[from] move: Text to Speech');
-					this.add('-ability', pokemon, 'Insomnia', '[from] move: Text to Speech');
-					if (pokemon.status === 'slp') {
-						pokemon.cureStatus();
+					this.add('-endability', target, oldAbility, '[from] move: Text to Speech');
+					this.add('-ability', target, 'Insomnia', '[from] move: Text to Speech');
+					if (target.status === 'slp') {
+						target.cureStatus();
 					}
 				}
 			}
-			pokemon.addVolatile('taunt');
-			pokemon.addVolatile('torment');
-			pokemon.addVolatile('leechseed');
-			pokemon.addVolatile('confusion');
+			target.addVolatile('taunt');
+			target.addVolatile('torment');
+			target.addVolatile('leechseed');
+			target.addVolatile('confusion');
 		},
 		num: 674,
 	},
@@ -1520,8 +1531,9 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', target, 'Giga Drain', target);
 		},
-		onHit: function (pokemon) {
-			pokemon.addVolatile('taunt');
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|...");
+			target.addVolatile('taunt');
 		},
 		num: 675,
 	},
@@ -1540,6 +1552,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Uproar', source);
+			this.add("c|" + source.name + "|As the great Sun Tzu once said, every battle is won before it is fought!");
 		},
 		sideCondition: 'warecho',
 		effect: {
@@ -1569,6 +1582,9 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Head Smash', target);
 		},
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|Do you feel lucky, punk?");
+		},
 		recoil: [1, 8],
 		num: 677,
 	},
@@ -1596,9 +1612,10 @@ exports.BattleMovedex = {
 				pokemon.removeVolatile('confusion');
 			}
 		},
-		onHit: function (pokemon) {
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|Are you not entertained?");
 			if (this.random(2) === 1) {
-				pokemon.forceSwitchFlag = 1;
+				target.forceSwitchFlag = 1;
 			}
 		},
 		num: 678,
@@ -1625,6 +1642,9 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Psychic', target);
 		},
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|They call me the goddess of Death for a reason!");
+		},
 		secondary: {
 			chance: 100,
 			volatileStatus: 'flinch',
@@ -1649,6 +1669,9 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Shadow Ball', source);
 		},
+		onHit: function (target, source) {
+			this.add("c|" + source.name + "|The laws of space are mine to command and they WILL OBEY ME!");
+		},
 		secondary: {chance: 10, status: 'frz'},
 		num: 680,
 	},
@@ -1669,6 +1692,7 @@ exports.BattleMovedex = {
 			}
 			this.add('-anim', attacker, 'Fly', defender);
 			this.add('-prepare', attacker, 'Fly', defender);
+			this.add("c|" + attacker.name + "|I see a humiliating defeat in your future!");
 			if (!this.runEvent('ChargeMove', attacker, defender, move)) {
 				this.add('-anim', attacker, 'Fly', defender);
 				return;
