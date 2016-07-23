@@ -1743,6 +1743,7 @@ exports.BattleMovedex = {
 			target.addVolatile('trapped', source, move, 'trapper');
 			source.addVolatile('trapped', target, move, 'trapper');
 		},
+		num: 682,
 	},
 	'loratory': {
 		id: 'loratory',
@@ -1766,5 +1767,141 @@ exports.BattleMovedex = {
 				target.trySetStatus('slp', source);
 			}
 		},
+		num: 683,
+	},
+	"beatingmist": {
+		num: 684,
+		accuracy: 100,
+		basePower: 25,
+		category: "Special",
+		desc: "Hits one to six times, with each hit having a 10% chance to lower the target's Special Attack by 1 stage. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit six times. Mega Evolves the user via Sharpedonite afterwards.",
+		shortDesc: "Hits 1-6 times. Each hit has 10% chance to lower SpA by 1. Mega Evolves user via Sharpedonite.",
+		id: "beatingmist",
+		name: "Beating Mist",
+		pp: 5,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		multihit: [1, 6],
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Water Shuriken', target);
+		},
+		secondary: {
+			chance: 10,
+			boosts: {
+				spa: -1,
+			},
+		},
+		self: {
+			onHit: function (pokemon) {
+				let temp = pokemon.item;
+				pokemon.item = 'Sharpedonite';
+				if (!pokemon.template.isMega) pokemon.canMegaEvo = this.canMegaEvo(pokemon); // don't mega evolve if it's already mega
+				if (pokemon.canMegaEvo) this.runMegaEvo(pokemon);
+				pokemon.item = temp; // give its normal item back.
+			},
+		},
+		target: "normal",
+		type: "Water",
+	},
+	"wailofthebanshee": {
+		num: 685, // boomburst is 586
+		accuracy: 100,
+		basePower: 140,
+		category: "Special",
+		desc: "No additional effect.",
+		shortDesc: "No additional effect. Hits adjacent Pokemon.",
+		id: "wailofthebanshee",
+		name: "Wail of the Banshee",
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1, mirror: 1, sound: 1, authentic: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Boomburst', target);
+		},
+		secondary: false,
+		target: "allAdjacent",
+		type: "Fairy",
+	},
+	"witchscurse": {
+		num: 686,
+		accuracy: 100,
+		basePower: 80,
+		category: "Special",
+		desc: "The target loses 1/4 of its maximum HP, rounded down, at the end of this turn. If the target uses Baton Pass, the replacement will continue to be affected.",
+		shortDesc: "Target loses 1/4 of its max HP for 1 turn.",
+		id: "witchscurse",
+		name: "Witch's Curse",
+		pp: 15,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Boomburst', target);
+		},
+		secondary: {
+			chance: 100,
+			volatileStatus: 'witchscurse',
+		},
+		effect: {
+			duration: 1,
+			onStart: function (pokemon, source) {
+				this.add('-start', pokemon, 'Witch's Curse, '[of] ' + source);
+			},
+			onResidualOrder: 10,
+			onResidual: function (pokemon) {
+				this.damage(pokemon.maxhp / 4);
+			},
+		},
+		target: "normal",
+		type: "Ghost",
+	},
+	"foxfire": {
+		num: 687,
+		accuracy: 85,
+		basePower: 0,
+		category: "Status",
+		desc: "Burns the target. Lowers the target's accuracy by 1 stage.",
+		shortDesc: "Burns the target. Lowers the target's accuracy by 1.",
+		id: "foxfire",
+		name: "Foxfire",
+		pp: 15,
+		priority: 0,
+		flags: {protect: 1, reflectable: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Will-O-Wisp', target);
+		},
+		status: 'brn',
+		boosts: {
+			accuracy: -1,
+		},
+		target: "normal",
+		type: "Fairy",
+	},
+	"spectralincantation": {
+		num: 688,
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "The user loses 1/2 of its maximum HP, rounded down, in exchange for raising the user's Special Attack and Special Defense by 2 stages.",
+		shortDesc: "User loses 1/2 its max HP. Raises the user's Sp. Atk and Sp. Def by 2.",
+		id: "spectralincantation",
+		name: "Spectral Incantation",
+		pp: 20,
+		priority: 0,
+		flags: {snatch: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Curse', source);
+		},
+		boosts: {
+			spa: 2,
+			spd: 2,
+		},
+		secondary: false,
+		target: "self",
+		type: "Ghost",
 	},
 };
