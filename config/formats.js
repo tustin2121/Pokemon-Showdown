@@ -749,7 +749,7 @@ exports.Formats = [
 	{
 		name: "Gendermons",
 		section: "Other Metagames",
-		
+
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Swagger Clause', 'Baton Pass Clause'],
 		banlist: ['Aegislash', 'Arceus', 'Blaziken', 'Darkrai', 'Deoxys', 'Dialga', 'Genesect', 'Gengarite', 'Giratina',
 			'Greninja', 'Groudon', 'Ho-Oh', 'Hoopa-Unbound', 'Kyogre', 'Kyurem-White', 'Lucarionite', 'Lugia',
@@ -761,7 +761,7 @@ exports.Formats = [
 			if (pokemon.gender === 'M') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'F') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
 		},
 		onModifyDefPriority: 42,
@@ -769,7 +769,7 @@ exports.Formats = [
 			if (pokemon.gender === 'M') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'F') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
 		},
 		onModifySpAPriority: 42,
@@ -777,7 +777,7 @@ exports.Formats = [
 			if (pokemon.gender === 'F') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'M') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
 		},
 		onModifySpDPriority: 42,
@@ -785,9 +785,9 @@ exports.Formats = [
 			if (pokemon.gender === 'F') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'M') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
-		}
+		},
 	},
 	{
 		name: "Trademarked",
