@@ -284,6 +284,18 @@ exports.BattleScripts = {
 				signatureMoves: ['drama', 'loratory'],
 				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
 			},
+			'Pokson': {
+				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+				signatureMove: 'beatingmist',
+				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+			},
+			'Cerebral_Harlot': {
+				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+				moves: [],
+				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
+			},
 		};
 		let pool = Object.keys(sets);
 		for (let i = 0; i < 6; i++) {
@@ -533,6 +545,18 @@ exports.BattleScripts = {
 				moves: ['recover', 'echoedvoice'],
 				signatureMoves: ['drama', 'loratory'],
 				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
+			},
+			'Pokson': {
+				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+				signatureMove: 'beatingmist',
+				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+			},
+			'Cerebral_Harlot': {
+				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+				moves: [],
+				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 			},
 		};
 		let pool = Object.keys(sets);
@@ -789,6 +813,18 @@ exports.BattleScripts = {
 				moves: ['recover', 'echoedvoice'],
 				signatureMoves: ['drama', 'loratory'],
 				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
+			},
+			'Pokson': {
+				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+				signatureMove: 'beatingmist',
+				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+			},
+			'Cerebral_Harlot': {
+				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+				moves: [],
+				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 			},
 		};
 		let pool = Object.keys(sets);
