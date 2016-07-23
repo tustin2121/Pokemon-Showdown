@@ -1847,7 +1847,7 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 1,
 			onStart: function (pokemon, source) {
-				this.add('-start', pokemon, 'Witch's Curse, '[of] ' + source);
+				this.add('-start', pokemon, "Witch's Curse", '[of] ' + source);
 			},
 			onResidualOrder: 10,
 			onResidual: function (pokemon) {
