@@ -17,7 +17,6 @@
 
 /* eslint no-else-return: "error" */
 
-const crypto = require('crypto');
 const fs = require('fs');
 
 const MAX_REASON_LENGTH = 300;
