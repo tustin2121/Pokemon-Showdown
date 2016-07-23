@@ -118,9 +118,9 @@ exports.BattleScripts = {
 				signatureMove: 'typeroulette',
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
-			"Soma's Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute'],
+			"Soma Ghost": {
+				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
 				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 			},
@@ -252,12 +252,12 @@ exports.BattleScripts = {
 				signatureMoves: ['rainbowspray'],
 				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
 			},
-			'Speedy Pokson': {
-				species: 'Serperior', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
-				moves: ['flyingpress', 'bulletpunch', 'rollout', 'extremespeed', 'quickattack', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere'],
+			/*'Speedy Pokson': {
+				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
 				signatureMoves: ['spindash', 'boost'],
-				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Jolly',
-			},
+				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
+			},*/
 			'ColeWalski': {
 				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
 				moves: ['hydropump', 'flashcannon'],
@@ -283,6 +283,18 @@ exports.BattleScripts = {
 				moves: ['recover', 'echoedvoice'],
 				signatureMoves: ['drama', 'loratory'],
 				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
+			},
+			'Pokson': {
+				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+				signatureMove: 'beatingmist',
+				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+			},
+			'Cerebral_Harlot': {
+				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+				moves: [],
+				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 			},
 		};
 		let pool = Object.keys(sets);
@@ -352,13 +364,13 @@ exports.BattleScripts = {
 			},
 			'TieSoul': {
 				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'knockoff', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'acrobatics', 'xscissor', 'poisonjab'],
+				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
 				signatureMove: 'typeroulette',
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
-			"Soma's Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute'],
+			"Soma Ghost": {
+				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
 				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 			},
@@ -496,6 +508,12 @@ exports.BattleScripts = {
 				signatureMoves: ['rainbowspray'],
 				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
 			},
+			'Speedy Pokson': {
+				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
+				signatureMoves: ['spindash', 'boost'],
+				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
+			},
 			'ColeWalski': {
 				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
 				moves: ['hydropump', 'flashcannon'],
@@ -527,6 +545,18 @@ exports.BattleScripts = {
 				moves: ['recover', 'echoedvoice'],
 				signatureMoves: ['drama', 'loratory'],
 				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
+			},
+			'Pokson': {
+				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+				signatureMove: 'beatingmist',
+				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+			},
+			'Cerebral_Harlot': {
+				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+				moves: [],
+				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 			},
 		};
 		let pool = Object.keys(sets);
@@ -596,13 +626,13 @@ exports.BattleScripts = {
 			},
 			'TieSoul': {
 				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'knockoff', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'acrobatics', 'xscissor', 'poisonjab'],
+				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
 				signatureMove: 'typeroulette',
 				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
 			},
-			"Soma's Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Leftovers', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute'],
+			"Soma Ghost": {
+				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
 				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 			},
@@ -746,6 +776,12 @@ exports.BattleScripts = {
 				signatureMoves: ['rainbowspray'],
 				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
 			},
+			'Speedy Pokson': {
+				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
+				signatureMoves: ['spindash', 'boost'],
+				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
+			},
 			'ColeWalski': {
 				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
 				moves: ['hydropump', 'flashcannon'],
@@ -777,6 +813,18 @@ exports.BattleScripts = {
 				moves: ['recover', 'echoedvoice'],
 				signatureMoves: ['drama', 'loratory'],
 				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
+			},
+			'Pokson': {
+				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+				signatureMove: 'beatingmist',
+				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+			},
+			'Cerebral_Harlot': {
+				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+				moves: [],
+				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
 			},
 		};
 		let pool = Object.keys(sets);

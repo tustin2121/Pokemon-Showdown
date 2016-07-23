@@ -749,7 +749,7 @@ exports.Formats = [
 	{
 		name: "Gendermons",
 		section: "Other Metagames",
-		
+
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Swagger Clause', 'Baton Pass Clause'],
 		banlist: ['Aegislash', 'Arceus', 'Blaziken', 'Darkrai', 'Deoxys', 'Dialga', 'Genesect', 'Gengarite', 'Giratina',
 			'Greninja', 'Groudon', 'Ho-Oh', 'Hoopa-Unbound', 'Kyogre', 'Kyurem-White', 'Lucarionite', 'Lugia',
@@ -761,7 +761,7 @@ exports.Formats = [
 			if (pokemon.gender === 'M') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'F') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
 		},
 		onModifyDefPriority: 42,
@@ -769,7 +769,7 @@ exports.Formats = [
 			if (pokemon.gender === 'M') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'F') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
 		},
 		onModifySpAPriority: 42,
@@ -777,7 +777,7 @@ exports.Formats = [
 			if (pokemon.gender === 'F') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'M') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
 		},
 		onModifySpDPriority: 42,
@@ -785,9 +785,9 @@ exports.Formats = [
 			if (pokemon.gender === 'F') {
 				return this.chainModify(1.3);
 			} else if (pokemon.gender === 'M') {
-				return this.chainModify(.75);
+				return this.chainModify(0.75);
 			}
-		}
+		},
 	},
 	{
 		name: "Trademarked",
@@ -1634,6 +1634,8 @@ exports.Formats = [
 				this.add("c|Kap'n Kooma|Hoist the black flag lads!");
 			} else if (name === 'kooma9') {
 				this.add("c|Kooma9|ello");
+			} else if (name === 'sohippy') {
+				this.add("c|sohippy|Here I come WAHAHAHAHAHAHAHAHAHAHA! KAPOW");
 			} else if (name === 'best') {
 				this.add("raw|<big>GO AWAY</big>");
 			} else if (name === 'poomph') {
@@ -1662,6 +1664,8 @@ exports.Formats = [
 				this.add("c|Speedy Pokson|YOU'RE TOO SLOW!");
 			} else if (name === 'pokson') {
 				this.add("c|Pokson|You won't be able to beat me!");
+			} else if (name === 'lorewritercole') {
+				this.add("c|Lorewriter Cole|I fight this battle in the name of the gods of TPP!");
 			} else if (name === 'cerebralharlot') {
 				this.add("c|Cerebral_Harlot|Yo.");
 			} else if (name === 'masterleozangetsu') {
@@ -1732,6 +1736,8 @@ exports.Formats = [
 				this.add("c|Kap'n Kooma|Avast! I be needing a pint of grog after this.");
 			} else if (name === 'kooma9') {
 				this.add("c|Kooma9|Most Disappointing Player 2015");
+			} else if (name === 'sohippy') {
+				this.add("c|sohippy|The WAHAHA never dies! KAPOW");
 			} else if (name === 'best') {
 				this.add("raw|<big>BEST? FALLED</big>");
 			} else if (name === 'poomph') {
@@ -1760,6 +1766,8 @@ exports.Formats = [
 				this.add("c|Speedy Pokson|C'MON, STEP IT UP!");
 			} else if (name === 'pokson') {
 				this.add("c|Pokson|Ech, fine, you Beat Me...");
+			} else if (name === 'lorewritercole') {
+				this.add("c|Lorewriter Cole|Dammit, mental block, I have no idea how to continue this story...");
 			} else if (name === 'masterleozangetsu') {
 				this.add("c|MasterLeoZangetsu|I didn't want to win anyways, was gonna forfeit");
 			}
