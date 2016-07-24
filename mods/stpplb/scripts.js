@@ -122,7 +122,7 @@ exports.BattleScripts = {
 				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
 				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
-				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
+				evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
 			},
 			/*"Lass zeowx": { // STPPLB+ only
 				species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
@@ -372,7 +372,7 @@ exports.BattleScripts = {
 				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
 				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
-				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
+				evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
 			},
 			"Lass zeowx": { // STPPLB+ only
 				species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
@@ -634,7 +634,7 @@ exports.BattleScripts = {
 				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
 				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
 				signatureMove: 'shadowrush',
-				evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
+				evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
 			},
 			"Lass zeowx": { // STPPLB+ only
 				species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
