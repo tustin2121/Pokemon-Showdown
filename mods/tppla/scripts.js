@@ -85,7 +85,6 @@ exports.BattleScripts = {
 	getMixedTemplate: function (originalSpecies, megaSpecies) {
 		let originalTemplate = this.getTemplate(originalSpecies);
 		let megaTemplate = this.getTemplate(megaSpecies);
-		console.log(originalSpecies);
 		if (originalTemplate.baseSpecies === megaTemplate.baseSpecies) return megaTemplate;
 		let deltas = this.getMegaDeltas(megaTemplate);
 		let template = this.doGetMixedTemplate(originalTemplate, deltas);
