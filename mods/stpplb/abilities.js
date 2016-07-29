@@ -710,7 +710,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 		},
 		onDamage: function (damage, target, source, effect) {
-			if (this.random(10) === 0 && damage >= target.hp && effect && effect.effectType === 'Move') {
+			if (this.random(10) === 7 && damage >= target.hp && effect && effect.effectType === 'Move') {
 				this.add("-activate", target, "ability: Beat Misty");
 				return target.hp - 1;
 			}

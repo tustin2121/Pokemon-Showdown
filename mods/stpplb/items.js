@@ -76,7 +76,7 @@ exports.BattleItems = {
 				return this.chainModify([0x1333, 0x1000]);
 			}
 		},
-		desc: "Holder has a 10% chance to survive an attack that would KO it with 1 HP.",
+		desc: "Increases power of Water-type moves by 20%.",
 	},
 	'murkyincense': {
 		id: "murkyincense",
