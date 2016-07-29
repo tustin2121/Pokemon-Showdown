@@ -1840,10 +1840,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Boomburst', target);
 		},
-		secondary: {
-			chance: 100,
-			volatileStatus: 'witchscurse',
-		},
+		volatileStatus: 'witchscurse',
 		effect: {
 			duration: 1,
 			onStart: function (pokemon, source) {
@@ -1896,9 +1893,12 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Curse', source);
 		},
-		boosts: {
-			spa: 2,
-			spd: 2,
+		onHit: function (target) {
+			if (target.hp <= target.maxhp / 2 || (target.boosts.spd >= 6 && target.boosts.spa >= 6) || target.maxhp === 1) { // Shedinja clause
+				return false;
+			}
+			this.directDamage(target.maxhp / 2);
+			this.boost({spa: 2, spd: 2}, target);
 		},
 		secondary: false,
 		target: "self",
