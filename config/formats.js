@@ -1846,6 +1846,136 @@ exports.Formats = [
 			this.add('-message', "STPPLB wiki with all ability descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
 		},
 	},
+	
+	{
+		name: 'Super Glitch Doubles',
+		section: 'STPPLB',
+		gameType: 'doubles',
+		column: 2,
+		searchShow: true,
+		mod: 'stpplb',
+		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview'],
+		banlist: ['No Fun Allowed', 'Wonder Guard', 'Physicalakazam', 'Defiant Plus', 'Messiah', 'Cursed Body', 'Moody', 'Little Engine', 'Unnerve', 'Magician', 'Pickpocket', 'Imposter', 'Iron Barbs', 'Rough Skin'],
+		maxLevel: 100,
+		defaultLevel: 100,
+
+		onSwitchInPriority: 1,
+		onSwitchIn: function (pokemon) {
+			let item = pokemon.getItem();
+			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
+				// Primal Reversion
+				let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
+				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
+					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
+					pokemon.formeChange(template);
+					pokemon.baseTemplate = template;
+
+					// Do we have a proper sprite for it?
+					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
+						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
+						this.add('detailschange', pokemon, pokemon.details);
+					} else {
+						let oTemplate = this.getTemplate(pokemon.originalSpecies);
+						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
+						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
+						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+						}
+					}
+					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
+					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
+					pokemon.setAbility(template.abilities['0']);
+					pokemon.baseAbility = pokemon.ability;
+					pokemon.canMegaEvo = false;
+				}
+			} else {
+				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+					// Place volatiles on the Pokémon to show its mega-evolved condition and details
+					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+					let oTemplate = this.getTemplate(pokemon.originalSpecies);
+					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+					}
+				}
+			}
+		},
+
+		onBegin: function () {
+			// Mix and Mega stuff
+			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
+			for (let i = 0, len = allPokemon.length; i < len; i++) {
+				let pokemon = allPokemon[i];
+				pokemon.originalSpecies = pokemon.baseTemplate.species;
+			}
+			this.add('-message', "STPPLB wiki with all ability descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+		},
+	},
+	
+	{
+		name: 'Super Glitch Triples',
+		section: 'STPPLB',
+		gameType: 'triples',
+		column: 2,
+		searchShow: true,
+		mod: 'stpplb',
+		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview'],
+		banlist: ['No Fun Allowed', 'Wonder Guard', 'Physicalakazam', 'Defiant Plus', 'Messiah', 'Cursed Body', 'Moody', 'Little Engine', 'Unnerve', 'Magician', 'Pickpocket', 'Imposter', 'Iron Barbs', 'Rough Skin'],
+		maxLevel: 100,
+		defaultLevel: 100,
+
+		onSwitchInPriority: 1,
+		onSwitchIn: function (pokemon) {
+			let item = pokemon.getItem();
+			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
+				// Primal Reversion
+				let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
+				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
+					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
+					pokemon.formeChange(template);
+					pokemon.baseTemplate = template;
+
+					// Do we have a proper sprite for it?
+					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
+						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
+						this.add('detailschange', pokemon, pokemon.details);
+					} else {
+						let oTemplate = this.getTemplate(pokemon.originalSpecies);
+						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
+						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
+						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+						}
+					}
+					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
+					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
+					pokemon.setAbility(template.abilities['0']);
+					pokemon.baseAbility = pokemon.ability;
+					pokemon.canMegaEvo = false;
+				}
+			} else {
+				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+					// Place volatiles on the Pokémon to show its mega-evolved condition and details
+					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+					let oTemplate = this.getTemplate(pokemon.originalSpecies);
+					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+					}
+				}
+			}
+		},
+
+		onBegin: function () {
+			// Mix and Mega stuff
+			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
+			for (let i = 0, len = allPokemon.length; i < len; i++) {
+				let pokemon = allPokemon[i];
+				pokemon.originalSpecies = pokemon.baseTemplate.species;
+			}
+			this.add('-message', "STPPLB wiki with all ability descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+		},
+	},
 
 	{
 		name: 'Snowball Fight',
