@@ -172,9 +172,11 @@ exports.BattleAbilities = {
 	"aromaveil": {
 		desc: "This Pokemon and its allies cannot be affected by Attract, Disable, Encore, Heal Block, Taunt, or Torment.",
 		shortDesc: "Protects user/allies from Attract, Disable, Encore, Heal Block, Taunt, and Torment.",
-		onAllyTryHit: function (target, source, move) {
-			if (move && move.id in {attract:1, disable:1, encore:1, healblock:1, taunt:1, torment:1}) {
-				this.add('-activate', this.effectData.target, 'ability: Aroma Veil', '[of] ' + target);
+		onAllyTryAddVolatile: function (status, target, source, effect) {
+			if (status.id in {attract:1, disable:1, encore:1, healblock:1, taunt:1, torment:1}) {
+				if (effect.effectType === 'Move') {
+					this.add('-activate', this.effectData.target, 'ability: Aroma Veil', '[of] ' + target);
+				}
 				return null;
 			}
 		},
@@ -234,7 +236,7 @@ exports.BattleAbilities = {
 		onBoost: function (boost, target, source, effect) {
 			if (source && target === source) return;
 			if (boost['def'] && boost['def'] < 0) {
-				boost['def'] = 0;
+				delete boost['def'];
 				if (!effect.secondaries) this.add("-fail", target, "unboost", "Defense", "[from] ability: Big Pecks", "[of] " + target);
 			}
 		},
@@ -409,7 +411,7 @@ exports.BattleAbilities = {
 			if (!source || source.volatiles['disable']) return;
 			if (source !== target && move && move.effectType === 'Move') {
 				if (this.random(10) < 3) {
-					source.addVolatile('disable');
+					source.addVolatile('disable', this.effectData.target);
 				}
 			}
 		},
@@ -424,7 +426,7 @@ exports.BattleAbilities = {
 		onAfterDamage: function (damage, target, source, move) {
 			if (move && move.flags['contact']) {
 				if (this.random(10) < 3) {
-					source.addVolatile('attract', target);
+					source.addVolatile('attract', this.effectData.target);
 				}
 			}
 		},
@@ -785,29 +787,29 @@ exports.BattleAbilities = {
 			delete this.effectData.forme;
 		},
 		onUpdate: function (pokemon) {
-			if (!pokemon.isActive || pokemon.baseTemplate.speciesid !== 'cherrim') return;
+			if (!pokemon.isActive || pokemon.baseTemplate.baseSpecies !== 'Cherrim' || pokemon.transformed) return;
 			if (this.isWeather(['sunnyday', 'desolateland'])) {
 				if (pokemon.template.speciesid !== 'cherrimsunshine') {
 					pokemon.formeChange('Cherrim-Sunshine');
-					this.add('-formechange', pokemon, 'Cherrim-Sunshine', '[msg]');
+					this.add('-formechange', pokemon, 'Cherrim-Sunshine', '[msg]', '[from] ability: Flower Gift');
 				}
 			} else {
 				if (pokemon.template.speciesid === 'cherrimsunshine') {
 					pokemon.formeChange('Cherrim');
-					this.add('-formechange', pokemon, 'Cherrim', '[msg]');
+					this.add('-formechange', pokemon, 'Cherrim', '[msg]', '[from] ability: Flower Gift');
 				}
 			}
 		},
 		onModifyAtkPriority: 3,
 		onAllyModifyAtk: function (atk) {
-			if (this.effectData.target.baseTemplate.speciesid !== 'cherrim') return;
+			if (this.effectData.target.baseTemplate.baseSpecies !== 'Cherrim') return;
 			if (this.isWeather(['sunnyday', 'desolateland'])) {
 				return this.chainModify(1.5);
 			}
 		},
 		onModifySpDPriority: 4,
 		onAllyModifySpD: function (spd) {
-			if (this.effectData.target.baseTemplate.speciesid !== 'cherrim') return;
+			if (this.effectData.target.baseTemplate.baseSpecies !== 'Cherrim') return;
 			if (this.isWeather(['sunnyday', 'desolateland'])) {
 				return this.chainModify(1.5);
 			}
@@ -831,8 +833,9 @@ exports.BattleAbilities = {
 			}
 			if (showMsg && !effect.secondaries) this.add('-fail', this.effectData.target, 'unboost', '[from] ability: Flower Veil', '[of] ' + target);
 		},
-		onAllySetStatus: function (status, target) {
+		onAllySetStatus: function (status, target, source, effect) {
 			if (target.hasType('Grass')) {
+				if (!effect || !effect.status) return false;
 				this.add('-activate', this.effectData.target, 'ability: Flower Veil', '[of] ' + target);
 				return null;
 			}
@@ -846,7 +849,7 @@ exports.BattleAbilities = {
 		desc: "If this Pokemon is a Castform, its type changes to the current weather condition's type, except Sandstorm.",
 		shortDesc: "Castform's type changes to the current weather condition's type, except Sandstorm.",
 		onUpdate: function (pokemon) {
-			if (pokemon.baseTemplate.species !== 'Castform' || pokemon.transformed) return;
+			if (pokemon.baseTemplate.baseSpecies !== 'Castform' || pokemon.transformed) return;
 			let forme = null;
 			switch (this.effectiveWeather()) {
 			case 'sunnyday':
@@ -866,7 +869,7 @@ exports.BattleAbilities = {
 			}
 			if (pokemon.isActive && forme) {
 				pokemon.formeChange(forme);
-				this.add('-formechange', pokemon, forme, '[msg]');
+				this.add('-formechange', pokemon, forme, '[msg]', '[from] ability: Forecast');
 			}
 		},
 		id: "forecast",
@@ -1128,7 +1131,7 @@ exports.BattleAbilities = {
 		onBoost: function (boost, target, source, effect) {
 			if (source && target === source) return;
 			if (boost['atk'] && boost['atk'] < 0) {
-				boost['atk'] = 0;
+				delete boost['atk'];
 				if (!effect.secondaries) this.add("-fail", target, "unboost", "Attack", "[from] ability: Hyper Cutter", "[of] " + target);
 			}
 		},
@@ -1323,7 +1326,7 @@ exports.BattleAbilities = {
 		onBoost: function (boost, target, source, effect) {
 			if (source && target === source) return;
 			if (boost['accuracy'] && boost['accuracy'] < 0) {
-				boost['accuracy'] = 0;
+				delete boost['accuracy'];
 				if (!effect.secondaries) this.add("-fail", target, "unboost", "accuracy", "[from] ability: Keen Eye", "[of] " + target);
 			}
 		},
@@ -1353,8 +1356,8 @@ exports.BattleAbilities = {
 				return false;
 			}
 		},
-		onTryHit: function (target, source, move) {
-			if (move && move.id === 'yawn' && this.isWeather(['sunnyday', 'desolateland'])) {
+		onTryAddVolatile: function (status, target) {
+			if (status.id === 'yawn' && this.isWeather(['sunnyday', 'desolateland'])) {
 				this.add('-immune', target, '[msg]', '[from] ability: Leaf Guard');
 				return null;
 			}
@@ -1887,8 +1890,8 @@ exports.BattleAbilities = {
 				pokemon.removeVolatile('confusion');
 			}
 		},
-		onImmunity: function (type, pokemon) {
-			if (type === 'confusion') return false;
+		onTryAddVolatile: function (status, pokemon) {
+			if (status.id === 'confusion') return null;
 		},
 		onHit: function (target, source, move) {
 			if (move && move.volatileStatus === 'confusion') {
@@ -2064,6 +2067,7 @@ exports.BattleAbilities = {
 			move.secondaries.push({
 				chance: 30,
 				status: 'psn',
+				ability: this.getAbility('poisontouch'),
 			});
 		},
 		id: "poisontouch",
@@ -2848,8 +2852,8 @@ exports.BattleAbilities = {
 				return null;
 			}
 		},
-		onAllyTryHit: function (target, source, move) {
-			if (move && move.id === 'yawn') {
+		onAllyTryAddVolatile: function (status, target) {
+			if (status.id === 'yawn') {
 				this.debug('Sweet Veil blocking yawn');
 				this.add('-activate', this.effectData.target, 'ability: Sweet Veil', '[of] ' + target);
 				return null;
@@ -2900,7 +2904,7 @@ exports.BattleAbilities = {
 			if (effect && effect.id === 'toxicspikes') return;
 			if (status.id === 'slp' || status.id === 'frz') return;
 			this.add('-activate', target, 'ability: Synchronize');
-			source.trySetStatus(status, target, {status: status.id});
+			source.trySetStatus(status, target, {status: status.id, id: 'synchronize'});
 		},
 		id: "synchronize",
 		name: "Synchronize",
@@ -3150,7 +3154,7 @@ exports.BattleAbilities = {
 	},
 	"unnerve": {
 		shortDesc: "While this Pokemon is active, it prevents opposing Pokemon from using their Berries.",
-		onStart: function (pokemon) {
+		onPreStart: function (pokemon) {
 			this.add('-ability', pokemon, 'Unnerve', pokemon.side.foe);
 		},
 		onFoeTryEatItem: false,
@@ -3307,12 +3311,13 @@ exports.BattleAbilities = {
 		shortDesc: "If Darmanitan, at end of turn changes Mode to Standard if > 1/2 max HP, else Zen.",
 		onResidualOrder: 27,
 		onResidual: function (pokemon) {
-			if (pokemon.baseTemplate.species !== 'Darmanitan' || pokemon.transformed) {
+			if (pokemon.baseTemplate.baseSpecies !== 'Darmanitan' || pokemon.transformed) {
 				return;
 			}
 			if (pokemon.hp <= pokemon.maxhp / 2 && pokemon.template.speciesid === 'darmanitan') {
 				pokemon.addVolatile('zenmode');
 			} else if (pokemon.hp > pokemon.maxhp / 2 && pokemon.template.speciesid === 'darmanitanzen') {
+				pokemon.addVolatile('zenmode'); // in case of base Darmanitan-Zen
 				pokemon.removeVolatile('zenmode');
 			}
 		},
@@ -3326,18 +3331,12 @@ exports.BattleAbilities = {
 		},
 		effect: {
 			onStart: function (pokemon) {
-				if (pokemon.formeChange('Darmanitan-Zen')) {
-					this.add('-formechange', pokemon, 'Darmanitan-Zen', '[from] ability: Zen Mode');
-				} else {
-					return false;
-				}
+				if (pokemon.template.speciesid === 'darmanitanzen' || !pokemon.formeChange('Darmanitan-Zen')) return;
+				this.add('-formechange', pokemon, 'Darmanitan-Zen', '[from] ability: Zen Mode');
 			},
 			onEnd: function (pokemon) {
-				if (pokemon.formeChange('Darmanitan')) {
-					this.add('-formechange', pokemon, 'Darmanitan', '[from] ability: Zen Mode');
-				} else {
-					return false;
-				}
+				if (!pokemon.formeChange('Darmanitan')) return;
+				this.add('-formechange', pokemon, 'Darmanitan', '[from] ability: Zen Mode');
 			},
 		},
 		id: "zenmode",

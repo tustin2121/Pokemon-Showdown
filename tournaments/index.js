@@ -215,6 +215,15 @@ class Tournament {
 			return;
 		}
 
+		let gameCount = 0;
+		for (let i in user.games) { // eslint-disable-line no-unused-vars
+			gameCount++;
+		}
+		if (gameCount > 4 || Monitor.countPrepBattle(user.latestIp, user.name)) {
+			output.errorReply("Due to high load, you are unable to join this tournament.");
+			return;
+		}
+
 		if (!isAllowAlts) {
 			let users = this.generator.getUsers();
 			for (let i = 0; i < users.length; i++) {
@@ -431,25 +440,34 @@ class Tournament {
 	}
 
 	disqualifyUser(userid, output, reason) {
+		let user = Users.get(userid);
+		let sendReply;
+		if (output) {
+			sendReply = msg => output.sendReply(msg);
+		} else if (user) {
+			sendReply = msg => user.sendTo(this.id, msg);
+		} else {
+			sendReply = () => {};
+		}
 		if (!this.isTournamentStarted) {
-			output.sendReply('|tournament|error|NotStarted');
+			sendReply('|tournament|error|NotStarted');
 			return false;
 		}
 
 		if (!(userid in this.players)) {
-			output.sendReply('|tournament|error|UserNotAdded');
+			sendReply('|tournament|error|UserNotAdded');
 			return false;
 		}
 
 		let player = this.players[userid];
 		if (this.disqualifiedUsers.get(player)) {
-			output.sendReply('|tournament|error|AlreadyDisqualified');
+			sendReply('|tournament|error|AlreadyDisqualified');
 			return false;
 		}
 
 		let error = this.generator.disqualifyUser(player);
 		if (error) {
-			output.sendReply('|tournament|error|' + error);
+			sendReply('|tournament|error|' + error);
 			return false;
 		}
 
@@ -491,7 +509,6 @@ class Tournament {
 		}
 
 		this.room.add('|tournament|disqualify|' + player.name);
-		let user = Users.get(userid);
 		if (user) {
 			user.sendTo(this.room, '|tournament|update|{"isJoined":false}');
 			if (reason !== null) user.popup("|modal|You have been disqualified from the tournament in " + this.room.title + (reason ? ":\n\n" + reason : "."));
@@ -755,7 +772,7 @@ class Tournament {
 		}
 
 		if (result === 'draw' && !this.generator.isDrawingSupported) {
-			this.room.add('|tournament|battleend|' + from.name + '|' + to.name + '|' + result + '|' + score.join(',') + '|fail');
+			this.room.add('|tournament|battleend|' + from.name + '|' + to.name + '|' + result + '|' + score.join(',') + '|fail|' + room.id);
 
 			this.generator.setUserBusy(from, false);
 			this.generator.setUserBusy(to, false);
@@ -775,7 +792,7 @@ class Tournament {
 			return this.room.add("Unexpected " + error + " from setMatchResult([" + room.p1.userid + ", " + room.p2.userid + "], " + result + ", " + score + ") in onBattleWin(" + room.id + ", " + winnerid + "). Please report this to an admin.").update();
 		}
 
-		this.room.add('|tournament|battleend|' + from.name + '|' + to.name + '|' + result + '|' + score.join(','));
+		this.room.add('|tournament|battleend|' + from.name + '|' + to.name + '|' + result + '|' + score.join(',') + '|success|' + room.id);
 
 		this.generator.setUserBusy(from, false);
 		this.generator.setUserBusy(to, false);
