@@ -745,7 +745,7 @@ class User {
 			return false;
 		}
 
-		if (this.named) this.prevNames[this.userid] = this.name;
+		if (this.named && this.userid !== userid) this.prevNames[this.userid] = this.name;
 		this.name = name;
 
 		let oldid = this.userid;
@@ -1234,7 +1234,7 @@ class User {
 			connection.popup("You are already searching a battle in that format.");
 			return Promise.resolve(false);
 		}
-		return TeamValidator(formatid).prepTeam(this.team).then(result => this.finishPrepBattle(connection, result));
+		return TeamValidator(formatid).prepTeam(this.team, this.locked || this.namelocked).then(result => this.finishPrepBattle(connection, result));
 	}
 	finishPrepBattle(connection, result) {
 		if (result.charAt(0) !== '1') {
