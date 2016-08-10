@@ -2173,7 +2173,8 @@ exports.Formats = [
 			let template = this.tools.getTemplate(set.species);
 			if (!template.exists) return ["The Pokemon '" + set.species + "' does not exist."];
 			if (!template.evos.length) return ["" + template.species + " cannot cross evolve because it doesn't evolve."];
-			if (crossTemplate.species == 'Shedinja') return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it is banned."];
+			if (crossTemplate.species == 'Shedinja' || crossTemplate.species == 'Gyarados') return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it is a banned evolution."];
+			if (template.species == 'Scyther' || template.species == 'Sneasel' || template.species == 'Archen') return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it is banned from cross evolving."];
 			if (crossTemplate.battleOnly || !crossTemplate.prevo) return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it isn't an evolution."];
 			let crossPrevoTemplate = this.tools.getTemplate(crossTemplate.prevo);
 			if (!crossPrevoTemplate.prevo !== !template.prevo) return ["" + template.species + " cannot cross into " + crossTemplate.species + " because they are not consecutive evolutionary stages."];
