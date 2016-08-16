@@ -73,12 +73,6 @@ exports.BattleAbilities = {
 	},
 	batonpass: {
 		onStart: function (pokemon) {
-			if (pokemon.side.alreadySwitched) {
-				pokemon.side.alreadySwitched = false;
-				return this.add('-fail', pokemon);
-			} else {
-				pokemon.side.alreadySwitched = true;
-			}
 			this.useMove(pokemon.ability, pokemon);
 		},
 	},
@@ -654,12 +648,6 @@ exports.BattleAbilities = {
 	},
 	partingshot: {
 		onStart: function (pokemon) {
-			if (pokemon.side.alreadySwitched) {
-				pokemon.side.alreadySwitched = false;
-				return this.add('-fail', pokemon);
-			} else {
-				pokemon.side.alreadySwitched = true;
-			}
 			this.useMove(pokemon.ability, pokemon);
 		},
 	},
