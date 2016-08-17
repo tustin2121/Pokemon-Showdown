@@ -1713,7 +1713,7 @@ exports.commands = {
 			let buffer = '<div class="scrollable"><table cellpadding="1" width="100%"><tr><th></th>';
 			let icon = {};
 			for (let type in Tools.data.TypeChart) {
-				icon[type] = '<img src="https://play.pokemonshowdown.com/sprites/types/' + type + '.png" width="32" height="14">';
+				icon[type] = '<img src="/sprites/types/' + type + '.png" width="32" height="14">';
 				// row of icons at top
 				buffer += '<th>' + icon[type] + '</th>';
 			}
@@ -2688,37 +2688,50 @@ exports.commands = {
 		}
 
 		let targets = target.split(',');
-		if (targets.length !== 3) {
-			// Width and height are required because most browsers insert the
-			// <img> element before width and height are known, and when the
-			// image is loaded, this changes the height of the chat area, which
-			// messes up autoscrolling.
-			return this.parse('/help showimage');
-		}
+		// if (targets.length !== 3) {
+		// 	// Width and height are required because most browsers insert the
+		// 	// <img> element before width and height are known, and when the
+		// 	// image is loaded, this changes the height of the chat area, which
+		// 	// messes up autoscrolling.
+		// 	return this.parse('/help showimage');
+		// }
+		// Fuck that. Fix it a better way elsewhere. --tustin2121 2016/08/17
 
 		let image = targets[0].trim();
 		if (!image) return this.errorReply('No image URL was provided!');
 		image = this.canEmbedURI(image);
 
 		if (!image) return false;
-
-		let width = targets[1].trim();
-		if (!width) return this.errorReply('No width for the image was provided!');
-		if (!isNaN(width)) width += 'px';
-
-		let height = targets[2].trim();
-		if (!height) return this.errorReply('No height for the image was provided!');
-		if (!isNaN(height)) height += 'px';
+		
+		let width = null;
+		let height = null;
+		
+		if (targets.length > 1)
+		{
+			width = targets[1].trim();
+			// if (!width) return this.errorReply('No width for the image was provided!');
+			if (!isNaN(width)) width += 'px';
+		}
+		if (targets.length > 2)
+		{
+			height = targets[2].trim();
+			// if (!height) return this.errorReply('No height for the image was provided!');
+			if (!isNaN(height)) height += 'px';
+		}
 
 		let unitRegex = /^\d+(?:p[xtc]|%|[ecm]m|ex|in)$/;
-		if (!unitRegex.test(width)) {
+		if (width && !unitRegex.test(width)) {
 			return this.errorReply('"' + width + '" is not a valid width value!');
 		}
-		if (!unitRegex.test(height)) {
+		if (height && !unitRegex.test(height)) {
 			return this.errorReply('"' + height + '" is not a valid height value!');
 		}
-
-		this.sendReply('|raw|<img src="' + Tools.escapeHTML(image) + '" ' + 'style="width: ' + Tools.escapeHTML(width) + '; height: ' + Tools.escapeHTML(height) + '" />');
+		
+		let style = "";
+		if (width) style += `width: ${Tools.escapeHTML(width)};`;
+		if (height) style += `width: ${Tools.escapeHTML(height)};`;
+		
+		this.sendReply(`|raw|<img src="${Tools.escapeHTML(image)}" style="${style}" />`);
 	},
 	showimagehelp: ["/showimage [url], [width], [height] - Show an image. " +
 		"Any CSS units may be used for the width or height (default: px)." +
