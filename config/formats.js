@@ -2259,7 +2259,8 @@ exports.Formats = [
 			let bannedTrademarks = [
 				'Block', 'Mean Look', 'Spider Web', 'Nature Power', 'Heal Pulse', 'Confuse Ray',
 				'Flatter', 'Swagger', 'Teeter Dance', 'Supersonic', 'Sweet Kiss', 'Detect', 'Copycat',
-				'Destiny Bond', 'Me First', 'Mimic', 'Mirror Move', 'Sketch',
+				'Destiny Bond', 'Me First', 'Mimic', 'Mirror Move', 'Sketch', 'Mat Block', 'Skill Swap',
+				'Roar', 'Whirlwind', 'Assist',
 			];
 			let move = this.getMove(set.ability);
 			if (!move.exists) {
