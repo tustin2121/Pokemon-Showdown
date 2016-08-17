@@ -2667,6 +2667,13 @@ exports.commands = {
 		"/dice [number of dice]d[number of sides] - Simulates rolling a number of dice, e.g., /dice 2d4 simulates rolling two 4-sided dice.",
 		"/dice [number of dice]d[number of sides][+/-][offset] - Simulates rolling a number of dice and adding an offset to the sum, e.g., /dice 2d6+10: two standard dice are rolled; the result lies between 12 and 22.",
 		"/dice [number of dice]d[number of sides]-[H/L] - Simulates rolling a number of dice with removal of extreme values, e.g., /dice 3d8-L: rolls three 8-sided dice; the result ignores the lowest value."],
+	
+	rollpkmn: 'rollpokemon',
+	rollpokemon: function(target, room, user) {
+		let number = Math.floor(Math.random() * 721) + 1;
+		return this.parse("/dt "+number);
+	},
+	rollpokemonhelp: ["/rollpokemon - Randomly picks a pokemon from all possible pokemon, and displays its stats. The equivilant of '/roll 721', then '/dt <result>'."],
 
 	pr: 'pickrandom',
 	pick: 'pickrandom',
