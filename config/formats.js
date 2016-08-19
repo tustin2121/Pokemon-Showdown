@@ -2255,6 +2255,25 @@ exports.Formats = [
 		ruleset: ['Ubers'],
 		banlist: ['Ignore Illegal Abilities'],
 
+		onValidateTeam: function (team) {
+			let abilityTable = {};
+			let restrictedCount = 0;
+			for (let i = 0; i < team.length; i++) {
+				let ability = team[i].ability;
+				if (ability && ability.isNonstandard) {
+					if (abilityTable[name]) {
+						return ["Your Pokémon must have different trademarked abilities.", "(You have more than one Pokémon with the " + abiility + " trademark)"];
+					}
+					if (ability === "partingshot" || ability === "batonpass" || ability === "protect" || ability === "spikyshield") {
+						restrictedCount++;
+					}
+					abilityTable[name] = true;
+				}
+			}
+			if (restrictedCount > 1) {
+				return ["You can only have one of Parting Shot, Baton Pass, Protect and Spiky Shield as a trademark."];
+			}
+		},
 		onValidateSet: function (set) {
 			let bannedTrademarks = [
 				'Block', 'Mean Look', 'Spider Web', 'Nature Power', 'Heal Pulse', 'Confuse Ray',
