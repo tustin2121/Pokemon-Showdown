@@ -2772,10 +2772,10 @@ exports.commands = {
 		if (this.canBroadcast()) {
 			if (!this.can('declare', null, room)) return;
 		} else return;
-		if (!this.runBroadcast()) return;
+		if (!this.runBroadcast("#NEWSNEWSNEWS TriHard")) return;
 		if (this.broadcasting) {
 			// Using this.send => don't want it in the history
-			this.send(`|html|<div class="infobox">#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote"></div>`);
+			// this.send(`|html|<div class="infobox">#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote"></div>`);
 			this.send("|news|refreshall");
 		} else {
 			this.sendReply("|news|refresh");
