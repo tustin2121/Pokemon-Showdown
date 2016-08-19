@@ -2265,6 +2265,7 @@ exports.Formats = [
 						return ["Your Pokémon must have different trademarked abilities.", "(You have more than one Pokémon with the " + abiility + " trademark)"];
 					}
 					if (ability === "partingshot" || ability === "batonpass" || ability === "protect" || ability === "spikyshield") {
+						return ["restricted move: " + ability];
 						restrictedCount++;
 					}
 					abilityTable[name] = true;
