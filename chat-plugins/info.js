@@ -2769,12 +2769,19 @@ exports.commands = {
 	htmlboxhelp: ["/htmlbox [message] - Displays a message, parsing HTML code contained. Requires: ~ # * with global authority OR * with room authority"],
 	
 	news: function (target, room, user) {
+		if (this.canBroadcast()) {
+			if (!this.can('declare', null, room)) return;
+		} else return;
 		if (!this.runBroadcast()) return;
 		if (this.broadcasting) {
-			this.sendReplyBox(`#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote">`);
+			// Using this.send => don't want it in the history
+			this.send(`|html|<div class="infobox">#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote"></div>`);
+			this.send("|news|refreshall");
+		} else {
+			this.sendReply("|news|refresh");
 		}
-		this.sendReply("|news|refresh");
 	},
+	newshelp: ["/news Updates the news sidebar. Broadcasting it will update it for everyone."],
 };
 
 process.nextTick(() => {
