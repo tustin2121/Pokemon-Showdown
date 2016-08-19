@@ -5,1350 +5,1350 @@ exports.BattleAbilities = {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	acupressure: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	afteryou: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	agility: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	allyswitch: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	amnesia: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	aquaring: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	aromatherapy: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	aromaticmist: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	assist: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	attract: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	autotomize: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	babydolleyes: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	barrier: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	batonpass: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	bellydrum: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	bestow: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	block: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	bulkup: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	calmmind: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	camouflage: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	captivate: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	celebrate: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	charge: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	charm: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	coil: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	confide: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	confuseray: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	conversion: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	conversion2: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	copycat: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	cosmicpower: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	cottonguard: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	cottonspore: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	craftyshield: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	curse: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	darkvoid: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	defendorder: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	defensecurl: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	defog: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	destinybond: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	detect: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	disable: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	doubleteam: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	dragondance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	eerieimpulse: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	electricterrain: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	electrify: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	embargo: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	encore: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	endure: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	entrainment: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	fairylock: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	faketears: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	featherdance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	flash: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	flatter: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	flowershield: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	focusenergy: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	followme: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	foresight: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	forestscurse: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	gastroacid: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	geomancy: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	glare: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	grasswhistle: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	grassyterrain: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	gravity: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	growl: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	growth: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	grudge: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	guardsplit: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	guardswap: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	hail: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	happyhour: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	harden: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	haze: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	healbell: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	healblock: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	healorder: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	healpulse: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	healingwish: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	heartswap: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	helpinghand: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	holdhands: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	honeclaws: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	howl: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	hypnosis: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	imprison: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	ingrain: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	iondeluge: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	irondefense: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	kinesis: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	kingsshield: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	leechseed: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	leer: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	lightscreen: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	lockon: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	lovelykiss: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	luckychant: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	lunardance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	magiccoat: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	magicroom: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	magnetrise: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	magneticflux: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	matblock: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mefirst: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	meanlook: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	meditate: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	memento: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	metalsound: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	metronome: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	milkdrink: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mimic: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mindreader: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	minimize: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	miracleeye: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mirrormove: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mist: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mistyterrain: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	moonlight: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	morningsun: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	mudsport: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	nastyplot: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	naturepower: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	nightmare: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	nobleroar: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	odorsleuth: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	painsplit: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	partingshot: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	perishsong: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	playnice: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	poisongas: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	poisonpowder: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	powder: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	powersplit: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	powerswap: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	powertrick: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	protect: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	psychup: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	psychoshift: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	quash: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	quickguard: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	quiverdance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	ragepowder: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	raindance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	recover: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	recycle: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	reflect: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	reflecttype: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	refresh: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	rest: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	roar: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	rockpolish: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	roleplay: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	roost: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	rototiller: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	safeguard: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sandattack: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sandstorm: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	scaryface: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	screech: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sharpen: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	shellsmash: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	shiftgear: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	simplebeam: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sing: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sketch: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	skillswap: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	slackoff: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sleeppowder: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sleeptalk: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	smokescreen: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	snatch: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	soak: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	softboiled: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	spiderweb: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	spikes: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	spikyshield: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	spite: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	splash: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	spore: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	stealthrock: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	stickyweb: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	stockpile: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	stringshot: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	stunspore: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	substitute: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sunnyday: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	supersonic: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	swagger: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	swallow: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sweetkiss: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	sweetscent: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	switcheroo: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	swordsdance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	synthesis: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	tailglow: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	tailwhip: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	tailwind: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	taunt: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	teeterdance: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	telekinesis: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	teleport: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	thunderwave: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	tickle: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	topsyturvy: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	torment: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	toxic: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	toxicspikes: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	transform: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	trick: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	trickroom: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	trickortreat: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	venomdrench: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	watersport: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	whirlwind: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	wideguard: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	willowisp: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	wish: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	withdraw: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	wonderroom: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	workup: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	worryseed: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 	yawn: {
 		onStart: function (pokemon) {
 			this.useMove(pokemon.ability, pokemon);
 		},
-		isNonstandard: true,
+		isTrademark: true,
 	},
 };
