@@ -2261,7 +2261,7 @@ exports.Formats = [
 			for (let i = 0; i < team.length; i++) {
 				let ability = team[i].ability;
 				return ["restricted move: " + ability];
-				if (ability && ability.isNonstandard) {
+				if (ability && ability.isTrademark) {
 					if (abilityTable[name]) {
 						return ["Your Pokémon must have different trademarked abilities.", "(You have more than one Pokémon with the " + abiility + " trademark)"];
 					}
