@@ -2005,12 +2005,14 @@ exports.commands = {
 	groups: function (target, room, user) {
 		if (!this.runBroadcast()) return;
 		this.sendReplyBox(
-			"+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />" +
-			"% <b>Driver</b> - The above, and they can mute. Global % can also lock users and check for alts<br />" +
-			"@ <b>Moderator</b> - The above, and they can ban users<br />" +
-			"* <b>Bot</b> - Like Moderator, but makes it clear that this user is a bot<br />" +
-			"&amp; <b>Leader</b> - The above, and they can promote to moderator and force ties<br />" +
-			"# <b>Room Owner</b> - They are leaders of the room and can almost totally control it<br />" +
+			"+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />"+
+			"% <b>Driver</b> - The above, and they can mute. Global % can also lock users and check for alts<br />"+
+			"@ <b>Moderator</b> - The above, and they can ban users<br />"+
+			"* <b>Bot</b> - Like Moderator, but makes it clear that this user is a bot<br />"+
+			"&amp; <b>Leader</b> - The above, and they can promote to moderator and force ties<br />"+
+			// "&#9315; <b>Elite Four</b> - Leaders with a special name.<br />"+
+			// "&copy; <b>Champion</b> - Leaders with a <em>very</em> special name.<br />"+
+			"# <b>Room Owner</b> - They are leaders of the room and can almost totally control it<br />"+
 			"~ <b>Administrator</b> - They can do anything, like change what this message says"
 		);
 	},
@@ -2716,12 +2718,14 @@ exports.commands = {
 		if (targets.length > 1)
 		{
 			width = targets[1].trim();
+			if (width > 1400) this.errorReply("No.");
 			// if (!width) return this.errorReply('No width for the image was provided!');
 			if (!isNaN(width)) width += 'px';
 		}
 		if (targets.length > 2)
 		{
 			height = targets[2].trim();
+			if (height > 1400) this.errorReply("No.");
 			// if (!height) return this.errorReply('No height for the image was provided!');
 			if (!isNaN(height)) height += 'px';
 		}
@@ -2769,17 +2773,19 @@ exports.commands = {
 	htmlboxhelp: ["/htmlbox [message] - Displays a message, parsing HTML code contained. Requires: ~ # * with global authority OR * with room authority"],
 	
 	news: function (target, room, user) {
-		if (this.canBroadcast()) {
+		if (this.cmdToken === '!') {
 			if (!this.can('declare', null, room)) return;
-		} else return;
-		if (!this.runBroadcast("#NEWSNEWSNEWS TriHard")) return;
+			if (!this.runBroadcast("#NEWSNEWSNEWS TriHard")) return;
+		};
 		if (this.broadcasting) {
 			// Using this.send => don't want it in the history
 			// this.send(`|html|<div class="infobox">#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote"></div>`);
 			this.send("|news|refreshall");
 		} else {
 			this.sendReply("|news|refresh");
+			this.sendReply("News has been refreshed.");
 		}
+		this.user.broadcasting = false;
 	},
 	newshelp: ["/news Updates the news sidebar. Broadcasting it will update it for everyone."],
 };

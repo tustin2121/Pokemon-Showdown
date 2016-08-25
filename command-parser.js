@@ -423,9 +423,11 @@ class CommandContext {
 		return true;
 	}
 	canEmbedURI(uri, isRelative) {
+		// return uri; // Fuck all of that below. --tustin2121 2016-08-24
 		if (uri.startsWith('https://')) return uri;
 		if (uri.startsWith('//')) return uri;
 		if (uri.startsWith('data:')) return uri;
+		if (uri.indexOf(':') == -1) return uri;
 		if (!uri.startsWith('http://')) {
 			if (/^[a-z]+\:\/\//.test(uri) || isRelative) {
 				return this.errorReply("URIs must begin with 'https://' or 'http://' or 'data:'");
