@@ -2327,7 +2327,7 @@ exports.Formats = [
 		section: 'Kappa Cup Season 3',
 
 		mod: 'classicstatswitch',
-		ruleset: ['Ubers'],
+		ruleset: ['Ubers', 'Baton Pass Clause'],
 		banlist: ['Azumarill', 'Regirock', 'Regice', 'Mawilite', 'Diancite'],
 		onModifyMove: function (move) {
 			let physicalTypes = [
