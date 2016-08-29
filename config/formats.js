@@ -2330,6 +2330,7 @@ exports.Formats = [
 		ruleset: ['Ubers', 'Baton Pass Clause'],
 		banlist: ['Azumarill', 'Regirock', 'Regice', 'Mawilite', 'Diancite'],
 		onModifyMove: function (move) {
+			if (move.category == "Status") return;
 			let physicalTypes = [
 				'Normal', 'Fighting', 'Flying', 'Ground', 'Rock', 'Bug',
 				'Ghost', 'Poison', 'Steel',
