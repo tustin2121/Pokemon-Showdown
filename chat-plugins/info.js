@@ -2718,14 +2718,14 @@ exports.commands = {
 		if (targets.length > 1)
 		{
 			width = targets[1].trim();
-			if (width > 1400) this.errorReply("No.");
+			if (width > 1400) return this.errorReply("No.");
 			// if (!width) return this.errorReply('No width for the image was provided!');
 			if (!isNaN(width)) width += 'px';
 		}
 		if (targets.length > 2)
 		{
 			height = targets[2].trim();
-			if (height > 1400) this.errorReply("No.");
+			if (height > 1400) return this.errorReply("No.");
 			// if (!height) return this.errorReply('No height for the image was provided!');
 			if (!isNaN(height)) height += 'px';
 		}
