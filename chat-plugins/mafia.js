@@ -5,7 +5,7 @@
 
 let MafiaData = require('./mafia-data');
 
-const deadImage = '<img width="75" height="75" src="//play.pokemonshowdown.com/fx/mafia-dead.png" />';
+const deadImage = '<img width="75" height="75" src="/fx/mafia-dead.png" />';
 const meetingMsg = {town: 'The town has lynched a suspect!', mafia: 'The mafia strikes again!'};
 
 const defaultSettings = {anonVotes: false, allowWills: false, autoModchat: false};

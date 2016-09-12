@@ -1730,7 +1730,7 @@ exports.commands = {
 			let buffer = '<div class="scrollable"><table cellpadding="1" width="100%"><tr><th></th>';
 			let icon = {};
 			for (let type in Tools.data.TypeChart) {
-				icon[type] = '<img src="https://play.pokemonshowdown.com/sprites/types/' + type + '.png" width="32" height="14">';
+				icon[type] = '<img src="/sprites/types/' + type + '.png" width="32" height="14">';
 				// row of icons at top
 				buffer += '<th>' + icon[type] + '</th>';
 			}
@@ -2022,12 +2022,14 @@ exports.commands = {
 	groups: function (target, room, user) {
 		if (!this.runBroadcast()) return;
 		this.sendReplyBox(
-			"+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />" +
-			"% <b>Driver</b> - The above, and they can mute. Global % can also lock users and check for alts<br />" +
-			"@ <b>Moderator</b> - The above, and they can ban users<br />" +
-			"* <b>Bot</b> - Like Moderator, but makes it clear that this user is a bot<br />" +
-			"&amp; <b>Leader</b> - The above, and they can promote to moderator and force ties<br />" +
-			"# <b>Room Owner</b> - They are leaders of the room and can almost totally control it<br />" +
+			"+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />"+
+			"% <b>Driver</b> - The above, and they can mute. Global % can also lock users and check for alts<br />"+
+			"@ <b>Moderator</b> - The above, and they can ban users<br />"+
+			"* <b>Bot</b> - Like Moderator, but makes it clear that this user is a bot<br />"+
+			"&amp; <b>Leader</b> - The above, and they can promote to moderator and force ties<br />"+
+			// "&#9315; <b>Elite Four</b> - Leaders with a special name.<br />"+
+			// "&copy; <b>Champion</b> - Leaders with a <em>very</em> special name.<br />"+
+			"# <b>Room Owner</b> - They are leaders of the room and can almost totally control it<br />"+
 			"~ <b>Administrator</b> - They can do anything, like change what this message says"
 		);
 	},
@@ -2684,6 +2686,13 @@ exports.commands = {
 		"/dice [number of dice]d[number of sides] - Simulates rolling a number of dice, e.g., /dice 2d4 simulates rolling two 4-sided dice.",
 		"/dice [number of dice]d[number of sides][+/-][offset] - Simulates rolling a number of dice and adding an offset to the sum, e.g., /dice 2d6+10: two standard dice are rolled; the result lies between 12 and 22.",
 		"/dice [number of dice]d[number of sides]-[H/L] - Simulates rolling a number of dice with removal of extreme values, e.g., /dice 3d8-L: rolls three 8-sided dice; the result ignores the lowest value."],
+	
+	rollpkmn: 'rollpokemon',
+	rollpokemon: function(target, room, user) {
+		let number = Math.floor(Math.random() * 721) + 1;
+		return this.parse("/dt "+number);
+	},
+	rollpokemonhelp: ["/rollpokemon - Randomly picks a pokemon from all possible pokemon, and displays its stats. The equivilant of '/roll 721', then '/dt <result>'."],
 
 	pr: 'pickrandom',
 	pick: 'pickrandom',
@@ -2705,37 +2714,52 @@ exports.commands = {
 		}
 
 		let targets = target.split(',');
-		if (targets.length !== 3) {
-			// Width and height are required because most browsers insert the
-			// <img> element before width and height are known, and when the
-			// image is loaded, this changes the height of the chat area, which
-			// messes up autoscrolling.
-			return this.parse('/help showimage');
-		}
+		// if (targets.length !== 3) {
+		// 	// Width and height are required because most browsers insert the
+		// 	// <img> element before width and height are known, and when the
+		// 	// image is loaded, this changes the height of the chat area, which
+		// 	// messes up autoscrolling.
+		// 	return this.parse('/help showimage');
+		// }
+		// Fuck that. Fix it a better way elsewhere. --tustin2121 2016/08/17
 
 		let image = targets[0].trim();
 		if (!image) return this.errorReply('No image URL was provided!');
 		image = this.canEmbedURI(image);
 
 		if (!image) return false;
-
-		let width = targets[1].trim();
-		if (!width) return this.errorReply('No width for the image was provided!');
-		if (!isNaN(width)) width += 'px';
-
-		let height = targets[2].trim();
-		if (!height) return this.errorReply('No height for the image was provided!');
-		if (!isNaN(height)) height += 'px';
+		
+		let width = null;
+		let height = null;
+		
+		if (targets.length > 1)
+		{
+			width = targets[1].trim();
+			if (width > 1400) return this.errorReply("No.");
+			// if (!width) return this.errorReply('No width for the image was provided!');
+			if (!isNaN(width)) width += 'px';
+		}
+		if (targets.length > 2)
+		{
+			height = targets[2].trim();
+			if (height > 1400) return this.errorReply("No.");
+			// if (!height) return this.errorReply('No height for the image was provided!');
+			if (!isNaN(height)) height += 'px';
+		}
 
 		let unitRegex = /^\d+(?:p[xtc]|%|[ecm]m|ex|in)$/;
-		if (!unitRegex.test(width)) {
+		if (width && !unitRegex.test(width)) {
 			return this.errorReply('"' + width + '" is not a valid width value!');
 		}
-		if (!unitRegex.test(height)) {
+		if (height && !unitRegex.test(height)) {
 			return this.errorReply('"' + height + '" is not a valid height value!');
 		}
-
-		this.sendReply('|raw|<img src="' + Tools.escapeHTML(image) + '" ' + 'style="width: ' + Tools.escapeHTML(width) + '; height: ' + Tools.escapeHTML(height) + '" />');
+		
+		let style = "";
+		if (width) style += `width: ${Tools.escapeHTML(width)};`;
+		if (height) style += `width: ${Tools.escapeHTML(height)};`;
+		
+		this.sendReply(`|raw|<img src="${Tools.escapeHTML(image)}" style="${style}" />`);
 	},
 	showimagehelp: ["/showimage [url], [width], [height] - Show an image. " +
 		"Any CSS units may be used for the width or height (default: px)." +
@@ -2764,6 +2788,23 @@ exports.commands = {
 		this.addBox(target);
 	},
 	htmlboxhelp: ["/htmlbox [message] - Displays a message, parsing HTML code contained. Requires: ~ # * with global authority OR * with room authority"],
+	
+	news: function (target, room, user) {
+		if (this.cmdToken === '!') {
+			if (!this.can('declare', null, room)) return;
+			if (!this.runBroadcast("#NEWSNEWSNEWS TriHard")) return;
+		};
+		if (this.broadcasting) {
+			// Using this.send => don't want it in the history
+			// this.send(`|html|<div class="infobox">#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote"></div>`);
+			this.send("|news|refreshall");
+		} else {
+			this.sendReply("|news|refresh");
+			this.sendReply("News has been refreshed.");
+		}
+		this.user.broadcasting = false;
+	},
+	newshelp: ["/news Updates the news sidebar. Broadcasting it will update it for everyone."],
 };
 
 process.nextTick(() => {

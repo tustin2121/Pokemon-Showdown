@@ -334,7 +334,7 @@ exports.commands = {
 		user.avatar = avatar;
 		if (!parts[1]) {
 			this.sendReply("Avatar changed to:\n" +
-				'|raw|<img src="//play.pokemonshowdown.com/sprites/trainers/' + (typeof avatar === 'string' ? avatar.substr(1) : avatar) + '.png" alt="" width="80" height="80" />');
+				'|raw|<img src="/sprites/trainers/' + (typeof avatar === 'string' ? avatar.substr(1) : ("000"+avatar).substr(-3)) + '.png" alt="" width="80" height="80" />');
 		}
 	},
 	avatarhelp: ["/avatar [avatar number 1 to 293] - Change your trainer sprite."],
@@ -1918,7 +1918,7 @@ exports.commands = {
 		if (!this.can('declare', null, room)) return false;
 		if (!this.canTalk()) return;
 
-		this.add('|raw|<div class="broadcast-blue"><b>' + Tools.escapeHTML(target) + '</b></div>');
+		this.add(`|raw|<div class="broadcast-blue chatmessage-${user.userid}"><b>${Tools.escapeHTML(target)}</b></div>`);
 		this.logModCommand(user.name + " declared " + target);
 	},
 	declarehelp: ["/declare [message] - Anonymously announces a message. Requires: # * & ~"],
@@ -1930,7 +1930,7 @@ exports.commands = {
 		target = this.canHTML(target);
 		if (!target) return;
 
-		this.add('|raw|<div class="broadcast-blue"><b>' + target + '</b></div>');
+		this.add(`|raw|<div class="broadcast-blue chatmessage-${user.userid}"><b>${target}</b></div>`);
 		this.logModCommand(user.name + " declared " + target);
 	},
 	htmldeclarehelp: ["/htmldeclare [message] - Anonymously announces a message using safe HTML. Requires: ~"],
@@ -2045,6 +2045,7 @@ exports.commands = {
 	},
 	unnamelockhelp: ["/unnamelock [username] - Unnamelocks the user. Requires: % @ * & ~"],
 
+	clearchat : "hidetest",
 	hidetext: function (target, room, user) {
 		if (!target) return this.parse('/help hidetext');
 
