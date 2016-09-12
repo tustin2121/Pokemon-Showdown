@@ -19,10 +19,10 @@ function getDirTypedContentsSync(dir, forceType) {
 }
 
 function init(callback) {
-	require('./../app.js');
+	require('./../app');
 
 	// Run the battle engine in the main process to keep our sanity
-	let BattleEngine = global.BattleEngine = require('./../battle-engine.js');
+	let BattleEngine = global.BattleEngine = require('./../battle-engine');
 	for (let listener of process.listeners('message')) {
 		process.removeListener('message', listener);
 	}
@@ -48,7 +48,7 @@ function init(callback) {
 	};
 
 	// Disable writing to modlog
-	require('./../command-parser.js').CommandContext.prototype.logModCommand = noop;
+	Rooms.Room.prototype.modlog = noop;
 
 	callback();
 }
@@ -59,7 +59,7 @@ before('initialization', function (done) {
 	// Load and override configuration before starting the server
 	let config;
 	try {
-		require.resolve('./../config/config.js');
+		require.resolve('./../config/config');
 	} catch (err) {
 		if (err.code !== 'MODULE_NOT_FOUND') throw err; // Should never happen
 
@@ -68,7 +68,7 @@ before('initialization', function (done) {
 			fs.readFileSync(path.resolve(__dirname, '../config/config-example.js'))
 		);
 	} finally {
-		config = require('./../config/config.js');
+		config = require('./../config/config');
 	}
 
 	try {
@@ -92,7 +92,7 @@ before('initialization', function (done) {
 
 	// Sandbox file system: it's possible for a production server to be running in the same directory.
 	// Don't create a REPL
-	require('./../repl.js').start = noop;
+	require('./../repl').start = noop;
 
 	// Sandbox file system: it's possible for a production server to be running in the same directory.
 	// And using a sandbox is safer anyway.

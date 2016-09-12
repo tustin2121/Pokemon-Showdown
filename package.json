@@ -4,7 +4,7 @@
   "description": "The server for the Pokémon Showdown battle simulator",
   "version": "0.10.2",
   "dependencies": {
-    "sockjs": "0.3.15",
+    "sockjs": "0.3.17",
     "sugar": "1.4.1",
     "irc": "~0.4.0",
     "pg-native": "~1.9.0",

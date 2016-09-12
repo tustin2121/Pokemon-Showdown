@@ -160,7 +160,7 @@ exports.BattleItems = {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
-		num: -6,
+		num: 679,
 		gen: 6,
 		desc: "If holder is an Alakazam, this item allows it to Mega Evolve in battle.",
 	},
@@ -188,7 +188,7 @@ exports.BattleItems = {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
-		num: -6,
+		num: 658,
 		gen: 6,
 		desc: "If holder is an Ampharos, this item allows it to Mega Evolve in battle.",
 	},
@@ -266,7 +266,7 @@ exports.BattleItems = {
 				}
 			}
 		},
-		num: -6,
+		num: 640,
 		gen: 6,
 		desc: "Holder's Sp. Def is 1.5x, but it can only select damaging moves.",
 	},
@@ -344,6 +344,7 @@ exports.BattleItems = {
 			basePower: 100,
 			type: "Electric",
 		},
+		onEat: false,
 		num: 183,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -460,7 +461,7 @@ exports.BattleItems = {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
-		num: -6,
+		num: 661,
 		gen: 6,
 		desc: "If holder is a Blastoise, this item allows it to Mega Evolve in battle.",
 	},
@@ -492,8 +493,13 @@ exports.BattleItems = {
 			pokemon.formeChange(template);
 			pokemon.baseTemplate = template;
 			pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-			this.add('detailschange', pokemon, pokemon.details);
-			this.add('-primal', pokemon);
+			if (pokemon.illusion) {
+				pokemon.ability = ''; // Don't allow Illusion to wear off
+				this.add('-primal', pokemon.illusion);
+			} else {
+				this.add('detailschange', pokemon, pokemon.details);
+				this.add('-primal', pokemon);
+			}
 			pokemon.setAbility(template.abilities['0']);
 			pokemon.baseAbility = pokemon.ability;
 		},
@@ -501,7 +507,7 @@ exports.BattleItems = {
 			if (source.baseTemplate.baseSpecies === 'Kyogre') return false;
 			return true;
 		},
-		num: -6,
+		num: 535,
 		gen: 6,
 		desc: "If holder is a Kyogre, this item triggers its Primal Reversion in battle.",
 	},
@@ -514,6 +520,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Fire",
 		},
+		onEat: false,
 		num: 165,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -923,6 +930,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Bug",
 		},
+		onEat: false,
 		num: 175,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -947,15 +955,17 @@ exports.BattleItems = {
 			basePower: 100,
 			type: "Ghost",
 		},
+		onModifyPriorityPriority: -1,
 		onModifyPriority: function (priority, pokemon) {
 			if (pokemon.hp <= pokemon.maxhp / 4 || (pokemon.hp <= pokemon.maxhp / 2 && pokemon.hasAbility('gluttony'))) {
 				if (pokemon.eatItem()) {
-					this.add('-activate', pokemon, 'Custap Berry');
+					this.add('-activate', pokemon, 'item: Custap Berry');
 					pokemon.removeVolatile('custapberry');
-					return priority + 0.1;
+					return Math.round(priority) + 0.1;
 				}
 			}
 		},
+		onEat: function () { },
 		num: 210,
 		gen: 4,
 		desc: "Holder moves first in its priority bracket when at 1/4 max HP or less. Single use.",
@@ -1187,6 +1197,7 @@ exports.BattleItems = {
 			basePower: 100,
 			type: "Water",
 		},
+		onEat: false,
 		num: 182,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -1293,15 +1304,15 @@ exports.BattleItems = {
 		},
 		onHit: function (target, source, move) {
 			if (move && move.typeMod > 0) {
-				target.eatItem();
+				if (target.eatItem()) {
+					this.heal(target.maxhp / 4);
+				}
 			}
 		},
 		onTryEatItem: function (item, pokemon) {
 			if (!this.runEvent('TryHeal', pokemon)) return false;
 		},
-		onEat: function (pokemon) {
-			this.heal(pokemon.maxhp / 4);
-		},
+		onEat: function () { },
 		num: 208,
 		gen: 3,
 		desc: "Restores 1/4 max HP after holder is hit by a supereffective move. Single use.",
@@ -1360,7 +1371,7 @@ exports.BattleItems = {
 				}
 			}
 		},
-		num: -6,
+		num: 715,
 		gen: 6,
 		desc: "Holder's first successful Fairy-type attack will have 1.3x power. Single use.",
 	},
@@ -1582,9 +1593,7 @@ exports.BattleItems = {
 			basePower: 10,
 		},
 		onModifyPriority: function (priority, pokemon) {
-			if (!pokemon.hasAbility('stall')) {
-				return priority - 0.1;
-			}
+			return Math.round(priority) - 0.1;
 		},
 		num: 316,
 		gen: 4,
@@ -1736,6 +1745,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Flying",
 		},
+		onEat: false,
 		num: 173,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -1910,6 +1920,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Ground",
 		},
+		onEat: false,
 		num: 172,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -2154,7 +2165,7 @@ exports.BattleItems = {
 		onEat: function (pokemon) {
 			this.boost({def: 1});
 		},
-		num: -6,
+		num: 687,
 		gen: 6,
 		desc: "Raises holder's Defense by 1 stage after it is hit by a physical attack. Single use.",
 	},
@@ -2167,6 +2178,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Fighting",
 		},
+		onEat: false,
 		num: 170,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -2218,9 +2230,7 @@ exports.BattleItems = {
 			basePower: 10,
 		},
 		onModifyPriority: function (priority, pokemon) {
-			if (!pokemon.hasAbility('stall')) {
-				return priority - 0.1;
-			}
+			return Math.round(priority) - 0.1;
 		},
 		num: 279,
 		gen: 4,
@@ -2257,7 +2267,7 @@ exports.BattleItems = {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
-		num: -6,
+		num: 684,
 		gen: 6,
 		desc: "If holder is a Latias, this item allows it to Mega Evolve in battle.",
 	},
@@ -2271,7 +2281,7 @@ exports.BattleItems = {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
-		num: -6,
+		num: 685,
 		gen: 6,
 		desc: "If holder is a Latios, this item allows it to Mega Evolve in battle.",
 	},
@@ -2529,7 +2539,7 @@ exports.BattleItems = {
 				this.boost({spd: 1});
 			}
 		},
-		num: -6,
+		num: 648,
 		gen: 6,
 		desc: "Raises holder's Sp. Def by 1 stage if hit by a Water-type attack. Single use.",
 	},
@@ -2633,6 +2643,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Rock",
 		},
+		onEat: false,
 		num: 176,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -2680,7 +2691,7 @@ exports.BattleItems = {
 		onEat: function (pokemon) {
 			this.boost({spd: 1});
 		},
-		num: -6,
+		num: 688,
 		gen: 6,
 		desc: "Raises holder's Sp. Def by 1 stage after it is hit by a special attack. Single use.",
 	},
@@ -3016,6 +3027,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Water",
 		},
+		onEat: false,
 		num: 166,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3062,6 +3074,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Dragon",
 		},
+		onEat: false,
 		num: 178,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3168,6 +3181,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Steel",
 		},
+		onEat: false,
 		num: 180,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3177,7 +3191,7 @@ exports.BattleItems = {
 		name: "Park Ball",
 		spritenum: 325,
 		num: 500,
-		gen: 2,
+		gen: 4,
 		desc: "A special Poke Ball for the Pal Park.",
 	},
 	"passhoberry": {
@@ -3314,6 +3328,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Grass",
 		},
+		onEat: false,
 		num: 168,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3350,7 +3365,7 @@ exports.BattleItems = {
 			return true;
 		},
 		forcedForme: "Arceus-Fairy",
-		num: -6,
+		num: 644,
 		gen: 6,
 		desc: "Holder's Fairy-type attacks have 1.2x power. Judgment is Fairy type.",
 	},
@@ -3419,6 +3434,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Ice",
 		},
+		onEat: false,
 		num: 169,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3476,6 +3492,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Poison",
 		},
+		onEat: false,
 		num: 171,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3490,10 +3507,11 @@ exports.BattleItems = {
 	},
 	"quickclaw": {
 		id: "quickclaw",
+		onModifyPriorityPriority: -1,
 		onModifyPriority: function (priority, pokemon) {
 			if (this.random(5) === 0) {
 				this.add('-activate', pokemon, 'item: Quick Claw');
-				return priority + 0.1;
+				return Math.round(priority) + 0.1;
 			}
 		},
 		name: "Quick Claw",
@@ -3530,6 +3548,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Ghost",
 		},
+		onEat: false,
 		num: 177,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3616,6 +3635,7 @@ exports.BattleItems = {
 			basePower: 80,
 			type: "Steel",
 		},
+		onEat: false,
 		num: 164,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -3655,8 +3675,13 @@ exports.BattleItems = {
 			pokemon.formeChange(template);
 			pokemon.baseTemplate = template;
 			pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-			this.add('detailschange', pokemon, pokemon.details);
-			this.add('-primal', pokemon);
+			if (pokemon.illusion) {
+				pokemon.ability = ''; // Don't allow Illusion to wear off
+				this.add('-primal', pokemon.illusion);
+			} else {
+				this.add('detailschange', pokemon, pokemon.details);
+				this.add('-primal', pokemon);
+			}
 			pokemon.setAbility(template.abilities['0']);
 			pokemon.baseAbility = pokemon.ability;
 		},
@@ -3664,7 +3689,7 @@ exports.BattleItems = {
 			if (source.baseTemplate.baseSpecies === 'Groudon') return false;
 			return true;
 		},
-		num: -6,
+		num: 534,
 		gen: 6,
 		desc: "If holder is a Groudon, this item triggers its Primal Reversion in battle.",
 	},
@@ -3811,7 +3836,7 @@ exports.BattleItems = {
 			}
 		},
 		onEat: function () { },
-		num: -6,
+		num: 686,
 		gen: 6,
 		desc: "Halves damage taken from a supereffective Fairy-type attack. Single use.",
 	},
@@ -3870,11 +3895,11 @@ exports.BattleItems = {
 		},
 		onTryHit: function (pokemon, source, move) {
 			if (move.flags['powder'] && pokemon !== source) {
-				this.add('-activate', pokemon, 'Safety Goggles', move.name);
+				this.add('-activate', pokemon, 'item: Safety Goggles', move.name);
 				return null;
 			}
 		},
-		num: -6,
+		num: 650,
 		gen: 6,
 		desc: "Holder is immune to powder moves and damage from Sandstorm or Hail.",
 	},
@@ -4202,7 +4227,7 @@ exports.BattleItems = {
 				this.boost({atk: 1});
 			}
 		},
-		num: -6,
+		num: 649,
 		gen: 6,
 		desc: "Raises holder's Attack by 1 if hit by an Ice-type attack. Single use.",
 	},
@@ -4272,6 +4297,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Dark",
 		},
+		onEat: false,
 		num: 179,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -4325,7 +4351,7 @@ exports.BattleItems = {
 		name: "Sport Ball",
 		spritenum: 465,
 		num: 499,
-		gen: 4,
+		gen: 2,
 		desc: "A special Poke Ball for the Bug-Catching Contest.",
 	},
 	"starfberry": {
@@ -4477,6 +4503,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Psychic",
 		},
+		onEat: false,
 		num: 174,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -4672,6 +4699,7 @@ exports.BattleItems = {
 			basePower: 100,
 			type: "Fire",
 		},
+		onEat: false,
 		num: 181,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",
@@ -4705,7 +4733,7 @@ exports.BattleItems = {
 				this.boost({atk: 2, spa: 2});
 			}
 		},
-		num: -6,
+		num: 639,
 		gen: 6,
 		desc: "If holder is hit super effectively, raises Attack, Sp. Atk by 2 stages. Single use.",
 	},
@@ -4718,6 +4746,7 @@ exports.BattleItems = {
 			basePower: 90,
 			type: "Electric",
 		},
+		onEat: false,
 		num: 167,
 		gen: 3,
 		desc: "Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.",

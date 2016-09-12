@@ -39,17 +39,17 @@ module.exports = (() => {
 
 	let dataTypes = ['Pokedex', 'FormatsData', 'Learnsets', 'Movedex', 'Statuses', 'TypeChart', 'Scripts', 'Items', 'Abilities', 'Natures', 'Formats', 'Aliases'];
 	let dataFiles = {
-		'Pokedex': 'pokedex.js',
-		'Movedex': 'moves.js',
-		'Statuses': 'statuses.js',
-		'TypeChart': 'typechart.js',
-		'Scripts': 'scripts.js',
-		'Items': 'items.js',
-		'Abilities': 'abilities.js',
-		'Formats': 'rulesets.js',
-		'FormatsData': 'formats-data.js',
-		'Learnsets': 'learnsets.js',
-		'Aliases': 'aliases.js',
+		'Pokedex': 'pokedex',
+		'Movedex': 'moves',
+		'Statuses': 'statuses',
+		'TypeChart': 'typechart',
+		'Scripts': 'scripts',
+		'Items': 'items',
+		'Abilities': 'abilities',
+		'Formats': 'rulesets',
+		'FormatsData': 'formats-data',
+		'Learnsets': 'learnsets',
+		'Aliases': 'aliases',
 	};
 
 	let BattleNatures = dataFiles.Natures = {
@@ -259,7 +259,7 @@ module.exports = (() => {
 		if (!template || typeof template === 'string') {
 			let name = (template || '').trim();
 			let id = toId(name);
-			if (this.data.Aliases[id]) {
+			if (id !== 'constructor' && this.data.Aliases[id]) {
 				name = this.data.Aliases[id];
 				id = toId(name);
 			}
@@ -550,7 +550,7 @@ module.exports = (() => {
 			let id = toId(type);
 			id = id.charAt(0).toUpperCase() + id.substr(1);
 			type = {};
-			if (id && this.data.TypeChart[id]) {
+			if (id && id !== 'constructor' && this.data.TypeChart[id]) {
 				type = this.data.TypeChart[id];
 				if (type.cached) return type;
 				type.cached = true;
@@ -571,7 +571,7 @@ module.exports = (() => {
 			let name = (nature || '').trim();
 			let id = toId(name);
 			nature = {};
-			if (id && this.data.Natures[id]) {
+			if (id && id !== 'constructor' && this.data.Natures[id]) {
 				nature = this.data.Natures[id];
 				if (nature.cached) return nature;
 				nature.cached = true;
@@ -717,6 +717,27 @@ module.exports = (() => {
 	Tools.prototype.escapeHTML = function (str) {
 		if (!str) return '';
 		return ('' + str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/\//g, '&#x2f;');
+	};
+
+	Tools.prototype.html = function (strings) {
+		let buf = strings[0];
+		for (let i = 1; i < arguments.length; i++) {
+			buf += moddedTools.base.escapeHTML(arguments[i]);
+			buf += strings[i];
+		}
+		return buf;
+	};
+	Tools.prototype.plural = function (num, plural, singular) {
+		if (!plural) plural = 's';
+		if (!singular) singular = '';
+		if (num && typeof num.length === 'number') {
+			num = num.length;
+		} else if (num && typeof num.size === 'number') {
+			num = num.size;
+		} else {
+			num = Number(num);
+		}
+		return (num !== 1 ? plural : singular);
 	};
 
 	Tools.prototype.toTimeStamp = function (date, options) {
@@ -1137,7 +1158,7 @@ module.exports = (() => {
 		this.data.Aliases = BattleAliases;
 
 		// Load formats
-		let maybeFormats = tryRequire('./config/formats.js');
+		let maybeFormats = tryRequire('./config/formats');
 		if (maybeFormats instanceof Error) {
 			if (maybeFormats.code !== 'MODULE_NOT_FOUND') throw new Error("CRASH LOADING FORMATS:\n" + maybeFormats.stack);
 		}
