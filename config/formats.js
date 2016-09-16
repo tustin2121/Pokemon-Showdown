@@ -2194,6 +2194,10 @@ exports.Formats = [
 
 		mod: 'reverse',
 		ruleset: ['Ubers'],
+		
+		onEffectiveness: function (typeMod, target, type, move) {
+			if (move.type === 'Ground' && type === 'Flying') return 0;
+		},
 	},
 ];
 let stpplb;
