@@ -2185,6 +2185,16 @@ exports.Formats = [
 		mod: 'hiddentype',
 		ruleset: ['OU'],
 	},
+	{
+		name: "Reverse Type Matchup",
+		desc: [
+			"The Attackers and Defenders on the type chart are reversed.",
+		],
+		section: "Kappa Cup Season 3",
+
+		mod: 'reverse',
+		ruleset: ['Ubers'],
+	},
 ];
 let stpplb;
 let stpplbi;
