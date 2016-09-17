@@ -1,7 +1,6 @@
 'use strict';
 
 exports.BattleScripts = {
-	inherit: true,
 	pokemon: {
 		isGrounded: function (negateImmunity) {
 			if ('gravity' in this.battle.pseudoWeather) return true;
