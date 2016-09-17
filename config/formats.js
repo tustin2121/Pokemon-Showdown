@@ -2237,7 +2237,7 @@ if (stpplb) {
 		name: "Super TPPL Bros. Doubles",
 		section: "STPPLB",
 		gameType: 'doubles',
-		
+	
 		mod: 'stpplb',
 		searchShow: true,
 		team: 'randomtpplb',
@@ -2252,7 +2252,7 @@ if (stpplb) {
 		name: "Super TPPL Bros. Plus Doubles",
 		section: "STPPLB",
 		gameType: 'doubles',
-		
+
 		mod: 'stpplb',
 		searchShow: true,
 		team: 'randomtpplbp',
@@ -2267,7 +2267,7 @@ if (stpplb) {
 		name: "Super TPP Bros. Doubles",
 		section: "STPPLB",
 		gameType: 'doubles',
-		
+
 		mod: 'stpplb',
 		searchShow: true,
 		team: 'randomtppb',
@@ -2282,7 +2282,7 @@ if (stpplb) {
 		name: "Super TPPL Bros. Triples",
 		section: "STPPLB",
 		gameType: 'triples',
-		
+
 		mod: 'stpplb',
 		searchShow: true,
 		team: 'randomtpplb',
@@ -2297,7 +2297,7 @@ if (stpplb) {
 		name: "Super TPPL Bros. Plus Triples",
 		section: "STPPLB",
 		gameType: 'triples',
-		
+
 		mod: 'stpplb',
 		searchShow: true,
 		team: 'randomtpplbp',
@@ -2312,7 +2312,7 @@ if (stpplb) {
 		name: "Super TPP Bros. Triples",
 		section: "STPPLB",
 		gameType: 'triples',
-		
+
 		mod: 'stpplb',
 		searchShow: true,
 		team: 'randomtppb',

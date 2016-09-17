@@ -73,6 +73,7 @@ exports.BattleTypeChart = {
 	"Electric": {
 		inherit: true,
 		damageTaken: {
+			par: 3,
 			"Bug": 0,
 			"Dark": 0,
 			"Dragon": 2,
@@ -142,6 +143,7 @@ exports.BattleTypeChart = {
 	"Fire": {
 		inherit: true,
 		damageTaken: {
+			brn: 3,
 			"Bug": 1,
 			"Dark": 0,
 			"Dragon": 2,
@@ -188,6 +190,7 @@ exports.BattleTypeChart = {
 	"Ghost": {
 		inherit: true,
 		damageTaken: {
+			trapped: 3,
 			"Bug": 0,
 			"Dark": 2,
 			"Dragon": 0,
@@ -211,6 +214,7 @@ exports.BattleTypeChart = {
 	"Grass": {
 		inherit: true,
 		damageTaken: {
+			powder: 3,
 			"Bug": 2,
 			"Dark": 0,
 			"Dragon": 2,
@@ -234,6 +238,7 @@ exports.BattleTypeChart = {
 	"Ground": {
 		inherit: true,
 		damageTaken: {
+			sandstorm: 3,
 			"Bug": 2,
 			"Dark": 0,
 			"Dragon": 0,
@@ -257,6 +262,8 @@ exports.BattleTypeChart = {
 	"Ice": {
 		inherit: true,
 		damageTaken: {
+			hail: 3,
+			frz: 3,
 			"Bug": 0,
 			"Dark": 0,
 			"Dragon": 1,
@@ -303,6 +310,8 @@ exports.BattleTypeChart = {
 	"Poison": {
 		inherit: true,
 		damageTaken: {
+			psn: 3,
+			tox: 3,
 			"Bug": 0,
 			"Dark": 0,
 			"Dragon": 0,
@@ -349,6 +358,7 @@ exports.BattleTypeChart = {
 	"Rock": {
 		inherit: true,
 		damageTaken: {
+			sandstorm: 3,
 			"Bug": 1,
 			"Dark": 0,
 			"Dragon": 0,
@@ -372,6 +382,9 @@ exports.BattleTypeChart = {
 	"Steel": {
 		inherit: true,
 		damageTaken: {
+			psn: 3,
+			tox: 3,
+			sandstorm: 3,
 			"Bug": 0,
 			"Dark": 0,
 			"Dragon": 0,
