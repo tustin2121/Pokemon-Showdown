@@ -2195,6 +2195,18 @@ exports.Formats = [
 		mod: 'reverse',
 		ruleset: ['Ubers'],
 	},
+	{
+		name: "Linked",
+		desc: [
+			"The first and second moves of Pok&eacute;mon become linked. These moves are in turn used one after the other.",
+			"&bullet; <a href=\"http://www.smogon.com/forums/threads/3524254/\">Linked</a>",
+		],
+		section: "Kappa Cup Season 3",
+
+		mod: 'linked',
+		ruleset: ['Ubers'],
+		banlist: ['Razor Fang', "King's Rock"],
+	},
 ];
 let stpplb;
 let stpplbi;
