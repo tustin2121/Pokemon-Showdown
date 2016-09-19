@@ -150,13 +150,35 @@ exports.BattleScripts = {
 		if (!noSort) {
 			this.queue.sort(this.comparePriority);
 		}
-	},
+	},/*
 	runDecision: function (decision) {
 		var pokemon;
 
 		// returns whether or not we ended in a callback
 		switch (decision.choice) {
-		case 'start':
+		case 'move':
+			if (!decision.pokemon.isActive) return false;
+			if (decision.pokemon.fainted) return false;
+			if (decision.linked) {
+				var linkedMoves = decision.linked;
+				var decisionMove = toId(decision.move);
+				for (var i = linkedMoves.length - 1; i >= 0; i--) {
+					var pseudoDecision = {choice: 'move', move: linkedMoves[i], targetLoc: decision.targetLoc, pokemon: decision.pokemon, targetPosition: decision.targetPosition, targetSide: decision.targetSide};
+					this.queue.unshift(pseudoDecision);
+				}
+				return;
+			}
+			this.runMove(decision.move, decision.pokemon, this.getTarget(decision), decision.sourceEffect);
+			decision.choice += "_done"; //make the case no longer match any in Battle.prototype.runDecision, so it doesn't run the case again.
+			break;
+		}
+		return Battle.prototype.runDecision.call(this, decision);
+	}, */
+	
+	runDecision: function (decision) {
+		// returns whether or not we ended in a callback
+		switch (decision.choice) {
+		case 'start': {
 			// I GIVE UP, WILL WRESTLE WITH EVENT SYSTEM LATER
 			let format = this.getFormat();
 
@@ -189,6 +211,8 @@ exports.BattleScripts = {
 			}
 			this.midTurn = true;
 			break;
+		}
+
 		case 'move':
 			if (!decision.pokemon.isActive) return false;
 			if (decision.pokemon.fainted) return false;
@@ -202,6 +226,7 @@ exports.BattleScripts = {
 				return;
 			}
 			this.runMove(decision.move, decision.pokemon, this.getTarget(decision), decision.sourceEffect);
+			decision.choice += "_done"; //make the case no longer match any in Battle.prototype.runDecision, so it doesn't run the case again.
 			break;
 		case 'megaEvo':
 			if (decision.pokemon.canMegaEvo) this.runMegaEvo(decision.pokemon);
@@ -339,17 +364,20 @@ exports.BattleScripts = {
 		}
 
 		// phazing (Roar, etc)
-
-		var self = this;
-		function checkForceSwitchFlag(a) {
-			if (!a) return false;
-			if (a.hp && a.forceSwitchFlag) {
-				self.dragIn(a.side, a.position);
+		for (let i = 0; i < this.p1.active.length; i++) {
+			let pokemon = this.p1.active[i];
+			if (pokemon.forceSwitchFlag) {
+				if (pokemon.hp) this.dragIn(pokemon.side, pokemon.position);
+				pokemon.forceSwitchFlag = false;
 			}
-			delete a.forceSwitchFlag;
 		}
-		this.p1.active.forEach(checkForceSwitchFlag);
-		this.p2.active.forEach(checkForceSwitchFlag);
+		for (let i = 0; i < this.p2.active.length; i++) {
+			let pokemon = this.p2.active[i];
+			if (pokemon.forceSwitchFlag) {
+				if (pokemon.hp) this.dragIn(pokemon.side, pokemon.position);
+				pokemon.forceSwitchFlag = false;
+			}
+		}
 
 		this.clearActiveMove();
 
@@ -369,21 +397,26 @@ exports.BattleScripts = {
 			return false;
 		}
 
-		function hasSwitchFlag(a) { return a ? a.switchFlag : false; }
-		function removeSwitchFlag(a) { if (a) a.switchFlag = false; }
-		var p1switch = this.p1.active.any(hasSwitchFlag);
-		var p2switch = this.p2.active.any(hasSwitchFlag);
+		let p1switch = this.p1.active.some(mon => mon && mon.switchFlag);
+		let p2switch = this.p2.active.some(mon => mon && mon.switchFlag);
 
 		if (p1switch && !this.canSwitch(this.p1)) {
-			this.p1.active.forEach(removeSwitchFlag);
+			for (let i = 0; i < this.p1.active.length; i++) {
+				this.p1.active[i].switchFlag = false;
+			}
 			p1switch = false;
 		}
 		if (p2switch && !this.canSwitch(this.p2)) {
-			this.p2.active.forEach(removeSwitchFlag);
+			for (let i = 0; i < this.p2.active.length; i++) {
+				this.p2.active[i].switchFlag = false;
+			}
 			p2switch = false;
 		}
 
 		if (p1switch || p2switch) {
+			if (this.gen >= 5) {
+				this.eachEvent('Update');
+			}
 			this.makeRequest('switch');
 			return true;
 		}
@@ -445,7 +478,7 @@ exports.BattleScripts = {
 		getLinkedMoves: function () {
 			var linkedMoves = this.moveset.slice(0, 2);
 			if (linkedMoves.length !== 2 || linkedMoves[0].pp <= 0 || linkedMoves[1].pp <= 0) return [];
-			return linkedMoves.map('id');
+			return linkedMoves.map(m => m.id);
 		},
 		hasLinkedMove: function (move) {
 			move = toId(move);
