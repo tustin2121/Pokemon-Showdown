@@ -158,22 +158,33 @@ exports.BattleScripts = {
 		switch (decision.choice) {
 		case 'start':
 			// I GIVE UP, WILL WRESTLE WITH EVENT SYSTEM LATER
-			var beginCallback = this.getFormat().onBegin;
-			if (beginCallback) beginCallback.call(this);
+			let format = this.getFormat();
+
+			// Remove Pokémon duplicates remaining after `team` decisions.
+			this.p1.pokemon = this.p1.pokemon.slice(0, this.p1.pokemonLeft);
+			this.p2.pokemon = this.p2.pokemon.slice(0, this.p2.pokemonLeft);
+
+			if (format.teamLength && format.teamLength.battle) {
+				// Trim the team: not all of the Pokémon brought to Preview will battle.
+				this.p1.pokemon = this.p1.pokemon.slice(0, format.teamLength.battle);
+				this.p1.pokemonLeft = this.p1.pokemon.length;
+				this.p2.pokemon = this.p2.pokemon.slice(0, format.teamLength.battle);
+				this.p2.pokemonLeft = this.p2.pokemon.length;
+			}
 
 			this.add('start');
-			for (var pos = 0; pos < this.p1.active.length; pos++) {
+			for (let pos = 0; pos < this.p1.active.length; pos++) {
 				this.switchIn(this.p1.pokemon[pos], pos);
 			}
-			for (var pos = 0; pos < this.p2.active.length; pos++) {
+			for (let pos = 0; pos < this.p2.active.length; pos++) {
 				this.switchIn(this.p2.pokemon[pos], pos);
 			}
-			for (var pos = 0; pos < this.p1.pokemon.length; pos++) {
-				pokemon = this.p1.pokemon[pos];
+			for (let pos = 0; pos < this.p1.pokemon.length; pos++) {
+				let pokemon = this.p1.pokemon[pos];
 				this.singleEvent('Start', this.getEffect(pokemon.species), pokemon.speciesData, pokemon);
 			}
-			for (var pos = 0; pos < this.p2.pokemon.length; pos++) {
-				pokemon = this.p2.pokemon[pos];
+			for (let pos = 0; pos < this.p2.pokemon.length; pos++) {
+				let pokemon = this.p2.pokemon[pos];
 				this.singleEvent('Start', this.getEffect(pokemon.species), pokemon.speciesData, pokemon);
 			}
 			this.midTurn = true;
@@ -193,65 +204,47 @@ exports.BattleScripts = {
 			this.runMove(decision.move, decision.pokemon, this.getTarget(decision), decision.sourceEffect);
 			break;
 		case 'megaEvo':
-			if (this.runMegaEvo) this.runMegaEvo(decision.pokemon);
+			if (decision.pokemon.canMegaEvo) this.runMegaEvo(decision.pokemon);
 			break;
-		case 'beforeTurnMove':
+		case 'beforeTurnMove': {
 			if (!decision.pokemon.isActive) return false;
 			if (decision.pokemon.fainted) return false;
 			this.debug('before turn callback: ' + decision.move.id);
-			var target = this.getTarget(decision);
+			let target = this.getTarget(decision);
 			if (!target) return false;
 			decision.move.beforeTurnCallback.call(this, decision.pokemon, target);
 			break;
+		}
+
 		case 'event':
 			this.runEvent(decision.event, decision.pokemon);
 			break;
-		case 'team':
-			var i = parseInt(decision.team[0], 10) - 1;
-			if (i >= 6 || i < 0) return;
-
-			if (decision.team[1]) {
-				// validate the choice
-				var len = decision.side.pokemon.length;
-				var newPokemon = [null, null, null, null, null, null].slice(0, len);
-				for (var j = 0; j < len; j++) {
-					var i = parseInt(decision.team[j], 10) - 1;
-					newPokemon[j] = decision.side.pokemon[i];
-				}
-				var reject = false;
-				for (var j = 0; j < len; j++) {
-					if (!newPokemon[j]) reject = true;
-				}
-				if (!reject) {
-					for (var j = 0; j < len; j++) {
-						newPokemon[j].position = j;
-					}
-					decision.side.pokemon = newPokemon;
-					return;
-				}
-			}
-
-			if (i === 0) return;
-			pokemon = decision.side.pokemon[i];
-			if (!pokemon) return;
-			decision.side.pokemon[i] = decision.side.pokemon[0];
-			decision.side.pokemon[0] = pokemon;
-			decision.side.pokemon[i].position = i;
-			decision.side.pokemon[0].position = 0;
+		case 'team': {
+			decision.side.pokemon.splice(decision.index, 0, decision.pokemon);
+			decision.pokemon.position = decision.index;
 			// we return here because the update event would crash since there are no active pokemon yet
 			return;
+		}
+
 		case 'pass':
 			if (!decision.priority || decision.priority <= 101) return;
 			if (decision.pokemon) {
 				decision.pokemon.switchFlag = false;
 			}
 			break;
+		case 'instaswitch':
 		case 'switch':
-			if (decision.pokemon) {
+			if (decision.choice === 'switch' && decision.pokemon.status && this.data.Abilities.naturalcure) {
+				this.singleEvent('CheckShow', this.data.Abilities.naturalcure, null, decision.pokemon);
+			}
+			if (decision.pokemon.hp) {
 				decision.pokemon.beingCalledBack = true;
-				var lastMove = this.getMove(decision.pokemon.getLastMoveAbsolute());
+				let lastMove = this.getMove(decision.pokemon.lastMove);
 				if (lastMove.selfSwitch !== 'copyvolatile') {
 					this.runEvent('BeforeSwitchOut', decision.pokemon);
+					if (this.gen >= 5) {
+						this.eachEvent('Update');
+					}
 				}
 				if (!this.runEvent('SwitchOut', decision.pokemon)) {
 					// Warning: DO NOT interrupt a switch-out
@@ -264,15 +257,16 @@ exports.BattleScripts = {
 					// a switch-out.
 					break;
 				}
-				this.singleEvent('End', this.getAbility(decision.pokemon.ability), decision.pokemon.abilityData, decision.pokemon);
 			}
-			if (decision.pokemon && !decision.pokemon.hp && !decision.pokemon.fainted) {
+			decision.pokemon.illusion = null;
+			this.singleEvent('End', this.getAbility(decision.pokemon.ability), decision.pokemon.abilityData, decision.pokemon);
+			if (!decision.pokemon.hp && !decision.pokemon.fainted) {
 				// a pokemon fainted from Pursuit before it could switch
 				if (this.gen <= 4) {
 					// in gen 2-4, the switch still happens
 					decision.priority = -101;
 					this.queue.unshift(decision);
-					this.debug('Pursuit target fainted');
+					this.add('-hint', 'Pursuit target fainted, switch continues in gen 2-4');
 					break;
 				}
 				// in gen 5+, the switch is cancelled
@@ -280,33 +274,68 @@ exports.BattleScripts = {
 				break;
 			}
 			if (decision.target.isActive) {
-				this.debug('Switch target is already active');
+				this.add('-hint', 'Switch failed; switch target is already active');
 				break;
 			}
+			if (decision.choice === 'switch' && decision.pokemon.activeTurns === 1) {
+				let foeActive = decision.pokemon.side.foe.active;
+				for (let i = 0; i < foeActive.length; i++) {
+					if (foeActive[i].isStale >= 2) {
+						decision.pokemon.isStaleCon++;
+						decision.pokemon.isStaleSource = 'switch';
+						break;
+					}
+				}
+			}
+
 			this.switchIn(decision.target, decision.pokemon.position);
+			break;
+		case 'runUnnerve':
+			this.singleEvent('PreStart', decision.pokemon.getAbility(), decision.pokemon.abilityData, decision.pokemon);
 			break;
 		case 'runSwitch':
 			this.runEvent('SwitchIn', decision.pokemon);
+			if (this.gen <= 2 && !decision.pokemon.side.faintedThisTurn && decision.pokemon.draggedIn !== this.turn) this.runEvent('AfterSwitchInSelf', decision.pokemon);
 			if (!decision.pokemon.hp) break;
 			decision.pokemon.isStarted = true;
 			if (!decision.pokemon.fainted) {
 				this.singleEvent('Start', decision.pokemon.getAbility(), decision.pokemon.abilityData, decision.pokemon);
+				decision.pokemon.abilityOrder = this.abilityOrder++;
 				this.singleEvent('Start', decision.pokemon.getItem(), decision.pokemon.itemData, decision.pokemon);
 			}
+			delete decision.pokemon.draggedIn;
 			break;
-		case 'shift':
+		case 'runPrimal':
+			if (!decision.pokemon.transformed) this.singleEvent('Primal', decision.pokemon.getItem(), decision.pokemon.itemData, decision.pokemon);
+			break;
+		case 'shift': {
 			if (!decision.pokemon.isActive) return false;
 			if (decision.pokemon.fainted) return false;
+			decision.pokemon.activeTurns--;
 			this.swapPosition(decision.pokemon, 1);
+			let foeActive = decision.pokemon.side.foe.active;
+			for (let i = 0; i < foeActive.length; i++) {
+				if (foeActive[i].isStale >= 2) {
+					decision.pokemon.isStaleCon++;
+					decision.pokemon.isStaleSource = 'switch';
+					break;
+				}
+			}
 			break;
+		}
+
 		case 'beforeTurn':
 			this.eachEvent('BeforeTurn');
 			break;
 		case 'residual':
 			this.add('');
 			this.clearActiveMove(true);
+			this.updateSpeed();
 			this.residualEvent('Residual');
 			break;
+
+		case 'skip':
+			throw new Error("Decision illegally skipped!");
 		}
 
 		// phazing (Roar, etc)
