@@ -2207,7 +2207,7 @@ exports.Formats = [
 		ruleset: ['Ubers'],
 		banlist: ['Razor Fang', "King's Rock"],
 		
-		validateTeam: function (team, format) {
+		validateTeam: function (team) {
 			var hasChoice = false;
 			for (var i = 0; i < team.length; i++) {
 				var item = toId(team[i].item);
@@ -2218,7 +2218,7 @@ exports.Formats = [
 				}
 			}
 		},
-		validateSet: function (set) {
+		onValidateSet: function (set) {
 			if (set.moves && set.moves.length >= 2) {
 				var moves = [toId(set.moves[0]), toId(set.moves[1])];
 				if (moves.indexOf('craftyshield') >= 0 || moves.indexOf('detect') >= 0 || moves.indexOf('kingsshield') >= 0 || moves.indexOf('protect') >= 0 || moves.indexOf('spikyshield') >= 0) {
