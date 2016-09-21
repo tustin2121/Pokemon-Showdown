@@ -73,11 +73,11 @@ exports.BattleStatuses = {
 				this.add('-start', target, 'confusion');
 			}
 			this.effectData.time = this.random(2, 6);
-			this.effectData.startTurn = this.turn;
+			this.effectData.timerDecreased = this.turn;
 		},
 		onBeforeMove: function (pokemon) {
 			if (this.effectData.movePrevented) return false;
-			if (this.effectData.timerDecreased !== this.turn && this.effectData.startTurn !== this.turn && !this.effectData.movePrevented) {
+			if (this.effectData.timerDecreased !== this.turn) {
 				this.effectData.timerDecreased = this.turn;
 				pokemon.volatiles.confusion.time--;
 				if (!pokemon.volatiles.confusion.time) {
