@@ -9,7 +9,7 @@ exports.BattleMovedex = {
 		inherit: true,
 		beforeTurnCallback: function (pokemon, target) {
 			var linkedMoves = pokemon.getLinkedMoves();
-			if (linkedMoves.length) {
+			if (linkedMoves.length && !linkedMoves.disabled) {
 				if (linkedMoves[0] === 'pursuit' && linkedMoves[1] !== 'pursuit') return;
 				if (linkedMoves[0] !== 'pursuit' && linkedMoves[1] === 'pursuit') return;
 			}
@@ -29,7 +29,7 @@ exports.BattleMovedex = {
 			var noMeFirst = {
 				chatter:1, counter:1, covet:1, focuspunch:1, mefirst:1, metalburst:1, mirrorcoat:1, struggle:1, thief:1
 			};
-			// Linked: Me First copies the first move in the link
+			// Mod-specific: Me First copies the first move in the link
 			var move = this.getMove(decision.linked ? decision.linked[0] : decision.move);
 			if (move.category !== 'Status' && !noMeFirst[move]) {
 				pokemon.addVolatile('mefirst');
@@ -41,7 +41,7 @@ exports.BattleMovedex = {
 	},
 	quash: {
 		inherit: true
-		// fine
+		// Mod-specific: default mechanics
 	},
 
 	/**
@@ -49,26 +49,31 @@ exports.BattleMovedex = {
 	 *	Will miss on two linked Status moves
 	 *
 	 */
-
 	suckerpunch: {
 		inherit: true,
-		onTryHit: function (target) {
+		onTry: function (source, target) {
 			var decision = this.willMove(target);
-			if (!decision || decision.choice !== 'move') return false;
+			if (!decision || decision.choice !== 'move') {
+				this.add('-fail', source);
+				return false;
+			}
 			if (target.volatiles['mustrecharge'] && target.volatiles['mustrecharge'].duration < 2) {
-				// duration may not be lower than 2 if Sucker Punch is used as a low-priority move
+				// Duration may not be lower than 2 if Sucker Punch is used as a low-priority move
 				// i.e. if Sucker Punch is linked with a negative priority move
+				this.add('-fail', source);
 				return false;
 			}
 			if (!decision.linked) {
-				if (decision.move.category === 'Status' && decision.move.id !== 'mefirst') return false;
-				return;
+				if (decision.move.category !== 'Status' || decision.move.id === 'mefirst') return;
+				this.add('-fail', source);
+				return false;
 			}
 
 			for (var i = 0; i < decision.linked.length; i++) {
 				var linkedMove = this.getMove(decision.linked[i]);
 				if (linkedMove.category !== 'Status' || linkedMove.id === 'mefirst') return;
 			}
+			this.add('-fail', source);
 			return false;
 		}
 	},
@@ -82,15 +87,15 @@ exports.BattleMovedex = {
 
 	firepledge: {
 		inherit: true
-		// awesome
+		// Mod-specific: default mechanics
 	},
 	grasspledge: {
 		inherit: true
-		// awesome
+		// Mod-specific: default mechanics
 	},
 	waterpledge: {
 		inherit: true
-		// awesome
+		// Mod-specific: default mechanics
 	},
 
 	/**
@@ -147,7 +152,7 @@ exports.BattleMovedex = {
 		}
 	},
 
-	/**
+/**
 	 * Copycat and Mirror Move
 	 * Copy/call the last absolute move used by the target
 	 *
@@ -165,9 +170,8 @@ exports.BattleMovedex = {
 	mirrormove: {
 		inherit: true,
 		onTryHit: function (target) {
-			var noMirrorMove = {acupressure:1, afteryou:1, aromatherapy:1, chatter:1, conversion2:1, counter:1, curse:1, doomdesire:1, feint:1, finalgambit:1, focuspunch:1, futuresight:1, gravity:1, guardsplit:1, hail:1, haze:1, healbell:1, healpulse:1, helpinghand:1, lightscreen:1, luckychant:1, mefirst:1, mimic:1, mirrorcoat:1, mirrormove:1, mist:1, mudsport:1, naturepower:1, perishsong:1, powersplit:1, psychup:1, quickguard:1, raindance:1, reflect:1, reflecttype:1, roleplay:1, safeguard:1, sandstorm:1, sketch:1, spikes:1, spitup:1, stealthrock:1, struggle:1, sunnyday:1, tailwind:1, toxicspikes:1, transform:1, watersport:1, wideguard:1};
 			var lastMove = target.getLastMoveAbsolute();
-			if (!lastMove || noMirrorMove[lastMove] || this.getMove(lastMove).target === 'self') {
+			if (!lastMove || !this.getMove(lastMove).flags['mirror']) {
 				return false;
 			}
 		},
@@ -175,7 +179,19 @@ exports.BattleMovedex = {
 			this.useMove(target.getLastMoveAbsolute(), source);
 		}
 	},
-
+	// mirrormove: {
+	// 	inherit: true,
+	// 	onTryHit: function (target) {
+	// 		var noMirrorMove = {acupressure:1, afteryou:1, aromatherapy:1, chatter:1, conversion2:1, counter:1, curse:1, doomdesire:1, feint:1, finalgambit:1, focuspunch:1, futuresight:1, gravity:1, guardsplit:1, hail:1, haze:1, healbell:1, healpulse:1, helpinghand:1, lightscreen:1, luckychant:1, mefirst:1, mimic:1, mirrorcoat:1, mirrormove:1, mist:1, mudsport:1, naturepower:1, perishsong:1, powersplit:1, psychup:1, quickguard:1, raindance:1, reflect:1, reflecttype:1, roleplay:1, safeguard:1, sandstorm:1, sketch:1, spikes:1, spitup:1, stealthrock:1, struggle:1, sunnyday:1, tailwind:1, toxicspikes:1, transform:1, watersport:1, wideguard:1};
+	// 		var lastMove = target.getLastMoveAbsolute();
+	// 		if (!lastMove || noMirrorMove[lastMove] || this.getMove(lastMove).target === 'self') {
+	// 			return false;
+	// 		}
+	// 	},
+	// 	onHit: function (target, source) {
+	// 		this.useMove(target.getLastMoveAbsolute(), source);
+	// 	}
+	// },
 	/**
 	 * Disable, Encore and Torment
 	 * Disabling effects
@@ -216,13 +232,14 @@ exports.BattleMovedex = {
 			onEnd: function (pokemon) {
 				this.add('-end', pokemon, 'Disable');
 			},
+			onBeforeMovePriority: 7,
 			onBeforeMove: function (attacker, defender, move) {
 				if (move.id === this.effectData.move) {
 					this.add('cant', attacker, 'Disable', move);
 					return false;
 				}
 			},
-			onModifyPokemon: function (pokemon) {
+			onDisableMove: function (pokemon) {
 				var moves = pokemon.moveset;
 				for (var i = 0; i < moves.length; i++) {
 					if (moves[i].id === this.effectData.move) {
@@ -243,37 +260,60 @@ exports.BattleMovedex = {
 				if (!lastMove) {
 					// it failed
 					delete target.volatiles['encore'];
-					return false;				
+					return false;
 				}
 				if (target.hasLinkedMove(lastMove)) {
+					// TODO: Check instead whether the last executed move was linked
 					var linkedMoves = target.getLinkedMoves();
 					if (noEncore[linkedMoves[0]] || noEncore[linkedMoves[1]] || target.moveset[0].pp <= 0 || target.moveset[1].pp <= 0) {
 						// it failed
 						delete target.volatiles['encore'];
-						return false;					
+						return false;
 					}
+					this.effectData.move = linkedMoves;
 				} else {
 					if (noEncore[lastMove] || (target.moveset[moveIndex] && target.moveset[moveIndex].pp <= 0)) {
 						// it failed
 						delete target.volatiles['encore'];
 						return false;
 					}
+					this.effectData.move = lastMove;
 				}
-				this.effectData.move = lastMove;
+				this.effectData.turnsActivated = {};
 				this.add('-start', target, 'Encore');
 				if (!this.willMove(target)) {
 					this.effectData.duration++;
 				}
 			},
 			onOverrideDecision: function (pokemon, target, move) {
-				if (this.willMove(pokemon)) return false;
-				if (pokemon.hasLinkedMove(this.effectData.move)) {
-					var linkedMoves = pokemon.getLinkedMoves();
-					// pass a `sourceEffect` argument to prevent infinite recursion at `runMove`
-					this.runMove(linkedMoves[0], pokemon, target, this.effectData);
-					return move.id !== linkedMoves[1] ? linkedMoves[1] : void 0; // are we fine with this targetting method? (Doubles/Triples)
+				if (!this.effectData.turnsActivated[this.turn]) {
+					// Initialize Encore effect for this turn
+					this.effectData.turnsActivated[this.turn] = 0;
+				} else if (this.effectData.turnsActivated[this.turn] >= (Array.isArray(this.effectData.move) ? this.effectData.move.length : 1)) {
+					// Finish Encore effect for this turn
+					return;
 				}
-				if (move.id !== this.effectData.move) return this.effectData.move;
+				this.effectData.turnsActivated[this.turn]++;
+				if (!Array.isArray(this.effectData.move)) {
+					var nextDecision = this.willMove(pokemon);
+					if (nextDecision) this.queue.splice(this.queue.indexOf(nextDecision), 1);
+					if (move.id !== this.effectData.move) return this.effectData.move;
+					return;
+				}
+
+				// Locked into a link
+				switch (this.effectData.turnsActivated[this.turn]) {
+				case 1:
+					if (!this.willMove(pokemon)) {
+						var pseudoDecision = {choice: 'move', move: this.effectData.move[1], targetLoc: this.currentDecision.targetLoc, pokemon: this.currentDecision.pokemon, targetPosition: this.currentDecision.targetPosition, targetSide: this.currentDecision.targetSide};
+						this.queue.unshift(pseudoDecision);
+					}
+					if (this.effectData.move[0] !== move.id) return this.effectData.move[0];
+					return;
+				case 2:
+					if (this.effectData.move[1] !== move.id) return this.effectData.move[1];
+					return;
+				}
 			},
 			onResidualOrder: 13,
 			onResidual: function (target) {
@@ -284,6 +324,7 @@ exports.BattleMovedex = {
 				if (index === -1) return; // no last move
 
 				if (target.hasLinkedMove(lastMove)) {
+					// TODO: Check instead whether the last executed move was linked
 					if (target.moveset[0].pp <= 0 || target.moveset[1].pp <= 0) {
 						delete target.volatiles.encore;
 						this.add('-end', target, 'Encore');
@@ -298,21 +339,22 @@ exports.BattleMovedex = {
 			onEnd: function (target) {
 				this.add('-end', target, 'Encore');
 			},
-			onModifyPokemon: function (pokemon) {
+			onDisableMove: function (pokemon) {
 				if (!this.effectData.move) return; // ??
-				if (!pokemon.hasMove(this.effectData.move)) {
-					return;
-				}
-				if (pokemon.hasLinkedMove(this.effectData.move)) {
-					// taking advantage of the fact that the first two move slots are reserved to linked moves
-					for (var i = 2; i < pokemon.moveset.length; i++) {
-						pokemon.disableMove(pokemon.moveset[i].id);
-					}					
-				} else {
+				if (!Array.isArray(this.effectData.move)) {
+					if (!pokemon.hasMove(this.effectData.move)) return;
 					for (var i = 0; i < pokemon.moveset.length; i++) {
 						if (pokemon.moveset[i].id !== this.effectData.move) {
 							pokemon.disableMove(pokemon.moveset[i].id);
 						}
+					}
+				} else {
+					for (var i = 0; i < this.effectData.move.length; i++) {
+						if (!pokemon.hasMove(this.effectData.move[i])) return;
+					}
+					for (var i = this.effectData.move.length; i < pokemon.moveset.length; i++) {
+						if (this.effectData.move.indexOf(pokemon.moveset[i].id) >= 0) continue;
+						pokemon.disableMove(pokemon.moveset[i].id);
 					}
 				}
 			}
@@ -327,7 +369,7 @@ exports.BattleMovedex = {
 			onEnd: function (pokemon) {
 				this.add('-end', pokemon, 'Torment');
 			},
-			onModifyPokemon: function (pokemon) {
+			onDisableMove: function (pokemon) {
 				var lastMove = pokemon.lastMove;
 				if (lastMove === 'struggle') return;
 
@@ -395,11 +437,11 @@ exports.BattleMovedex = {
 
 	rollout: {
 		inherit: true
-		// fine
+		// Mod-specific: default mechanics
 	},
 	iceball: {
 		inherit: true
-		// fine
+		// Mod-specific: default mechanics
 	},
 
 	/**
@@ -473,7 +515,7 @@ exports.BattleMovedex = {
 	},
 	uproar: {
 		inherit: true
-		// fine
+		// Mod-specific: default mechanics
 	},
 
 	/**
@@ -550,7 +592,7 @@ exports.BattleMovedex = {
 	 },
 
 	/**
-	 * First Law of PokAcmon Simulation:
+	 * First Law of Pokémon Simulation:
 	 * Always make sure that Sky Drop works
 	 *
 	 */
@@ -598,6 +640,7 @@ exports.BattleMovedex = {
 				if (source.hasAbility('noguard') || target.hasAbility('noguard')) {
 					return;
 				}
+				if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return;
 				return 0;
 			},
 			onAnyBasePower: function (basePower, target, source, move) {

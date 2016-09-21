@@ -4,7 +4,6 @@ exports.BattleScripts = {
 	runMove: function (move, pokemon, target, sourceEffect) {
 		if (!sourceEffect && toId(move) !== 'struggle') {
 			var changedMove = this.runEvent('OverrideDecision', pokemon, target, move);
-			if (changedMove === false) return; // Linked: Encore hack
 			if (changedMove && changedMove !== true) {
 				move = changedMove;
 				target = null;
@@ -39,7 +38,7 @@ exports.BattleScripts = {
 				return;
 			}
 		}
-		pokemon.lastDamage = 0;	
+		pokemon.lastDamage = 0;
 		var lockedMove = this.runEvent('LockMove', pokemon);
 		if (lockedMove === true) lockedMove = false;
 		if (!lockedMove) {
@@ -85,7 +84,7 @@ exports.BattleScripts = {
 				}
 
 				var linkedMoves = decision.pokemon.getLinkedMoves();
-				if (linkedMoves.length) {
+				if (linkedMoves.length && !linkedMoves.disabled) {
 					var decisionMove = toId(decision.move);
 					var index = linkedMoves.indexOf(decisionMove);
 					if (index !== -1) {
@@ -120,7 +119,7 @@ exports.BattleScripts = {
 
 					// Linked: if two moves are linked, the effective priority is minimized
 					var linkedMoves = decision.pokemon.getLinkedMoves();
-					if (linkedMoves.length) {
+					if (linkedMoves.length && !linkedMoves.disabled) {
 						var decisionMove = toId(decision.move);
 						var index = linkedMoves.indexOf(decisionMove);
 						if (index !== -1) {
@@ -455,20 +454,14 @@ exports.BattleScripts = {
 		return Math.random() - 0.5;
 	},
 	pokemon: {
-		moveUsed: function (move) {
+		moveUsed: function (move) { // overrided
 			var lastMove = this.moveThisTurn ? [this.moveThisTurn, this.battle.getMove(move).id] : this.battle.getMove(move).id;
 			this.lastMove = lastMove;
 			this.moveThisTurn = lastMove;
 		},
-		getLastMoveAbsolute: function () {
+		getLastMoveAbsolute: function () { // used
 			if (Array.isArray(this.lastMove)) return this.lastMove[1];
 			return this.lastMove;
-		},
-		checkLastMove: function (move, maybeLinked) {
-			move = toId(move);
-			if (!maybeLinked) return this.getLastMoveAbsolute() === move;
-			if (Array.isArray(this.lastMove)) return this.lastMove.indexOf(move) >= 0;
-			return this.lastMove === move;
 		},
 		checkMoveThisTurn: function (move) {
 			move = toId(move);
@@ -478,7 +471,15 @@ exports.BattleScripts = {
 		getLinkedMoves: function () {
 			var linkedMoves = this.moveset.slice(0, 2);
 			if (linkedMoves.length !== 2 || linkedMoves[0].pp <= 0 || linkedMoves[1].pp <= 0) return [];
-			return linkedMoves.map(m => m.id);
+			var ret = [toId(linkedMoves[0]), toId(linkedMoves[1])];
+
+			// Disabling effects which won't abort execution of moves already added to battle event loop.
+			if (!this.ateBerry && ret.indexOf('belch') >= 0) {
+				ret.disabled = true;
+			} else if (this.hasItem('assaultvest') && (this.battle.getMove(ret[0]).category === 'Status' || this.battle.getMove(ret[1]).category === 'Status')) {
+				ret.disabled = true;
+			}
+			return ret;
 		},
 		hasLinkedMove: function (move) {
 			move = toId(move);
@@ -486,16 +487,6 @@ exports.BattleScripts = {
 			if (!linkedMoves.length) return;
 
 			return linkedMoves[0] === move || linkedMoves[1] === move;
-		},
-		hasLinkedMoves: function (move1, move2) {
-			var linkedMoves = this.getLinkedMoves();
-			if (!linkedMoves.length) return;
-
-			move1 = toId(move1);
-			move2 = toId(move2);
-			if (linkedMoves[0] === move1 && linkedMoves[1] === move2) return true;
-			if (linkedMoves[1] === move2 && linkedMoves[0] === move1) return true;
-			return false;
 		}
 	}
 };
