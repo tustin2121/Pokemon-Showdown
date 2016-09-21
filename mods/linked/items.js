@@ -14,6 +14,6 @@ exports.BattleItems = {
 	},
 	metronome: {
 		inherit: true
-		// fine
+		// Mod-specific: default mechanics
 	}
 };

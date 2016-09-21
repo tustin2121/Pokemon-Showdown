@@ -25,35 +25,79 @@ exports.BattleStatuses = {
 	frz: {
 		inherit: true,
 		onBeforeMove: function (pokemon, target, move) {
-			if (move.thawsUser || this.effectData.durationRolled !== this.turn && this.random(5) === 0) {
+			if (move.flags['defrost']) return;
+			if (this.effectData.durationRolled !== this.turn && this.random(5) === 0) {
 				pokemon.cureStatus();
 				return;
 			}
 			if (this.effectData.durationRolled !== this.turn) {
-				// no need to display the frozen message twice
+				// Display the `frozen` message only once per turn.
 				this.effectData.durationRolled = this.turn;
 				this.add('cant', pokemon, 'frz');
 			}
 			return false;
 		}
 	},
+	par: {
+		inherit: true,
+		onStart: function (target, source, sourceEffect) {
+			if (sourceEffect && sourceEffect.effectType === 'Ability') {
+				this.add('-status', target, 'par', '[from] ability: ' + sourceEffect.name, '[of] ' + source);
+			} else {
+				this.add('-status', target, 'par');
+			}
+			this.effectData.lastCheckTurn = this.turn;
+		},
+		onBeforeMove: function (pokemon) {
+			if (this.effectData.lastCheckTurn !== this.turn) {
+				// Check for `par` only once per turn.
+				this.effectData.lastCheckTurn = this.turn;
+				this.effectData.lastCheck = (this.random(4) === 0);
+				if (this.effectData.lastCheck) {
+					this.add('cant', pokemon, 'par');
+					return false;
+				}
+			}
+			if (this.effectData.lastCheckTurn === this.turn && this.effectData.lastCheck) {
+				// this.add('cant', pokemon, 'par');
+				return false;
+			}
+		},
+	},
 	confusion: {
 		inherit: true,
+		onStart: function (target, source, sourceEffect) {
+			if (sourceEffect && sourceEffect.id === 'lockedmove') {
+				this.add('-start', target, 'confusion', '[fatigue]');
+			} else {
+				this.add('-start', target, 'confusion');
+			}
+			this.effectData.time = this.random(2, 6);
+			this.effectData.timerDecreased = this.turn;
+		},
 		onBeforeMove: function (pokemon) {
+			if (this.effectData.movePrevented && this.effectData.timerDecreased === this.turn) return false;
 			if (this.effectData.timerDecreased !== this.turn) {
+				this.effectData.movePrevented = false;
 				this.effectData.timerDecreased = this.turn;
 				pokemon.volatiles.confusion.time--;
 				if (!pokemon.volatiles.confusion.time) {
 					pokemon.removeVolatile('confusion');
 					return;
 				}
+				
+				this.add('-activate', pokemon, 'confusion');
+				if (this.random(2) === 0) {
+					return;
+				}
+				this.damage(this.getDamage(pokemon, pokemon, 40), pokemon, pokemon, {
+					id: 'confused',
+					effectType: 'Move',
+					type: '???',
+				});
+				this.effectData.movePrevented = true;
+				return false;
 			}
-			this.add('-activate', pokemon, 'confusion');
-			if (this.random(2) === 0) {
-				return;
-			}
-			this.directDamage(this.getDamage(pokemon, pokemon, 40));
-			return false;
 		}
 	},
 	flinch: {
@@ -70,7 +114,7 @@ exports.BattleStatuses = {
 			}
 			return false;
 		}
-	},     
+	},    
 	mustrecharge: {
 		inherit: true,
 		onBeforeMove: function (pokemon) {
@@ -89,7 +133,7 @@ exports.BattleStatuses = {
 	 * Make sure that they only boost a single move
 	 *
 	 */
- 
+
 	gem: {
 		inherit: true,
 		onBeforeMove: function (pokemon) {
@@ -99,7 +143,7 @@ exports.BattleStatuses = {
 	aura: {
 		inherit: true,
 		onBeforeMove: function (pokemon) {
-			if (pokemon.moveThisTurn) pokemon.removeVolatile('gem');
+			if (pokemon.moveThisTurn) pokemon.removeVolatile('aura');
 		}
 	}
 };
