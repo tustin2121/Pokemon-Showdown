@@ -629,7 +629,7 @@ exports.BattleMovedex = {
 			},
 			onBeforeMovePriority: 2,
 			onBeforeMove: function (pokemon, target, move) {
-				if (this.effectData.movePrevented) return false;
+				if (this.effectData.lastChecked === this.turn && this.effectData.movePrevented) return false;
 				if (this.effectData.lastChecked !== this.turn) {
 					this.effectData.movePrevented = false;
 					this.effectData.lastChecked = this.turn;
