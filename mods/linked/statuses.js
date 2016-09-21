@@ -39,21 +39,36 @@ exports.BattleStatuses = {
 	},
 	confusion: {
 		inherit: true,
+		onStart: function (target, source, sourceEffect) {
+			if (sourceEffect && sourceEffect.id === 'lockedmove') {
+				this.add('-start', target, 'confusion', '[fatigue]');
+			} else {
+				this.add('-start', target, 'confusion');
+			}
+			this.effectData.time = this.random(2, 6);
+			this.effectData.startTurn = this.turn;
+		},
 		onBeforeMove: function (pokemon) {
-			if (this.effectData.timerDecreased !== this.turn) {
+			if (this.effectData.movePrevented) return false;
+			if (this.effectData.timerDecreased !== this.turn && this.effectData.startTurn !== this.turn && !this.effectData.movePrevented) {
 				this.effectData.timerDecreased = this.turn;
 				pokemon.volatiles.confusion.time--;
 				if (!pokemon.volatiles.confusion.time) {
 					pokemon.removeVolatile('confusion');
 					return;
 				}
+				this.add('-activate', pokemon, 'confusion');
+				if (this.random(2) === 0) {
+					return;
+				}
+				this.damage(this.getDamage(pokemon, pokemon, 40), pokemon, pokemon, {
+					id: 'confused',
+					effectType: 'Move',
+					type: '???',
+				});
+				this.effectData.movePrevented = true;
+				return false;
 			}
-			this.add('-activate', pokemon, 'confusion');
-			if (this.random(2) === 0) {
-				return;
-			}
-			this.directDamage(this.getDamage(pokemon, pokemon, 40));
-			return false;
 		}
 	},
 	flinch: {
