@@ -633,11 +633,10 @@ exports.BattleMovedex = {
 				if (this.effectData.lastChecked !== this.turn) {
 					this.effectData.lastChecked = this.turn;
 					this.add('-activate', pokemon, 'move: Attract', '[of] ' + this.effectData.source);
-					if (this.random(2) === 0) {
-						this.add('cant', pokemon, 'Attract');
-						return false;
-					}
+					if (this.random(2) === 0) return;
+					this.add('cant', pokemon, 'Attract');
 					this.effectData.movePrevented = true;
+					return false;
 				}
 			},
 			onEnd: function (pokemon) {
