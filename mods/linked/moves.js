@@ -524,7 +524,7 @@ exports.BattleMovedex = {
 	 *
 	 **/
 
-	 fusionbolt: {
+	fusionbolt: {
 		inherit: true,
 		onBasePower: function (basePower, pokemon) {
 			var actives = pokemon.side.active;
@@ -536,7 +536,7 @@ exports.BattleMovedex = {
 			}
 		}
 	 },
-	 fusionflare: {
+	fusionflare: {
 		inherit: true,
 		onBasePower: function (basePower, pokemon) {
 			var actives = pokemon.side.active;
@@ -572,7 +572,7 @@ exports.BattleMovedex = {
 	 *
 	 */
 
-	 furycutter: {
+	furycutter: {
 		inherit: true,
 		effect: {
 			duration: 2,
@@ -590,6 +590,61 @@ exports.BattleMovedex = {
 			}
 		}
 	 },
+	 
+	/**
+	 * Attract
+	 * Should only check before the first linked move
+	 *
+	 */
+
+	attract: {
+		inherit: true,
+		effect: {
+			noCopy: true, // doesn't get copied by Baton Pass
+			onStart: function (pokemon, source, effect) {
+				if (!(pokemon.gender === 'M' && source.gender === 'F') && !(pokemon.gender === 'F' && source.gender === 'M')) {
+					this.debug('incompatible gender');
+					return false;
+				}
+				if (!this.runEvent('Attract', pokemon, source)) {
+					this.debug('Attract event failed');
+					return false;
+				}
+
+				if (effect.id === 'cutecharm') {
+					this.add('-start', pokemon, 'Attract', '[from] ability: Cute Charm', '[of] ' + source);
+				} else if (effect.id === 'destinyknot') {
+					this.add('-start', pokemon, 'Attract', '[from] item: Destiny Knot', '[of] ' + source);
+				} else {
+					this.add('-start', pokemon, 'Attract');
+				}
+				
+				this.effectData.lastChecked = this.turn;
+			},
+			onUpdate: function (pokemon) {
+				if (this.effectData.source && !this.effectData.source.isActive && pokemon.volatiles['attract']) {
+					this.debug('Removing Attract volatile on ' + pokemon);
+					pokemon.removeVolatile('attract');
+				}
+			},
+			onBeforeMovePriority: 2,
+			onBeforeMove: function (pokemon, target, move) {
+				if (this.effectData.movePrevented) return false;
+				if (this.effectData.lastChecked !== this.turn) {
+					this.effectData.lastChecked = this.turn;
+					this.add('-activate', pokemon, 'move: Attract', '[of] ' + this.effectData.source);
+					if (this.random(2) === 0) {
+						this.add('cant', pokemon, 'Attract');
+						return false;
+					}
+					this.effectData.movePrevented = true;
+				}
+			},
+			onEnd: function (pokemon) {
+				this.add('-end', pokemon, 'Attract', '[silent]');
+			},
+		},
+	}
 
 	/**
 	 * First Law of Pokémon Simulation:
@@ -597,7 +652,7 @@ exports.BattleMovedex = {
 	 *
 	 */
 
-	 skydrop: {
+	skydrop: {
 		inherit: true,
 		effect: {
 			duration: 2,
