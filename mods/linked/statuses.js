@@ -78,6 +78,7 @@ exports.BattleStatuses = {
 		onBeforeMove: function (pokemon) {
 			if (this.effectData.movePrevented) return false;
 			if (this.effectData.timerDecreased !== this.turn) {
+				this.effectData.movePrevented = false;
 				this.effectData.timerDecreased = this.turn;
 				pokemon.volatiles.confusion.time--;
 				if (!pokemon.volatiles.confusion.time) {
