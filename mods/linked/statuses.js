@@ -40,8 +40,16 @@ exports.BattleStatuses = {
 	},
 	par: {
 		inherit: true,
+		onStart: function (target, source, sourceEffect) {
+			if (sourceEffect && sourceEffect.effectType === 'Ability') {
+				this.add('-status', target, 'par', '[from] ability: ' + sourceEffect.name, '[of] ' + source);
+			} else {
+				this.add('-status', target, 'par');
+			}
+			this.effectData.startTurn = this.turn;
+		},
 		onBeforeMove: function (pokemon) {
-			if (this.effectData.lastCheckTurn !== this.turn) {
+			if (this.effectData.lastCheckTurn !== this.turn && this.effectData.startTurn !== this.turn) {
 				// Check for `par` only once per turn.
 				this.effectData.lastCheckTurn = this.turn;
 				this.effectData.lastCheck = (this.random(4) === 0);
