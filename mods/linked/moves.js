@@ -643,7 +643,7 @@ exports.BattleMovedex = {
 				this.add('-end', pokemon, 'Attract', '[silent]');
 			},
 		},
-	}
+	},
 
 	/**
 	 * First Law of Pokémon Simulation:
