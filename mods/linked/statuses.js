@@ -76,7 +76,7 @@ exports.BattleStatuses = {
 			this.effectData.timerDecreased = this.turn;
 		},
 		onBeforeMove: function (pokemon) {
-			if (this.effectData.movePrevented) return false;
+			if (this.effectData.movePrevented && this.effectData.timerDecreased === this.turn) return false;
 			if (this.effectData.timerDecreased !== this.turn) {
 				this.effectData.movePrevented = false;
 				this.effectData.timerDecreased = this.turn;
