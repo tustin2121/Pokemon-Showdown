@@ -631,6 +631,7 @@ exports.BattleMovedex = {
 			onBeforeMove: function (pokemon, target, move) {
 				if (this.effectData.movePrevented) return false;
 				if (this.effectData.lastChecked !== this.turn) {
+					this.effectData.movePrevented = false;
 					this.effectData.lastChecked = this.turn;
 					this.add('-activate', pokemon, 'move: Attract', '[of] ' + this.effectData.source);
 					if (this.random(2) === 0) return;
