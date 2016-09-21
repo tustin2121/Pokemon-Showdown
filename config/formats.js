@@ -104,6 +104,16 @@ exports.Formats = [
 		banlist: ['RU', 'BL3', 'NU', 'BL4', 'Chatter'],
 	},
 	{
+		name: "FU",
+		desc: [
+			"The tier below PU. Only available here!",
+		],
+		section: "ORAS Singles",
+
+		ruleset: ['PU'],
+		banlist: ['PU', 'Chatter'],
+	},
+	{
 		name: "LC",
 		desc: [
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3505710/\">LC Metagame Discussion</a>",
