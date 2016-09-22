@@ -92,7 +92,13 @@ exports.BattleScripts = {
 						// flag the move as linked here
 						decision.linked = linkedMoves;
 						if (this.getMove(linkedMoves[1 - index]).beforeTurnCallback) {
-							this.addQueue({choice: 'beforeTurnMove', pokemon: decision.pokemon, move: linkedMoves[1 - index], targetLoc: decision.targetLoc}, true);
+							this.addQueue({
+								choice: 'beforeTurnMove', 
+								pokemon: decision.pokemon, 
+								move: linkedMoves[1 - index], 
+								// move: this.getMoveCopy(linkedMoves[1 - index]),
+								targetLoc: decision.targetLoc
+							}, true);
 						}
 					}
 				}
@@ -189,7 +195,15 @@ exports.BattleScripts = {
 				var linkedMoves = decision.linked;
 				var decisionMove = toId(decision.move);
 				for (var i = linkedMoves.length - 1; i >= 0; i--) {
-					var pseudoDecision = {choice: 'move', move: linkedMoves[i], targetLoc: decision.targetLoc, pokemon: decision.pokemon, targetPosition: decision.targetPosition, targetSide: decision.targetSide};
+					var pseudoDecision = {
+						choice: 'move', 
+						// move: linkedMoves[i], 
+						move: this.getMoveCopy(linkedMoves[i]), 
+						targetLoc: decision.targetLoc, 
+						pokemon: decision.pokemon,
+						targetPosition: decision.targetPosition, 
+						targetSide: decision.targetSide
+					};
 					this.queue.unshift(pseudoDecision);
 				}
 				return;
