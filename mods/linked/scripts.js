@@ -1,9 +1,9 @@
 'use strict';
 
 exports.BattleScripts = {
-	runMove: function (move, pokemon, target, sourceEffect) {
+	runMove: function (move, pokemon, target, sourceEffect) { ///Overridden
 		if (!sourceEffect && toId(move) !== 'struggle') {
-			var changedMove = this.runEvent('OverrideDecision', pokemon, target, move);
+			let changedMove = this.runEvent('OverrideDecision', pokemon, target, move);
 			if (changedMove && changedMove !== true) {
 				move = changedMove;
 				target = null;
@@ -13,8 +13,9 @@ exports.BattleScripts = {
 		if (!target && target !== false) target = this.resolveTarget(pokemon, move);
 
 		this.setActiveMove(move, pokemon, target);
-
-		// Linked: Pokemon can move more than once per turn
+		
+		/// BEGIN CHANGE ///
+		// Linked: Pokemon can move more than once per turn: this is commended out
 		/* if (pokemon.moveThisTurn) {
 			// THIS IS PURELY A SANITY CHECK
 			// DO NOT TAKE ADVANTAGE OF THIS TO PREVENT A POKEMON FROM MOVING;
@@ -23,12 +24,12 @@ exports.BattleScripts = {
 			this.clearActiveMove(true);
 			return;
 		}*/
+		/// END CHANGE ///
 		if (!this.runEvent('BeforeMove', pokemon, target, move)) {
 			// Prevent invulnerability from persisting until the turn ends
-			// Linked: make sure that the cancelled move is the correct one.
-			if (pokemon.volatiles['twoturnmove'] && pokemon.volatiles['twoturnmove'].move === move.id) {
-				pokemon.removeVolatile('twoturnmove');
-			}
+			pokemon.removeVolatile('twoturnmove');
+			// Prevent Pursuit from running again against a slower U-turn/Volt Switch/Parting Shot
+			pokemon.moveThisTurn = true;
 			this.clearActiveMove(true);
 			return;
 		}
@@ -39,50 +40,50 @@ exports.BattleScripts = {
 			}
 		}
 		pokemon.lastDamage = 0;
-		var lockedMove = this.runEvent('LockMove', pokemon);
+		let lockedMove = this.runEvent('LockMove', pokemon);
 		if (lockedMove === true) lockedMove = false;
 		if (!lockedMove) {
 			if (!pokemon.deductPP(move, null, target) && (move.id !== 'struggle')) {
 				this.add('cant', pokemon, 'nopp', move);
+				let gameConsole = [null, 'Game Boy', 'Game Boy', 'Game Boy Advance', 'DS', 'DS'][this.gen] || '3DS';
+				this.add('-hint', "This is not a bug, this is really how it works on the " + gameConsole + "; try it yourself if you don't believe us.");
 				this.clearActiveMove(true);
 				return;
 			}
+		} else {
+			sourceEffect = this.getEffect('lockedmove');
 		}
 		pokemon.moveUsed(move);
 		this.useMove(move, pokemon, target, sourceEffect);
 		this.singleEvent('AfterMove', move, null, pokemon, target, move);
 	},
-	addQueue: function (decision, noSort, side) {
+	resolvePriority: function (decision) { /// Overridden
 		if (decision) {
-			if (Array.isArray(decision)) {
-				for (var i = 0; i < decision.length; i++) {
-					this.addQueue(decision[i], noSort);
-				}
-				return;
-			}
-			if (!decision.side && side) decision.side = side;
 			if (!decision.side && decision.pokemon) decision.side = decision.pokemon.side;
 			if (!decision.choice && decision.move) decision.choice = 'move';
-			if (!decision.priority) {
-				var priorities = {
+			if (!decision.priority && decision.priority !== 0) {
+				let priorities = {
 					'beforeTurn': 100,
 					'beforeTurnMove': 99,
-					'switch': 6,
-					'runSwitch': 6.1,
-					'megaEvo': 5.9,
+					'switch': 7,
+					'runUnnerve': 7.3,
+					'runSwitch': 7.2,
+					'runPrimal': 7.1,
+					'instaswitch': 101,
+					'megaEvo': 6.9,
 					'residual': -100,
 					'team': 102,
-					'start': 101
+					'start': 101,
 				};
-				if (priorities[decision.choice]) {
+				if (decision.choice in priorities) {
 					decision.priority = priorities[decision.choice];
 				}
 			}
 			if (decision.choice === 'move') {
 				if (this.getMove(decision.move).beforeTurnCallback) {
-					this.addQueue({choice: 'beforeTurnMove', pokemon: decision.pokemon, move: decision.move, targetLoc: decision.targetLoc}, true);
+					this.addQueue({choice: 'beforeTurnMove', pokemon: decision.pokemon, move: decision.move, targetLoc: decision.targetLoc});
 				}
-
+				/// BEGIN CHANGE ///
 				var linkedMoves = decision.pokemon.getLinkedMoves();
 				if (linkedMoves.length && !linkedMoves.disabled) {
 					var decisionMove = toId(decision.move);
@@ -95,7 +96,8 @@ exports.BattleScripts = {
 						}
 					}
 				}
-			} else if (decision.choice === 'switch') {
+				/// END CHANGE ///
+			} else if (decision.choice === 'switch' || decision.choice === 'instaswitch') {
 				if (decision.pokemon.switchFlag && decision.pokemon.switchFlag !== true) {
 					decision.pokemon.switchCopyFlag = decision.pokemon.switchFlag;
 				}
@@ -103,10 +105,9 @@ exports.BattleScripts = {
 				if (!decision.speed && decision.pokemon && decision.pokemon.isActive) decision.speed = decision.pokemon.speed;
 			}
 			if (decision.move) {
-				var target;
+				let target;
 
 				if (!decision.targetPosition) {
-					// this target is not relevant to Linked (or any other game mode)
 					target = this.resolveTarget(decision.pokemon, decision.move);
 					decision.targetSide = target.side;
 					decision.targetPosition = target.position;
@@ -114,9 +115,10 @@ exports.BattleScripts = {
 
 				decision.move = this.getMoveCopy(decision.move);
 				if (!decision.priority) {
-					var priority = decision.move.priority;
+					let priority = decision.move.priority;
 					priority = this.runEvent('ModifyPriority', decision.pokemon, target, decision.move, priority);
-
+					
+					/// BEGIN CHANGE ///
 					// Linked: if two moves are linked, the effective priority is minimized
 					var linkedMoves = decision.pokemon.getLinkedMoves();
 					if (linkedMoves.length && !linkedMoves.disabled) {
@@ -129,52 +131,19 @@ exports.BattleScripts = {
 							priority = Math.min(priority, altPriority);
 						}
 					}
-
+					/// END CHANGE ///
+					
 					decision.priority = priority;
 					// In Gen 6, Quick Guard blocks moves with artificially enhanced priority.
 					if (this.gen > 5) decision.move.priority = priority;
 				}
 			}
 			if (!decision.pokemon && !decision.speed) decision.speed = 1;
-			if (!decision.speed && decision.choice === 'switch' && decision.target) decision.speed = decision.target.speed;
+			if (!decision.speed && (decision.choice === 'switch' || decision.choice === 'instaswitch') && decision.target) decision.speed = decision.target.speed;
 			if (!decision.speed) decision.speed = decision.pokemon.speed;
-
-			if (decision.choice === 'switch' && !decision.side.pokemon[0].isActive) {
-				// if there's no actives, switches happen before activations
-				decision.priority = 6.2;
-			}
-
-			this.queue.push(decision);
 		}
-		if (!noSort) {
-			this.queue.sort(this.comparePriority);
-		}
-	},/*
-	runDecision: function (decision) {
-		var pokemon;
-
-		// returns whether or not we ended in a callback
-		switch (decision.choice) {
-		case 'move':
-			if (!decision.pokemon.isActive) return false;
-			if (decision.pokemon.fainted) return false;
-			if (decision.linked) {
-				var linkedMoves = decision.linked;
-				var decisionMove = toId(decision.move);
-				for (var i = linkedMoves.length - 1; i >= 0; i--) {
-					var pseudoDecision = {choice: 'move', move: linkedMoves[i], targetLoc: decision.targetLoc, pokemon: decision.pokemon, targetPosition: decision.targetPosition, targetSide: decision.targetSide};
-					this.queue.unshift(pseudoDecision);
-				}
-				return;
-			}
-			this.runMove(decision.move, decision.pokemon, this.getTarget(decision), decision.sourceEffect);
-			decision.choice += "_done"; //make the case no longer match any in Battle.prototype.runDecision, so it doesn't run the case again.
-			break;
-		}
-		return Battle.prototype.runDecision.call(this, decision);
-	}, */
-	
-	runDecision: function (decision) {
+	},
+	runDecision: function (decision) { ///Overridden
 		// returns whether or not we ended in a callback
 		switch (decision.choice) {
 		case 'start': {
@@ -215,6 +184,7 @@ exports.BattleScripts = {
 		case 'move':
 			if (!decision.pokemon.isActive) return false;
 			if (decision.pokemon.fainted) return false;
+			/// BEGIN CHANGE ///
 			if (decision.linked) {
 				var linkedMoves = decision.linked;
 				var decisionMove = toId(decision.move);
@@ -224,8 +194,9 @@ exports.BattleScripts = {
 				}
 				return;
 			}
+			/// END CHANGE ///
 			this.runMove(decision.move, decision.pokemon, this.getTarget(decision), decision.sourceEffect);
-			decision.choice += "_done"; //make the case no longer match any in Battle.prototype.runDecision, so it doesn't run the case again.
+			// decision.choice += "_done"; //make the case no longer match any in Battle.prototype.runDecision, so it doesn't run the case again.
 			break;
 		case 'megaEvo':
 			if (decision.pokemon.canMegaEvo) this.runMegaEvo(decision.pokemon);
@@ -424,7 +395,7 @@ exports.BattleScripts = {
 
 		return false;
 	},
-	comparePriority: function (a, b) { // intentionally not in Battle.prototype
+	comparePriority: function (a, b) { // I don't know why this is in here. Nothing in it changed...
 		a.priority = a.priority || 0;
 		a.subPriority = a.subPriority || 0;
 		a.speed = a.speed || 0;
