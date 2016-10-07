@@ -998,12 +998,15 @@ exports.BattleMovedex = {
 		flags: {contact: 1, protect: 1},
 		volatileStatus: 'bide',
 		ignoreImmunity: true,
+		beforeMoveCallback: function (pokemon) {
+			if (pokemon.volatiles['bide']) return true;
+		},
 		effect: {
 			duration: 3,
 			onLockMove: 'bide',
 			onStart: function (pokemon) {
 				this.effectData.totalDamage = 0;
-				this.add('-start', pokemon, 'Bide');
+				this.add('-start', pokemon, 'move: Bide');
 			},
 			onDamagePriority: -101,
 			onDamage: function (damage, target, source, move) {
@@ -1011,14 +1014,9 @@ exports.BattleMovedex = {
 				this.effectData.totalDamage += damage;
 				this.effectData.lastDamageSource = source;
 			},
-			onAfterSetStatus: function (status, pokemon) {
-				if (status.id === 'slp') {
-					pokemon.removeVolatile('bide');
-				}
-			},
 			onBeforeMove: function (pokemon, target, move) {
 				if (this.effectData.duration === 1) {
-					this.add('-end', pokemon, 'Bide');
+					this.add('-end', pokemon, 'move: Bide');
 					target = this.effectData.lastDamageSource;
 					if (!target || !this.effectData.totalDamage) {
 						this.attrLastMove('[still]');
@@ -1045,7 +1043,9 @@ exports.BattleMovedex = {
 					return false;
 				}
 				this.add('-activate', pokemon, 'move: Bide');
-				return false;
+			},
+			onEnd: function (pokemon) {
+				this.add('-end', pokemon, 'move: Bide', '[silent]');
 			},
 		},
 		secondary: false,
@@ -2590,7 +2590,7 @@ exports.BattleMovedex = {
 		basePower: 0,
 		category: "Status",
 		desc: "Lowers the target's evasiveness by 1 stage. If this move is successful and whether or not the target's evasiveness was affected, the effects of Reflect, Light Screen, Safeguard, Mist, Spikes, Toxic Spikes, Stealth Rock, and Sticky Web end for the target's side, and the effects of Spikes, Toxic Spikes, Stealth Rock, and Sticky Web end for the user's side. Ignores a target's substitute, although a substitute will still block the lowering of evasiveness.",
-		shortDesc: "Removes hazards from field. Lowers foe's evasion.",
+		shortDesc: "-1 evasion; clears user and target side's hazards.",
 		id: "defog",
 		isViable: true,
 		name: "Defog",
@@ -5137,7 +5137,7 @@ exports.BattleMovedex = {
 			return this.clampIntRange(move.basePower * pokemon.volatiles.furycutter.multiplier, 1, 160);
 		},
 		category: "Physical",
-		desc: "Power doubles with each successful hit, up to a maximum of 160 power; resets to 40 power if the move misses or another move is used.",
+		desc: "Power doubles with each successful hit, up to a maximum of 160 power; power is reset if the move misses or another move is used.",
 		shortDesc: "Power doubles with each hit, up to 160.",
 		id: "furycutter",
 		name: "Fury Cutter",
@@ -12102,7 +12102,7 @@ exports.BattleMovedex = {
 		basePower: 80,
 		category: "Special",
 		desc: "Has a 30% chance to burn the target. The target thaws out if it is frozen.",
-		shortDesc: "30% chance to burn the target. Thaws user.",
+		shortDesc: "30% chance to burn the target. Thaws target.",
 		id: "scald",
 		isViable: true,
 		name: "Scald",
@@ -12628,7 +12628,6 @@ exports.BattleMovedex = {
 		onHit: function (pokemon) {
 			let oldAbility = pokemon.setAbility('simple');
 			if (oldAbility) {
-				this.add('-endability', pokemon, oldAbility, '[from] move: Simple Beam');
 				this.add('-ability', pokemon, 'Simple', '[from] move: Simple Beam');
 				return;
 			}
@@ -12716,7 +12715,11 @@ exports.BattleMovedex = {
 		onHit: function (target, source, move) {
 			let targetAbility = this.getAbility(target.ability);
 			let sourceAbility = this.getAbility(source.ability);
-			this.add('-activate', source, 'move: Skill Swap', targetAbility, sourceAbility, '[of] ' + target);
+			if (target.side === source.side) {
+				this.add('-activate', source, 'move: Skill Swap', '', '', '[of] ' + target);
+			} else {
+				this.add('-activate', source, 'move: Skill Swap', targetAbility, sourceAbility, '[of] ' + target);
+			}
 			source.battle.singleEvent('End', sourceAbility, source.abilityData, source);
 			target.battle.singleEvent('End', targetAbility, target.abilityData, target);
 			if (targetAbility.id !== sourceAbility.id) {
@@ -13948,11 +13951,7 @@ exports.BattleMovedex = {
 			move.type = '???';
 			this.add('-activate', pokemon, 'move: Struggle');
 		},
-		self: {
-			onHit: function (source) {
-				this.directDamage(source.maxhp / 4, source, source, {id: 'strugglerecoil'});
-			},
-		},
+		struggleRecoil: true,
 		secondary: false,
 		target: "randomNormal",
 		type: "Normal",
@@ -16179,7 +16178,6 @@ exports.BattleMovedex = {
 		onHit: function (pokemon) {
 			let oldAbility = pokemon.setAbility('insomnia');
 			if (oldAbility) {
-				this.add('-endability', pokemon, oldAbility, '[from] move: Worry Seed');
 				this.add('-ability', pokemon, 'Insomnia', '[from] move: Worry Seed');
 				if (pokemon.status === 'slp') {
 					pokemon.cureStatus();
