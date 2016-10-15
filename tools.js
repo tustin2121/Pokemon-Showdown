@@ -1210,6 +1210,7 @@ module.exports = (() => {
 		for (let i = 0; i < BattleFormats.length; i++) {
 			let format = BattleFormats[i];
 			let id = toId(format.name);
+			console.log(`Loading format #${i+1}: ${format.name} [${id}]`);
 			if (!id) throw new RangeError("Format #" + (i + 1) + " must have a name with alphanumeric characters");
 			if (this.data.Formats[id]) throw new Error("Format #" + (i + 1) + " has a duplicate ID: `" + id + "`");
 			format.effectType = 'Format';
