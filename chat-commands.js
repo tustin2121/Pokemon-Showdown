@@ -2452,6 +2452,11 @@ exports.commands = {
 				Rooms.global.send(Rooms.global.formatListText);
 
 				return this.sendReply("Formats have been hotpatched.");
+			} else if (target === 'bot') {
+				Bot.connection.disconnect();
+				Chat.uncacheTree('./bot');
+				global.Bot = require('./bot');
+				return this.sendReply("The IRC Bot has been hot-patched.");
 			} else if (target === 'loginserver') {
 				fs.unwatchFile('./config/custom.css');
 				Chat.uncacheTree('./loginserver');
@@ -2969,12 +2974,14 @@ exports.commands = {
 		let datahash = crypto.createHash('md5').update(data.replace(/[^(\x20-\x7F)]+/g, '')).digest('hex');
 		let players = room.battle.playerNames;
 		LoginServer.request('prepreplay', {
-			id: room.id.substr(7),
-			loghash: datahash,
-			p1: players[0],
-			p2: players[1],
-			format: room.format,
-			hidden: room.isPrivate ? '1' : '',
+			// IF THERE ARE ANY MERGE CHANGES TO THE BELOW, DO NOT ACCEPT THEM!! --tustin2121
+			id: room.id.substr(7),  // Room ID
+			log: data,				// The actual replay daya
+			p1: players[0], 		// Player 1
+			p2: players[1], 		// Player 2
+			format: room.format,	// Format Name
+			// hidden: room.isPrivate ? '1' : '', //There is no privacy in tppleague BigBrother
+			// ANY CHANGES TO THE ABOVE ARE DEATH TO REPLAYS! DO NOT ACCEPT THEM --tustin2121
 		}, success => {
 			if (success && success.errorip) {
 				connection.popup("This server's request IP " + success.errorip + " is not a registered server.");

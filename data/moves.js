@@ -21,6 +21,7 @@ recharge: If this move is successful, the user must recharge on the following tu
 reflectable: Bounced back to the original user by Magic Coat or the Ability Magic Bounce.
 snatch: Can be stolen from the original user and instead used by another Pokemon using Snatch.
 sound: Has no effect on Pokemon with the Ability Soundproof.
+groundsource: Moves that originate from the ground. For use with the GroundsourceMod ruleset only.
 
 */
 
@@ -2720,7 +2721,7 @@ exports.BattleMovedex = {
 		name: "Dig",
 		pp: 10,
 		priority: 0,
-		flags: {contact: 1, charge: 1, protect: 1, mirror: 1, nonsky: 1},
+		flags: {contact: 1, charge: 1, protect: 1, mirror: 1, nonsky: 1, groundsource: 1},
 		onTry: function (attacker, defender, move) {
 			if (attacker.removeVolatile(move.id)) {
 				return;
@@ -3400,7 +3401,7 @@ exports.BattleMovedex = {
 		name: "Earth Power",
 		pp: 10,
 		priority: 0,
-		flags: {protect: 1, mirror: 1, nonsky: 1},
+		flags: {protect: 1, mirror: 1, nonsky: 1, groundsource: 1},
 		secondary: {
 			chance: 10,
 			boosts: {
@@ -3423,7 +3424,7 @@ exports.BattleMovedex = {
 		name: "Earthquake",
 		pp: 10,
 		priority: 0,
-		flags: {protect: 1, mirror: 1, nonsky: 1},
+		flags: {protect: 1, mirror: 1, nonsky: 1, groundsource: 1},
 		secondary: false,
 		target: "allAdjacent",
 		type: "Ground",
@@ -4388,7 +4389,7 @@ exports.BattleMovedex = {
 		name: "Fissure",
 		pp: 5,
 		priority: 0,
-		flags: {protect: 1, mirror: 1, nonsky: 1},
+		flags: {protect: 1, mirror: 1, nonsky: 1, groundsource: 1},
 		ohko: true,
 		secondary: false,
 		target: "normal",
@@ -7743,7 +7744,7 @@ exports.BattleMovedex = {
 		name: "Land's Wrath",
 		pp: 10,
 		priority: 0,
-		flags: {protect: 1, mirror: 1, nonsky: 1},
+		flags: {protect: 1, mirror: 1, nonsky: 1, groundsource: 1},
 		secondary: false,
 		target: "allAdjacentFoes",
 		type: "Ground",
@@ -8473,7 +8474,7 @@ exports.BattleMovedex = {
 		name: "Magnitude",
 		pp: 30,
 		priority: 0,
-		flags: {protect: 1, mirror: 1, nonsky: 1},
+		flags: {protect: 1, mirror: 1, nonsky: 1, groundsource: 1},
 		onModifyMove: function (move, pokemon) {
 			let i = this.random(100);
 			if (i < 5) {

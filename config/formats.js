@@ -492,6 +492,14 @@ exports.Formats = [
 		ruleset: ['Pokemon', 'Endless Battle Clause', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod'],
 		banlist: ['Illegal', 'Unreleased'],
 	},
+	// {
+	// 	name: "Groundsource",
+	// 	section: "Other Metagames",
+	// 	column: 2,
+
+	// 	ruleset: ['Pokemon', 'Team Preview', 'Groundsource Mod', 'HP Percentage Mod', 'Cancel Mod'],
+	// 	banlist: [],
+	// },
 	{
 		name: "Balanced Hackmons",
 		desc: [

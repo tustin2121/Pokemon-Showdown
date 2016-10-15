@@ -272,9 +272,11 @@ function FakeRoom(id) {
 	this.id = id;
 }
 FakeRoom.prototype.isMuted = identity(false);
-FakeRoom.prototype.users = {};
+FakeRoom.prototype.users = {"YAYBOT":1};
+FakeRoom.prototype.update = function(){};
 
 let ircUser = {
+	userid: "YAYBOT",
 	named: false,
 	can: identity(false),
 	resetName: identity(),
@@ -285,10 +287,17 @@ let ircUser = {
 
 let ircConnection = {
 	sendTo: function (room, message) {
+		console.log(`SENDTO: ${room.id}, ${message}`);
 		say(room.id, filter(message));
 	},
 	popup: identity(),
 };
+
+connection.on('error', function(err){
+	connection.say("#tppleague", 'ERROR! Please see output.');
+	console.log("IRC Error: "+require("util").inspect(err));
+	console.log("IRC Error: "+err.stack);
+});
 
 connection.on('message', function parseMessage(from, to, text, message) {
 	if (config.loggerid && to === (config.reportroom || config.channels[0])) {
@@ -303,7 +312,7 @@ connection.on('message', function parseMessage(from, to, text, message) {
 	// DootBot conflict
 	if (text.slice(0, 2) === '!?') return;
 	if (text.charAt(0) !== '!' && text.charAt(0) !== '/') return;
-	CommandParser.parse('/' + text.slice(1), new FakeRoom(to), ircUser, ircConnection);
+	Chat.parse('/' + text.slice(1), new FakeRoom(to), ircUser, ircConnection);
 });
 
 if (config.loggerid) {

@@ -676,4 +676,91 @@ exports.BattleFormats = {
 			}
 		},
 	},
+	groundsourcemod: {
+		effectType: "Rule",
+		name: "Groundsource Mod",
+		onStart: function() {
+			this.add('rule', 'Groundsource Mod: Some Ground moves can hit flying pokemon');
+		},
+		pokemon : {
+			isGrounded: function(negateImmunity) {
+				if ('gravity' in this.battle.pseudoWeather) return true;
+				if ('ingrain' in this.volatiles) return true;
+				if ('smackdown' in this.volatiles) return true;
+				let item = (this.ignoringItem() ? '' : this.item);
+				if (item === 'ironball') return true;
+				// These pokemon are NOT flying
+				if (this.speciesid in ['doduo', 'dodrio']) return true;
+				
+				if (!negateImmunity && this.hasType('Flying')) return false;
+				if (this.hasAbility('levitate') && !this.battle.suppressingAttackEvents()) return null;
+				if ('magnetrise' in this.volatiles) return false;
+				if ('telekinesis' in this.volatiles) return false;
+				if (item === 'airballoon') return false;
+				
+				// Certain pokemon are inherently floating
+				if (this.speciesid in [
+					// Fly
+					'beedrill', 'beedrillmega', 'dustox', 'venomoth',
+					'vibrava', 'flygon', 'shedinja', 'scizor', 
+					'volcarona', 'spritzee', 'aromatisse',
+					'heracross', 'volbeat', 'illumise',
+					'dragonair', 'hydreigon', 'mew', 'mewtwo',
+					'latias', 'latios', 'latiasmega', 'latiosmega', 'celebi',
+					// Levitate
+					'porygon', 'porygon2', 'porygonz', 
+					'magnemite', 'magneton', 'magnezone', 
+					'vanillite', 'vanillish', 'vanilluxe', 
+					'solosis', 'duosion', 'reuniclus',
+					'klink', 'klang', 'klinklang',
+					'honedge', 'doublade', 'aegislash',
+					'gastly', 'haunter', 'duskull', 'dusknoir', 'lampent', 'chandelure',
+					'flabebe', 'floette', 'florges',
+					'probopass', 'bronzor', 'bronzong',
+					'froslass', 'munna', 'musharna',
+					'elgyem', 'beheeyem', 'misdreavus', 'mismagius',
+					'shuppet', 'banette', 'banettemega', 'yamask', 'cofagrigus',
+					'phantump', 'klefki', 'lunatone', 'solrock', 'carbink',
+					'unown', 'beldum', 'metang', 'metagross', 'metagrossmega',
+					'diancie', 'dianciemega', 'darkrai',
+					
+					'pumpkaboo', 'castform', 'rotom', 'deoxys', // Alt forms covered by id number below
+				]) return false;
+				if (this.template.num in [710, 351, 479, 386]) return false;
+				
+				return true;
+			},
+			runImmunity: function(type, message) {
+				if (!type || type === '???') {
+					return true;
+				}
+				if (!(type in this.battle.data.TypeChart)) {
+					if (type === 'Fairy' || type === 'Dark' || type === 'Steel') return true;
+					throw new Error("Use runStatusImmunity for " + type);
+				}
+				if (this.fainted) {
+					return false;
+				}
+				let isGrounded;
+				let negateResult = this.battle.runEvent('NegateImmunity', this, type);
+				if (type === 'Ground') {
+					isGrounded = this.isGrounded(!negateResult);
+					if (isGrounded === null) {
+						if (message) {
+							this.battle.add('-immune', this, '[msg]', '[from] ability: Levitate');
+						}
+						return false;
+					}
+				}
+				if (!negateResult) return true;
+				if ((isGrounded === undefined && !this.battle.getImmunity(type, this)) || isGrounded === false) {
+					if (message) {
+						this.battle.add('-immune', this, '[msg]');
+					}
+					return false;
+				}
+				return true;
+			},
+		},
+	}
 };
