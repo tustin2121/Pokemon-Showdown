@@ -28,7 +28,7 @@ exports.BattleScripts = {
 		let template = this.getMixedTemplate(pokemon.originalSpecies, pokemon.canMegaEvo);
 		let side = pokemon.side;
 
-		// Pokémon affected by Sky Drop cannot mega evolve. Enforce it here for now.
+		// Pokémon affected by Sky Drop cannot Mega Evolve. Enforce it here for now.
 		let foeActive = side.foe.active;
 		for (let i = 0; i < foeActive.length; i++) {
 			if (foeActive[i].volatiles['skydrop'] && foeActive[i].volatiles['skydrop'].source === pokemon) {
@@ -37,7 +37,7 @@ exports.BattleScripts = {
 		}
 
 		pokemon.formeChange(template);
-		pokemon.baseTemplate = template; // mega evolution is permanent
+		pokemon.baseTemplate = template; // Mega Evolution is permanent
 
 		// Do we have a proper sprite for it?
 		if (this.getTemplate(pokemon.canMegaEvo).baseSpecies === pokemon.originalSpecies) {
