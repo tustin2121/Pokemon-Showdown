@@ -138,7 +138,7 @@ exports.BattleScripts = {
 			},
 			'sohippy': {
 				species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
-				moves: ['scald', 'painsplit', 'destinybond', 'voltswitch', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
+				moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
 				signatureMove: 'hyperwahahahahaha',
 				evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
 			},
@@ -176,7 +176,7 @@ exports.BattleScripts = {
 			},*/
 			'BigFatMantis': {
 				species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
-				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'uturn', 'xscissor', 'knockoff', 'earthquake'],
+				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
 				signatureMove: 'nofun',
 				evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
 			},
@@ -388,7 +388,7 @@ exports.BattleScripts = {
 			},
 			'sohippy': {
 				species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
-				moves: ['scald', 'painsplit', 'destinybond', 'voltswitch', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
+				moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
 				signatureMove: 'hyperwahahahahaha',
 				evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
 			},
@@ -426,7 +426,7 @@ exports.BattleScripts = {
 			},
 			'BigFatMantis': {
 				species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
-				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'uturn', 'xscissor', 'knockoff', 'earthquake'],
+				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
 				signatureMove: 'nofun',
 				evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
 			},
@@ -650,7 +650,7 @@ exports.BattleScripts = {
 			},
 			'sohippy': {
 				species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
-				moves: ['scald', 'painsplit', 'destinybond', 'voltswitch', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
+				moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
 				signatureMove: 'hyperwahahahahaha',
 				evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
 			},
@@ -688,7 +688,7 @@ exports.BattleScripts = {
 			},
 			'BigFatMantis': {
 				species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
-				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'uturn', 'xscissor', 'knockoff', 'earthquake'],
+				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
 				signatureMove: 'nofun',
 				evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
 			},

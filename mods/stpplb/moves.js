@@ -56,7 +56,6 @@ exports.BattleMovedex = {
 				}
 			},
 		},
-		secondary: false,
 		target: "self",
 		type: "Normal",
 	},
@@ -163,7 +162,6 @@ exports.BattleMovedex = {
 			this.damage(source.maxhp * this.random(24, 48) * 0.01, source, source);
 			return null;
 		},
-		secondary: false,
 		target: "self",
 		type: "Normal",
 	},
@@ -178,6 +176,7 @@ exports.BattleMovedex = {
 		drain: [1, 2],
 		category: 'Physical',
 		flags: {pulse: 1, bullet: 1, protect: 1, mirror: 1},
+		secondary: false,
 		onPrepareHit: function (target, source) { // Turns user into ???-type.
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Wish', source);
@@ -239,9 +238,11 @@ exports.BattleMovedex = {
 		pp: 20,
 		basePower: 12,
 		multihit: [8, 11],
+		flags: {protect: 1, mirror: 1},
+		secondary: false,
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add('-anim', source, 'Bullet Punch', target);
+			this.add('-anim', source, 'Vacuum Wave', target);
 		},
 		self: {
 			volatileStatus: 'lockedmove',
@@ -251,7 +252,6 @@ exports.BattleMovedex = {
 				pokemon.removeVolatile('lockedmove');
 			}
 		},
-		flags: {protect: 1, mirror: 1},
 	},
 	'bulk': {
 		num: 628,
@@ -274,7 +274,6 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Bulk Up', source);
 		},
-		secondary: false,
 		target: "self",
 		type: "Fighting",
 	},
@@ -488,6 +487,7 @@ exports.BattleMovedex = {
 		pp: 10,
 		type: 'Steel',
 		flags: {contact:1, protect:1, mirror:1},
+		secondary: false,
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Hammer Arm', target);
@@ -563,7 +563,7 @@ exports.BattleMovedex = {
 	"godbird": {
 		num: 638,
 		accuracy: 100,
-		basePower: 100,
+		basePower: 130,
 		category: "Special",
 		desc: "If this move is successful, it breaks through the target's Detect, King's Shield, Protect, or Spiky Shield for this turn, allowing other Pokemon to attack the target normally. If the target's side is protected by Crafty Shield, Mat Block, Quick Guard, or Wide Guard, that protection is also broken for this turn and other Pokemon may attack the target's side normally. This attack charges on the first turn and executes on the second. On the first turn, the user avoids all attacks. If the user is holding a Power Herb, the move completes in one turn. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
 		shortDesc: "Soars in the sky turn 1. Hits turn 2. Breaks protection.",
@@ -690,36 +690,6 @@ exports.BattleMovedex = {
 				];
 				target.item = megaStoneList[this.random(megaStoneList.length)];
 				this.add('-item', target, target.getItem(), '[from] move: Re-Roll');
-				target.canMegaEvo = this.canMegaEvo(target);
-				let pokemon = target;
-				let item = pokemon.getItem();
-				if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
-					// Primal Reversion
-					let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
-					if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
-						let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
-						pokemon.formeChange(template);
-						pokemon.baseTemplate = template;
-
-						// Do we have a proper sprite for it?
-						if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
-							pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-							this.add('detailschange', pokemon, pokemon.details);
-						} else {
-							let oTemplate = this.getTemplate(pokemon.originalSpecies);
-							this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-							this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
-							if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-								this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-							}
-						}
-						this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
-						this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
-						pokemon.setAbility(template.abilities['0']);
-						pokemon.baseAbility = pokemon.ability;
-						pokemon.canMegaEvo = false;
-					}
-				}
 			}
 		},
 		name: 'Re-Roll',
@@ -843,7 +813,6 @@ exports.BattleMovedex = {
 			this.add('-start', pokemon, 'typeadd', 'Flying', '[from] move: BAWK!');
 		},
 		heal: [1, 2],
-		secondary: false,
 		target: "self",
 		type: "Flying",
 	},
@@ -899,7 +868,7 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Slash', target);
 		},
 		flags: {contact: 1, protect: 1, mirror: 1},
-		critRatio: 2, //nerf imo
+		critRatio: 2,
 		multihit: [2, 5],
 		secondary: false,
 		target: "normal",
@@ -917,6 +886,7 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: -3,
 		flags: {contact: 1, protect: 1},
+		secondary: false,
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Sacred Sword', target);
@@ -962,7 +932,6 @@ exports.BattleMovedex = {
 			target.side.addSideCondition(hazards[this.random(4)]);
 		},
 		volatileStatus: 'confusion',
-		secondary: false,
 		desc: 'Confuses the target.',
 		shortdesc: 'Wow Description OneHand',
 		id: 'toucan',
@@ -1131,7 +1100,7 @@ exports.BattleMovedex = {
 		id: 'locknload',
 		name: 'Lock \'n\' Load',
 		type: 'Steel',
-		flage: {protect: 1, mirror: 1},
+		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Mean Look', target);
@@ -1149,7 +1118,7 @@ exports.BattleMovedex = {
 	},
 	'assassinate': {
 		num: 665,
-		accuracy: 0, // ohko moves' accuracy is defined elsewhere
+		accuracy: 0,
 		basePower: 0,
 		category: 'Physical',
 		desc: 'Deals damage to the target equal to the target\'s maximum HP. Ignores accuracy and evasiveness modifiers.',
@@ -1159,18 +1128,25 @@ exports.BattleMovedex = {
 		pp: 5,
 		priority: 0,
 		flags: {bullet: 1, protect: 1, mirror: 1},
-		ohko: true,
 		secondary: false,
+		damageCallback: function (pokemon, target) {
+			return target.maxhp;
+		},
 		onPrepareHit: function (target, source) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Flash Cannon', target);
 		},
 		onTryHit: function (target, source) {
+			if (pokemon.level < target.level) {
+				this.add('-immune', target, '[ohko]');
+				return false;
+			}
 			if (target.volatiles['lockon'] && source === target.volatiles['lockon'].source) return true;
 			if (source.hasAbility('noguard') || target.hasAbility('noguard')) return true;
 			return false;
 		},
 		onHit: function (target, source) {
+			this.add('-ohko');
 			this.add('c|' + source.name + '|Bye!');
 		},
 		target: 'normal',
@@ -1257,6 +1233,7 @@ exports.BattleMovedex = {
 		basePower: 80,
 		accuracy: true,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		secondary: false,
 		onPrepareHit: function (target, source) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Close Combat', target);
@@ -1282,6 +1259,7 @@ exports.BattleMovedex = {
 		basePower: 120,
 		accuracy: 100,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		secondary: false,
 		onPrepareHitPriority: 100,
 		onPrepareHit: function (target, source, move) {
 			move.type = move.typeList[this.random(move.typeList.length)];
@@ -1358,6 +1336,7 @@ exports.BattleMovedex = {
 		basePower: 0,
 		accuracy: true,
 		flags: {},
+		secondary: false,
 		onTryHit: function (target, pokemon) {
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
@@ -1434,7 +1413,7 @@ exports.BattleMovedex = {
 		basePower: 100,
 		accuracy: 100,
 		flags: {protect: 1, mirror: 1},
-		secondaries: [{chance: 100, boosts: {spe: -1}}, {chance: 20, volatileStatus: 'flinch'}],
+		secondaries: [{chance: 100, boosts: {spe: -1}}, {chance: 30, volatileStatus: 'flinch'}],
 		onPrepareHit: function (target, source) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Close Combat', target);
@@ -1455,6 +1434,7 @@ exports.BattleMovedex = {
 		basePower: 100,
 		accuracy: true,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		secondary: false,
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Power Split', target);
@@ -1559,6 +1539,7 @@ exports.BattleMovedex = {
 			duration: 3,
 			onResidualOrder: 4,
 			onEnd: function (side) {
+				this.add(source.name + "'s warcry echoes back!");
 				let target = side.active[this.effectData.sourcePosition];
 				if (target && !target.fainted) {
 					this.boost({atk: 2}, target);
@@ -1578,6 +1559,7 @@ exports.BattleMovedex = {
 		basePower: 150,
 		accuracy: 80,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		secondary: false,
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Head Smash', target);
@@ -1602,6 +1584,7 @@ exports.BattleMovedex = {
 		self: {
 			volatileStatus: 'lockedmove',
 		},
+		secondary: false,
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Quiver Dance', target);
@@ -1686,6 +1669,7 @@ exports.BattleMovedex = {
 		basePower: 95,
 		accuracy: 95,
 		flags: {contact: 1, charge: 1, protect: 1, mirror: 1},
+		secondary: false,
 		onTry: function (attacker, defender, move) {
 			if (attacker.removeVolatile(move.id)) {
 				return;
@@ -1840,7 +1824,10 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Boomburst', target);
 		},
-		volatileStatus: 'witchscurse',
+		secondary: {
+			chance: 100,
+			volatileStatus: 'witchscurse',
+		},
 		effect: {
 			duration: 2,
 			onStart: function (pokemon, source) {
