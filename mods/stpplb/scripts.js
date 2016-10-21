@@ -538,7 +538,7 @@ exports.BattleScripts = {
 				species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
 				moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
 				signatureMove: 'godswrath',
-				nature: 'Serious',
+				evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Serious',
 			},
 			'Trollkitten': {
 				species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
@@ -806,7 +806,7 @@ exports.BattleScripts = {
 				species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
 				moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
 				signatureMove: 'godswrath',
-				nature: 'Serious',
+				evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Serious',
 			},
 			'Trollkitten': {
 				species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
@@ -853,13 +853,14 @@ exports.BattleScripts = {
 		}
 		return team;
 	},
-	// Mix and Mega mechanics just for Natsugon EleGiggle
+
+	// Mix and Mega stuff
 	init: function () {
-		let onTakeMegaStone = function (item, source) {
+		let onTakeMegaStone = function (item) {
 			return false;
 		};
 		for (let id in this.data.Items) {
-			if (id !== 'redorb' && id !== 'blueorb' && !this.data.Items[id].megaStone) continue;
+			if (!this.data.Items[id].megaStone) continue;
 			this.modData('Items', id).onTakeItem = onTakeMegaStone;
 		}
 	},
@@ -881,7 +882,7 @@ exports.BattleScripts = {
 		let template = this.getMixedTemplate(pokemon.originalSpecies, pokemon.canMegaEvo);
 		let side = pokemon.side;
 
-		// Pokémon affected by Sky Drop cannot mega evolve. Enforce it here for now.
+		// Pokémon affected by Sky Drop cannot Mega Evolve. Enforce it here for now.
 		let foeActive = side.foe.active;
 		for (let i = 0; i < foeActive.length; i++) {
 			if (foeActive[i].volatiles['skydrop'] && foeActive[i].volatiles['skydrop'].source === pokemon) {
@@ -890,7 +891,7 @@ exports.BattleScripts = {
 		}
 
 		pokemon.formeChange(template);
-		pokemon.baseTemplate = template; // mega evolution is permanent
+		pokemon.baseTemplate = template; // Mega Evolution is permanent
 
 		// Do we have a proper sprite for it?
 		if (this.getTemplate(pokemon.canMegaEvo).baseSpecies === pokemon.originalSpecies) {
@@ -918,22 +919,6 @@ exports.BattleScripts = {
 		pokemon.canMegaEvo = false;
 		return true;
 	},
-	doGetMixedTemplate: function (template, deltas) {
-		if (!deltas) throw new TypeError("Must specify deltas!");
-		if (!template || typeof template === 'string') template = this.getTemplate(template);
-		template = Object.assign({}, template);
-		template.abilities = {'0': deltas.ability};
-		template.types = Array.from(new Set(Object.assign(template.types.slice(), deltas.types).filter(type => type)));
-		let baseStats = template.baseStats;
-		template.baseStats = {};
-		for (let statName in baseStats) template.baseStats[statName] = baseStats[statName] + deltas.baseStats[statName];
-		template.weightkg = Math.max(0.1, template.weightkg + deltas.weightkg);
-		template.originalMega = deltas.originalMega;
-		template.requiredItem = deltas.requiredItem;
-		if (deltas.isMega) template.isMega = true;
-		if (deltas.isPrimal) template.isPrimal = true;
-		return template;
-	},
 	getMixedTemplate: function (originalSpecies, megaSpecies) {
 		let originalTemplate = this.getTemplate(originalSpecies);
 		let megaTemplate = this.getTemplate(megaSpecies);
@@ -945,19 +930,46 @@ exports.BattleScripts = {
 	getMegaDeltas: function (megaTemplate) {
 		let baseTemplate = this.getTemplate(megaTemplate.baseSpecies);
 		let deltas = {
-			ability: megaTemplate.abilities['0'], baseStats: {}, weightkg: megaTemplate.weightkg - baseTemplate.weightkg, types: Array(baseTemplate.types.length),
-			originalMega: megaTemplate.species, requiredItem: megaTemplate.requiredItem,
+			ability: megaTemplate.abilities['0'],
+			baseStats: {},
+			weightkg: megaTemplate.weightkg - baseTemplate.weightkg,
+			originalMega: megaTemplate.species,
+			requiredItem: megaTemplate.requiredItem,
 		};
-		for (let statId in megaTemplate.baseStats) deltas.baseStats[statId] = megaTemplate.baseStats[statId] - baseTemplate.baseStats[statId];
+		for (let statId in megaTemplate.baseStats) {
+			deltas.baseStats[statId] = megaTemplate.baseStats[statId] - baseTemplate.baseStats[statId];
+		}
 		if (megaTemplate.types.length > baseTemplate.types.length) {
-			deltas.types.push(megaTemplate.types[1]);
+			deltas.type = megaTemplate.types[1];
 		} else if (megaTemplate.types.length < baseTemplate.types.length) {
-			deltas.types[1] = baseTemplate.types[0];
+			deltas.type = baseTemplate.types[0];
 		} else if (megaTemplate.types[1] !== baseTemplate.types[1]) {
-			deltas.types[1] = megaTemplate.types[1];
+			deltas.type = megaTemplate.types[1];
 		}
 		if (megaTemplate.isMega) deltas.isMega = true;
 		if (megaTemplate.isPrimal) deltas.isPrimal = true;
 		return deltas;
+	},
+	doGetMixedTemplate: function (template, deltas) {
+		if (!deltas) throw new TypeError("Must specify deltas!");
+		if (!template || typeof template === 'string') template = this.getTemplate(template);
+		template = Object.assign({}, template);
+		template.abilities = {'0': deltas.ability};
+		if (template.types[0] === deltas.type) {
+			template.types = [deltas.type];
+		} else if (deltas.type) {
+			template.types = [template.types[0], deltas.type];
+		}
+		let baseStats = template.baseStats;
+		template.baseStats = {};
+		for (let statName in baseStats) {
+			template.baseStats[statName] = this.clampIntRange(baseStats[statName] + deltas.baseStats[statName], 1, 255);
+		}
+		template.weightkg = Math.max(0.1, template.weightkg + deltas.weightkg);
+		template.originalMega = deltas.originalMega;
+		template.requiredItem = deltas.requiredItem;
+		if (deltas.isMega) template.isMega = true;
+		if (deltas.isPrimal) template.isPrimal = true;
+		return template;
 	},
 };

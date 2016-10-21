@@ -1628,7 +1628,7 @@ exports.BattleMovedex = {
 		category: 'Physical',
 		type: 'Flying',
 		target: 'normal',
-		basePower: 40,
+		basePower: 60,
 		accuracy: 100,
 		flags: {mirror: 1, authentic: 1},
 		onTry: function (pokemon, target) {
@@ -1683,7 +1683,7 @@ exports.BattleMovedex = {
 		category: 'Physical',
 		type: 'Dragon',
 		target: 'normal',
-		basePower: 80,
+		basePower: 95,
 		accuracy: 95,
 		flags: {contact: 1, charge: 1, protect: 1, mirror: 1},
 		onTry: function (attacker, defender, move) {
@@ -1807,7 +1807,7 @@ exports.BattleMovedex = {
 	"wailofthebanshee": {
 		num: 685, // boomburst is 586
 		accuracy: 100,
-		basePower: 140,
+		basePower: 110,
 		category: "Special",
 		desc: "No additional effect.",
 		shortDesc: "No additional effect. Hits adjacent Pokemon.",
@@ -1842,9 +1842,9 @@ exports.BattleMovedex = {
 		},
 		volatileStatus: 'witchscurse',
 		effect: {
-			duration: 1,
+			duration: 2,
 			onStart: function (pokemon, source) {
-				this.add('-start', pokemon, "Witch's Curse", '[of] ' + source);
+				this.add('-singleturn', pokemon, "Witch's Curse", '[of] ' + source);
 			},
 			onResidualOrder: 10,
 			onResidual: function (pokemon) {

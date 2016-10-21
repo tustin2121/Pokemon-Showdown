@@ -1381,6 +1381,12 @@ exports.Formats = [
 				if (name === 'hazorex' && pokemon.getAbility().id !== 'physicalakazam') {
 					pokemon.setAbility('Physicalakazam');
 				}
+				if (name === 'lyca' && pokemon.getAbility().id === 'magicbounce') {
+					pokemon.setAbility('jackyofalltrades');
+				}
+				if (name === 'pokson' && pokemon.getAbility().id === 'strongjaw') {
+					pokemon.setAbility('bestmisty');
+				}
 			}
 		},
 		onSwitchInPriority: 1,
@@ -1398,6 +1404,9 @@ exports.Formats = [
 				}
 				if (name === 'lyca' && pokemon.getAbility().id === 'magicbounce') {
 					pokemon.setAbility('jackyofalltrades');
+				}
+				if (name === 'pokson' && pokemon.getAbility().id === 'strongjaw') {
+					pokemon.setAbility('bestmisty');
 				}
 			} else {
 				pokemon.canMegaEvo = this.canMegaEvo(pokemon); // Bypass one mega limit.
@@ -1462,54 +1471,29 @@ exports.Formats = [
 			} else {
 				this.add('c|' + (pokemon.illusion ? pokemon.illusion.name : pokemon.name) + '|PLACEHOLDER MESSAGE PLEASE CONTACT TIESOUL');
 			}
-			let item = pokemon.getItem();
-			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
-				// Primal Reversion
-				let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
-				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
-					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
-					pokemon.formeChange(template);
-					pokemon.baseTemplate = template;
-
-					// Do we have a proper sprite for it?
-					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
-						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-						this.add('detailschange', pokemon, pokemon.details);
-					} else {
-						let oTemplate = this.getTemplate(pokemon.originalSpecies);
-						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
-						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-						}
-					}
-					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
-					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
-					pokemon.setAbility(template.abilities['0']);
-					pokemon.baseAbility = pokemon.ability;
-					pokemon.canMegaEvo = false;
-				}
-			} else {
-				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-					// Place volatiles on the Pokémon to show its mega-evolved condition and details
-					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-					let oTemplate = this.getTemplate(pokemon.originalSpecies);
-					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-					}
+			
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				// Place volatiles on the Pokémon to show its mega-evolved condition and details
+				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+				let oTemplate = this.getTemplate(pokemon.originalSpecies);
+				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
 				}
 			}
 		},
 
 		onSwitchOut: function (pokemon) {
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-			}
 			let name = toId(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
 			if (name === 'cerebralharlot') {
 				this.add("c|Cerebral_Harlot|See ya.");
+			}
+
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
 			}
 		},
 
@@ -1561,14 +1545,16 @@ exports.Formats = [
 				this.add("c|MasterLeoZangetsu|I didn't want to win anyways, was gonna forfeit");
 			}
 		},
+
 		onBegin: function () {
+			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+
 			// Mix and Mega stuff
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
 			for (let i = 0, len = allPokemon.length; i < len; i++) {
 				let pokemon = allPokemon[i];
 				pokemon.originalSpecies = pokemon.baseTemplate.species;
 			}
-			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
 		},
 	},
 
@@ -1583,56 +1569,37 @@ exports.Formats = [
 		maxLevel: 100,
 		defaultLevel: 100,
 
-		onSwitchInPriority: 1,
-		onSwitchIn: function (pokemon) {
-			let item = pokemon.getItem();
-			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
-				// Primal Reversion
-				let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
-				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
-					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
-					pokemon.formeChange(template);
-					pokemon.baseTemplate = template;
-
-					// Do we have a proper sprite for it?
-					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
-						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-						this.add('detailschange', pokemon, pokemon.details);
-					} else {
-						let oTemplate = this.getTemplate(pokemon.originalSpecies);
-						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
-						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-						}
-					}
-					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
-					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
-					pokemon.setAbility(template.abilities['0']);
-					pokemon.baseAbility = pokemon.ability;
-					pokemon.canMegaEvo = false;
-				}
-			} else {
-				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-					// Place volatiles on the Pokémon to show its mega-evolved condition and details
-					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-					let oTemplate = this.getTemplate(pokemon.originalSpecies);
-					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-					}
-				}
-			}
-		},
-
 		onBegin: function () {
+			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+
 			// Mix and Mega stuff
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
 			for (let i = 0, len = allPokemon.length; i < len; i++) {
 				let pokemon = allPokemon[i];
 				pokemon.originalSpecies = pokemon.baseTemplate.species;
 			}
-			this.add('-message', "STPPLB wiki with all ability descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+		},
+
+		onSwitchInPriority: 1,
+		onSwitchIn: function (pokemon) {
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				// Place volatiles on the Pokémon to show its mega-evolved condition and details
+				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+				let oTemplate = this.getTemplate(pokemon.originalSpecies);
+				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+				}
+			}
+		},
+
+		onSwitchOut: function (pokemon) {
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+			}
 		},
 	},
 	
@@ -1648,56 +1615,37 @@ exports.Formats = [
 		maxLevel: 100,
 		defaultLevel: 100,
 
-		onSwitchInPriority: 1,
-		onSwitchIn: function (pokemon) {
-			let item = pokemon.getItem();
-			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
-				// Primal Reversion
-				let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
-				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
-					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
-					pokemon.formeChange(template);
-					pokemon.baseTemplate = template;
-
-					// Do we have a proper sprite for it?
-					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
-						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-						this.add('detailschange', pokemon, pokemon.details);
-					} else {
-						let oTemplate = this.getTemplate(pokemon.originalSpecies);
-						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
-						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-						}
-					}
-					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
-					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
-					pokemon.setAbility(template.abilities['0']);
-					pokemon.baseAbility = pokemon.ability;
-					pokemon.canMegaEvo = false;
-				}
-			} else {
-				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-					// Place volatiles on the Pokémon to show its mega-evolved condition and details
-					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-					let oTemplate = this.getTemplate(pokemon.originalSpecies);
-					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-					}
-				}
-			}
-		},
-
 		onBegin: function () {
+			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+
 			// Mix and Mega stuff
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
 			for (let i = 0, len = allPokemon.length; i < len; i++) {
 				let pokemon = allPokemon[i];
 				pokemon.originalSpecies = pokemon.baseTemplate.species;
 			}
-			this.add('-message', "STPPLB wiki with all ability descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+		},
+
+		onSwitchInPriority: 1,
+		onSwitchIn: function (pokemon) {
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				// Place volatiles on the Pokémon to show its mega-evolved condition and details
+				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+				let oTemplate = this.getTemplate(pokemon.originalSpecies);
+				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+				}
+			}
+		},
+
+		onSwitchOut: function (pokemon) {
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+			}
 		},
 	},
 	
@@ -1713,56 +1661,37 @@ exports.Formats = [
 		maxLevel: 100,
 		defaultLevel: 100,
 
-		onSwitchInPriority: 1,
-		onSwitchIn: function (pokemon) {
-			let item = pokemon.getItem();
-			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
-				// Primal Reversion
-				let bannedMons = {'Kyurem-Black':1, 'Slaking':1, 'Regigigas':1, 'Cresselia':1, 'Shuckle':1};
-				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
-					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
-					pokemon.formeChange(template);
-					pokemon.baseTemplate = template;
-
-					// Do we have a proper sprite for it?
-					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
-						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-						this.add('detailschange', pokemon, pokemon.details);
-					} else {
-						let oTemplate = this.getTemplate(pokemon.originalSpecies);
-						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
-						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-						}
-					}
-					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
-					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
-					pokemon.setAbility(template.abilities['0']);
-					pokemon.baseAbility = pokemon.ability;
-					pokemon.canMegaEvo = false;
-				}
-			} else {
-				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-					// Place volatiles on the Pokémon to show its mega-evolved condition and details
-					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-					let oTemplate = this.getTemplate(pokemon.originalSpecies);
-					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-					}
-				}
-			}
-		},
-
 		onBegin: function () {
+			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+
 			// Mix and Mega stuff
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
 			for (let i = 0, len = allPokemon.length; i < len; i++) {
 				let pokemon = allPokemon[i];
 				pokemon.originalSpecies = pokemon.baseTemplate.species;
 			}
-			this.add('-message', "STPPLB wiki with all ability descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
+		},
+
+		onSwitchInPriority: 1,
+		onSwitchIn: function (pokemon) {
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				// Place volatiles on the Pokémon to show its mega-evolved condition and details
+				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+				let oTemplate = this.getTemplate(pokemon.originalSpecies);
+				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+				}
+			}
+		},
+
+		onSwitchOut: function (pokemon) {
+			// Mix and Mega stuff
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+			}
 		},
 	},
 
@@ -1817,13 +1746,13 @@ exports.Formats = [
 		gameType: 'doubles',
 		ruleset: ['Doubles Ubers'],
 		banlist: ['Gengarite', 'Shadow Tag', 'Dynamic Punch', 'Zap Cannon', 'Electrify'],
-		onValidateTeam: function (team, format) {
+		onValidateTeam: function (team) {
 			let itemTable = {};
 			for (let i = 0; i < team.length; i++) {
 				let item = this.getItem(team[i].item);
 				if (!item) continue;
-				if (itemTable[item] && item.megaStone) return ["You are limited to one of each Mega Stone.", "(You have more than one " + this.tools.getItem(item).name + ")"];
-				if (itemTable[item] && (item.id === 'redorb' || item.id === 'blueorb')) return ["You are limited to one of each Primal Orb.", "(You have more than one " + this.tools.getItem(item).name + ")"];
+				if (itemTable[item] && item.megaStone) return ["You are limited to one of each Mega Stone.", "(You have more than one " + this.getItem(item).name + ")"];
+				if (itemTable[item] && (item.id === 'blueorb' || item.id === 'redorb')) return ["You are limited to one of each Primal Orb.", "(You have more than one " + this.getItem(item).name + ")"];
 				itemTable[item] = true;
 			}
 		},
@@ -1831,55 +1760,10 @@ exports.Formats = [
 			let template = this.getTemplate(set.species || set.name);
 			let item = this.getItem(set.item);
 			if (!item.megaEvolves && item.id !== 'blueorb' && item.id !== 'redorb') return;
-			if (template.baseSpecies === item.megaEvolves || (item.id === 'redorb' && template.baseSpecies === 'Groudon') || (item.id === 'blueorb' && template.baseSpecies === 'Kyogre')) return;
+			if (template.baseSpecies === item.megaEvolves || (template.baseSpecies === 'Groudon' && item.id === 'redorb') || (template.baseSpecies === 'Kyogre' && item.id === 'blueorb')) return;
 			if (template.evos.length) return ["" + template.species + " is not allowed to hold " + item.name + " because it's not fully evolved."];
-			if (template.tier === 'Uber') return ["" + template.species + " is not allowed to hold " + item.name + " because it's in the Uber tier."];
-			if (template.species === 'Shuckle' && ['abomasite', 'aggronite', 'audinite', 'cameruptite', 'charizarditex', 'charizarditey', 'galladite', 'gyaradosite', 'heracronite', 'houndoominite', 'latiasite', 'mewtwonitey', 'sablenite', 'salamencite', 'scizorite', 'sharpedonite', 'slowbronite', 'steelixite', 'tyranitarite', 'venusaurite'].indexOf(item.id) >= 0) {
-				return ["" + template.species + " is not allowed to hold " + item.name + "."];
-			}
-			let bannedMons = {'Cresselia':1, 'Dragonite':1, 'Kyurem-Black':1, 'Lucario':1, 'Slaking':1, 'Smeargle':1, 'Regigigas':1};
-			if (template.species in bannedMons) {
-				return ["" + template.species + " is not allowed to hold a Mega Stone."];
-			}
-			let powerAbilities = {'Huge Power':1, 'Pure Power':1};
-			let allowedPower = false;
-			switch (item.id) {
-			case 'beedrillite': case 'kangaskhanite':
-				return ["" + item.name + " can only allowed be held by " + item.megaEvolves + "."];
-			case 'blazikenite':
-				if (set.ability !== 'Speed Boost') return ["" + template.species + " is not allowed to hold " + item.name + "."];
-				break;
-			case 'mawilite': case 'medichamite':
-				if (powerAbilities.hasOwnProperty(set.ability)) break;
-				if (!template.otherFormes) return ["" + template.species + " is not allowed to hold " + item.name + "."];
-				for (let i = 0; i < template.otherFormes.length; i++) {
-					let altTemplate = this.getTemplate(template.otherFormes[i]);
-					if ((altTemplate.isMega || altTemplate.isPrimal) && powerAbilities.hasOwnProperty(altTemplate.abilities['0'])) {
-						allowedPower = true;
-						break;
-					}
-				}
-				if (!allowedPower) return ["" + template.species + " is not allowed to hold " + item.name + "."];
-				break;
-			case 'mewtwonitey':
-				if (template.baseStats.def <= 20) return ["" + template.species + " does not have enough Defense to hold " + item.name + "."];
-				break;
-			case 'diancite':
-				if (template.baseStats.def <= 40 || template.baseStats.spd <= 40) return ["" + template.species + " does not have enough Def. or Sp. Def. to hold " + item.name + "."];
-				break;
-			case 'slowbronite':
-				if (template.baseStats.def > 185) return ["" + template.species + " is not allowed to hold " + item.name + "."];
-				break;
-			case 'ampharosite': case 'garchompite': case 'heracronite':
-				if (template.baseStats.spe <= 10) return ["" + template.species + " does not have enough Speed to hold " + item.name + "."];
-				break;
-			case 'cameruptite':
-				if (template.baseStats.spe <= 20) return ["" + template.species + " does not have enough Speed to hold " + item.name + "."];
-				break;
-			case 'abomasite': case 'sablenite':
-				if (template.baseStats.spe <= 30) return ["" + template.species + " does not have enough Speed to hold " + item.name + "."];
-				break;
-			}
+			let uberStones = ['beedrillite', 'gengarite', 'kangaskhanite', 'mawilite', 'medichamite'];
+			if (template.tier === 'Uber' || uberStones.indexOf(item.id) >= 0) return ["" + template.species + " is not allowed to hold " + item.name + "."];
 		},
 		onBegin: function () {
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
@@ -1888,44 +1772,14 @@ exports.Formats = [
 				pokemon.originalSpecies = pokemon.baseTemplate.species;
 			}
 		},
-		onSwitchInPriority: -6,
 		onSwitchIn: function (pokemon) {
-			let item = pokemon.getItem();
-			if (pokemon.isActive && !pokemon.template.isMega && !pokemon.template.isPrimal && (item.id === 'redorb' || item.id === 'blueorb') && pokemon.baseTemplate.tier !== 'Uber' && !pokemon.template.evos.length) {
-				// Primal Reversion
-				let bannedMons = {'Cresselia':1, 'Dragonite':1, 'Kyurem-Black':1, 'Lucario':1, 'Regigigas':1, 'Slaking':1, 'Smeargle':1};
-				if (!(pokemon.baseTemplate.baseSpecies in bannedMons)) {
-					let template = this.getMixedTemplate(pokemon.originalSpecies, item.id === 'redorb' ? 'Groudon-Primal' : 'Kyogre-Primal');
-					pokemon.formeChange(template);
-					pokemon.baseTemplate = template;
-
-					// Do we have a proper sprite for it?
-					if (pokemon.originalSpecies === (item.id === 'redorb' ? 'Groudon' : 'Kyogre')) {
-						pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-						this.add('detailschange', pokemon, pokemon.details);
-					} else {
-						let oTemplate = this.getTemplate(pokemon.originalSpecies);
-						this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-						this.add('-start', pokemon, this.getTemplate(template.originalMega).requiredItem, '[silent]');
-						if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-							this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-						}
-					}
-					this.add('message', pokemon.name + "'s " + pokemon.getItem().name + " activated!");
-					this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
-					pokemon.setAbility(template.abilities['0']);
-					pokemon.baseAbility = pokemon.ability;
-					pokemon.canMegaEvo = false;
-				}
-			} else {
-				let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-				if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-					// Place volatiles on the Pokémon to show its mega-evolved condition and details
-					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-					let oTemplate = this.getTemplate(pokemon.originalSpecies);
-					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-					}
+			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
+			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
+				// Place volatiles on the Pokémon to show its mega-evolved condition and details
+				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+				let oTemplate = this.getTemplate(pokemon.originalSpecies);
+				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
 				}
 			}
 		},
@@ -2239,6 +2093,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2253,6 +2108,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2268,6 +2124,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2283,6 +2140,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2298,6 +2156,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2313,6 +2172,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2328,6 +2188,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2343,6 +2204,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	}, {
@@ -2356,6 +2218,7 @@ if (stpplb) {
 		onModifyMove: stpplb.onModifyMove,
 		onSwitchInPriority: 1,
 		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
 	});
