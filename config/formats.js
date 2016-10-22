@@ -1385,7 +1385,7 @@ exports.Formats = [
 					pokemon.setAbility('jackyofalltrades');
 				}
 				if (name === 'pokson' && pokemon.getAbility().id === 'strongjaw') {
-					pokemon.setAbility('bestmisty');
+					pokemon.setAbility('beatmisty');
 				}
 			}
 		},
@@ -1406,7 +1406,7 @@ exports.Formats = [
 					pokemon.setAbility('jackyofalltrades');
 				}
 				if (name === 'pokson' && pokemon.getAbility().id === 'strongjaw') {
-					pokemon.setAbility('bestmisty');
+					pokemon.setAbility('beatmisty');
 				}
 			} else {
 				pokemon.canMegaEvo = this.canMegaEvo(pokemon); // Bypass one mega limit.
