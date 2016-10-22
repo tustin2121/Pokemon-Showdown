@@ -1137,7 +1137,7 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Flash Cannon', target);
 		},
 		onTryHit: function (target, source) {
-			if (pokemon.level < target.level) {
+			if (source.level < target.level) {
 				this.add('-immune', target, '[ohko]');
 				return false;
 			}
