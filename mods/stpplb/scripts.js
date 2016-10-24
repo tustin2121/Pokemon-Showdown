@@ -457,14 +457,6 @@ let leaguemon = {
 		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
 		megaability: 'jackyofalltrades',
 	},
-	"masterleozangetsu": {
-		leagues: [], //This pokemon is missing and not valid, and thus participates in no leagues
-		quotes: {
-			SwitchIn: "Sup o/",
-			Faint: "I didn't want to win anyways, was gonna forfeit",
-		},
-		// Pokemon specs needed
-	},
 	
 	'BEST': { // STPPB only
 		leagues: ["b"],
@@ -489,6 +481,67 @@ let leaguemon = {
 		signatureMove: 'godbird',
 		evs: {spa:252, def:4, spe:252}, nature: 'Timid',
 	},
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Pending Submission Queue - https://redd.it/4tvc1r
+	//--------------------------------------------------------------------------
+	// Take from the top, work your way down. SeemsGood
+	// These Pokemon are incomplete, and thus participate in no leagues.
+	// They must have a "leagues" property to not crash things, but it is empty, 
+	// so they are not selected.
+	// When a pokemon is complete, fill in the leagues and move it to where 
+	// appropriate above.
+	
+	"Some Goats": { // STPPLB+ only //Soma Ghost alt
+		leagues: [],
+		quotes: {
+			SwitchIn: "Nothing to see here. Just Some Goats passing through.",
+			SwitchOut: "Gotta Gogoat Fast!",
+			Faint: "BAHHHD GAME!",
+		},
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d72bs8j/
+	},
+	"masterleozangetsu": { // First Mon
+		leagues: [], 
+		quotes: {
+			SwitchIn: "Sup o/",
+			Faint: "I didn't want to win anyways, was gonna forfeit",
+		},
+		// http://pastebin.com/ZLgNhMR9
+	},
+	"Coryn216" : { // First Mon
+		leagues: [],
+		quotes: {
+			SwitchIn: "o/",
+			Faint: "o7",
+		},
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5podgs/
+	},
+	"Redwings1340": { // First Mon
+		leagues: [],
+		quotes: {
+			SwitchIn: "Quick pokemon battle before rp?",
+			Faint: "That was fun. I'm going to rp now.",
+		},
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
+	},
+	"Tustin2121": { // First Mon
+		leagues: [],
+		quotes: {
+			// Put quotes to the limit \o/
+			FirstTime: "I'm not very good at this whole competitive thing...",
+			SwitchIn: "Alright, time to try again.",
+			Faint: "I need to get back to work anyway.",
+		},
+		// Quilava (with base power of a Typhlosion)
+		// Item: Reinforced Glass | If the holder is hit with a super effective move, that move is nullified, and this item breaks. Single Use.
+		// Ability:
+		// ???
+		// Signiture Moves:
+		// Code Refactor | Special | Fire-Type | Power: 15 | Accuracy: 100% | PP: 15 | Hits 2-5 times | each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit. Says quotes about how horrible code is.
+		
+	}
+	
 };
 
 // Mon definition Support functions
