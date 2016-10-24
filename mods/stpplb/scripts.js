@@ -5,6 +5,26 @@ let leaguemon = {
 	// This is where all movesets are defined. Add new mons here.
 	// Please define primary and alt mons together, with primaries first.
 	// Please define non-user mons at the very bottom.
+	
+	/******* Template ******
+	'Player Name': {
+		leagues: ["lb", "lb+", "b"], //Leagues they can participate in.
+		quotes: {  //Quote block is required
+			SwitchIn: "I say this when I switch in!", //Required
+			Faint: "raw|this prints raw to the battle output when I faint!", //Required
+			SwitchOut: "Something to say when switching out.", //Optional
+			// If a required quote is assigned a 0, a default message will not print for it.
+		},
+		species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
+		moves: ['moonblast', 'hyperbeam', 'fireblast'], //Random moves that will be filled in
+		signatureMove: 'darkfire', //Single move that this pokemon will alway have
+		signatureMoves: ['fakeout', 'partingvoltturn'], //OR multiple moves this pokemon will always have
+		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
+		megaability: 'darkaura', //Including this will ensure mega evolutions will have this ability
+		onSwitchIn: function(pokemon) {}, //A function to run when switched in
+		onSwitchOut: function(pokemon) {}, //A function to run when switched out
+	},
+	 */
 	'darkfiregamer': {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
@@ -15,11 +35,7 @@ let leaguemon = {
 		moves: ['moonblast', 'hyperbeam', 'fireblast'],
 		signatureMove: 'darkfire',
 		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-		megafix : function(pokemon) {
-			if (pokemon.getAbility().id === 'solarpower') {
-				pokemon.setAbility('darkaura');
-			}
-		},
+		megaability: 'darkaura',
 	},
 	'xfix': {
 		leagues: ["lb", "lb+", "b"],
@@ -181,11 +197,7 @@ let leaguemon = {
 		moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
 		signatureMove: 'beatingmist',
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
-		megafix : function(pokemon) {
-			if (pokemon.getAbility().id === 'strongjaw') {
-				pokemon.setAbility('beatmisty');
-			}
-		},
+		megaability: 'beatmisty',
 	},
 	'Speedy Pokson': { // STPPLB+ only
 		leagues: ["lb+", "b"],
@@ -230,11 +242,7 @@ let leaguemon = {
 		moves: ['barrier', 'craftyshield', 'trick', 'block', 'disable', 'stickyweb', 'embargo', 'quash', 'taunt', 'knockoff', 'bulletpunch'],
 		signatureMove: 'ironfist',
 		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-		megafix : function(pokemon) {
-			if (pokemon.getAbility().id === 'technician') {
-				pokemon.setAbility('Technicality');
-			}
-		},
+		megaability: 'Technicality',
 	},
 	'MegaCharizard': {
 		leagues: ["lb", "lb+", "b"],
@@ -338,11 +346,7 @@ let leaguemon = {
 		moves: ['firepunch', 'thunderpunch', 'icepunch', 'drainpunch', 'megapunch', 'endure'],
 		signatureMove: 'psychocut',
 		evs: {atk: 252, spe: 252, hp: 4}, nature: 'Adamant',
-		megafix : function(pokemon) {
-			if (pokemon.getAbility().id !== 'physicalakazam') {
-				pokemon.setAbility('Physicalakazam');
-			}
-		},
+		megaability: 'physicalakazam',
 	},
 	'Leonys': {
 		leagues: ["lb", "lb+", "b"],
@@ -451,11 +455,7 @@ let leaguemon = {
 		moves: ['nightslash', 'slash', 'psychocut', 'shadowclaw', 'playrough', 'knockoff'],
 		signatureMoves: ['quityourbullshit', 'keepcalmandfocus'],
 		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-		megafix : function(pokemon) {
-			if (pokemon.getAbility().id === 'magicbounce') {
-				pokemon.setAbility('jackyofalltrades');
-			}
-		},
+		megaability: 'jackyofalltrades',
 	},
 	"masterleozangetsu": {
 		leagues: [], //This pokemon is missing and not valid, and thus participates in no leagues
@@ -656,9 +656,12 @@ exports.BattleScripts = {
 				this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
 			}
 		}
-
-		pokemon.setAbility(template.abilities['0']);
-		pokemon.baseAbility = pokemon.ability;
+		
+		let newAbility = ((pokemon.set) ? pokemon.set.megaability : undefined) || template.abilities['0'];
+		if (newAbility !== pokemon.getAbility().id) {
+			pokemon.setAbility(newAbility);
+			pokemon.baseAbility = pokemon.ability;
+		}
 		pokemon.canMegaEvo = false;
 		return true;
 	},

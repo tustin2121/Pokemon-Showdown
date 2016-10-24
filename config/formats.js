@@ -1371,23 +1371,11 @@ exports.Formats = [
 		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
 		debug: true,
 		
-		onUpdate: function (pokemon) { // called whenever a pokemon changes
-			let name = toId(pokemon.name);
-			if (pokemon.template.isMega) { // some foolery to give megas their proper ability
-				if (pokemon.set && pokemon.set.megafix) {
-					pokemon.set.megafix(pokemon);
-				}
-			}
-		},
 		onSwitchInPriority: 1,
 		onSwitchIn: function (pokemon) {
 			let name = toId(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
 			if (!pokemon.set) throw new Error("Pokemon's set is not set!");
-			if (pokemon.template.isMega) { // more hackery for mega abilities.
-				if (pokemon.set.megafix) {
-					pokemon.set.megafix.call(this, pokemon);
-				}
-			} else {
+			if (!pokemon.template.isMega) { // more hackery for mega abilities.
 				pokemon.canMegaEvo = this.canMegaEvo(pokemon); // Bypass one mega limit.
 			}
 			
@@ -1410,6 +1398,10 @@ exports.Formats = [
 	
 		onSwitchOut: function (pokemon) {
 			let name = toId(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
+			
+			if (pokemon.set.onSwitchOut) 
+				pokemon.set.onSwitchOut.call(this, pokemon);
+			
 			this.sayQuote(pokemon, "SwitchOut");
 	
 			// Mix and Mega stuff
