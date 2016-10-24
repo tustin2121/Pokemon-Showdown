@@ -286,7 +286,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			for (let i = 0; i < foeactive.length; i++) {
 				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
 				if (!activated) {
-					this.add('-ability', pokemon, 'Dictator');
+					this.add('-ability', pokemon, 'Dictator', 'boost');
 					activated = true;
 				}
 				if (foeactive[i].volatiles['substitute']) {

@@ -1374,105 +1374,27 @@ exports.Formats = [
 		onUpdate: function (pokemon) { // called whenever a pokemon changes
 			let name = toId(pokemon.name);
 			if (pokemon.template.isMega) { // some foolery to give megas their proper ability
-				if (name === 'darkfiregamer' && pokemon.getAbility().id === 'solarpower') {
-					pokemon.setAbility('darkaura');
-				}
-				if (name === 'dictatormantis' && pokemon.getAbility().id === 'technician') {
-					pokemon.setAbility('Technicality');
-				}
-				if (name === 'hazorex' && pokemon.getAbility().id !== 'physicalakazam') {
-					pokemon.setAbility('Physicalakazam');
-				}
-				if (name === 'lyca' && pokemon.getAbility().id === 'magicbounce') {
-					pokemon.setAbility('jackyofalltrades');
-				}
-				if (name === 'pokson' && pokemon.getAbility().id === 'strongjaw') {
-					pokemon.setAbility('beatmisty');
+				if (pokemon.set && pokemon.set.megafix) {
+					pokemon.set.megafix(pokemon);
 				}
 			}
 		},
 		onSwitchInPriority: 1,
 		onSwitchIn: function (pokemon) {
 			let name = toId(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
+			if (!pokemon.set) throw new Error("Pokemon's set is not set!");
 			if (pokemon.template.isMega) { // more hackery for mega abilities.
-				if (name === 'darkfiregamer' && pokemon.getAbility().id === 'solarpower') {
-					pokemon.setAbility('darkaura');
-				}
-				if (name === 'dictatormantis' && pokemon.getAbility().id === 'technician') {
-					pokemon.setAbility('Technicality');
-				}
-				if (name === 'hazorex' && pokemon.getAbility().id !== 'physicalakazam') {
-					pokemon.setAbility('Physicalakazam');
-				}
-				if (name === 'lyca' && pokemon.getAbility().id === 'magicbounce') {
-					pokemon.setAbility('jackyofalltrades');
-				}
-				if (name === 'pokson' && pokemon.getAbility().id === 'strongjaw') {
-					pokemon.setAbility('beatmisty');
+				if (pokemon.set.megafix) {
+					pokemon.set.megafix.call(this, pokemon);
 				}
 			} else {
 				pokemon.canMegaEvo = this.canMegaEvo(pokemon); // Bypass one mega limit.
 			}
-			if (name === 'somaghost' && !pokemon.illusion) {
-				this.add('-start', pokemon, 'typechange', 'Normal/Ghost');
-				pokemon.types = ['Normal', 'Ghost'];
-			}
-			if (name === 'cerebralharlot' && !pokemon.illusion) {
-				this.add('-start', pokemon, 'typechange', 'Ghost/Fairy');
-				pokemon.types = ['Ghost', 'Fairy'];
-			}
-			if (name === 'pikalaxalt') {
-				this.boost({def:1, spd:1}, pokemon);
-			}
-			if (name === 'xfix') {
-				this.add("c|xfix|YayBot will be updated soon, okay?");
-			} else if (name === 'azum4roll') {
-				this.add("c|azum4roll|What? I'm just a normal Azumarill.");
-			} else if (name === 'lasszeowx') {
-				this.add("c|Lass zeowx|Oh, a new challenger?");
-			} else if (name === 'kapnkooma') {
-				this.add("c|Kap'n Kooma|Hoist the black flag lads!");
-			} else if (name === 'kooma9') {
-				this.add("c|Kooma9|ello");
-			} else if (name === 'sohippy') {
-				this.add("c|sohippy|Here I come WAHAHAHAHAHAHAHAHAHAHA! KAPOW");
-			} else if (name === 'best') {
-				this.add("raw|<big>GO AWAY</big>");
-			} else if (name === 'poomph') {
-				this.add("c|Poomph|I'm sure I'll win this time!");
-			} else if (name === 'tadpole0fdoom') {
-				this.add("c|Tadpole_0f_Doom|I'm not racist. I own Pokemon Black. TriHard");
-			} else if (name === 'trollkitten') {
-				this.add("c|TrollKitten|Have time to listen to my lore?");
-			} else if (name === 'bigfatmantis') {
-				this.add("c|BigFatMantis|gldhf");
-			} else if (name === 'nofunmantis') {
-				this.add("c|NoFunMantis|gldhf");
-			} else if (name === 'dictatormantis') {
-				this.add("c|DictatorMantis|Do you even have enough yays to be battling?");
-			} else if (name === 'xinc') {
-				this.add("c|Xinc|Iwa took Gengar. DansGame");
-			} else if (name === 'natsugan') {
-				this.add('c|Natsugan|Flygonite when');
-			} else if (name === 'pikalaxalt') {
-				this.add('c|PikalaxALT|ヽ༼ຈل͜ຈ༽ﾉ RIOT ヽ༼ຈل͜ຈ༽ﾉ');
-			} else if (name === 'colewalski') {
-				this.add('c|ColeWalski|Allons-y and GERONIMOOO!');
-			} else if (name === 'liria10') {
-				this.add("c|Liria_10|let's draw all night!");
-			} else if (name === 'speedypokson') {
-				this.add("c|Speedy Pokson|YOU'RE TOO SLOW!");
-			} else if (name === 'pokson') {
-				this.add("c|Pokson|You won't be able to beat me!");
-			} else if (name === 'lorewritercole') {
-				this.add("c|Lorewriter Cole|I fight this battle in the name of the gods of TPP!");
-			} else if (name === 'cerebralharlot') {
-				this.add("c|Cerebral_Harlot|Yo.");
-			} else if (name === 'masterleozangetsu') {
-				this.add("c|MasterLeoZangetsu|Sup o/");
-			} else {
-				this.add('c|' + (pokemon.illusion ? pokemon.illusion.name : pokemon.name) + '|PLACEHOLDER MESSAGE PLEASE CONTACT TIESOUL');
-			}
+			
+			if (pokemon.set.onSwitchIn) 
+				pokemon.set.onSwitchIn.call(this, pokemon);
+			
+			this.sayQuote(pokemon, "SwitchIn");
 			
 			// Mix and Mega stuff
 			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
@@ -1488,9 +1410,7 @@ exports.Formats = [
 	
 		onSwitchOut: function (pokemon) {
 			let name = toId(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
-			if (name === 'cerebralharlot') {
-				this.add("c|Cerebral_Harlot|See ya.");
-			}
+			this.sayQuote(pokemon, "SwitchOut");
 	
 			// Mix and Mega stuff
 			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
@@ -1500,52 +1420,7 @@ exports.Formats = [
 		},
 	
 		onFaint: function (pokemon) { // PJSalt-y faint messages go here.
-			let name = toId(pokemon.name);
-			if (name === 'xfix') {
-				this.add("c|xfix|I'm not going to update YayBot if you defeat me like that...");
-			} else if (name === 'azum4roll') {
-				this.add("c|azum4roll|This game doesn't have enough glitches!");
-			} else if (name === 'lasszeowx') {
-				this.add("c|Lass zeowx|When can I beat TPPLA BibleThump");
-			} else if (name === 'kapnkooma') {
-				this.add("c|Kap'n Kooma|Avast! I be needing a pint of grog after this.");
-			} else if (name === 'kooma9') {
-				this.add("c|Kooma9|Most Disappointing Player 2015");
-			} else if (name === 'sohippy') {
-				this.add("c|sohippy|The WAHAHA never dies! KAPOW");
-			} else if (name === 'best') {
-				this.add("raw|<big>BEST? FALLED</big>");
-			} else if (name === 'poomph') {
-				this.add("c|Poomph|0/4 again. DansGame");
-			} else if (name === 'tadpole0fdoom') {
-				this.add("c|Tadpole_0f_Doom|You'll never take me alive!");
-			} else if (name === 'trollkitten') {
-				this.add("c|TrollKitten|I need time away from the sub to clear my head after this.");
-			} else if (name === 'bigfatmantis') {
-				this.add("c|BigFatMantis|GGioz");
-			} else if (name === 'nofunmantis') {
-				this.add("c|NoFunMantis|GGCtrl27");
-			} else if (name === 'dictatormantis') {
-				this.add("c|DictatorMantis|bg DansGame");
-			} else if (name === 'xinc') {
-				this.add("c|Xinc|Bruh");
-			} else if (name === 'natsugan') {
-				this.add('c|Natsugan|hax imo');
-			} else if (name === 'pikalaxalt') {
-				this.add('c|PikalaxALT|Wow Deku OneHand');
-			} else if (name === 'colewalski') {
-				this.add('c|ColeWalski|Dced again');
-			} else if (name === 'liria10') {
-				this.add('c|Liria_10|why is art so difficult ;_;');
-			} else if (name === 'speedypokson') {
-				this.add("c|Speedy Pokson|C'MON, STEP IT UP!");
-			} else if (name === 'pokson') {
-				this.add("c|Pokson|Ech, fine, you Beat Me...");
-			} else if (name === 'lorewritercole') {
-				this.add("c|Lorewriter Cole|Dammit, mental block, I have no idea how to continue this story...");
-			} else if (name === 'masterleozangetsu') {
-				this.add("c|MasterLeoZangetsu|I didn't want to win anyways, was gonna forfeit");
-			}
+			this.sayQuote(pokemon, "Faint");
 		},
 
 		onBegin: function () {
