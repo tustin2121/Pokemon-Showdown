@@ -536,29 +536,32 @@ exports.BattleScripts = {
 		for (let i = 0; i < 6; i++) {
 			let name = this.sampleNoReplace(pool);
 			let set = clone(leaguemon[name]);
-			if (!set.leagues.includes(league)) { i--; continue; } //try again
-			set.level = 100;
 			set.name = name;
-			if (typeof set.item == "function") set.item = set.item.call(this);
-			if (!set.ivs) {
-				set.ivs = {hp:31, atk:31, def:31, spa:31, spd:31, spe:31};
-			} else {
-				for (let iv in {hp:31, atk:31, def:31, spa:31, spd:31, spe:31}) {
-					set.ivs[iv] = iv in set.ivs ? set.ivs[iv] : 31;
-				}
-			}
-			// Assuming the hardcoded set evs are all legal.
-			if (!set.evs) set.evs = {hp:84, atk:84, def:84, spa:84, spd:84, spe:84};
-			if (set.signatureMove) set.signatureMoves = [set.signatureMove];
-			let len = set.signatureMoves.length;
-			let moves = set.signatureMoves;
-			for (let j = 0; j < 4 - len; j++) {
-				moves = [this.sampleNoReplace(set.moves)].concat(moves);
-			}
-			set.moves = moves;
+			if (!set.leagues.includes(league)) { i--; continue; } //try again
+			this.prepareTPPMonSet(set);
 			team.push(set);
 		}
 		return team;
+	},
+	prepareTPPMonSet: function(set) {
+		set.level = 100;
+		if (typeof set.item == "function") set.item = set.item.call(this);
+		if (!set.ivs) {
+			set.ivs = {hp:31, atk:31, def:31, spa:31, spd:31, spe:31};
+		} else {
+			for (let iv in {hp:31, atk:31, def:31, spa:31, spd:31, spe:31}) {
+				set.ivs[iv] = iv in set.ivs ? set.ivs[iv] : 31;
+			}
+		}
+		// Assuming the hardcoded set evs are all legal.
+		if (!set.evs) set.evs = {hp:84, atk:84, def:84, spa:84, spd:84, spe:84};
+		if (set.signatureMove) set.signatureMoves = [set.signatureMove];
+		let len = set.signatureMoves.length;
+		let moves = set.signatureMoves;
+		for (let j = 0; j < 4 - len; j++) {
+			moves = [this.sampleNoReplace(set.moves)].concat(moves);
+		}
+		set.moves = moves;
 	},
 	
 	sayQuote: function(pokemon, event, defQuote) {
@@ -595,6 +598,34 @@ exports.BattleScripts = {
 	},
 	randomtppbTeam: function (side) {
 		return this.chooseTeamFor("b");
+	},
+	
+	// Copied from /data/scripts.js, and modified
+	getTeam: function (side, team) {
+		const format = this.getFormat();
+		const teamGenerator = typeof format.team === 'string' && format.team.startsWith('random') ? format.team + 'Team' : '';
+		if (!teamGenerator && team) { //CHANGES START HERE
+			// If we have a team already, we can replace the team based on name matching
+			for (let i = 0; i < team.length; i++) {
+				let name = team[i].name;
+				if (leaguemon[name]) { //If we have a mon by that name, replace
+					this.debug(`Found matching TPP mon by the name ${name}! Replacing with set!`);
+					// Copied from chooseTeamFor
+					let set = clone(leaguemon[name]);
+					set.name = name;
+					this.prepareTPPMonSet(set);
+					team[i] = set;
+				}
+			}
+			return team; //CHANGES END HERE
+		} else {
+			// Reinitialize the RNG seed to create random teams.
+			this.startingSeed = this.startingSeed.concat(this.generateSeed());
+			team = this[teamGenerator || 'randomTeam'](side);
+			// Restore the default seed
+			this.seed = this.startingSeed.slice(0, 4);
+			return team;
+		}
 	},
 
 	// Mix and Mega stuff
@@ -662,6 +693,7 @@ exports.BattleScripts = {
 			pokemon.setAbility(newAbility);
 			pokemon.baseAbility = pokemon.ability;
 		}
+		this.add('-ability', pokemon, this.getAbility(newAbility), '[from] shutup client', '[silent]');
 		pokemon.canMegaEvo = false;
 		return true;
 	},

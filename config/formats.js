@@ -2090,5 +2090,6 @@ if (stpplb) {
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
 		onBegin: stpplb.onBegin,
+		validateSet: function(){ return false; } // Always validate
 	});
 }
