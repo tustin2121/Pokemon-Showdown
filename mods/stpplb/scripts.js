@@ -247,8 +247,8 @@ let leaguemon = {
 	'MegaCharizard': {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			SwitchIn: "o/",
+			Faint: "rip the dream",
 		},
 		species: 'Charizard', ability: 'Truant', item: 'Charizardite Y', gender: 'M',
 		moves: ['airslash', 'earthpower', 'roost', 'slackoff', 'flamethrower'],
@@ -339,8 +339,8 @@ let leaguemon = {
 	'HazorEx': {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			SwitchIn: "New Meta",
+			Faint: "Bulkymence DansGame",
 		},
 		species: 'Alakazam', ability: 'Physicalakazam', item: 'Alakazite', gender: 'M',
 		moves: ['firepunch', 'thunderpunch', 'icepunch', 'drainpunch', 'megapunch', 'endure'],
