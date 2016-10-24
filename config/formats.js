@@ -1369,6 +1369,8 @@ exports.Formats = [
 		searchShow: true,
 		team: 'randomtpplb',
 		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
+		debug: true,
+		
 		onUpdate: function (pokemon) { // called whenever a pokemon changes
 			let name = toId(pokemon.name);
 			if (pokemon.template.isMega) { // some foolery to give megas their proper ability
@@ -1483,20 +1485,20 @@ exports.Formats = [
 				}
 			}
 		},
-
+	
 		onSwitchOut: function (pokemon) {
 			let name = toId(pokemon.illusion ? pokemon.illusion.name : pokemon.name);
 			if (name === 'cerebralharlot') {
 				this.add("c|Cerebral_Harlot|See ya.");
 			}
-
+	
 			// Mix and Mega stuff
 			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
 			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
 				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
 			}
 		},
-
+	
 		onFaint: function (pokemon) { // PJSalt-y faint messages go here.
 			let name = toId(pokemon.name);
 			if (name === 'xfix') {

@@ -690,6 +690,8 @@ exports.BattleMovedex = {
 				];
 				target.item = megaStoneList[this.random(megaStoneList.length)];
 				this.add('-item', target, target.getItem(), '[from] move: Re-Roll');
+			} else {
+				this.add('-fail', target);
 			}
 		},
 		name: 'Re-Roll',
@@ -835,7 +837,7 @@ exports.BattleMovedex = {
 			}
 			let oldAbility = pokemon.setAbility('furcoat');
 			if (oldAbility) {
-				this.add('-endability', pokemon, oldAbility, '[from] move: Yiff Yiff');
+				// this.add('-endability', pokemon, oldAbility, '[from] move: Yiff Yiff');
 				this.add('-ability', pokemon, 'Fur Coat', '[from] move: Yiff Yiff');
 			}
 			return;
@@ -1137,11 +1139,16 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Flash Cannon', target);
 		},
 		onTryHit: function (target, source) {
+			this.debug("onTryHit: source.level < target.level ==> "+(source.level < target.level));
 			if (source.level < target.level) {
 				this.add('-immune', target, '[ohko]');
 				return false;
 			}
-			if (target.volatiles['lockon'] && source === target.volatiles['lockon'].source) return true;
+			this.debug("onTryHit: lockon present ==> "+(!!source.volatiles['lockon']));
+			if (source.volatiles['lockon']) this.debug("onTryHit: lockon source match ==> "+(target === source.volatiles['lockon'].source));
+			
+			if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return true;
+			this.debug("onTryHit: noguard test ==> "+(source.hasAbility('noguard') || target.hasAbility('noguard')));
 			if (source.hasAbility('noguard') || target.hasAbility('noguard')) return true;
 			return false;
 		},

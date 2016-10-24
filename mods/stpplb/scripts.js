@@ -1,59 +1,310 @@
 "use strict";
+const clone = require("clone");
+
+let leaguemon = { 
+	// This is where all movesets are defined. Add new mons here.
+	// Please define primary and alt mons together, with primaries first.
+	// Please define non-user mons at the very bottom.
+	'darkfiregamer': {
+		leagues: ["lb", "lb+", "b"],
+		species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
+		moves: ['moonblast', 'hyperbeam', 'fireblast'],
+		signatureMove: 'darkfire',
+		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
+	},
+	'xfix': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Xatu', ability: 'Mirror Guard', item: 'Focus Sash', gender: 'M',
+		moves: ['thunderwave', 'substitute', 'roost'],
+		signatureMove: 'superglitch',
+		evs: {hp:252, spd:252, def:4}, nature: 'Calm',
+	},
+	'azum4roll': {
+		leagues: ["lb", "lb+", "b"],
+		species: "Azumarill", ability: "Glitchiate", item: "Metronome", gender: 'M',
+		moves: ['rollout', 'batonpass', 'swordsdance', 'bellydrum', 'extremespeed', 'playrough', 'thunderwave'],
+		signatureMove: 'tm56',
+		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+	},
+	'Iwamiger': { 
+		leagues: ["lb", "lb+", "b"],
+		species: "Gengar", ability: 'Serene Grace Plus', item: "Life Orb", gender: 'M',
+		moves: ['shadowball', 'flamethrower', 'icebeam', 'crunch'],
+		signatureMove: 'hexattack',
+		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
+	},
+	'TieSoul': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
+		moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
+		signatureMove: 'typeroulette',
+		evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
+	},
+	'BulkSoul': { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Rhyperior', ability: 'Rock Head', item: 'Focus Sash', gender: 'M',
+		moves: ['headsmash', 'autotomize', 'earthquake'],
+		signatureMove: 'bulk',
+		evs: {hp:252, def:252, spe:4}, nature: 'Impish',
+	},
+	"Soma Ghost": {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
+		moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
+		signatureMove: 'shadowrush',
+		evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
+	},
+	"Lass zeowx": { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
+		moves: ['suckerpunch', 'shadowsneak', 'bulletpunch', 'playrough', 'spikes', 'acrobatics'],
+		signatureMoves: ['fakeout', 'partingvoltturn'],
+		evs: {atk:252, spa:12, spe:244}, nature: 'Hasty',
+	},
+	"Eeveelutionlvr": {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Eevee', ability: 'Proteon', item: 'Eviolite', gender: 'M',
+		moves: ['hydropump', 'flareblitz', 'thunderbolt', 'batonpass', 'nastyplot', 'dazzlinggleam', 'energyball', 'leechseed', 'blizzard', 'nightslash', 'psychic', 'hyperbeam'], // azum stop nagging about this moveset.
+		signatureMove: 'evolutionbeam',
+		evs: {spa:252, spe:252, hp:4}, nature: 'Timid',
+	},
+	'sohippy': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
+		moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
+		signatureMove: 'hyperwahahahahaha',
+		evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
+	},
+	'Kooma9': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Blastoise-Mega', ability: 'Psychologist', item: 'Focus Sash', gender: 'M',
+		moves: ['scald', 'roar', 'toxic'],
+		signatureMove: 'disappointment',
+		evs: {hp:252, def:252, spa:4}, nature: 'Bold',
+	},
+	"Kap'n Kooma": { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Kingdra', ability: 'Sea and Sky', item: 'Choice Specs', gender: 'M',
+		moves: ['scald', 'dracometeor', 'thunder'],
+		signatureMove: 'broadside',
+		evs: {hp:4, spa:252, spe:252}, nature: 'Modest',
+	},
+	'Poomph':{
+		leagues: ["lb", "lb+", "b"],
+		species: "Ampharosmega", ability: "Little Engine", item: 'Life Orb', gender: 'M',
+		moves: ['surf', 'powergem', 'detect', 'wish', 'nastyplot'],
+		signatureMove: 'eternalstruggle',
+		happiness: 0,
+		evs: {hp:252, spa:252, def:4}, nature: 'Modest',
+	},
+	'Poomphcario': { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: "Lucario", ability: "Scrappy", item: 'Assault Vest', gender: 'M',
+		moves: ['rockwrecker', 'megahorn', 'bulletpunch'],
+		signatureMove: 'projectilespam',
+		evs: {hp:4, atk:252, spe:252}, nature: 'Jolly',
+	},
+	'Pokson': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
+		moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
+		signatureMove: 'beatingmist',
+		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
+	},
+	'Speedy Pokson': { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
+		moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
+		signatureMoves: ['spindash', 'boost'],
+		evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
+	},
+	'BigFatMantis': {
+		leagues: ["lb", "lb+", "b"],
+		species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
+		moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
+		signatureMove: 'nofun',
+		evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
+	},
+	'NoFunMantis':{ // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: "Scyther", ability: "No Fun Allowed", item: 'Eviolite', gender: 'M',
+		moves: ['knockoff', 'brickbreak', 'aerialace', 'swordsdance', 'agility', 'batonpass', 'roost'],
+		signatureMove: 'xscissor',
+		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+	},
+	'DictatorMantis': { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Scizor', ability: 'Technicality', item: 'Occa Berry', gender: 'M',
+		moves: ['barrier', 'craftyshield', 'trick', 'block', 'disable', 'stickyweb', 'embargo', 'quash', 'taunt', 'knockoff', 'bulletpunch'],
+		signatureMove: 'ironfist',
+		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+	},
+	'MegaCharizard': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Charizard', ability: 'Truant', item: 'Charizardite Y', gender: 'M',
+		moves: ['airslash', 'earthpower', 'roost', 'slackoff', 'flamethrower'],
+		signatureMove: 'afk',
+		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
+	},
+	'Natsugan': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Flygon', ability: 'Mega Plunder', gender: 'M',
+		item: randomMegaStone,
+		moves: ['earthquake', 'earthpower', 'uturn', 'dragonclaw', 'fireblast', 'boomburst', 'dragonpulse', 'return', 'stoneedge', 'crunch', 'ironhead', 'dragondance', 'quiverdance'],
+		signatureMove: 'reroll',
+		evs: {hp:88, atk: 84, def: 84, spa: 84, spd: 84, spe: 84}, nature: 'Serious',
+	},
+	'GroundCtrl27': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Meloetta', ability: 'Scrappy', item: 'Assault Vest', gender: 'M',
+		moves: ['hypervoice', 'psyshock', 'sneakyspook'],
+		signatureMoves: ['shadowsphere', 'drainforce'],
+		evs: {hp: 248, spa: 252, spe: 8}, nature: 'Modest',
+	},
+	'Whatevs4': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Sneasel', ability: 'Technician', item: 'Dark Gem', gender: 'F',
+		moves: ['aerialace', 'stormthrow', 'thief'],
+		signatureMove: 'arcticslash',
+		evs: {atk: 252, hp: 4, spe: 252}, nature: 'Jolly',
+	},
+	'WhatevsFur': { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Ursaring', ability: 'Furrier Coat', item: 'Leftovers', gender: 'F',
+		moves: ['earthquake', 'drainpunch'],
+		signatureMoves: ['wish', 'aromatherapy', 'bulkup'],
+		evs: {hp: 252, def: 168, spd: 88}, nature: 'Calm',
+	},
+	'PikalaxALT': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Pikachu', ability: 'Pika Power', item: 'Light Ball', gender: 'M',
+		moves: ['thunder', 'thunderbolt', 'quickattack', 'voltswitch', 'irontail'],
+		signatureMove: 'toucan',
+		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Hasty',
+	},
+	'Tadpole_0f_Doom': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Poliwrath', ability: 'Ban Evade', item: 'BrightPowder', gender: 'M',
+		moves: ['closecombat', 'waterfall', 'icepunch', 'endure', 'bellydrum'],
+		signatureMove: 'thousandalts',
+		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
+	},
+	'MihiraTheTiger': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Mamoswine', ability: 'Technician', item: 'Leftovers', gender: 'M',
+		moves: ['iceshard', 'stealthrock'],
+		signatureMoves: ['yiffyiff', 'bawk'],
+		evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
+	},
+	'HazorEx': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Alakazam', ability: 'Physicalakazam', item: 'Alakazite', gender: 'M',
+		moves: ['firepunch', 'thunderpunch', 'icepunch', 'drainpunch', 'megapunch', 'endure'],
+		signatureMove: 'psychocut',
+		evs: {atk: 252, spe: 252, hp: 4}, nature: 'Adamant',
+	},
+	'Leonys': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Flareon', ability: 'Incinerate', item: 'Choice Band', gender: 'M',
+		moves: ['volttackle', 'drillrun', 'irontail', 'revenge', 'pursuit', 'zenheadbutt'],
+		signatureMoves: ['quickattack', 'doubleedge'],
+		evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
+	},
+	'Xinc': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Bisharp', ability: 'Defiant Plus', item: 'Leftovers', gender: 'M',
+		moves: ['knockoff', 'drainpunch', 'ironhead', 'suckerpunch', 'bulletpunch'],
+		signatureMove: 'ganonssword',
+		evs: {hp: 200, atk: 252, spe: 56}, nature: 'Adamant',
+	},
+	'Abyll': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Milotic', ability: 'Silver Scale', item: 'Lunchabylls', gender: 'M',
+		moves: ['dragontail', 'mirrorcoat', 'icebeam', 'recover'],
+		signatureMoves: ['rainbowspray'],
+		evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
+	},
+	'Trollkitten': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
+		moves: ['recover', 'echoedvoice'],
+		signatureMoves: ['drama', 'loratory'],
+		evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
+	},
+	'Cerebral_Harlot': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
+		moves: [],
+		signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
+		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
+	},
+	'ColeWalski': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
+		moves: ['hydropump', 'flashcannon'],
+		signatureMoves: ['setmine', 'locknload', 'assassinate'],
+		evs: {hp: 252, spa: 252, spe: 4}, nature: 'Modest',
+		ivs: {atk: 0},
+	},
+	'Lorewriter Cole': { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
+		moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
+		signatureMove: 'godswrath',
+		evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Serious',
+	},
+	'Liria_10': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Roserade', ability: 'Drawing Request', item: 'Black Sludge', gender: 'F',
+		moves: ['gigadrain', 'leechseed', 'sleeppowder', 'sludgebomb', 'spikes', 'toxicspikes', 'aromatherapy', 'synthesis'],
+		signatureMove: 'quicksketch',
+		evs: {hp: 252, spd: 240, spe: 16}, nature: 'Calm',
+		ivs: {atk: 0},
+	},
+	'Lyca': {
+		leagues: ["lb", "lb+", "b"],
+		species: 'Absol', ability: 'Jack(y) of All Trades', item: 'Scope Lens', gender: 'F',
+		moves: ['nightslash', 'slash', 'psychocut', 'shadowclaw', 'playrough', 'knockoff'],
+		signatureMoves: ['quityourbullshit', 'keepcalmandfocus'],
+		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
+	},
+	
+	'BEST': { // STPPB only
+		leagues: ["b"],
+		species: 'Typhlosion', ability: 'Technician', item: 'Life Orb', gender: 'M',
+		moves: ['waterpulse', 'hiddenpowerice', 'shockwave'],
+		ivs: {atk:30, def:30}, // in order for HP Ice to be a thing.
+		signatureMove: 'bestfcar',
+		evs: {spa:252, def:4, spe:252}, nature: 'Modest',
+	},
+	'Bird Jesus': { //STPPB only
+		leagues: ["b"],
+		species: 'Pidgeot', ability: 'Messiah', item: 'Flying Gem', gender: 'M',
+		moves: ['judgment', 'focusblast', 'roost', 'fireblast'],
+		signatureMove: 'godbird',
+		evs: {spa:252, def:4, spe:252}, nature: 'Timid',
+	},
+};
+
+// Mon definition Support functions
+function randomMegaStone() {
+	let megaStoneList = ['Abomasite', 'Absolite', 'Aerodactylite', 'Aggronite',
+		'Alakazite','Altarianite','Ampharosite','Audinite','Banettite','Beedrillite',
+		'Blastoisinite','Blazikenite','Cameruptite','Charizardite X','Charizardite Y',
+		'Diancite','Galladite','Garchompite','Gardevoirite','Gengarite','Glalitite',
+		'Gyaradosite','Heracronite','Houndoominite','Kangaskhanite','Latiasite',
+		'Latiosite','Lopunnite','Lucarionite','Manectite','Mawilite','Medichamite',
+		'Metagrossite','Mewtwonite X','Mewtwonite Y','Pidgeotite','Pinsirite',
+		'Sablenite','Salamencite','Sceptilite','Scizorite','Sharpedonite',
+		'Slowbronite','Steelixite','Swampertite','Tyranitarite','Venusaurite',
+		'Red Orb','Blue Orb',
+	];
+	return megaStoneList[this.random(megaStoneList.length)];
+}
 
 
-let megaStoneList = [
-	'Abomasite',
-	'Absolite',
-	'Aerodactylite',
-	'Aggronite',
-	'Alakazite',
-	'Altarianite',
-	'Ampharosite',
-	'Audinite',
-	'Banettite',
-	'Beedrillite',
-	'Blastoisinite',
-	'Blazikenite',
-	'Cameruptite',
-	'Charizardite X',
-	'Charizardite Y',
-	'Diancite',
-	'Galladite',
-	'Garchompite',
-	'Gardevoirite',
-	'Gengarite',
-	'Glalitite',
-	'Gyaradosite',
-	'Heracronite',
-	'Houndoominite',
-	'Kangaskhanite',
-	'Latiasite',
-	'Latiosite',
-	'Lopunnite',
-	'Lucarionite',
-	'Manectite',
-	'Mawilite',
-	'Medichamite',
-	'Metagrossite',
-	'Mewtwonite X',
-	'Mewtwonite Y',
-	'Pidgeotite',
-	'Pinsirite',
-	'Sablenite',
-	'Salamencite',
-	'Sceptilite',
-	'Scizorite',
-	'Sharpedonite',
-	'Slowbronite',
-	'Steelixite',
-	'Swampertite',
-	'Tyranitarite',
-	'Venusaurite',
-	'Red Orb',
-	'Blue Orb',
-];
 exports.BattleScripts = {
-	fastPop: function (list, index) {
+	fastPop: function(list, index) {
 		// If an array doesn't need to be in order, replacing the
 		// element at the given index with the removed element
 		// is much, much faster than using list.splice(index, 1).
@@ -63,7 +314,7 @@ exports.BattleScripts = {
 		list.pop();
 		return element;
 	},
-	sampleNoReplace: function (list) {
+	sampleNoReplace: function(list) {
 		// The cute code to sample no replace is:
 		//   return list.splice(this.random(length), 1)[0];
 		// However manually removing the element is twice as fast.
@@ -73,236 +324,17 @@ exports.BattleScripts = {
 		let index = this.random(length);
 		return this.fastPop(list, index);
 	},
-	randomtpplbTeam: function (side) {
+	chooseTeamFor: function(league) {
 		let team = [];
-		let sets = { // this is where all the movesets are defined. Add new mons here.
-			'darkfiregamer': {
-				species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
-				moves: ['moonblast', 'hyperbeam', 'fireblast'],
-				signatureMove: 'darkfire',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-			},
-			'xfix': {
-				species: 'Xatu', ability: 'Mirror Guard', item: 'Focus Sash', gender: 'M',
-				moves: ['thunderwave', 'substitute', 'roost'],
-				signatureMove: 'superglitch',
-				evs: {hp:252, spd:252, def:4}, nature: 'Calm',
-			},
-			'azum4roll': {
-				species: "Azumarill", ability: "Glitchiate", item: "Metronome", gender: 'M',
-				moves: ['rollout', 'batonpass', 'swordsdance', 'bellydrum', 'extremespeed', 'playrough', 'thunderwave'],
-				signatureMove: 'tm56',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'Iwamiger': {
-				species: "Gengar", ability: 'Serene Grace Plus', item: "Life Orb", gender: 'M',
-				moves: ['shadowball', 'flamethrower', 'icebeam', 'crunch'],
-				signatureMove: 'hexattack',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-			},
-			/*'Poomphcario': { // STPPLB+ only
-				species: "Lucario", ability: "Scrappy", item: 'Assault Vest', gender: 'M',
-				moves: ['rockwrecker', 'megahorn', 'bulletpunch'],
-				signatureMove: 'projectilespam',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Jolly',
-			},*/
-			/*'BulkSoul': { // STPPLB+ only
-				species: 'Rhyperior', ability: 'Rock Head', item: 'Focus Sash', gender: 'M',
-				moves: ['headsmash', 'autotomize', 'earthquake'],
-				signatureMove: 'bulk',
-				evs: {hp:252, def:252, spe:4}, nature: 'Impish',
-			},*/
-			'TieSoul': {
-				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
-				signatureMove: 'typeroulette',
-				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
-			},
-			"Soma Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
-				signatureMove: 'shadowrush',
-				evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
-			},
-			/*"Lass zeowx": { // STPPLB+ only
-				species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
-				moves: ['suckerpunch', 'shadowsneak', 'bulletpunch', 'playrough', 'spikes', 'acrobatics'],
-				signatureMoves: ['fakeout', 'partingvoltturn'],
-				evs: {atk:252, spa:12, spe:244}, nature: 'Hasty',
-			},*/
-			"Eeveelutionlvr": {
-				species: 'Eevee', ability: 'Proteon', item: 'Eviolite', gender: 'M',
-				moves: ['hydropump', 'flareblitz', 'thunderbolt', 'batonpass', 'nastyplot', 'dazzlinggleam', 'energyball', 'leechseed', 'blizzard', 'nightslash', 'psychic', 'hyperbeam'], // azum stop nagging about this moveset.
-				signatureMove: 'evolutionbeam',
-				evs: {spa:252, spe:252, hp:4}, nature: 'Timid',
-			},
-			'sohippy': {
-				species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
-				moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
-				signatureMove: 'hyperwahahahahaha',
-				evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
-			},
-			'Kooma9': {
-				species: 'Blastoise-Mega', ability: 'Psychologist', item: 'Focus Sash', gender: 'M',
-				moves: ['scald', 'roar', 'toxic'],
-				signatureMove: 'disappointment',
-				evs: {hp:252, def:252, spa:4}, nature: 'Bold',
-			},
-			/*"Kap'n Kooma": { // STPPLB+ only
-				species: 'Kingdra', ability: 'Sea and Sky', item: 'Choice Specs', gender: 'M',
-				moves: ['scald', 'dracometeor', 'thunder'],
-				signatureMove: 'broadside',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Modest',
-			},*/
-			/*'BEST': { // STPPB only
-				species: 'Typhlosion', ability: 'Technician', item: 'Life Orb', gender: 'M',
-				moves: ['waterpulse', 'hiddenpowerice', 'shockwave'],
-				ivs: {atk:30, def:30}, // in order for HP Ice to be a thing.
-				signatureMove: 'bestfcar',
-				evs: {spa:252, def:4, spe:252}, nature: 'Modest',
-			},*/
-			'Poomph':{
-				species: "Ampharosmega", ability: "Little Engine", item: 'Life Orb', gender: 'M',
-				moves: ['surf', 'powergem', 'detect', 'wish', 'nastyplot'],
-				signatureMove: 'eternalstruggle',
-				happiness: 0,
-				evs: {hp:252, spa:252, def:4}, nature: 'Modest',
-			},
-			/*'NoFunMantis':{ // STPPLB+ only
-				species: "Scyther", ability: "No Fun Allowed", item: 'Eviolite', gender: 'M',
-				moves: ['knockoff', 'brickbreak', 'aerialace', 'swordsdance', 'agility', 'batonpass', 'roost'],
-				signatureMove: 'xscissor',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},*/
-			'BigFatMantis': {
-				species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
-				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
-				signatureMove: 'nofun',
-				evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
-			},
-			/*'DictatorMantis': { // STPPLB+ only
-				species: 'Scizor', ability: 'Technicality', item: 'Occa Berry', gender: 'M',
-				moves: ['barrier', 'craftyshield', 'trick', 'block', 'disable', 'stickyweb', 'embargo', 'quash', 'taunt', 'knockoff', 'bulletpunch'],
-				signatureMove: 'ironfist',
-				evs: {hp:4,atk:252,spe:252}, nature: 'Adamant',
-			},*/
-			'MegaCharizard': {
-				species: 'Charizard', ability: 'Truant', item: 'Charizardite Y', gender: 'M',
-				moves: ['airslash', 'earthpower', 'roost', 'slackoff', 'flamethrower'],
-				signatureMove: 'afk',
-				evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
-			},
-			'Natsugan': {
-				species: 'Flygon', ability: 'Mega Plunder', item: megaStoneList[this.random(megaStoneList.length)], gender: 'M',
-				moves: ['earthquake', 'earthpower', 'uturn', 'dragonclaw', 'fireblast', 'boomburst', 'dragonpulse', 'return', 'stoneedge', 'crunch', 'ironhead', 'dragondance', 'quiverdance'],
-				signatureMove: 'reroll',
-				evs: {hp:88, atk: 84, def: 84, spa: 84, spd: 84, spe: 84}, nature: 'Serious',
-			},
-			'GroundCtrl27': {
-				species: 'Meloetta', ability: 'Scrappy', item: 'Assault Vest', gender: 'M',
-				moves: ['hypervoice', 'psyshock', 'sneakyspook'],
-				signatureMoves: ['shadowsphere', 'drainforce'],
-				evs: {hp: 248, spa: 252, spe: 8}, nature: 'Modest',
-			},
-			'PikalaxALT': {
-				species: 'Pikachu', ability: 'Pika Power', item: 'Light Ball', gender: 'M',
-				moves: ['thunder', 'thunderbolt', 'quickattack', 'voltswitch', 'irontail'],
-				signatureMove: 'toucan',
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Hasty',
-			},
-			'Tadpole_0f_Doom': {
-				species: 'Poliwrath', ability: 'Ban Evade', item: 'BrightPowder', gender: 'M',
-				moves: ['closecombat', 'waterfall', 'icepunch', 'endure', 'bellydrum'],
-				signatureMove: 'thousandalts',
-				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-			},
-			'Whatevs4': {
-				species: 'Sneasel', ability: 'Technician', item: 'Dark Gem', gender: 'F',
-				moves: ['aerialace', 'stormthrow', 'thief'],
-				signatureMove: 'arcticslash',
-				evs: {atk: 252, hp: 4, spe: 252}, nature: 'Jolly',
-			},
-			'MihiraTheTiger': {
-				species: 'Mamoswine', ability: 'Technician', item: 'Leftovers', gender: 'M',
-				moves: ['iceshard', 'stealthrock'],
-				signatureMoves: ['yiffyiff', 'bawk'],
-				evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
-			},
-			'HazorEx': {
-				species: 'Alakazam', ability: 'Physicalakazam', item: 'Alakazite', gender: 'M',
-				moves: ['firepunch', 'thunderpunch', 'icepunch', 'drainpunch', 'megapunch', 'endure'],
-				signatureMove: 'psychocut',
-				evs: {atk: 252, spe: 252, hp: 4}, nature: 'Adamant',
-			},
-			'Leonys': {
-				species: 'Flareon', ability: 'Incinerate', item: 'Choice Band', gender: 'M',
-				moves: ['volttackle', 'drillrun', 'irontail', 'revenge', 'pursuit', 'zenheadbutt'],
-				signatureMoves: ['quickattack', 'doubleedge'],
-				evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
-			},
-			'Xinc': {
-				species: 'Bisharp', ability: 'Defiant Plus', item: 'Leftovers', gender: 'M',
-				moves: ['knockoff', 'drainpunch', 'ironhead', 'suckerpunch', 'bulletpunch'],
-				signatureMove: 'ganonssword',
-				evs: {hp: 200, atk: 252, spe: 56}, nature: 'Adamant',
-			},
-			'Abyll': {
-				species: 'Milotic', ability: 'Silver Scale', item: 'Lunchabylls', gender: 'M',
-				moves: ['dragontail', 'mirrorcoat', 'icebeam', 'recover'],
-				signatureMoves: ['rainbowspray'],
-				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
-			},
-			/*'Speedy Pokson': {
-				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
-				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
-				signatureMoves: ['spindash', 'boost'],
-				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
-			},*/
-			'ColeWalski': {
-				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
-				moves: ['hydropump', 'flashcannon'],
-				signatureMoves: ['setmine', 'locknload', 'assassinate'],
-				evs: {hp: 252, spa: 252, spe: 4}, nature: 'Modest',
-				ivs: {atk: 0},
-			},
-			'Liria_10': {
-				species: 'Roserade', ability: 'Drawing Request', item: 'Black Sludge', gender: 'F',
-				moves: ['gigadrain', 'leechseed', 'sleeppowder', 'sludgebomb', 'spikes', 'toxicspikes', 'aromatherapy', 'synthesis'],
-				signatureMove: 'quicksketch',
-				evs: {hp: 252, spd: 240, spe: 16}, nature: 'Calm',
-				ivs: {atk: 0},
-			},
-			'Lyca': {
-				species: 'Absol', ability: 'Jack(y) of All Trades', item: 'Scope Lens', gender: 'F',
-				moves: ['nightslash', 'slash', 'psychocut', 'shadowclaw', 'playrough', 'knockoff'],
-				signatureMoves: ['quityourbullshit', 'keepcalmandfocus'],
-				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-			},
-			'Trollkitten': {
-				species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
-				moves: ['recover', 'echoedvoice'],
-				signatureMoves: ['drama', 'loratory'],
-				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
-			},
-			'Pokson': {
-				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
-				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
-				signatureMove: 'beatingmist',
-				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
-			},
-			'Cerebral_Harlot': {
-				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
-				moves: [],
-				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
-			},
-		};
-		let pool = Object.keys(sets);
+		
+		let pool = Object.keys(leaguemon);
 		for (let i = 0; i < 6; i++) {
 			let name = this.sampleNoReplace(pool);
-			let set = sets[name];
+			let set = clone(leaguemon[name]);
+			if (!set.leagues.includes(league)) { i--; continue; } //try again
 			set.level = 100;
 			set.name = name;
+			if (typeof set.item == "function") set.item = set.item.call(this);
 			if (!set.ivs) {
 				set.ivs = {hp:31, atk:31, def:31, spa:31, spd:31, spe:31};
 			} else {
@@ -322,536 +354,16 @@ exports.BattleScripts = {
 			team.push(set);
 		}
 		return team;
+	},
+	
+	randomtpplbTeam: function (side) {
+		return this.chooseTeamFor("lb");
 	},
 	randomtpplbpTeam: function (side) {
-		let team = [];
-		let sets = { // this is where all the movesets are defined. Add new mons here.
-			'darkfiregamer': {
-				species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
-				moves: ['moonblast', 'hyperbeam', 'fireblast'],
-				signatureMove: 'darkfire',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-			},
-			'xfix': {
-				species: 'Xatu', ability: 'Mirror Guard', item: 'Focus Sash', gender: 'M',
-				moves: ['thunderwave', 'substitute', 'roost'],
-				signatureMove: 'superglitch',
-				evs: {hp:252, spd:252, def:4}, nature: 'Calm',
-			},
-			'azum4roll': {
-				species: "Azumarill", ability: "Glitchiate", item: "Metronome", gender: 'M',
-				moves: ['rollout', 'batonpass', 'swordsdance', 'bellydrum', 'extremespeed', 'playrough', 'thunderwave'],
-				signatureMove: 'tm56',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'Iwamiger': {
-				species: "Gengar", ability: 'Serene Grace Plus', item: "Life Orb", gender: 'M',
-				moves: ['shadowball', 'flamethrower', 'icebeam', 'crunch'],
-				signatureMove: 'hexattack',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-			},
-			'Poomphcario': {
-				species: "Lucario", ability: "Scrappy", item: 'Assault Vest', gender: 'M',
-				moves: ['rockwrecker', 'megahorn', 'bulletpunch'],
-				signatureMove: 'projectilespam',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Jolly',
-			},
-			'BulkSoul': {
-				species: 'Rhyperior', ability: 'Rock Head', item: 'Focus Sash', gender: 'M',
-				moves: ['headsmash', 'autotomize', 'earthquake'],
-				signatureMove: 'bulk',
-				evs: {hp:252, def:252, spe:4}, nature: 'Impish',
-			},
-			'TieSoul': {
-				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
-				signatureMove: 'typeroulette',
-				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
-			},
-			"Soma Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
-				signatureMove: 'shadowrush',
-				evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
-			},
-			"Lass zeowx": { // STPPLB+ only
-				species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
-				moves: ['suckerpunch', 'shadowsneak', 'bulletpunch', 'playrough', 'spikes', 'acrobatics'],
-				signatureMoves: ['fakeout', 'partingvoltturn'],
-				evs: {atk:252, spa:12, spe:244}, nature: 'Hasty',
-			},
-			"Eeveelutionlvr": {
-				species: 'Eevee', ability: 'Proteon', item: 'Eviolite', gender: 'M',
-				moves: ['hydropump', 'flareblitz', 'thunderbolt', 'batonpass', 'nastyplot', 'dazzlinggleam', 'energyball', 'leechseed', 'blizzard', 'nightslash', 'psychic', 'hyperbeam'], // azum stop nagging about this moveset.
-				signatureMove: 'evolutionbeam',
-				evs: {spa:252, spe:252, hp:4}, nature: 'Timid',
-			},
-			'sohippy': {
-				species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
-				moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
-				signatureMove: 'hyperwahahahahaha',
-				evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
-			},
-			'Kooma9': {
-				species: 'Blastoise-Mega', ability: 'Psychologist', item: 'Focus Sash', gender: 'M',
-				moves: ['scald', 'roar', 'toxic'],
-				signatureMove: 'disappointment',
-				evs: {hp:252, def:252, spa:4}, nature: 'Bold',
-			},
-			"Kap'n Kooma": { // STPPLB+ only
-				species: 'Kingdra', ability: 'Sea and Sky', item: 'Choice Specs', gender: 'M',
-				moves: ['scald', 'dracometeor', 'thunder'],
-				signatureMove: 'broadside',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Modest',
-			},
-			/*'BEST': { // STPPB only
-				species: 'Typhlosion', ability: 'Technician', item: 'Life Orb', gender: 'M',
-				moves: ['waterpulse', 'hiddenpowerice', 'shockwave'],
-				ivs: {atk:30, def:30}, // in order for HP Ice to be a thing.
-				signatureMove: 'bestfcar',
-				evs: {spa:252, def:4, spe:252}, nature: 'Modest',
-			},*/
-			'Poomph':{
-				species: "Ampharosmega", ability: "Little Engine", item: 'Life Orb', gender: 'M',
-				moves: ['surf', 'powergem', 'detect', 'wish', 'nastyplot'],
-				signatureMove: 'eternalstruggle',
-				happiness: 0,
-				evs: {hp:252, spa:252, def:4}, nature: 'Modest',
-			},
-			'NoFunMantis':{
-				species: "Scyther", ability: "No Fun Allowed", item: 'Eviolite', gender: 'M',
-				moves: ['knockoff', 'brickbreak', 'aerialace', 'swordsdance', 'agility', 'batonpass', 'roost'],
-				signatureMove: 'xscissor',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'BigFatMantis': {
-				species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
-				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
-				signatureMove: 'nofun',
-				evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
-			},
-			'DictatorMantis': {
-				species: 'Scizor', ability: 'Technicality', item: 'Occa Berry', gender: 'M',
-				moves: ['barrier', 'craftyshield', 'trick', 'block', 'disable', 'stickyweb', 'embargo', 'quash', 'taunt', 'knockoff', 'bulletpunch'],
-				signatureMove: 'ironfist',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'MegaCharizard': {
-				species: 'Charizard', ability: 'Truant', item: 'Charizardite Y', gender: 'M',
-				moves: ['airslash', 'earthpower', 'roost', 'slackoff', 'flamethrower'],
-				signatureMove: 'afk',
-				evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
-			},
-			'Natsugan': {
-				species: 'Flygon', ability: 'Mega Plunder', item: megaStoneList[this.random(megaStoneList.length)], gender: 'M',
-				moves: ['earthquake', 'earthpower', 'uturn', 'dragonclaw', 'fireblast', 'boomburst', 'dragonpulse', 'return', 'stoneedge', 'crunch', 'ironhead', 'dragondance', 'quiverdance'],
-				signatureMove: 'reroll',
-				nature: 'Serious',
-			},
-			'GroundCtrl27': {
-				species: 'Meloetta', ability: 'Scrappy', item: 'Assault Vest', gender: 'M',
-				moves: ['hypervoice', 'psyshock', 'sneakyspook'],
-				signatureMoves: ['shadowsphere', 'drainforce'],
-				evs: {hp: 248, spa: 252, spe: 8}, nature: 'Modest',
-			},
-			'WhatevsFur': {
-				species: 'Ursaring', ability: 'Furrier Coat', item: 'Leftovers', gender: 'F',
-				moves: ['earthquake', 'drainpunch'],
-				signatureMoves: ['wish', 'aromatherapy', 'bulkup'],
-				evs: {hp: 252, def: 168, spd: 88}, nature: 'Calm',
-			},
-			'PikalaxALT': {
-				species: 'Pikachu', ability: 'Pika Power', item: 'Light Ball', gender: 'M',
-				moves: ['thunder', 'thunderbolt', 'quickattack', 'voltswitch', 'irontail'],
-				signatureMove: 'toucan',
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Hasty',
-			},
-			'Tadpole_0f_Doom': {
-				species: 'Poliwrath', ability: 'Ban Evade', item: 'BrightPowder', gender: 'M',
-				moves: ['closecombat', 'waterfall', 'icepunch', 'endure', 'bellydrum'],
-				signatureMove: 'thousandalts',
-				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-			},
-			'Whatevs4': {
-				species: 'Sneasel', ability: 'Technician', item: 'Dark Gem', gender: 'F',
-				moves: ['aerialace', 'stormthrow', 'thief'],
-				signatureMove: 'arcticslash',
-				evs: {atk: 252, hp: 4, spe: 252}, nature: 'Jolly',
-			},
-			'MihiraTheTiger': {
-				species: 'Mamoswine', ability: 'Technician', item: 'Leftovers', gender: 'M',
-				moves: ['iceshard', 'stealthrock'],
-				signatureMoves: ['yiffyiff', 'bawk'],
-				evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
-			},
-			'HazorEx': {
-				species: 'Alakazam', ability: 'Physicalakazam', item: 'Alakazite', gender: 'M',
-				moves: ['firepunch', 'thunderpunch', 'icepunch', 'drainpunch', 'megapunch', 'endure'],
-				signatureMove: 'psychocut',
-				evs: {atk: 252, spe: 252, hp: 4}, nature: 'Adamant',
-			},
-			'Leonys': {
-				species: 'Flareon', ability: 'Incinerate', item: 'Choice Band', gender: 'M',
-				moves: ['volttackle', 'drillrun', 'irontail', 'revenge', 'pursuit', 'zenheadbutt'],
-				signatureMoves: ['quickattack', 'doubleedge'],
-				evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
-			},
-			'Xinc': {
-				species: 'Bisharp', ability: 'Defiant Plus', item: 'Leftovers', gender: 'M',
-				moves: ['knockoff', 'drainpunch', 'ironhead', 'suckerpunch', 'bulletpunch'],
-				signatureMove: 'ganonssword',
-				evs: {hp: 200, atk: 252, spe: 56}, nature: 'Adamant',
-			},
-			'Abyll': {
-				species: 'Milotic', ability: 'Silver Scale', item: 'Lunchabylls', gender: 'M',
-				moves: ['dragontail', 'mirrorcoat', 'icebeam', 'recover'],
-				signatureMoves: ['rainbowspray'],
-				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
-			},
-			'Speedy Pokson': {
-				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
-				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
-				signatureMoves: ['spindash', 'boost'],
-				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
-			},
-			'ColeWalski': {
-				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
-				moves: ['hydropump', 'flashcannon'],
-				signatureMoves: ['setmine', 'locknload', 'assassinate'],
-				evs: {hp: 252, spa: 252, spe: 4}, nature: 'Modest',
-				ivs: {atk: 0},
-			},
-			'Liria_10': {
-				species: 'Roserade', ability: 'Drawing Request', item: 'Black Sludge', gender: 'F',
-				moves: ['gigadrain', 'leechseed', 'sleeppowder', 'sludgebomb', 'spikes', 'toxicspikes', 'aromatherapy', 'synthesis'],
-				signatureMove: 'quicksketch',
-				evs: {hp: 252, spd: 240, spe: 16}, nature: 'Calm',
-				ivs: {atk: 0},
-			},
-			'Lyca': {
-				species: 'Absol', ability: 'Jack(y) of All Trades', item: 'Scope Lens', gender: 'F',
-				moves: ['nightslash', 'slash', 'psychocut', 'shadowclaw', 'playrough', 'knockoff'],
-				signatureMoves: ['quityourbullshit', 'keepcalmandfocus'],
-				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-			},
-			'Lorewriter Cole': {
-				species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
-				moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
-				signatureMove: 'godswrath',
-				evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Serious',
-			},
-			'Trollkitten': {
-				species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
-				moves: ['recover', 'echoedvoice'],
-				signatureMoves: ['drama', 'loratory'],
-				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
-			},
-			'Pokson': {
-				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
-				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
-				signatureMove: 'beatingmist',
-				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
-			},
-			'Cerebral_Harlot': {
-				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
-				moves: [],
-				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
-			},
-		};
-		let pool = Object.keys(sets);
-		for (let i = 0; i < 6; i++) {
-			let name = this.sampleNoReplace(pool);
-			let set = sets[name];
-			set.level = 100;
-			set.name = name;
-			if (!set.ivs) {
-				set.ivs = {hp:31, atk:31, def:31, spa:31, spd:31, spe:31};
-			} else {
-				for (let iv in {hp:31, atk:31, def:31, spa:31, spd:31, spe:31}) {
-					set.ivs[iv] = iv in set.ivs ? set.ivs[iv] : 31;
-				}
-			}
-			// Assuming the hardcoded set evs are all legal.
-			if (!set.evs) set.evs = {hp:84, atk:84, def:84, spa:84, spd:84, spe:84};
-			if (set.signatureMove) set.signatureMoves = [set.signatureMove];
-			let len = set.signatureMoves.length;
-			let moves = set.signatureMoves;
-			for (let j = 0; j < 4 - len; j++) {
-				moves = [this.sampleNoReplace(set.moves)].concat(moves);
-			}
-			set.moves = moves;
-			team.push(set);
-		}
-		return team;
+		return this.chooseTeamFor("lb+");
 	},
 	randomtppbTeam: function (side) {
-		let team = [];
-		let sets = { // this is where all the movesets are defined. Add new mons here.
-			'darkfiregamer': {
-				species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
-				moves: ['moonblast', 'hyperbeam', 'fireblast'],
-				signatureMove: 'darkfire',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-			},
-			'xfix': {
-				species: 'Xatu', ability: 'Mirror Guard', item: 'Focus Sash', gender: 'M',
-				moves: ['thunderwave', 'substitute', 'roost'],
-				signatureMove: 'superglitch',
-				evs: {hp:252, spd:252, def:4}, nature: 'Calm',
-			},
-			'azum4roll': {
-				species: "Azumarill", ability: "Glitchiate", item: "Metronome", gender: 'M',
-				moves: ['rollout', 'batonpass', 'swordsdance', 'bellydrum', 'extremespeed', 'playrough', 'thunderwave'],
-				signatureMove: 'tm56',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'Iwamiger': {
-				species: "Gengar", ability: 'Serene Grace Plus', item: "Life Orb", gender: 'M',
-				moves: ['shadowball', 'flamethrower', 'icebeam', 'crunch'],
-				signatureMove: 'hexattack',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
-			},
-			'Poomphcario': {
-				species: "Lucario", ability: "Scrappy", item: 'Assault Vest', gender: 'M',
-				moves: ['rockwrecker', 'megahorn', 'bulletpunch'],
-				signatureMove: 'projectilespam',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Jolly',
-			},
-			'BulkSoul': {
-				species: 'Rhyperior', ability: 'Rock Head', item: 'Focus Sash', gender: 'M',
-				moves: ['headsmash', 'autotomize', 'earthquake'],
-				signatureMove: 'bulk',
-				evs: {hp:252, def:252, spe:4}, nature: 'Impish',
-			},
-			'TieSoul': {
-				species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
-				moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
-				signatureMove: 'typeroulette',
-				evs: {hp:252, atk:252, spe:4}, nature: 'Adamant',
-			},
-			"Soma Ghost": {
-				species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
-				moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
-				signatureMove: 'shadowrush',
-				evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
-			},
-			"Lass zeowx": { // STPPLB+ only
-				species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
-				moves: ['suckerpunch', 'shadowsneak', 'bulletpunch', 'playrough', 'spikes', 'acrobatics'],
-				signatureMoves: ['fakeout', 'partingvoltturn'],
-				evs: {atk:252, spa:12, spe:244}, nature: 'Hasty',
-			},
-			"Eeveelutionlvr": {
-				species: 'Eevee', ability: 'Proteon', item: 'Eviolite', gender: 'M',
-				moves: ['hydropump', 'flareblitz', 'thunderbolt', 'batonpass', 'nastyplot', 'dazzlinggleam', 'energyball', 'leechseed', 'blizzard', 'nightslash', 'psychic', 'hyperbeam'], // azum stop nagging about this moveset.
-				signatureMove: 'evolutionbeam',
-				evs: {spa:252, spe:252, hp:4}, nature: 'Timid',
-			},
-			'sohippy': {
-				species: 'Rotom-Wash', ability: 'Swahahahahaggers', item: 'Leftovers', gender: 'M',
-				moves: ['scald', 'painsplit', 'destinybond', 'swagger', 'taunt', 'foulplay', 'hex', 'hydropump', 'electricterrain'],
-				signatureMove: 'hyperwahahahahaha',
-				evs: {hp:252, spa:252, spd:4}, nature: 'Modest',
-			},
-			'Kooma9': {
-				species: 'Blastoise-Mega', ability: 'Psychologist', item: 'Focus Sash', gender: 'M',
-				moves: ['scald', 'roar', 'toxic'],
-				signatureMove: 'disappointment',
-				evs: {hp:252, def:252, spa:4}, nature: 'Bold',
-			},
-			"Kap'n Kooma": { // STPPLB+ only
-				species: 'Kingdra', ability: 'Sea and Sky', item: 'Choice Specs', gender: 'M',
-				moves: ['scald', 'dracometeor', 'thunder'],
-				signatureMove: 'broadside',
-				evs: {hp:4, spa:252, spe:252}, nature: 'Modest',
-			},
-			'BEST': { // STPPB only
-				species: 'Typhlosion', ability: 'Technician', item: 'Life Orb', gender: 'M',
-				moves: ['waterpulse', 'hiddenpowerice', 'shockwave'],
-				ivs: {atk:30, def:30}, // in order for HP Ice to be a thing.
-				signatureMove: 'bestfcar',
-				evs: {spa:252, def:4, spe:252}, nature: 'Modest',
-			},
-			'Poomph':{
-				species: "Ampharosmega", ability: "Little Engine", item: 'Life Orb', gender: 'M',
-				moves: ['surf', 'powergem', 'detect', 'wish', 'nastyplot'],
-				signatureMove: 'eternalstruggle',
-				happiness: 0,
-				evs: {hp:252, spa:252, def:4}, nature: 'Modest',
-			},
-			'NoFunMantis':{
-				species: "Scyther", ability: "No Fun Allowed", item: 'Eviolite', gender: 'M',
-				moves: ['knockoff', 'brickbreak', 'aerialace', 'swordsdance', 'agility', 'batonpass', 'roost'],
-				signatureMove: 'xscissor',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'BigFatMantis': {
-				species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
-				moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
-				signatureMove: 'nofun',
-				evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
-			},
-			'DictatorMantis': {
-				species: 'Scizor', ability: 'Technicality', item: 'Occa Berry', gender: 'M',
-				moves: ['barrier', 'craftyshield', 'trick', 'block', 'disable', 'stickyweb', 'embargo', 'quash', 'taunt', 'knockoff', 'bulletpunch'],
-				signatureMove: 'ironfist',
-				evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-			},
-			'MegaCharizard': {
-				species: 'Charizard', ability: 'Truant', item: 'Charizardite Y', gender: 'M',
-				moves: ['airslash', 'earthpower', 'roost', 'slackoff', 'flamethrower'],
-				signatureMove: 'afk',
-				evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
-			},
-			'Natsugan': {
-				species: 'Flygon', ability: 'Mega Plunder', item: megaStoneList[this.random(megaStoneList.length)], gender: 'M',
-				moves: ['earthquake', 'earthpower', 'uturn', 'dragonclaw', 'fireblast', 'boomburst', 'dragonpulse', 'return', 'stoneedge', 'crunch', 'ironhead', 'dragondance', 'quiverdance'],
-				signatureMove: 'reroll',
-				nature: 'Serious',
-			},
-			'Bird Jesus': { //STPPB only
-				species: 'Pidgeot', ability: 'Messiah', item: 'Flying Gem', gender: 'M',
-				moves: ['judgment', 'focusblast', 'roost', 'fireblast'],
-				signatureMove: 'godbird',
-				evs: {spa:252, def:4, spe:252}, nature: 'Timid',
-			},
-			'GroundCtrl27': {
-				species: 'Meloetta', ability: 'Scrappy', item: 'Assault Vest', gender: 'M',
-				moves: ['hypervoice', 'psyshock', 'sneakyspook'],
-				signatureMoves: ['shadowsphere', 'drainforce'],
-				evs: {hp: 248, spa: 252, spe: 8}, nature: 'Modest',
-			},
-			'WhatevsFur': {
-				species: 'Ursaring', ability: 'Furrier Coat', item: 'Leftovers', gender: 'F',
-				moves: ['earthquake', 'drainpunch'],
-				signatureMoves: ['wish', 'aromatherapy', 'bulkup'],
-				evs: {hp: 252, def: 168, spd: 88}, nature: 'Calm',
-			},
-			'PikalaxALT': {
-				species: 'Pikachu', ability: 'Pika Power', item: 'Light Ball', gender: 'M',
-				moves: ['thunder', 'thunderbolt', 'quickattack', 'voltswitch', 'irontail'],
-				signatureMove: 'toucan',
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Hasty',
-			},
-			'Tadpole_0f_Doom': {
-				species: 'Poliwrath', ability: 'Ban Evade', item: 'BrightPowder', gender: 'M',
-				moves: ['closecombat', 'waterfall', 'icepunch', 'endure', 'bellydrum'],
-				signatureMove: 'thousandalts',
-				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-			},
-			'Whatevs4': {
-				species: 'Sneasel', ability: 'Technician', item: 'Dark Gem', gender: 'F',
-				moves: ['aerialace', 'stormthrow', 'thief'],
-				signatureMove: 'arcticslash',
-				evs: {atk: 252, hp: 4, spe: 252}, nature: 'Jolly',
-			},
-			'MihiraTheTiger': {
-				species: 'Mamoswine', ability: 'Technician', item: 'Leftovers', gender: 'M',
-				moves: ['iceshard', 'stealthrock'],
-				signatureMoves: ['yiffyiff', 'bawk'],
-				evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
-			},
-			'HazorEx': {
-				species: 'Alakazam', ability: 'Physicalakazam', item: 'Alakazite', gender: 'M',
-				moves: ['firepunch', 'thunderpunch', 'icepunch', 'drainpunch', 'megapunch', 'endure'],
-				signatureMove: 'psychocut',
-				evs: {atk: 252, spe: 252, hp: 4}, nature: 'Adamant',
-			},
-			'Leonys': {
-				species: 'Flareon', ability: 'Incinerate', item: 'Choice Band', gender: 'M',
-				moves: ['volttackle', 'drillrun', 'irontail', 'revenge', 'pursuit', 'zenheadbutt'],
-				signatureMoves: ['quickattack', 'doubleedge'],
-				evs: {hp: 252, atk: 252, def: 4}, nature: 'Adamant',
-			},
-			'Xinc': {
-				species: 'Bisharp', ability: 'Defiant Plus', item: 'Leftovers', gender: 'M',
-				moves: ['knockoff', 'drainpunch', 'ironhead', 'suckerpunch', 'bulletpunch'],
-				signatureMove: 'ganonssword',
-				evs: {hp: 200, atk: 252, spe: 56}, nature: 'Adamant',
-			},
-			'Abyll': {
-				species: 'Milotic', ability: 'Silver Scale', item: 'Lunchabylls', gender: 'M',
-				moves: ['dragontail', 'mirrorcoat', 'icebeam', 'recover'],
-				signatureMoves: ['rainbowspray'],
-				evs: {hp: 252, def: 252, spdef: 4}, nature: 'Sassy',
-			},
-			'Speedy Pokson': {
-				species: 'Deoxys-Speed', ability: 'Gotta Go Fast', item: 'Speed Shoes', gender: 'M',
-				moves: ['flyingpress', 'leafblade', 'watershuriken', 'mysticalfire', 'aurasphere', 'spikyshield', 'rapidspin'],
-				signatureMoves: ['spindash', 'boost'],
-				evs: {spe: 252, atk: 252, hp: 4}, nature: 'Hasty',
-			},
-			'ColeWalski': {
-				species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
-				moves: ['hydropump', 'flashcannon'],
-				signatureMoves: ['setmine', 'locknload', 'assassinate'],
-				evs: {hp: 252, spa: 252, spe: 4}, nature: 'Modest',
-				ivs: {atk: 0},
-			},
-			'Liria_10': {
-				species: 'Roserade', ability: 'Drawing Request', item: 'Black Sludge', gender: 'F',
-				moves: ['gigadrain', 'leechseed', 'sleeppowder', 'sludgebomb', 'spikes', 'toxicspikes', 'aromatherapy', 'synthesis'],
-				signatureMove: 'quicksketch',
-				evs: {hp: 252, spd: 240, spe: 16}, nature: 'Calm',
-				ivs: {atk: 0},
-			},
-			'Lyca': {
-				species: 'Absol', ability: 'Jack(y) of All Trades', item: 'Scope Lens', gender: 'F',
-				moves: ['nightslash', 'slash', 'psychocut', 'shadowclaw', 'playrough', 'knockoff'],
-				signatureMoves: ['quityourbullshit', 'keepcalmandfocus'],
-				evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
-			},
-			'Lorewriter Cole': {
-				species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
-				moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
-				signatureMove: 'godswrath',
-				evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Serious',
-			},
-			'Trollkitten': {
-				species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
-				moves: ['recover', 'echoedvoice'],
-				signatureMoves: ['drama', 'loratory'],
-				evs: {hp: 252, def: 128, spd: 128}, nature: 'Modest',
-			},
-			'Pokson': {
-				species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
-				moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
-				signatureMove: 'beatingmist',
-				evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
-			},
-			'Cerebral_Harlot': {
-				species: 'Mismagius', ability: 'Herald of Death', item: 'Murky Incense', gender: 'M',
-				moves: [],
-				signatureMoves: ['wailofthebanshee', 'witchscurse', 'foxfire', 'spectralincantation'],
-				evs: {spa: 252, spd: 4, spe: 252}, nature: 'Timid',
-			},
-		};
-		let pool = Object.keys(sets);
-		for (let i = 0; i < 6; i++) {
-			let name = this.sampleNoReplace(pool);
-			let set = sets[name];
-			set.level = 100;
-			set.name = name;
-			if (!set.ivs) {
-				set.ivs = {hp:31, atk:31, def:31, spa:31, spd:31, spe:31};
-			} else {
-				for (let iv in {hp:31, atk:31, def:31, spa:31, spd:31, spe:31}) {
-					set.ivs[iv] = iv in set.ivs ? set.ivs[iv] : 31;
-				}
-			}
-			// Assuming the hardcoded set evs are all legal.
-			if (!set.evs) set.evs = {hp:84, atk:84, def:84, spa:84, spd:84, spe:84};
-			if (set.signatureMove) set.signatureMoves = [set.signatureMove];
-			let len = set.signatureMoves.length;
-			let moves = set.signatureMoves;
-			for (let j = 0; j < 4 - len; j++) {
-				moves = [this.sampleNoReplace(set.moves)].concat(moves);
-			}
-			set.moves = moves;
-			team.push(set);
-		}
-		return team;
+		return this.chooseTeamFor("b");
 	},
 
 	// Mix and Mega stuff
@@ -972,4 +484,5 @@ exports.BattleScripts = {
 		if (deltas.isPrimal) template.isPrimal = true;
 		return template;
 	},
+	
 };
