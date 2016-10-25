@@ -134,6 +134,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		desc: "On switch-in, all opponents become confused for 1 turn, with 70% self-hit chance.",
 		shortDesc: "On switch-in, all opponents become confused for 1 turn, with 70% self-hit chance.",
 		onStart: function (pokemon) {
+			this.add('-ability', pokemon, 'Swahahahahaggers');
 			let activeFoe = pokemon.side.foe.active;
 			for (let i = 0; i < activeFoe.length; i++) {
 				let foe = activeFoe[i];

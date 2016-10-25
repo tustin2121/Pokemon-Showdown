@@ -4,6 +4,64 @@
 //  num, id, name, desc, shortDesc, <the rest>
 
 exports.BattleMovedex = {
+	////////////////////////////////////////////////////////////////////////////
+	// Modified Moves
+	"rapidspin": {
+		inherit: true,
+		self: {
+			onHit: function (pokemon) {
+				if (pokemon.hp && pokemon.removeVolatile('leechseed')) {
+					this.add('-end', pokemon, 'Leech Seed', '[from] move: Rapid Spin', '[of] ' + pokemon);
+				}
+				let sideConditions = {
+					spikes:1, toxicspikes:1, stealthrock:1, stickyweb:1, //standard
+					setmine:1, //nonstandard
+				};
+				for (let i in sideConditions) {
+					if (pokemon.hp && pokemon.side.removeSideCondition(i)) {
+						if (i == "setmine") {
+							this.add('-sideend', pokemon.side, this.getEffect(i).name, '[from] move: Rapid Spin', '[of] ' + pokemon, `[msg] The mine is blown away!`);
+						} else {
+							this.add('-sideend', pokemon.side, this.getEffect(i).name, '[from] move: Rapid Spin', '[of] ' + pokemon);
+						}
+					}
+				}
+				if (pokemon.hp && pokemon.volatiles['partiallytrapped']) {
+					pokemon.removeVolatile('partiallytrapped');
+				}
+			},
+		},
+	},
+	"defog": {
+		inherit: true,
+		onHit: function (target, source, move) {
+			if (!target.volatiles['substitute'] || move.infiltrates) this.boost({evasion:-1});
+			let removeTarget = {
+				reflect:1, lightscreen:1, safeguard:1, mist:1, spikes:1, toxicspikes:1, stealthrock:1, stickyweb:1, //standard
+				setmine:1, //nonstandard
+			};
+			let removeAll = {
+				spikes:1, toxicspikes:1, stealthrock:1, stickyweb:1, //standard
+				setmine:1, //nonstandard
+			};
+			for (let targetCondition in removeTarget) {
+				if (target.side.removeSideCondition(targetCondition)) {
+					if (!removeAll[targetCondition]) continue;
+					this.add('-sideend', target.side, this.getEffect(targetCondition).name, '[from] move: Defog', '[of] ' + target);
+				}
+			}
+			for (let sideCondition in removeAll) {
+				if (source.side.removeSideCondition(sideCondition)) {
+					this.add('-sideend', source.side, this.getEffect(sideCondition).name, '[from] move: Defog', '[of] ' + source);
+				}
+			}
+		},
+	},
+	
+	
+	////////////////////////////////////////////////////////////////////////////
+	// Custom Moves
+	
 	"disappointment": {
 		num: 622,
 		id: "disappointment",
@@ -184,11 +242,11 @@ exports.BattleMovedex = {
 		category: 'Physical',
 		flags: {pulse: 1, bullet: 1, protect: 1, mirror: 1},
 		secondary: false,
-		onPrepareHit: function (target, source) { // Turns user into ???-type.
+		onPrepareHit: function (target, source, move) { // Turns user into ???-type.
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Wish', source);
 			if (!source.hasType('???')) { // turn user into ???-type and spout glitchy nonsense.
-				this.add("c|" + source.name + "|9̜͉̲͇̱̘̼ͬ̈́̒͌̑̓̓7ͩ͊̚5ͨ̆͐͏̪̦6̗͎ͬ̿̍̍̉ͧ͢4̯̠ͤ͛͐̄͒͡2͐ͬ̀d̺͉̜̈ͯ̓x̩̖̥̦̥͛́ͥ͑̈́ͩ͊͠║̛̥̜̱̝͍͒̌ͣ̀͌͌̒'̣͎̗̬̯r̸̗͍ͫ̓͆ͣ̎͊ ̜̻̈D͓̰̳̝̥̙͙͋̀E͉͔̥͇̫͓͍̔ͬͣ͂̓̽x̰̗̬̖͊̏̄̑̒̿͊s̜̪̏́f̧̯̼̦̓͌̇̒o̱̾̓ͩ̆̓̀F̟̰͓̩̂̆͛ͤ▓̣̩̝̙̇̓͒͋̈͡1̡̹̹͓̬͖͐̑̉̔̏xͥ̀'̻͖͍̠̉͡v̫̼̹̳̤̱͉▓̄̏͂ͤͭ̋ͫ͏̠̦̝▓̟͉͇̣̠̦̓̄ͫͥ̐̍̂▓͔̦̫̦̜̖́▓͍ͯ͗̾͆▓̮̗̠̜͙̹̟͊̎ͤ̔̽ͬ̃▓̩̟̏ͪ̇̂̂̒▓̖̼̤͉ͤ̾̋ͥͣͬ͒▓̈́̿͂̌̓▓͇̞̗̽̔̂͊̌ͣ͐▓ͬ́ͥ̔͒͒̎▓̰̪̫̩͇̲̇̔̿͢ͅ▓̞̬͎▓̖͍̖̫ͪ͐̆̅̍̂ͨͅ▓̡̭̠̗̳̬̜̝▓̤͙̥̆̌ͨͪ̆͌▓̴͉̩̈́▓ͩ̌̌̂̿̑̐▓ͨ҉͕̠͍▓̹̌̅̂ͨ͋̃͑▓̯̰̣̝̯ͭͦ̂͋̇̾͠▓̸̺̣̜̯̙̂͋̈ͨ̎̾ͧ▓͢▓͔̚▓̭͎͖̟̼̄̈̃̎́▓̧̌ͧ▓̼̹͈͗̄̆");
+				this.sayQuote(source, "Move-"+move.id, {target:target, default: "9̜͉̲͇̱̘̼ͬ̈́̒͌̑̓̓7ͩ͊̚5ͨ̆͐͏̪̦6̗͎ͬ̿̍̍̉ͧ͢4̯̠ͤ͛͐̄͒͡2͐ͬ̀d̺͉̜̈ͯ̓x̩̖̥̦̥͛́ͥ͑̈́ͩ͊͠║̛̥̜̱̝͍͒̌ͣ̀͌͌̒'̣͎̗̬̯r̸̗͍ͫ̓͆ͣ̎͊ ̜̻̈D͓̰̳̝̥̙͙͋̀E͉͔̥͇̫͓͍̔ͬͣ͂̓̽x̰̗̬̖͊̏̄̑̒̿͊s̜̪̏́f̧̯̼̦̓͌̇̒o̱̾̓ͩ̆̓̀F̟̰͓̩̂̆͛ͤ▓̣̩̝̙̇̓͒͋̈͡1̡̹̹͓̬͖͐̑̉̔̏xͥ̀'̻͖͍̠̉͡v̫̼̹̳̤̱͉▓̄̏͂ͤͭ̋ͫ͏̠̦̝▓̟͉͇̣̠̦̓̄ͫͥ̐̍̂▓͔̦̫̦̜̖́▓͍ͯ͗̾͆▓̮̗̠̜͙̹̟͊̎ͤ̔̽ͬ̃▓̩̟̏ͪ̇̂̂̒▓̖̼̤͉ͤ̾̋ͥͣͬ͒▓̈́̿͂̌̓▓͇̞̗̽̔̂͊̌ͣ͐▓ͬ́ͥ̔͒͒̎▓̰̪̫̩͇̲̇̔̿͢ͅ▓̞̬͎▓̖͍̖̫ͪ͐̆̅̍̂ͨͅ▓̡̭̠̗̳̬̜̝▓̤͙̥̆̌ͨͪ̆͌▓̴͉̩̈́▓ͩ̌̌̂̿̑̐▓ͨ҉͕̠͍▓̹̌̅̂ͨ͋̃͑▓̯̰̣̝̯ͭͦ̂͋̇̾͠▓̸̺̣̜̯̙̂͋̈ͨ̎̾ͧ▓͢▓͔̚▓̭͎͖̟̼̄̈̃̎́▓̧̌ͧ▓̼̹͈͗̄̆"});
 				source.setType('Bird');
 				this.add('-start', source, 'typechange', '???');
 			}
@@ -322,7 +380,7 @@ exports.BattleMovedex = {
 		flags: {},
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add("c|" + source.name + "|I'm getting outta here! Byeeeee~");
+			this.sayQuote(source, "Move-"+move.id, {target:target});
 		},
 		onHit: function (target) {
 			this.useMove('partingshot', target);
@@ -545,15 +603,15 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			if (attacker.volatiles[move.id] && attacker.volatiles[move.id].duration === 1) {
 				this.add('-anim', attacker, 'Flare Blitz', defender);
-				this.add('c|' + attacker.name + '|back');
+				this.sayQuote(attacker, "Move-"+move.id+"-2", "back");
 				attacker.removeVolatile(move.id);
 				return;
 			}
 			if (!attacker.volatiles[move.id]) {
-				this.add('c|' + attacker.name + '|afk');
+				this.sayQuote(attacker, "Move-"+move.id+"-1", "afk");
 				this.add('-prepare', attacker, 'Shadow Force', defender);
 			} else {
-				this.add('raw|' + attacker.name + ' is still gone!');
+				this.sayQuote(attacker, "Move-"+move.id+"-w", `raw|${attacker.name} is still gone!`);
 			}
 			attacker.addVolatile('afk', defender);
 			return null;
@@ -647,6 +705,7 @@ exports.BattleMovedex = {
 		onHit: function (target) {
 			if (target.template.isMega || target.template.isPrimal) {
 				this.add('-fail', target);
+				this.add('-hint', `Can't reroll a megastone when you've already mega evolved.`);
 				return;
 			}
 			
@@ -948,9 +1007,7 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Chatter', target);
 		},
 		onTryHit: function (target, source, move) {
-			let targetName = toId(target.name);
-			let sourceName = toId(source.name);
-			this.add('c|' + sourceName + '|Wow ' + targetName + ' OneHand');
+			this.sayQuote(source, "Move-"+move.id, { default: `Wow ${toId(target.name)} OneHand`, target: target });
 		},
 		onHit: function (target) {
 			let hazards = ['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'];
@@ -1081,8 +1138,8 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			onStart: function (side) {
-				this.add('-sidestart', side, 'move: Set Mine');
-				this.add('c|' + this.effectData.source.name + '|Tick tick boom!');
+				this.add('-sidestart', side, 'move: Set Mine', `[msg] ${this.effectData.source.name} set a mine near the feet of the opposing team!`);
+				this.sayQuote(this.effectData.source, "Move-setmine", `Tick tick boom!`);
 				this.effectData.moveData = {
 					id: 'mine',
 					name: 'Mine',
@@ -1132,10 +1189,10 @@ exports.BattleMovedex = {
 			if (source.volatiles['lockon']) source.removeVolatile('lockon');
 			source.addVolatile('focusenergy');
 		},
-		onHit: function (target, source) {
+		onHit: function (target, source, move) {
 			source.addVolatile('lockon', target);
 			this.add('-activate', source, 'move: Lock \'n\' Load', '[of] ' + target);
-			this.add('c|' + source.name + '|Say hello to Becky and Betsy!');
+			this.sayQuote(source, "Move-"+move.id, {target:target});
 		},
 		pp: 20,
 	},
@@ -1180,9 +1237,9 @@ exports.BattleMovedex = {
 			// this.debug("onTryHit: noguard test ==> "+(source.hasAbility('noguard') || target.hasAbility('noguard')));
 			// if (source.hasAbility('noguard') || target.hasAbility('noguard')) return true;
 		},
-		onHit: function (target, source) {
+		onHit: function (target, source, move) {
 			this.add('-ohko');
-			this.add('c|' + source.name + '|Bye!');
+			this.sayQuote(source, "Move-"+move.id, {default:'rip', target:target});
 		},
 		target: 'normal',
 		type: 'Steel',
@@ -1385,8 +1442,10 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Confuse Ray', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|ANARCHY, BITCH!");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {
+				default:['b+b+start+select', 'select+B+R+A', 'b+up', 'down+b', 'left+right', 'b+a+start'], 
+				target: target});
 			target.clearBoosts();
 			this.add('-clearboost', target);
 		},
@@ -1410,8 +1469,10 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Close Combat', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|The time for democracy's rise is here, motherf***er!");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {
+				default:['start9','wait4baba','wait4abrightbastart','b9','a9','upstartdown'],
+				target: target});
 		},
 	},
 	'balancedstrike': {
@@ -1449,8 +1510,8 @@ exports.BattleMovedex = {
 			target.setBoost(boostTarget);
 			this.add('-anim', source, 'Sky Attack', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|Time to untip the scales!");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {default:['anarchy','democracy'], target: target});
 		},
 	},
 	'texttospeech': {
@@ -1471,8 +1532,14 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Hyper Voice', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|I shall smite thee with potatoes of doom! WHEEEEEE");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {default:[
+					'walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut walnut',
+					'potato potato potato potato potato potato potato potato potato potato potato potato potato potato potato potato',
+					'soisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoisoi',
+					'!potato!potato!potato!potato!potato!potato!potato!potato!potato!potato!potato',
+					'Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em Em moist potato penetration.'], 
+				target: target});
 			let bannedAbilities = {insomnia:1, multitype:1, stancechange:1, truant:1};
 			if (!bannedAbilities[target.ability]) {
 				let oldAbility = target.setAbility('insomnia');
@@ -1509,8 +1576,8 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', target, 'Giga Drain', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|...");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {default:"...", target: target});
 			target.addVolatile('taunt');
 		},
 	},
@@ -1532,14 +1599,14 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Uproar', source);
-			this.add("c|" + source.name + "|As the great Sun Tzu once said, every battle is won before it is fought!");
+			this.sayQuote(source, "Move-"+move.id, {target: target});
 		},
 		sideCondition: 'warecho',
 		effect: {
 			duration: 3,
 			onResidualOrder: 4,
 			onEnd: function (side) {
-				this.add(source.name + "'s warcry echoes back!");
+				this.add('raw|', this.effectData.source.name + "'s warcry echoes back!");
 				let target = side.active[this.effectData.sourcePosition];
 				if (target && !target.fainted) {
 					this.boost({atk: 2}, target);
@@ -1566,8 +1633,8 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Head Smash', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|Do you feel lucky, punk?");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
 		},
 		recoil: [1, 8],
 		
@@ -1600,8 +1667,10 @@ exports.BattleMovedex = {
 				pokemon.removeVolatile('confusion');
 			}
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|Are you not entertained?");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {
+				default: '♫ ┌༼ຈل͜ຈ༽┘ ♪ DANCE RIOT ♫ ┌༼ຈل͜ຈ༽┘ ♪', 
+				target: target});
 			if (this.random(2) === 1) {
 				target.forceSwitchFlag = 1;
 			}
@@ -1633,8 +1702,10 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Psychic', target);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|They call me the goddess of Death for a reason!");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {
+				default: ['Oh no! err 03h was somehow tripped unexpectedly!', 'KERNEL PANIC', 'BET BOY!'],
+				target: target});
 		},
 		secondary: {
 			chance: 100,
@@ -1663,8 +1734,8 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Shadow Ball', source);
 		},
-		onHit: function (target, source) {
-			this.add("c|" + source.name + "|The laws of space are mine to command and they WILL OBEY ME!");
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {default: 'SPAAAAAAAAAAAAACE!!!!', target: target});
 		},
 		secondary: {chance: 10, status: 'frz'},
 	},
@@ -1689,7 +1760,7 @@ exports.BattleMovedex = {
 			}
 			this.add('-anim', attacker, 'Fly', defender);
 			this.add('-prepare', attacker, 'Fly', defender);
-			this.add("c|" + attacker.name + "|I see a humiliating defeat in your future!");
+			this.sayQuote(attacker, "Move-"+move.id, {target: defender});
 			if (!this.runEvent('ChargeMove', attacker, defender, move)) {
 				this.add('-anim', attacker, 'Fly', defender);
 				return;
@@ -1916,6 +1987,10 @@ exports.BattleMovedex = {
 		pp: 16,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Horn Leech', target);
+		},
 		accuracy: 100,
 		basePower: 80,
 		category: 'Physical',
@@ -1925,7 +2000,7 @@ exports.BattleMovedex = {
 		type: "Grass",
 	},
 	"goatflu": {
-		num: 689,
+		num: 690,
 		id: "goatflu",
 		name: "Goat Flu",
 		desc: "Inflicts the target with Goat Flu. The target loses 1/6 of its maximum HP, rounded down, at the end of each turn, and has its Attack and Speed halved while it is active. If the target uses Baton Pass, the replacement will continue to be affected. Fails if there is no target or if the target is already affected. Grass Pokemon are immune to this move, but not the effect.",
@@ -1936,6 +2011,10 @@ exports.BattleMovedex = {
 		basePower: 0,
 		category: "Status",
 		volatileStatus: 'goatflu',
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Ice Burn', target);
+		},
 		onTryHit: function (target, source, move) {
 			if (target.hasType('Grass')) {
 				this.add('-immune', target, '[msg]');

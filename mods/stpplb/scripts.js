@@ -64,6 +64,7 @@ let leaguemon = {
 		quotes: {
 			SwitchIn: "Oh, a new challenger?",
 			Faint: "When can I beat TPPLA BibleThump",
+			"Move-partingvoltturn": "I'm getting outta here! Byeeeee~",
 		},
 		species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
 		moves: ['suckerpunch', 'shadowsneak', 'bulletpunch', 'playrough', 'spikes', 'acrobatics'],
@@ -415,6 +416,8 @@ let leaguemon = {
 		quotes: {
 			SwitchIn: "Allons-y and GERONIMOOO!",
 			Faint: "Dced again",
+			"Move-locknload": "Say hello to Becky and Betsy!",
+			"Move-assassinate": "Bye!",
 		},
 		species: 'Empoleon', ability: 'Sniper', item: 'Scope Lens', gender: 'M',
 		moves: ['hydropump', 'flashcannon'],
@@ -427,6 +430,17 @@ let leaguemon = {
 		quotes: {
 			SwitchIn: "I fight this battle in the name of the gods of TPP!",
 			Faint: "Dammit, mental block, I have no idea how to continue this story...",
+			"Move-abstartselect": "ANARCHY, BITCH!",
+			"Move-wait4baba": "The time for democracy's rise is here, motherf***er!",
+			"Move-balancedstrike": "Time to untip the scales!",
+			"Move-texttospeech": "I shall smite thee with potatoes of doom! WHEEEEEE",
+			"Move-holyducttapeofclaw": "...",
+			"Move-warecho": "As the great Sun Tzu once said, every battle is won before it is fought!",
+			"Move-skullsmash": "Do you feel lucky, punk?",
+			"Move-danceriot": "Are you not entertained?",
+			"Move-bluescreenofdeath": "They call me the goddess of Death for a reason!",
+			"Move-portaltospaaaaaaace": "The laws of space are mine to command and they WILL OBEY ME!",
+			"Move-doubleascent": "I see a humiliating defeat in your future!",
 		},
 		species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
 		moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
@@ -492,7 +506,7 @@ let leaguemon = {
 	// When a pokemon is complete, fill in the leagues and move it to where 
 	// appropriate above.
 	
-	"Some Goats": { // STPPLB+ only // Soma Ghost alt, as if that isn't obvious enough
+	"Some Goats": { // STPPLB+ only
 		leagues: [],
 		quotes: {
 			SwitchIn: "Nothing to see here. Just Some Goats passing through.",
@@ -529,20 +543,31 @@ let leaguemon = {
 		},
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
 	},
-	"Tustin2121": { // First Mon
+	"tustin2121": { // First Mon
 		leagues: [],
 		quotes: {
 			// Put quotes to the limit \o/
 			FirstTime: "I'm not very good at this whole competitive thing...",
 			SwitchIn: "Alright, time to try again.",
 			Faint: "I need to get back to work anyway.",
+			"Move-afk-1": "brb",
+			"Move-afk-2": "b",
 		},
+		
+		species: 'Typhlosion', ability: 'Blaze', item: 'Eviolite', gender: 'M',
+		moves: ['extrasensory', 'flamethrower', 'lavaplume', 'eruption'],
+		signatureMoves: [],
+		// evs: {atk:252, def:4, spe:252}, nature: 'Timid',
+		evs: {}, nature: "Serious",
+		ivs: {hp:0, atk:0, def:0, spa:0, spd:0, spe:0},
+		// baseStats: {hp: 78, atk: 84, def: 78, spa: 109, spd: 85, spe: 100}, //Typhlosion stats
 		// Quilava (with base power of a Typhlosion)
 		// Item: Reinforced Glass | If the holder is hit with a super effective move, that move is nullified, and this item breaks. Single Use.
 		// Ability:
 		// ???
 		// Signiture Moves:
 		// Code Refactor | Special | Fire-Type | Power: 15 | Accuracy: 100% | PP: 15 | Hits 2-5 times | each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit. Says quotes about how horrible code is.
+		// Signiture Theif | Status | Normal-Type | Power: -- | Accuract: -- | PP: 15 | Picks a random signiture move from the STPPLB pool.
 		
 	}
 	
@@ -621,29 +646,40 @@ exports.BattleScripts = {
 		set.moves = moves;
 	},
 	
-	sayQuote: function(pokemon, event, defQuote) {
+	sayQuote: function(pokemon, event, opts) {
+		opts = opts || {};
+		if (typeof opts == "string") opts = {"default":opts};
+		
 		let name = pokemon.illusion ? pokemon.illusion.name : pokemon.name;
-		if (!pokemon.set.quotes) {
-			this.add(`raw|<div class="chat message-error">Invalid Pokemon definition! ${name} has no quotes object!</div>`);
+		if (!pokemon.set.quotes && !opts.default) {
+			this.add(`error|Invalid Pokemon definition! ${name} has no quotes object!`);
+			 return;
+		}
+		
+		let quote = pokemon.set.quotes[event];
+		if (event == "SwitchIn" && pokemon.set.quotes["FirstTime"]) {
+			quote = pokemon.set.quotes["FirstTime"];
+			pokemon.set.quotes["FirstTime"] = null;
+		}
+		if (!quote) {
+			// Only the SwitchIn and Faint messages are required
+			// 0 is used as an exemption.
+			if ((event == "SwitchIn" || event === "Faint") && quote !== 0 && !opts.default)
+				this.add(`bchat|${name}|[PLACEHOLDER MESSAGE]`);
+			if (!opts.default) return;
+			quote = opts.default;
+		}
+		if (Array.isArray(quote)) {
+			quote = quote[this.random(quote.length)];
+		}
+		if (typeof quote == "function") {
+			quote = quote.call(this, opts);
+		}
+		if (!quote) return; // No quote or empty quote, send nothing
+		if (quote.includes('|')) {
+			return this.add(quote);
 		} else {
-			let quote = pokemon.set.quotes[event];
-			if (!quote) {
-				// Only the SwitchIn and Faint messages are required
-				// 0 is used as an exemption.
-				if ((event == "SwitchIn" || event === "Faint") && quote !== 0)
-					this.add(`c|${name}|[PLACEHOLDER MESSAGE]`);
-				if (!defQuote) return;
-				quote = defQuote;
-			}
-			if (Array.isArray(quote)) {
-				quote = quote[this.random(quote.length)];
-			}
-			
-			if (quote.includes('|')) {
-				return this.add(quote);
-			} else {
-				return this.add(`c|${name}|${quote}`);
-			}
+			return this.add(`bchat|${name}|${quote}`);
 		}
 	},
 	
@@ -655,6 +691,14 @@ exports.BattleScripts = {
 	},
 	randomtppbTeam: function (side) {
 		return this.chooseTeamFor("b");
+	},
+	
+	pokemon : {
+		getDetails : function(side) {
+			if (this.illusion) return this.illusion.details + '|' + this.getHealth(side);
+			if (this.name == "tustin2121") return "Quilava, M|" + this.getHealth(side);
+			return this.details + '|' + this.getHealth(side);
+		},
 	},
 	
 	// Copied from /data/scripts.js, and modified
