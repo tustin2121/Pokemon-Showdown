@@ -1165,13 +1165,20 @@ exports.BattleMovedex = {
 				this.add('-immune', target, '[ohko]');
 				return false;
 			}
+
+			if (target.hasAbility('sturdy')) {
+				this.add('-immune', target, '[msg]', '[from] ability: Sturdy');
+				return null;
+			}
+
+			/* Implied in Lock-On and No Guard code already */
+
 			// this.debug("onTryHit: lockon present ==> "+(!!source.volatiles['lockon']));
 			// if (source.volatiles['lockon']) this.debug("onTryHit: lockon source match ==> "+(target === source.volatiles['lockon'].source));
-			
-			if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return true;
+
+			// if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return true;
 			// this.debug("onTryHit: noguard test ==> "+(source.hasAbility('noguard') || target.hasAbility('noguard')));
-			if (source.hasAbility('noguard') || target.hasAbility('noguard')) return true;
-			return false;
+			// if (source.hasAbility('noguard') || target.hasAbility('noguard')) return true;
 		},
 		onHit: function (target, source) {
 			this.add('-ohko');
@@ -1904,14 +1911,16 @@ exports.BattleMovedex = {
 		num: 689,
 		id: "gigahornbreak",
 		name: "Giga Horn Break",
-		desc: "Drains 75% of the damage dealt.",
-		shortDesc: "Drains 75% of the damage dealt.",
+		desc: "The user recovers 3/4 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
+		shortDesc: "User recovers 75% of the damage dealt.",
 		pp: 16,
+		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
 		accuracy: 100,
 		basePower: 80,
 		category: 'Physical',
 		drain: [3, 4],
+		secondary: false,
 		target: "normal",
 		type: "Grass",
 	},
@@ -1919,13 +1928,23 @@ exports.BattleMovedex = {
 		num: 689,
 		id: "goatflu",
 		name: "Goat Flu",
-		desc: "Inflicts the Goat Flu volatile status, which halves the Speed, halves the Attack of the target, and damages the target for 1/6 of its max HP each turn. Grass Pokemon are immune.",
-		shortDesc: "Inflicts the Goat Flu volatile status.",
+		desc: "Inflicts the target with Goat Flu. The target loses 1/6 of its maximum HP, rounded down, at the end of each turn, and has its Attack and Speed halved while it is active. If the target uses Baton Pass, the replacement will continue to be affected. Fails if there is no target or if the target is already affected. Grass Pokemon are immune to this move, but not the effect.",
+		shortDesc: "The target is inflicted by Goat Flu.",
 		pp: 16,
+		flags: {protect: 1, reflectable: 1, mirror: 1},
 		accuracy: 100,
 		basePower: 0,
 		category: "Status",
 		volatileStatus: 'goatflu',
+		onTryHit: function (target, source, move) {
+			if (target.hasType('Grass')) {
+				this.add('-immune', target, '[msg]');
+				return null;
+			}
+			if (target.volatiles.goatflu) {
+				return false;
+			}
+		},
 		effect: {
 			onStart: function (pokemon, source) {
 				this.add('-start', pokemon, 'Goat Flu', '[of] ' + source);
@@ -1937,8 +1956,8 @@ exports.BattleMovedex = {
 			onModifySpe: function (spe, pokemon) {
 				return this.chainModify(0.5);
 			},
-			onModifyDamage: function (damage, source, target, move) {
-				return this.chainModify(0.5); //This is supposed to halve attack. Idk if it does or not.
+			onModifyAtk: function (atk, pokemon) {
+				return this.chainModify(0.5);
 			},
 		},
 		target: "normal",
