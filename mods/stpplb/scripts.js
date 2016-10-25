@@ -492,17 +492,17 @@ let leaguemon = {
 	// When a pokemon is complete, fill in the leagues and move it to where 
 	// appropriate above.
 	
-	"Some Goats": { // STPPLB+ only //Soma Ghost alt
+	"Some Goats": { // STPPLB+ only // Soma Ghost alt, as if that isn't obvious enough
 		leagues: [],
 		quotes: {
 			SwitchIn: "Nothing to see here. Just Some Goats passing through.",
 			SwitchOut: "Gotta Gogoat Fast!",
 			Faint: "BAHHHD GAME!",
 		},
-		species: 'Gogoat', ability: 'Summon Goats', item: 'Rocket Hooves', gender: 'M',
+		species: 'Gogoat', ability: 'Summon Goats', item: 'Goat of Arms', gender: 'M',
 		moves: ['earthquake', 'rockslide', 'aerialace', 'brickbreak', 'zenheadbutt', 'irontail', 'bulldoze', 'bulkup', 'milkdrink'],
 		signatureMoves: ['gigahornbreak', 'goatflu'],
-		evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
+		evs: {hp:252, spd:216, spe:40}, nature: 'Careful',
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d72bs8j/
 	},
 	"masterleozangetsu": { // First Mon
