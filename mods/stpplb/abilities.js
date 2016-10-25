@@ -733,12 +733,12 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	"summongoats": {
-		num: 222,
+		num: 223,
 		id: "summongoats",
 		name: "Summon Goats",
-		desc: "Summons additional goats to attack with a fraction of power the higher the current HP is. >79% = 4 goats (5 attacks); 60-79% = 3 goats (4 attacks); 40-59% = 2 goats (3 attacks); 20-39% = 1 goat (2 attacks); <20% = 0 goats (1 attack). Each attack is a multiplier fraction based on this formula: x = 1/y, where y is the number of the hit (so 5 attacks would be 5 hits at 1x, 0.5x, 0.333x, 0.25x, and 0.2x base power, sequentially). Does not affect Status, multihit, self-KO, or spread (in Doubles) moves. tl;dr, Parental Bond with more possible hits.",
-		shortDesc: "Summon additional goats to attack, like Parental Bond.",
+		desc: "Summons additional goats to attack with a fraction of power the higher the current HP is. X is equal to (user's current HP * 48 / user's maximum HP), rounded down; the number of additional hits is 0 if X is 0 to 12, 1 if X is 13 to 24, 2 if X is 25 to 36, 3 if X is 37 to 47, and 4 if X is 48. The second hit has its damage halved; the third hit has its damage thirded, etc. Does not affect multi-hit moves or moves that have multiple targets. tl;dr: Parental Bond with more possible hits.", // Sticking to game mechanics TriHard
+		shortDesc: "This Pokemon's damaging moves hit multiple times depending on its current HP. Damage decreases from the second hit onwards.",
 		//TODO Implement
-		rating: 3, //TODO learn wtf a rating is and let azum rate it anyway.
+		rating: 5, // It's just the competitiveness of the ability
 	},
 };
