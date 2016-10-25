@@ -100,18 +100,15 @@ exports.BattleItems = {
 		},
 		
 	},
-	'rockethooves' : {
+	'goatofarms': {
 		num: 450,
-		id: 'rockethooves',
-		name: "Rocket Hooves",
-		desc: "Increases the holder's Speed by 2 for each super-effective hit.",
-		//no fling
-		onSourceModifyDamage: function (damage, source, target, move) {
-			// if (move.typeMod > 0) {
-			// 	this.debug('Membrane neutralize');
-			// 	return this.chainModify(0.75);
-			// }
-		},
+		id: 'goatofarms',
+		name: "Goat of Arms",
+		desc: "Holder calls forth 1 extra goat to tag along. Works even if holder's ability isn't Summon Goats.",
+		fling: {
+			basePower: 20, // just make up a power depending on the estimated size/weight of the item
+		}
+		// I have no idea how to code Summon Goats and this.
 	},
 	blueorb: {
 		inherit: true,
