@@ -499,6 +499,10 @@ let leaguemon = {
 			SwitchOut: "Gotta Gogoat Fast!",
 			Faint: "BAHHHD GAME!",
 		},
+		species: 'Gogoat', ability: 'Summon Goats', item: 'Rocket Hooves', gender: 'M',
+		moves: ['earthquake', 'rockslide', 'aerialace', 'brickbreak', 'zenheadbutt', 'irontail', 'bulldoze', 'bulkup', 'milkdrink'],
+		signatureMoves: ['gigahornbreak', 'goatflu'],
+		evs: {atk:252, def:4, spe:252}, nature: 'Jolly',
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d72bs8j/
 	},
 	"masterleozangetsu": { // First Mon

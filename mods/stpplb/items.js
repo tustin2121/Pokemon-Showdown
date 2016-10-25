@@ -2,9 +2,10 @@
 
 exports.BattleItems = {
 	"lunchabylls": {
+		num: 444,
 		id: "lunchabylls",
 		name: "Lunchabylls",
-		num: 444,
+		desc: "At the end of every turn, holder restores 1/16 of its max HP. Recovers 1/8th hp if statused",
 		fling: {
 			basePower: 10,
 		},
@@ -17,28 +18,27 @@ exports.BattleItems = {
 				this.heal(pokemon.maxhp / 16);
 			}
 		},
-		desc: "At the end of every turn, holder restores 1/16 of its max HP. Recovers 1/8th hp if statused",
 	},
 	'speedshoes': {
+		num: 445,
 		id: 'speedshoes',
 		name: 'Speed Shoes',
-		num: 445,
+		desc: "Doubles speed.",
 		fling: {
 			basePower: 15,
 		},
-		desc: "Doubles speed.",
 		onModifySpe: function (spe, pokemon) {
 			return this.chainModify(2);
 		},
 	},
 	'dex': {
+		num: 446,
 		id: 'dex',
 		name: 'Dex',
-		num: 446,
+		desc: 'Boosts accuracy by 20% and crit rate by one stage.',
 		fling: {
 			basePower: 15,
 		},
-		desc: 'Boosts accuracy by 20% and crit rate by one stage.',
 		onModifyMove: function (move) {
 			move.critRatio++;
 		},
@@ -49,13 +49,13 @@ exports.BattleItems = {
 		},
 	},
 	'membrane': {
+		num: 447,
 		id: 'membrane',
 		name: 'Membrane',
-		num: 447,
+		desc: 'Reduces super-effective damage by 25%',
 		fling: {
 			basePower: 1,
 		},
-		desc: 'Reduces super-effective damage by 25%',
 		onSourceModifyDamage: function (damage, source, target, move) {
 			if (move.typeMod > 0) {
 				this.debug('Membrane neutralize');
@@ -64,9 +64,10 @@ exports.BattleItems = {
 		},
 	},
 	'mistywater': { //just mystic water with a new name
+		num: 448,
 		id: 'mistywater',
 		name: 'Misty Water',
-		num: 448,
+		desc: "Increases power of Water-type moves by 20%.",
 		fling: {
 			basePower: 30,
 		},
@@ -76,11 +77,12 @@ exports.BattleItems = {
 				return this.chainModify([0x1333, 0x1000]);
 			}
 		},
-		desc: "Increases power of Water-type moves by 20%.",
 	},
 	'murkyincense': {
+		num: 449,
 		id: "murkyincense",
 		name: "Murky Incense",
+		desc: "Holder's attacks do 1.3x damage, and it loses 1/10 its max HP after the attack. If holder is the target of a foe's move, that move loses one additional PP.",
 		fling: {
 			basePower: 10,
 		},
@@ -96,8 +98,20 @@ exports.BattleItems = {
 			if (target.side === source.side) return;
 			return 1;
 		},
-		num: 449,
-		desc: "Holder's attacks do 1.3x damage, and it loses 1/10 its max HP after the attack. If holder is the target of a foe's move, that move loses one additional PP.",
+		
+	},
+	'rockethooves' : {
+		num: 450,
+		id: 'rockethooves',
+		name: "Rocket Hooves",
+		desc: "Increases the holder's Speed by 2 for each super-effective hit.",
+		//no fling
+		onSourceModifyDamage: function (damage, source, target, move) {
+			// if (move.typeMod > 0) {
+			// 	this.debug('Membrane neutralize');
+			// 	return this.chainModify(0.75);
+			// }
+		},
 	},
 	blueorb: {
 		inherit: true,

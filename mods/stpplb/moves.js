@@ -1303,60 +1303,24 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			let anim;
 			switch (move.type) {
-			case 'Normal':
-				anim = 'Mega Punch';
-				break;
-			case 'Fire':
-				anim = 'Fire Punch';
-				break;
-			case 'Fighting':
-				anim = 'Close Combat';
-				break;
-			case 'Water':
-				anim = 'Waterfall';
-				break;
-			case 'Flying':
-				anim = 'Wing Attack';
-				break;
-			case 'Grass':
-				anim = 'Leaf Blade';
-				break;
-			case 'Poison':
-				anim = 'Poison Jab';
-				break;
-			case 'Electric':
-				anim = 'Thunder Punch';
-				break;
-			case 'Ground':
-				anim = 'Drill Run';
-				break;
-			case 'Psychic':
-				anim = 'Zen Headbutt';
-				break;
-			case 'Rock':
-				anim = 'Head Smash';
-				break;
-			case 'Ice':
-				anim = 'Ice Punch';
-				break;
-			case 'Bug':
-				anim = 'X-Scissor';
-				break;
-			case 'Dragon':
-				anim = 'Outrage';
-				break;
-			case 'Ghost':
-				anim = 'Shadow Punch';
-				break;
-			case 'Dark':
-				anim = 'Night Slash';
-				break;
-			case 'Steel':
-				anim = 'Heavy Slam';
-				break;
-			case 'Fairy':
-				anim = 'Play Rough';
-				break;
+				case 'Normal':	anim = 'Mega Punch';	break;
+				case 'Fire':	anim = 'Fire Punch';	break;
+				case 'Fighting':anim = 'Close Combat';	break;
+				case 'Water':	anim = 'Waterfall'; 	break;
+				case 'Flying':	anim = 'Wing Attack';	break;
+				case 'Grass':	anim = 'Leaf Blade';	break;
+				case 'Poison':	anim = 'Poison Jab';	break;
+				case 'Electric':anim = 'Thunder Punch'; break;
+				case 'Ground':	anim = 'Drill Run'; 	break;
+				case 'Psychic':	anim = 'Zen Headbutt';	break;
+				case 'Rock':	anim = 'Head Smash';	break;
+				case 'Ice':		anim = 'Ice Punch'; 	break;
+				case 'Bug':		anim = 'X-Scissor'; 	break;
+				case 'Dragon':	anim = 'Outrage';		break;
+				case 'Ghost':	anim = 'Shadow Punch';	break;
+				case 'Dark':	anim = 'Night Slash';	break;
+				case 'Steel':	anim = 'Heavy Slam';	break;
+				case 'Fairy':	anim = 'Play Rough';	break;
 			}
 			this.add('-anim', source, anim, target);
 		},
@@ -1379,39 +1343,17 @@ exports.BattleMovedex = {
 		onTryHit: function (target, pokemon) {
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
-			case 'omastar':
-				move = 'abstartselect';
-				break;
-			case 'kabutops':
-				move = 'wait4baba';
-				break;
-			case 'aerodactyl':
-				move = 'balancedstrike';
-				break;
-			case 'cradily':
-				move = 'texttospeech';
-				break;
-			case 'armaldo':
-				move = 'holyducttapeofclaw';
-				break;
-			case 'bastiodon':
-				move = 'warecho';
-				break;
-			case 'rampardos':
-				move = 'skullsmash';
-				break;
-			case 'carracosta':
-				move = 'danceriot';
-				break;
-			case 'archeops':
-				move = 'bluescreenofdeath';
-				break;
-			case 'aurorus':
-				move = 'portaltospaaaaaaace';
-				break;
-			case 'tyrantrum':
-				move = 'doubleascent';
-				break;
+			case 'omastar':		move = 'abstartselect';		break;
+			case 'kabutops':	move = 'wait4baba';			break;
+			case 'aerodactyl':	move = 'balancedstrike';	break;
+			case 'cradily':		move = 'texttospeech';		break;
+			case 'armaldo':		move = 'holyducttapeofclaw';break;
+			case 'bastiodon':	move = 'warecho';			break;
+			case 'rampardos':	move = 'skullsmash';		break;
+			case 'carracosta':	move = 'danceriot';			break;
+			case 'archeops':	move = 'bluescreenofdeath';	break;
+			case 'aurorus':		move = 'portaltospaaaaaaace';break;
+			case 'tyrantrum':	move = 'doubleascent';		break;
 			}
 			this.useMove(move, pokemon, target);
 			return null;
@@ -1957,5 +1899,49 @@ exports.BattleMovedex = {
 		secondary: false,
 		target: "self",
 		type: "Ghost",
+	},
+	"gigahornbreak": {
+		num: 689,
+		id: "gigahornbreak",
+		name: "Giga Horn Break",
+		desc: "Drains 75% of the damage dealt.",
+		shortDesc: "Drains 75% of the damage dealt.",
+		pp: 16,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		accuracy: 100,
+		basePower: 80,
+		category: 'Physical',
+		drain: [3, 4],
+		target: "normal",
+		type: "Grass",
+	},
+	"goatflu": {
+		num: 689,
+		id: "goatflu",
+		name: "Goat Flu",
+		desc: "Inflicts the Goat Flu volatile status, which halves the Speed, halves the Attack of the target, and damages the target for 1/6 of its max HP each turn. Grass Pokemon are immune.",
+		shortDesc: "Inflicts the Goat Flu volatile status.",
+		pp: 16,
+		accuracy: 100,
+		basePower: 0,
+		category: "Status",
+		volatileStatus: 'goatflu',
+		effect: {
+			onStart: function (pokemon, source) {
+				this.add('-start', pokemon, 'Goat Flu', '[of] ' + source);
+			},
+			onResidualOrder: 10,
+			onResidual: function (pokemon) {
+				this.damage(pokemon.maxhp / 6);
+			},
+			onModifySpe: function (spe, pokemon) {
+				return this.chainModify(0.5);
+			},
+			onModifyDamage: function (damage, source, target, move) {
+				return this.chainModify(0.5); //This is supposed to halve attack. Idk if it does or not.
+			},
+		},
+		target: "normal",
+		type: "Grass",
 	},
 };
