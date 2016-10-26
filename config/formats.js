@@ -1410,10 +1410,14 @@ exports.Formats = [
 				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
 			}
 		},
-	
-		onFaint: function (pokemon) { // PJSalt-y faint messages go here.
-			this.sayQuote(pokemon, "Faint");
+		
+		// General quote hooks
+		onFaint: function (pokemon) { this.sayQuote(pokemon, "Faint"); },
+		onCriticalHit: function(pokemon) { this.sayQuote(pokemon, "CriticalHit"); },
+		onAttract: function(pokemon, source) { 
+			this.sayQuote(pokemon, "Attract", {source: source, target: pokemon}); 
 		},
+		
 
 		onBegin: function () {
 			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");

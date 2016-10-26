@@ -8915,12 +8915,12 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, authentic: 1},
-		onHit: function (target, source) {
-			let disallowedMoves = {chatter:1, mimic:1, sketch:1, struggle:1, transform:1};
-			if (source.transformed || !target.lastMove || disallowedMoves[target.lastMove] || source.moves.indexOf(target.lastMove) >= 0) return false;
+		disallowedMoves: {chatter:1, mimic:1, sketch:1, struggle:1, transform:1},
+		onHit: function (target, source, me) {
+			if (source.transformed || !target.lastMove || me.disallowedMoves[target.lastMove] || source.moves.indexOf(target.lastMove) >= 0) return false;
 			let moveslot = source.moves.indexOf('mimic');
 			if (moveslot < 0) return false;
-			let move = Tools.getMove(target.lastMove);
+			let move = Tools.getMove.call(this, target.lastMove);
 			source.moveset[moveslot] = {
 				move: move.name,
 				id: move.id,
@@ -12670,12 +12670,12 @@ exports.BattleMovedex = {
 		noPPBoosts: true,
 		priority: 0,
 		flags: {authentic: 1},
-		onHit: function (target, source) {
-			let disallowedMoves = {chatter:1, sketch:1, struggle:1};
-			if (source.transformed || !target.lastMove || disallowedMoves[target.lastMove] || source.moves.indexOf(target.lastMove) >= 0) return false;
+		disallowedMoves: {chatter:1, sketch:1, struggle:1},
+		onHit: function (target, source, me) {
+			if (source.transformed || !target.lastMove || me.disallowedMoves[target.lastMove] || source.moves.indexOf(target.lastMove) >= 0) return false;
 			let moveslot = source.moves.indexOf('sketch');
 			if (moveslot < 0) return false;
-			let move = Tools.getMove(target.lastMove);
+			let move = Tools.getMove.call(this, target.lastMove);
 			let sketchedMove = {
 				move: move.name,
 				id: move.id,

@@ -57,6 +57,74 @@ exports.BattleMovedex = {
 			}
 		},
 	},
+	"mimic": {
+		inherit: true,
+		disallowedMoves : {
+			chatter:1, mimic:1, sketch:1, struggle:1, transform:1, //standard
+			mine:1, //nonstandard
+		},
+	},
+	"sketch": {
+		inherit: true,
+		disallowedMoves: {
+			chatter:1, sketch:1, struggle:1, //standard
+			mine:1, //nonstandard
+		},
+	},
+	"attract": {
+		inherit: true,
+		desc: "Causes the target to become infatuated, making it unable to attack 50% of the time. Fails if the user and the target are incompatible, or if the target is already infatuated. The effect ends when either the user or the target is no longer active. Pokemon with the Ability Oblivious or protected by the Ability Aroma Veil are immune.",
+		effect: {
+			noCopy: true, // doesn't get copied by Baton Pass
+			onStart: function (pokemon, source, effect) {
+				if (effect.id !== "superattract") { //skip this check if this is from superattract
+					if (pokemon.set.attract) { 
+						// If the target pokemon's set has an attract clause
+						let gender = source.gender || "U"; //U == genderless
+						if (!pokemon.set.attract[gender]) { //If the source's gender is not in the clause, fail
+							this.debug("incompatable gender (clause check)");
+							return false;
+						}
+					} else {
+						// Otherwise, follow normal rules
+						if (!(pokemon.gender === 'M' && source.gender === 'F') && !(pokemon.gender === 'F' && source.gender === 'M')) {
+							this.debug('incompatible gender');
+							return false;
+						}
+					}
+				}
+				if (!this.runEvent('Attract', pokemon, source)) {
+					this.debug('Attract event failed');
+					return false;
+				}
+
+				if (effect.id === 'cutecharm') {
+					this.add('-start', pokemon, 'Attract', '[from] ability: Cute Charm', '[of] ' + source);
+				} else if (effect.id === 'destinyknot') {
+					this.add('-start', pokemon, 'Attract', '[from] item: Destiny Knot', '[of] ' + source);
+				} else {
+					this.add('-start', pokemon, 'Attract');
+				}
+			},
+			onUpdate: function (pokemon) {
+				if (this.effectData.source && !this.effectData.source.isActive && pokemon.volatiles['attract']) {
+					this.debug('Removing Attract volatile on ' + pokemon);
+					pokemon.removeVolatile('attract');
+				}
+			},
+			onBeforeMovePriority: 2,
+			onBeforeMove: function (pokemon, target, move) {
+				this.add('-activate', pokemon, 'move: Attract', '[of] ' + this.effectData.source);
+				if (this.random(2) === 0) {
+					this.add('cant', pokemon, 'Attract');
+					return false;
+				}
+			},
+			onEnd: function (pokemon) {
+				this.add('-end', pokemon, 'Attract', '[silent]');
+			},
+		},
+	},
 	
 	
 	////////////////////////////////////////////////////////////////////////////
@@ -1256,9 +1324,12 @@ exports.BattleMovedex = {
 		pp: 5,
 		priority: 0,
 		flags: {protect: 1, authentic: 1},
-		onHit: function (target, source) {
-			let disallowedMoves = {copycat:1, focuspunch:1, mimic: 1, quicksketch: 1, sketch:1, sleeptalk:1, snatch:1, struggle:1, transform:1};
-			if (!this.lastMove || disallowedMoves[this.lastMove] || source.hasMove(this.lastMove)) return false;
+		disallowedMoves: {
+			copycat:1, focuspunch:1, mimic: 1, quicksketch: 1, sketch:1, sleeptalk:1, snatch:1, struggle:1, transform:1,
+			mine:1, // The result of Cole's Set Mine move
+		},
+		onHit: function (target, source, me) {
+			if (!this.lastMove || me.disallowedMoves[this.lastMove] || source.hasMove(this.lastMove)) return false;
 			let move = this.getMove(this.lastMove);
 			let sketchedMove = {
 				move: move.name,
@@ -1985,7 +2056,7 @@ exports.BattleMovedex = {
 		name: "Giga Horn Break",
 		desc: "The user recovers 3/4 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
 		shortDesc: "User recovers 75% of the damage dealt.",
-		pp: 16,
+		pp: 10,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation
@@ -2006,7 +2077,7 @@ exports.BattleMovedex = {
 		name: "Goat Flu",
 		desc: "Inflicts the target with Goat Flu. The target loses 1/6 of its maximum HP, rounded down, at the end of each turn, and has its Attack and Speed halved while it is active. If the target uses Baton Pass, the replacement will continue to be affected. Fails if there is no target or if the target is already affected. Grass Pokemon are immune to this move, but not the effect.",
 		shortDesc: "The target is inflicted by Goat Flu.",
-		pp: 16,
+		pp: 10,
 		flags: {protect: 1, reflectable: 1, mirror: 1},
 		accuracy: 100,
 		basePower: 0,
@@ -2017,12 +2088,12 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Ice Burn', target);
 		},
 		onTryHit: function (target, source, move) {
+			if (target.volatiles.goatflu) {
+				return false;
+			}
 			if (target.hasType('Grass')) {
 				this.add('-immune', target, '[msg]');
 				return null;
-			}
-			if (target.volatiles.goatflu) {
-				return false;
 			}
 		},
 		effect: {
@@ -2042,5 +2113,31 @@ exports.BattleMovedex = {
 		},
 		target: "normal",
 		type: "Grass",
+	},
+	"operationlove": {
+		num: 2059,
+		id: "operationlove",
+		name: "Operation Love",
+		desc: "Spreads love throughout the world! Attracts the target, regardless of gender or sexual preference, and changes the target's first move to Attract.",
+		shortDesc: "A target becomes infaturated, and gains the move Attract over the target's first move.",
+		pp: 15,
+		accuracy: 100,
+		basePower: 0,
+		category: "Status",
+		priority: 0,
+		flags: {protect: 1, reflectable: 1, mirror: 1, authentic: 1},
+		volatileStatus: 'attract',
+		//TODO implement?
+		onPrepareHit: function (target, source, move) {
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Hypnosis', source);
+		},
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
+		},
+		secondary: false,
+		target: "normal",
+		type: "Normal",
+		contestType: "Cute",
 	},
 };

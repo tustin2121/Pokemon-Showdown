@@ -739,7 +739,48 @@ exports.BattleAbilities = { // define custom abilities here.
 		name: "Summon Goats",
 		desc: "Summons additional goats to attack with a fraction of power the higher the current HP is. X is equal to (user's current HP * 48 / user's maximum HP), rounded down; the number of additional hits is 0 if X is 0 to 12, 1 if X is 13 to 24, 2 if X is 25 to 36, 3 if X is 37 to 47, and 4 if X is 48. The second hit has its damage halved; the third hit has its damage thirded, etc. Does not affect multi-hit moves or moves that have multiple targets. tl;dr: Parental Bond with more possible hits.", // Sticking to game mechanics TriHard
 		shortDesc: "This Pokemon's damaging moves hit multiple times depending on its current HP. Damage decreases from the second hit onwards.",
+		onPrepareHitPriority: 10, //higher than Goat of Arms item
+		onPrepareHit: function (source, target, move) {
+			if (move.id in {iceball: 1, rollout: 1}) return;
+			if (move.category !== 'Status' && !move.selfdestruct && !move.multihit && !move.flags['charge'] && !move.spreadHit) {
+				
+				let num = Math.floor(source.hp * 48 / source.maxhp);
+				if (num < 12) num = 0;
+				else if (num < 24) num = 1;
+				else if (num < 36) num = 2;
+				else if (num < 48) num = 3
+				else num = 4;
+				move.multihit = num+1;
+				source.addVolatile('summongoats');
+			}
+		},
+		effect: {
+			duration: 1,
+			onBasePowerPriority: 8,
+			onBasePower: function (basePower) {
+				if (this.effectData.hit) {
+					this.effectData.hit++;
+					return this.chainModify(1.0 / this.effectData.hit);
+				} else {
+					this.effectData.hit = 1;
+				}
+			},
+			onSourceModifySecondaries: function (secondaries, target, source, move) {
+				if (move.id === 'secretpower' && this.effectData.hit < 2) {
+					// hack to prevent accidentally suppressing King's Rock/Razor Fang
+					return secondaries.filter(effect => effect.volatileStatus === 'flinch');
+				}
+			},
+		},
+		rating: 5,
+	},
+	"nolovelost": {
+		num: 2033,
+		id: "nolovelost",
+		name: "No Love Lost",
+		desc: "This pokemon is immune to the effects of Attract. If the pokemon is hit by Attract, the user is instead attracted to this pokemon, and this pokemon gains +2 SpA and +2 SpD.",
+		shortDesc: "Cannot be Attracted, but gains +2 SpA, +2 SpD, and an attracted foe if tried.",
 		//TODO Implement
-		rating: 5, // It's just the competitiveness of the ability
+		rating: 1,
 	},
 };

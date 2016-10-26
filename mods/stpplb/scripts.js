@@ -121,6 +121,19 @@ let leaguemon = {
 			}
 		}
 	},
+	"Some Goats": { // STPPLB+ only
+		leagues: ["lb+", "b"],
+		quotes: {
+			SwitchIn: "Nothing to see here. Just Some Goats passing through.",
+			SwitchOut: "Gotta Gogoat Fast!",
+			Faint: "BAHHHD GAME!",
+		},
+		species: 'Gogoat', ability: 'Summon Goats', item: 'Rocket Hooves', gender: 'M',
+		moves: ['earthquake', 'rockslide', 'aerialace', 'brickbreak', 'zenheadbutt', 'irontail', 'bulldoze', 'bulkup', 'milkdrink'],
+		signatureMoves: ['gigahornbreak', 'goatflu'],
+		evs: {hp:252, spd:216, spe:40}, nature: 'Careful',
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d72bs8j/
+	},
 	"Eeveelutionlvr": {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
@@ -506,19 +519,7 @@ let leaguemon = {
 	// When a pokemon is complete, fill in the leagues and move it to where 
 	// appropriate above.
 	
-	"Some Goats": { // STPPLB+ only
-		leagues: [],
-		quotes: {
-			SwitchIn: "Nothing to see here. Just Some Goats passing through.",
-			SwitchOut: "Gotta Gogoat Fast!",
-			Faint: "BAHHHD GAME!",
-		},
-		species: 'Gogoat', ability: 'Summon Goats', item: 'Goat of Arms', gender: 'M',
-		moves: ['earthquake', 'rockslide', 'aerialace', 'brickbreak', 'zenheadbutt', 'irontail', 'bulldoze', 'bulkup', 'milkdrink'],
-		signatureMoves: ['gigahornbreak', 'goatflu'],
-		evs: {hp:252, spd:216, spe:40}, nature: 'Careful',
-		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d72bs8j/
-	},
+	
 	"masterleozangetsu": { // First Mon
 		leagues: [], 
 		quotes: {
@@ -543,6 +544,21 @@ let leaguemon = {
 		},
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
 	},
+	"Burrito": {
+		leagues: [],
+		quotes: {
+			SwitchIn: "Hello there... <3",
+			Attract: "Oh, you are so cute! <3 VoHiYo",
+			CriticalHit: "Ow! What was that for?! BibleThump",
+			Faint: "All I wanted to do was spread the love... BibleThump",
+			"Move-operationlove": "<3 VoHiYo <3 Go out and spread the love! <3 VoHiYo <3"
+		},
+		species: 'Espeon', ability: 'No Love Lost', item: 'Full Heal', gender: 'M',
+		moves: ['morningsun', 'flash', 'psychic', 'dazzlinggleam', 'shadowball'],
+		signatureMoves: ['operationlove'],
+		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
+		attract: {M:1, F:1, U:1}, // pan, also allowing all Attract through to trigger No Love Lost
+	},
 	"tustin2121": { // First Mon
 		leagues: [],
 		quotes: {
@@ -560,7 +576,7 @@ let leaguemon = {
 		species: 'Typhlosion', ability: 'Blaze', item: 'Eviolite', gender: 'M',
 		moves: ['extrasensory', 'flamethrower', 'lavaplume', 'eruption'],
 		signatureMoves: [],
-		forceMega: false, // Never Mega Evolve (usually as a result of using a signiture move)
+		attract: {M:1}, forceMega: false, // Never Mega Evolve (usually as a result of using a signiture move)
 		// evs: {atk:252, def:4, spe:252}, nature: 'Timid',
 		evs: {}, nature: "Serious",
 		ivs: {hp:0, atk:0, def:0, spa:0, spd:0, spe:0},
@@ -571,18 +587,15 @@ let leaguemon = {
 		// Quilava (with base power of a Typhlosion)
 		// Item: Reinforced Glass | If the holder is hit with a super effective move, that move is nullified, and this item breaks. Single Use.
 		// Ability:
-		// ???
-		// Signiture Moves:
-		// Code Refactor | Special | Fire-Type | Power: 15 | Accuracy: 100% | PP: 15 | Hits 2-5 times | each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit. Says quotes about how horrible code is.
-		// Cheat Code | Status | Normal-Type | Power: -- | Accuracy: -- | PP: 5 | Picks a signiture move that is super effective against the opposing pokemon, or otherwise useful in the current situation.
-		// -> First Turn => bluescreenofdeath
-		// -> HP < 30% => keepcalmandfocus
-		// -> Best SE move => texttospeech, skullsmash, danceriot, wailofthebanshee, quityourbullshit, boost, rainbowspray, ganonssword, shadowsphere, godbird, ironfist, eternalstruggle, bestfcar, hyperwahahahahaha, darkfire
-		// Note: set move.isNonstandard on Cheat Code, so Super Glitch doesn't call it.
-		// When using the move, the move prints out something random in a fake /evalbattle call response (though the information is real). It can print out the opponent's types, the opponent's ability (which will then be revealed to the client), the current hp of the opponent, the last move in the moveset (which is basically always the signiture move). The quote then comes after it.
+		// Cheat Code | Upon switch in, and at the end of every turn, this pokemon aquires two new signiture moves, appended onto its movepool. One of the moves is from the opponent's set of signiture moves, and the other is a random "god" move. Upon using one of these moves, this pokemon loses the move. This ability cannot add more than four extra moves.
+		// When the ability activates, the move prints out something random in a fake /evalbattle call response (though the information is real). It can print out the opponent's types, the opponent's ability (which will then be revealed to the client), the current hp of the opponent, the last move in the moveset (which is basically always the signiture move). The quote then comes after it.
 		// >>> this.p1.active[0].types
 		// <<< [Fire,Flying]
 		// tustin2121: Time to exploit that.
+		//
+		// Signiture Moves:
+		// Code Refactor | Special | Fire-Type | Power: 15 | Accuracy: 100% | PP: 15 | Hits 2-5 times | each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit. Says quotes about how horrible code is.
+		
 		
 	}
 	
@@ -666,9 +679,9 @@ exports.BattleScripts = {
 		if (typeof opts == "string") opts = {"default":opts};
 		
 		let name = pokemon.illusion ? pokemon.illusion.name : pokemon.name;
-		if (!pokemon.set.quotes && !opts.default) {
+		if (!pokemon.set.quotes) {
 			this.add(`error|Invalid Pokemon definition! ${name} has no quotes object!`);
-			 return;
+			pokemon.set.quotes = {}; //Temporarily fix the problem.
 		}
 		
 		let quote = pokemon.set.quotes[event];

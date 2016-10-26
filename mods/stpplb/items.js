@@ -100,15 +100,30 @@ exports.BattleItems = {
 		},
 		
 	},
-	'goatofarms': {
-		num: 2007,
-		id: 'goatofarms',
-		name: "Goat of Arms",
-		desc: "Holder calls forth 1 extra goat to tag along. Works even if holder's ability isn't Summon Goats.",
+	// 'goatofarms': { //If you want this item, azum, YOU implement it OpieOP
+	// 	num: 2007,
+	// 	id: 'goatofarms',
+	// 	name: "Goat of Arms",
+	// 	desc: "Holder calls forth 1 extra goat to tag along. Works even if holder's ability isn't Summon Goats.",
+	// 	fling: {
+	// 		basePower: 20, // just make up a power depending on the estimated size/weight of the item
+	// 	}
+	// 	// I have no idea how to code Summon Goats and this.
+	// },
+	'rockethooves': {
+		num: 2008,
+		id: "rockethooves",
+		name: "Rocket Hooves",
+		desc: "Increases the holder's Speed by 1 for each super-effective hit.",
+		shortDesc: "Increases the holder's Speed by 1 for each super-effective hit.",
 		fling: {
-			basePower: 20, // just make up a power depending on the estimated size/weight of the item
-		}
-		// I have no idea how to code Summon Goats and this.
+			basePower: 100, //throwing a shoe WutFace
+		},
+		onHit: function (target, source, move) {
+			if (target.hp && move.category !== 'Status' && !move.damage && !move.damageCallback && move.typeMod > 0) {
+				this.boost({spe: 1});
+			}
+		},
 	},
 	blueorb: {
 		inherit: true,
