@@ -2984,13 +2984,15 @@ exports.commands = {
 			// ANY CHANGES TO THE ABOVE ARE DEATH TO REPLAYS! DO NOT ACCEPT THEM --tustin2121
 		}, success => {
 			if (success && success.errorip) {
-				connection.popup("This server's request IP " + success.errorip + " is not a registered server.");
+				if (connection) connection.popup("This server's request IP " + success.errorip + " is not a registered server.");
+				console.warn("This server's request IP " + success.errorip + " is not a registered server.");
 				return;
 			}
-			connection.send('|queryresponse|savereplay|' + JSON.stringify({
-				log: data,
-				id: room.id.substr(7),
-			}));
+			if (connection)
+				connection.send('|queryresponse|savereplay|' + JSON.stringify({
+					log: data,
+					id: room.id.substr(7),
+				}));
 		});
 	},
 

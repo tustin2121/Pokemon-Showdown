@@ -2,7 +2,7 @@
 
 exports.BattleAbilities = { // define custom abilities here.
 	"glitchiate": {
-		num: 192,
+		num: 2001,
 		id: "glitchiate",
 		name: "Glitchiate",
 		desc: "This Pokemon's moves become ???-type moves and have their power multiplied by 1.3. This effect comes after other effects that change a move's type, but before Ion Deluge and Electrify's effects.",
@@ -22,7 +22,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},
 	"serenegraceplus": {
-		num: 193,
+		num: 2002,
 		id: "serenegraceplus",
 		name: "Serene Grace Plus",
 		desc: "This Pokemon's moves have their secondary chances multiplied by 3.",
@@ -38,7 +38,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 5,
 	},
 	'spoopify': {
-		num: 194,
+		num: 2003,
 		id: "spoopify",
 		name: "Spoopify",
 		desc: "Makes stuff Ghost on switch-in.",
@@ -62,7 +62,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},
 	/*'scrubterrain': { // MLZekrom pls, Scrub Terrain was really hacky. Happy it's out of the meta.
-		num: 195,
+		num: 2004,
 		id: 'scrubterrain',
 		name: 'Scrub Terrain',
 		desc: '',
@@ -90,7 +90,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},*/
 	'proteon': { // Eeveelutionlvr's ability.
-		num: 196,
+		num: 2005,
 		id: 'proteon',
 		name: 'Proteon',
 		desc: "This Pokemon transforms into an Eeveelution to match the type of the move it is about to use, if possible.",
@@ -128,7 +128,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4.5,
 	},
 	'swahahahahaggers': { // Sohippy's ability: con on switch-in.
-		num: 197,
+		num: 2006,
 		id: 'swahahahahaggers',
 		name: 'Swahahahahaggers',
 		desc: "On switch-in, all opponents become confused for 1 turn, with 70% self-hit chance.",
@@ -144,7 +144,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},
 	'psychologist': { // Kooma's ability: immune to all "mental" volatile statuses.
-		num: 198,
+		num: 2007,
 		id: 'psychologist',
 		name: 'Psychologist',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -169,7 +169,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},
 	'seaandsky': { // Kap'n Kooma's ability: Primordial Sea plus Swift Swim.
-		num: 199,
+		num: 2008,
 		id: 'seaandsky',
 		name: 'Sea and Sky',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -202,7 +202,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 5,
 	},
 	'littleengine': { // Poomph, the little engine who couldn't. Little moody.
-		num: 200,
+		num: 2009,
 		id: "littleengine",
 		name: "Little Engine",
 		desc: "This Pokemon has a random stat raised by 1 stage at the end of each turn.",
@@ -226,7 +226,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4.5,
 	},
 	'furriercoat': { // WhatevsFur, better fur coat, no frz.
-		num: 201,
+		num: 2010,
 		id: "furriercoat",
 		name: "Furrier Coat",
 		desc: "This Pokemon's Defense and Sp. Defense are doubled. This Pokemon cannot be frozen.",
@@ -245,7 +245,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	'nofun': {
-		num: 202,
+		num: 2011,
 		id: "nofun",
 		name: "No Fun",
 		desc: "Abilities are fun. No more ability for you.",
@@ -253,7 +253,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 0,
 	},
 	'nofunallowed': {
-		num: 203,
+		num: 2012,
 		id: "nofunallowed",
 		name: "No Fun Allowed",
 		desc: "Makes opponent's ability No Fun. Causes all custom moves to fail.",
@@ -277,7 +277,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 		},
 		onAnyTryMove: function (target, source, effect) {
-			if (effect.num > 621) {
+			if (effect.num >= 2000) {
 				this.attrLastMove('[still]');
 				this.add("raw|No Fun Mantis's No Fun Allowed suppressed the signature move!");
 				return false;
@@ -286,7 +286,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	"dictator": {
-		num: 204,
+		num: 2013,
 		id: "dictator",
 		name: "Dictator",
 		desc: "On switch-in, this Pokemon lowers the Attack, Special Attack and Speed of adjacent opposing Pokemon by 1 stage. Pokemon behind a substitute are immune.",
@@ -310,7 +310,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},
 	"messiah": {
-		num: 205,
+		num: 2014,
 		id: "messiah",
 		name: "Messiah",
 		desc: "This Pokemon blocks certain status moves and instead uses the move against the original user. Increases Sp.Attack by 2 when triggered",
@@ -342,7 +342,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4.5,
 	},
 	'technicality': {
-		num: 206,
+		num: 2015,
 		rating: 2,
 		id: 'technicality',
 		name: 'Technicality',
@@ -357,7 +357,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	'megaplunder': {
-		num: 207,
+		num: 2016,
 		id: 'megaplunder',
 		name: 'Mega Plunder',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -365,7 +365,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 0,
 	},
 	'pikapower': {
-		num: 208,
+		num: 2017,
 		id: "pikapower",
 		name: "Pika Power",
 		desc: "This Pok&#xe9;mon has a 10% chance of exploding if you target it.",
@@ -384,7 +384,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	'banevade': {
-		num: 209,
+		num: 2018,
 		id: "banevade",
 		name: "Ban Evade",
 		desc: "This Pokemon's evasion is evaluated by end of each turn. Higher evasion at lower HP. OHKO moves will fail.",
@@ -411,7 +411,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3,
 	},
 	'incinerate': {
-		num: 210,
+		num: 2019,
 		id: "incinerate",
 		name: "Incinerate",
 		desc: "This Pokemon's Normal type moves become Fire type and have their power multiplied by 1.3. This effect comes after other effects that change a move's type, but before Ion Deluge and Electrify's effects.",
@@ -433,7 +433,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	'physicalakazam': { // Makes Alakazam into a physical tank
-		num: 211,
+		num: 2020,
 		id: "physicalakazam",
 		name: "Physicalakazam",
 		desc: "This Pokemon's Attack is doubled and its Defense is increased 1.5x.",
@@ -449,7 +449,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	"defiantplus": {
-		num: 212,
+		num: 2021,
 		id: "defiantplus",
 		name: "Defiant Plus",
 		desc: "This Pokemon's Attack and Speed is raised by 2 stages for each of its stat stages that is lowered by an opposing Pokemon. If this Pokemon has a major status condition, its Speed is multiplied by 1.5; the Speed drop from paralysis is ignored.",
@@ -476,7 +476,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 2.5,
 	},
 	'silverscale': { // Abyll's Milotic's ability: Upgraded marvel scale
-		num: 213,
+		num: 2022,
 		id: "silverscale",
 		name: "Silver Scale",
 		desc: "If this Pokemon has a major status condition, its Sp Defense is multiplied by 1.5, and Speed by 1.25.",
@@ -496,7 +496,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 2.5,
 	},
 	'gottagofast': { // Pokson's speedboost
-		num: 214,
+		num: 2023,
 		id: 'gottagofast',
 		name: 'Gotta Go Fast',
 		desc: "Chance of boosting speed when using signature move",
@@ -511,7 +511,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	'drawingrequest': {
-		num: 215,
+		num: 2024,
 		id: 'drawingrequest',
 		name: 'Drawing Request',
 		desc: "At the end of each turn, replaces this Pokemon's first move with a random move from the pool of all Special attacks >= 60 BP and all status moves, minus the ones that boost the user's Attack stat, and the ones this Pokemon already has.",
@@ -555,7 +555,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	"mindgames": {
-		num: 216,
+		num: 2025,
 		id: "mindgames",
 		name: "Mind Games",
 		desc: "When this Pokemon switches in, it appears as the last unfainted Pokemon in its party until it takes direct damage from another Pokemon's attack. This Pokemon's actual level and HP are displayed instead of those of the mimicked Pokemon.",
@@ -569,7 +569,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4.5,
 	},
 	'jackyofalltrades': {
-		num: 217,
+		num: 2026,
 		id: 'jackyofalltrades',
 		name: 'Jack(y) of All Trades',
 		desc: '[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]',
@@ -584,7 +584,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	'mirrorguard': {
-		num: 218,
+		num: 2027,
 		id: 'mirrorguard',
 		name: 'Mirror Guard',
 		desc: 'Pokemon bounces residual damage. Curse and Substitute on use, Belly Drum, Pain Split, Struggle recoil, and confusion damage are considered direct damage.',
@@ -608,7 +608,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 5,
 	},
 	'superprotean': {
-		num: 219,
+		num: 2028,
 		id: 'superprotean',
 		name: 'Super Protean',
 		desc: 'Adds the type of every move used to the pokemon.',
@@ -628,7 +628,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 4,
 	},
 	'invocation': {
-		num: 220,
+		num: 2029,
 		name: 'Invocation',
 		id: 'invocation',
 		desc: 'Randomly transforms into a fossil god on switch-in.',
@@ -691,7 +691,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 1,
 	},
 	'heraldofdeath': {
-		num: 221,
+		num: 2030,
 		id: 'heraldofdeath',
 		name: 'Herald of Death',
 		desc: "On switch-in, each adjacent opposing active Pokemon receives a perish count of 4 if it doesn't already have a perish count. At the end of each turn including the turn used, the perish count of all active Pokemon lowers by 1 and Pokemon faint if the number reaches 0. The perish count is removed from Pokemon that switch out. If a Pokemon uses Baton Pass while it has a perish count, the replacement will gain the perish count and continue to count down.",
@@ -712,7 +712,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	"beatmisty": {
-		num: 222,
+		num: 2031,
 		id: "beatmisty",
 		name: "Beat Misty",
 		desc: "This Pokemon is immune to Water-type moves and restores 1/4 of its maximum HP, rounded down, when hit by a Water-type move. This Pokemon has a 10% chance to survive an attack that would KO it with 1 HP.",
@@ -734,7 +734,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		rating: 3.5,
 	},
 	"summongoats": {
-		num: 223,
+		num: 2032,
 		id: "summongoats",
 		name: "Summon Goats",
 		desc: "Summons additional goats to attack with a fraction of power the higher the current HP is. X is equal to (user's current HP * 48 / user's maximum HP), rounded down; the number of additional hits is 0 if X is 0 to 12, 1 if X is 13 to 24, 2 if X is 25 to 36, 3 if X is 37 to 47, and 4 if X is 48. The second hit has its damage halved; the third hit has its damage thirded, etc. Does not affect multi-hit moves or moves that have multiple targets. tl;dr: Parental Bond with more possible hits.", // Sticking to game mechanics TriHard

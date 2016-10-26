@@ -2,7 +2,7 @@
 
 exports.BattleItems = {
 	"lunchabylls": {
-		num: 444,
+		num: 2001,
 		id: "lunchabylls",
 		name: "Lunchabylls",
 		desc: "At the end of every turn, holder restores 1/16 of its max HP. Recovers 1/8th hp if statused",
@@ -20,7 +20,7 @@ exports.BattleItems = {
 		},
 	},
 	'speedshoes': {
-		num: 445,
+		num: 2002,
 		id: 'speedshoes',
 		name: 'Speed Shoes',
 		desc: "Doubles speed.",
@@ -32,7 +32,7 @@ exports.BattleItems = {
 		},
 	},
 	'dex': {
-		num: 446,
+		num: 2003,
 		id: 'dex',
 		name: 'Dex',
 		desc: 'Boosts accuracy by 20% and crit rate by one stage.',
@@ -49,7 +49,7 @@ exports.BattleItems = {
 		},
 	},
 	'membrane': {
-		num: 447,
+		num: 2004,
 		id: 'membrane',
 		name: 'Membrane',
 		desc: 'Reduces super-effective damage by 25%',
@@ -64,7 +64,7 @@ exports.BattleItems = {
 		},
 	},
 	'mistywater': { //just mystic water with a new name
-		num: 448,
+		num: 2005,
 		id: 'mistywater',
 		name: 'Misty Water',
 		desc: "Increases power of Water-type moves by 20%.",
@@ -79,7 +79,7 @@ exports.BattleItems = {
 		},
 	},
 	'murkyincense': {
-		num: 449,
+		num: 2006,
 		id: "murkyincense",
 		name: "Murky Incense",
 		desc: "Holder's attacks do 1.3x damage, and it loses 1/10 its max HP after the attack. If holder is the target of a foe's move, that move loses one additional PP.",
@@ -101,7 +101,7 @@ exports.BattleItems = {
 		
 	},
 	'goatofarms': {
-		num: 450,
+		num: 2007,
 		id: 'goatofarms',
 		name: "Goat of Arms",
 		desc: "Holder calls forth 1 extra goat to tag along. Works even if holder's ability isn't Summon Goats.",

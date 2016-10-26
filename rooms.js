@@ -951,10 +951,11 @@ class BattleRoom extends Room {
 			this.battle.logData = null;
 		}
 		if (Config.autosavereplays) {
-			let uploader = Users.get(winnerid);
-			if (uploader && uploader.connections[0]) {
-				Chat.parse('/savereplay', this, uploader, uploader.connections[0]);
-			}
+			// let uploader = Users.get(winnerid);
+			// if (uploader && uploader.connections[0]) {
+				// Chat.parse('/savereplay', this, uploader, uploader.connections[0]);
+				Chat.parse('/savereplay', this, null, null);
+			// }
 		}
 		if (this.tour) {
 			this.tour.onBattleWin(this, winnerid);

@@ -1423,6 +1423,9 @@ exports.Formats = [
 			for (let i = 0, len = allPokemon.length; i < len; i++) {
 				let pokemon = allPokemon[i];
 				pokemon.originalSpecies = pokemon.baseTemplate.species;
+				
+				if (pokemon.set.onBegin)
+					pokemon.set.onBegin.call(this, pokemon);
 			}
 		},
 	},

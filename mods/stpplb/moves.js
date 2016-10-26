@@ -63,7 +63,7 @@ exports.BattleMovedex = {
 	// Custom Moves
 	
 	"disappointment": {
-		num: 622,
+		num: 2000,
 		id: "disappointment",
 		name: "Disappointment",
 		desc: "The user faints and the Pokemon brought out to replace it has its HP fully restored along with having any major status condition cured and getting a boost in all stats. Fails if the user is the last unfainted Pokemon in its party.",
@@ -121,7 +121,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	'darkfire': {
-		num: 623,
+		num: 2001,
 		id: 'darkfire',
 		name: 'Darkfire',
 		desc: "20% chance to flinch the target. Mega Evolves user via Houndoomite.",
@@ -156,7 +156,7 @@ exports.BattleMovedex = {
 		type: 'Dark',
 	},
 	'superglitch': {
-		num: 624,
+		num: 2002,
 		name: "(Super Glitch)",
 		id: "superglitch",
 		desc: "A random move is selected for use, other than After You, Assist, Belch, Bestow, Celebrate, Chatter, Copycat, Counter, Covet, Crafty Shield, Destiny Bond, Detect, Diamond Storm, Endure, Feint, Focus Punch, Follow Me, Freeze Shock, Happy Hour, Helping Hand, Hold Hands, Hyperspace Hole, Ice Burn, King's Shield, Light of Ruin, Mat Block, Me First, Metronome, Mimic, Mirror Coat, Mirror Move, Nature Power, Protect, Quash, Quick Guard, Rage Powder, Relic Song, Secret Sword, Sketch, Sleep Talk, Snarl, Snatch, Snore, Spiky Shield, Steam Eruption, Struggle, Switcheroo, Techno Blast, Thief, Thousand Arrows, Thousand Waves, Transform, Trick, V-create, or Wide Guard.",
@@ -183,7 +183,7 @@ exports.BattleMovedex = {
 			}
 			let randomMove = '';
 			if (moves.length) {
-				moves.sort((a, b) => a.num - b.num);
+				moves.sort((a, b) => a.num - b.num); //What purpose does this serve beyond slowing down the processing?
 				randomMove = moves[this.random(moves.length)].id;
 			}
 			if (!randomMove) {
@@ -229,7 +229,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	'tm56': {
-		num: 625,
+		num: 2003,
 		id: 'tm56',
 		name: 'TM56',
 		desc: "Changes user's type to ??? type before attacking. User recovers 50% of the damage dealt. Changes target's type to ??? type if it hits. Raises the user's Accuracy and Evasion by 1 if it misses.",
@@ -261,7 +261,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'hexattack': {
-		num: 626,
+		num: 2004,
 		id: 'hexattack',
 		name: 'Hex Attack',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -297,7 +297,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'projectilespam': {
-		num: 627,
+		num: 2005,
 		id: 'projectilespam',
 		name: 'Projectile Spam',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -323,7 +323,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'bulk': {
-		num: 628,
+		num: 2006,
 		id: "bulk",
 		name: "BULK!!",
 		desc: "Raises the user's Attack and Defense by 2 stages.",
@@ -347,7 +347,7 @@ exports.BattleMovedex = {
 		type: "Fighting",
 	},
 	'shadowrush': {
-		num: 629,
+		num: 2007,
 		id: "shadowrush",
 		name: "Shadow Rush",
 		desc: "No additional effect.",
@@ -367,7 +367,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'partingvoltturn': {
-		num: 630,
+		num: 2008,
 		id: "partingvoltturn",
 		name: "Parting Volt Turn",
 		desc: "Gets the fuck out of here.", // hue
@@ -392,7 +392,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	'evolutionbeam': {
-		num: 631,
+		num: 2009,
 		id: "evolutionbeam",
 		name: "Evolution Beam",
 		desc: "Hits once for every eeveelution.",
@@ -445,7 +445,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	'hyperwahahahahaha': {
-		num: 632,
+		num: 2010,
 		id: 'hyperwahahahahaha',
 		name: 'Hyper WAHAHAHAHAHA',
 		desc: "Has a 20% chance to paralyze the target and a 20% chance to confuse it.",
@@ -466,7 +466,7 @@ exports.BattleMovedex = {
 		type: "Electric",
 	},
 	'broadside': {
-		num: 633,
+		num: 2011,
 		id: 'broadside',
 		name: 'Broadside',
 		desc: "Hits 5 times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits.",
@@ -487,7 +487,7 @@ exports.BattleMovedex = {
 		type: "Water",
 	},
 	'bestfcar': {
-		num: 634,
+		num: 2012,
 		id: 'bestfcar',
 		name: 'BEST F-CAR',
 		desc: "Has a 20% chance to burn the target. Raises the user's Special Attack by 1 stage.",
@@ -507,7 +507,7 @@ exports.BattleMovedex = {
 		type: "Fire",
 	},
 	'eternalstruggle': {
-		num: 635,
+		num: 2013,
 		id: 'eternalstruggle',
 		name: 'Eternal Struggle',
 		desc: "If the target lost HP, the user takes recoil damage equal to 1/2 the HP lost by the target, rounded half up, but not less than 1 HP. Lowers the user's Attack, Defense, Special Attack, Special Defense, and Speed by 1 stage.",
@@ -529,7 +529,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'nofun': {
-		num: 636,
+		num: 2014,
 		id: 'nofun',
 		name: 'No Fun',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -549,7 +549,7 @@ exports.BattleMovedex = {
 		target: "normal",
 	},
 	'ironfist': {
-		num: 637,
+		num: 2015,
 		id: 'ironfist',
 		name: 'Iron Fist',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -587,7 +587,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'afk': {
-		num: 638,
+		num: 2016,
 		id: 'afk',
 		name: 'AFK',
 		desc: "This attack charges on the first and second turns and executes on the third, and shows how AFK the user can be. On the first and second turns, the user avoids all attacks.",
@@ -634,7 +634,7 @@ exports.BattleMovedex = {
 		target: 'normal',
 	},
 	"godbird": {
-		num: 638,
+		num: 2017,
 		id: "godbird",
 		name: "God Bird",
 		desc: "If this move is successful, it breaks through the target's Detect, King's Shield, Protect, or Spiky Shield for this turn, allowing other Pokemon to attack the target normally. If the target's side is protected by Crafty Shield, Mat Block, Quick Guard, or Wide Guard, that protection is also broken for this turn and other Pokemon may attack the target's side normally. This attack charges on the first turn and executes on the second. On the first turn, the user avoids all attacks. If the user is holding a Power Herb, the move completes in one turn. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
@@ -687,7 +687,7 @@ exports.BattleMovedex = {
 		type: "Flying",
 	},
 	'reroll': {
-		num: 639,
+		num: 2018,
 		id: 'reroll',
 		name: 'Re-Roll',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -779,7 +779,7 @@ exports.BattleMovedex = {
 		type: 'Normal',
 	},
 	'shadowsphere': {
-		num: 640,
+		num: 2019,
 		id: "shadowsphere",
 		name: "Shadow Sphere",
 		desc: "Has a 20% chance to lower the target's Special Defense by 1 stage.",
@@ -802,7 +802,7 @@ exports.BattleMovedex = {
 		type: "Ghost",
 	},
 	'drainforce': {
-		num: 641,
+		num: 2020,
 		id: "drainforce",
 		name: "Drain Force",
 		desc: "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down. Has a 20% chance to lower the target's Attack and Speed by 1 stage, and raises the user's Special Attack and Speed by 1 stage.",
@@ -827,7 +827,7 @@ exports.BattleMovedex = {
 		type: "Fighting",
 	},
 	'sneakyspook': {
-		num: 642, // blaze it + 222
+		num: 2021,
 		id: "sneakyspook",
 		name: "Sneaky Spook",
 		desc: "No additional effect.",
@@ -848,7 +848,7 @@ exports.BattleMovedex = {
 		type: "Ghost",
 	},
 	'thousandalts': {
-		num: 643,
+		num: 2022,
 		id: "thousandalts",
 		name: "Thousand Alts",
 		desc: "If the target lost HP, the user takes recoil damage equal to 50% the HP lost by the target, rounded half up, but not less than 1 HP.",
@@ -873,7 +873,7 @@ exports.BattleMovedex = {
 		type: "Dark",
 	},
 	'bawk': {
-		num: 644,
+		num: 2023,
 		id: "bawk",
 		name: "BAWK!",
 		desc: "The user becomes flying type and restores 1/2 of its maximum HP, rounded half up.",
@@ -897,7 +897,7 @@ exports.BattleMovedex = {
 		type: "Flying",
 	},
 	'yiffyiff': {
-		num: 645,
+		num: 2024,
 		id: "yiffyiff",
 		name: "Yiff Yiff",
 		desc: "Causes the user's Ability to become Fur Coat. Randomly executes a move based on the user's type.",
@@ -932,7 +932,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	"arcticslash": {
-		num: 656,
+		num: 2025,
 		id: "arcticslash",
 		name: "Arctic Slash",
 		desc: "Hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
@@ -955,7 +955,7 @@ exports.BattleMovedex = {
 		type: "Ice",
 	},
 	"ganonssword": {
-		num: 657,
+		num: 2026,
 		id: "ganonssword",
 		name: "Ganon's Sword",
 		desc: "The user's defenses increase by two stages at the beginning of the turn. The user attacks last. The user's defenses drop by two stages at the end of the turn.",
@@ -994,7 +994,7 @@ exports.BattleMovedex = {
 		type: "Dark",
 	},
 	'toucan': {
-		num: 658,
+		num: 2027,
 		id: 'toucan',
 		name: "Toucan",
 		desc: 'Confuses the target.',
@@ -1022,7 +1022,7 @@ exports.BattleMovedex = {
 		type: "Flying",
 	},
 	'rainbowspray': {
-		num: 659,
+		num: 2028,
 		id: 'rainbowspray',
 		name:"Rainbow Spray",
 		desc: "This move combines Fairy in its type effectiveness against the target. Has a chance to confuse or paralyze target.",
@@ -1047,7 +1047,7 @@ exports.BattleMovedex = {
 		type: "Water",
 	},
 	"spindash": {
-		num: 660,
+		num: 2029,
 		id: "spindash",
 		name: "Spindash",
 		desc: "If this move is successful, the user is locked into this move and cannot make another move until it misses, 5 turns have passed, or the attack cannot be used. Power doubles with each successful hit of this move and doubles again if Defense Curl was used previously by the user. If this move is called by Sleep Talk, the move is used for one turn.",
@@ -1099,7 +1099,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	"boost": {
-		num: 661,
+		num: 2030,
 		id: "boost",
 		name: "Boost",
 		desc: "No additional effect.",
@@ -1120,7 +1120,7 @@ exports.BattleMovedex = {
 		type: "Normal",
 	},
 	'setmine': {
-		num: 662,
+		num: 2031,
 		id: 'setmine',
 		name: 'Set Mine',
 		desc: 'Lays a mine which will explode with a base power of 160 when a new pokemon is switched in.',
@@ -1170,7 +1170,7 @@ exports.BattleMovedex = {
 		type: 'Fire',
 	},
 	'locknload': {
-		num: 664,
+		num: 2032,
 		id: 'locknload',
 		name: `Lock 'n' Load`,
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1197,7 +1197,7 @@ exports.BattleMovedex = {
 		pp: 20,
 	},
 	'assassinate': {
-		num: 665,
+		num: 2033,
 		id: 'assassinate',
 		name: 'Assassinate',
 		desc: 'Deals damage to the target equal to the target\'s maximum HP. Ignores accuracy and evasiveness modifiers.',
@@ -1245,7 +1245,7 @@ exports.BattleMovedex = {
 		type: 'Steel',
 	},
 	'quicksketch': {
-		num: 666, // hue
+		num: 2034, // hue
 		id: 'quicksketch',
 		name: 'Quick Sketch',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1287,7 +1287,7 @@ exports.BattleMovedex = {
 		type: 'Normal',
 	},
 	'keepcalmandfocus': {
-		num: 667,
+		num: 2035,
 		id: 'keepcalmandfocus',
 		name: 'Keep Calm and Focus!',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1321,7 +1321,7 @@ exports.BattleMovedex = {
 		target: 'self',
 	},
 	'quityourbullshit': {
-		num: 668,
+		num: 2036,
 		id: 'quityourbullshit',
 		name: 'Quit your Bullshit',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1346,7 +1346,7 @@ exports.BattleMovedex = {
 		target: 'normal',
 	},
 	'typeroulette': {
-		num: 669,
+		num: 2037,
 		id: 'typeroulette',
 		name: 'Type Roulette',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1390,7 +1390,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'godswrath': {
-		num: 670,
+		num: 2038,
 		id: 'godswrath',
 		name: "God's Wrath",
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1424,7 +1424,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'abstartselect': {
-		num: 671,
+		num: 2039,
 		id: 'abstartselect',
 		name: "A+B+Start+Select",
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1451,7 +1451,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'wait4baba': {
-		num: 672,
+		num: 2040,
 		id: 'wait4baba',
 		name: 'Wait4baba',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1476,7 +1476,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'balancedstrike': {
-		num: 673,
+		num: 2041,
 		id: 'balancedstrike',
 		name: 'Balanced Strike',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1515,7 +1515,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'texttospeech': {
-		num: 674,
+		num: 2042,
 		id: 'texttospeech',
 		name: 'Text to Speech',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1558,7 +1558,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'holyducttapeofclaw': {
-		num: 675,
+		num: 2043,
 		id: 'holyducttapeofclaw',
 		name: 'Holy Duct Tape of Claw',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1582,7 +1582,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'warecho': {
-		num: 676,
+		num: 2044,
 		id: 'warecho',
 		name: 'War Echo',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1615,7 +1615,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'skullsmash': {
-		num: 677,
+		num: 2045,
 		id: 'skullsmash',
 		name: 'Skull Smash',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1640,7 +1640,7 @@ exports.BattleMovedex = {
 		
 	},
 	'danceriot': {
-		num: 678,
+		num: 2046,
 		id: 'danceriot',
 		name: 'Dance Riot',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1678,7 +1678,7 @@ exports.BattleMovedex = {
 		
 	},
 	'bluescreenofdeath': {
-		num: 679,
+		num: 2047,
 		id: 'bluescreenofdeath',
 		name: 'Blue Screen of Death',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1704,7 +1704,8 @@ exports.BattleMovedex = {
 		},
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {
-				default: ['Oh no! err 03h was somehow tripped unexpectedly!', 'KERNEL PANIC', 'BET BOY!'],
+				default: ['Oh no! err 03h was somehow tripped unexpectedly!', 
+					'KERNEL PANIC', 'A fatal exception BET-BOY has occurred'],
 				target: target});
 		},
 		secondary: {
@@ -1714,7 +1715,7 @@ exports.BattleMovedex = {
 		
 	},
 	'portaltospaaaaaaace': {
-		num: 680,
+		num: 2048,
 		id: 'portaltospaaaaaaace',
 		name: 'Portal to SPAAAAAAACE',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1740,7 +1741,7 @@ exports.BattleMovedex = {
 		secondary: {chance: 10, status: 'frz'},
 	},
 	'doubleascent': {
-		num: 681,
+		num: 2049,
 		id: 'doubleascent',
 		name: 'Double Ascent',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
@@ -1790,7 +1791,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'drama': {
-		num: 682,
+		num: 2050,
 		id: 'drama',
 		name: 'Drama',
 		desc: "Causes drama in the subreddit. Both the user and the target are poisoned and trapped.",
@@ -1815,7 +1816,7 @@ exports.BattleMovedex = {
 		},
 	},
 	'loratory': {
-		num: 683,
+		num: 2051,
 		id: 'loratory',
 		name: 'Loratory',
 		desc: "Gives a lengthy speech about insane headcannon lore. The target is either left confused, or bored to sleep (50:50). (Loratory = Lore + Oratory)",
@@ -1841,7 +1842,7 @@ exports.BattleMovedex = {
 		},
 	},
 	"beatingmist": {
-		num: 684,
+		num: 2052,
 		id: "beatingmist",
 		name: "Beating Mist",
 		desc: "Hits one to six times, with each hit having a 10% chance to lower the target's Special Attack by 1 stage. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit six times. Mega Evolves the user via Sharpedonite afterwards.",
@@ -1876,7 +1877,7 @@ exports.BattleMovedex = {
 		type: "Water",
 	},
 	"wailofthebanshee": {
-		num: 685, // boomburst is 586
+		num: 2053, // boomburst is 586
 		id: "wailofthebanshee",
 		name: "Wail of the Banshee",
 		desc: "No additional effect.",
@@ -1896,7 +1897,7 @@ exports.BattleMovedex = {
 		type: "Fairy",
 	},
 	"witchscurse": {
-		num: 686,
+		num: 2054,
 		id: "witchscurse",
 		name: "Witch's Curse",
 		desc: "The target loses 1/4 of its maximum HP, rounded down, at the end of this turn. If the target uses Baton Pass, the replacement will continue to be affected.",
@@ -1929,7 +1930,7 @@ exports.BattleMovedex = {
 		type: "Ghost",
 	},
 	"foxfire": {
-		num: 687,
+		num: 2055,
 		id: "foxfire",
 		name: "Foxfire",
 		desc: "Burns the target. Lowers the target's accuracy by 1 stage.",
@@ -1952,7 +1953,7 @@ exports.BattleMovedex = {
 		type: "Fairy",
 	},
 	"spectralincantation": {
-		num: 688,
+		num: 2056,
 		id: "spectralincantation",
 		name: "Spectral Incantation",
 		desc: "The user loses 1/2 of its maximum HP, rounded down, in exchange for raising the user's Special Attack and Special Defense by 2 stages.",
@@ -1979,7 +1980,7 @@ exports.BattleMovedex = {
 		type: "Ghost",
 	},
 	"gigahornbreak": {
-		num: 689,
+		num: 2057,
 		id: "gigahornbreak",
 		name: "Giga Horn Break",
 		desc: "The user recovers 3/4 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
@@ -2000,7 +2001,7 @@ exports.BattleMovedex = {
 		type: "Grass",
 	},
 	"goatflu": {
-		num: 690,
+		num: 2058,
 		id: "goatflu",
 		name: "Goat Flu",
 		desc: "Inflicts the target with Goat Flu. The target loses 1/6 of its maximum HP, rounded down, at the end of each turn, and has its Attack and Speed halved while it is active. If the target uses Baton Pass, the replacement will continue to be affected. Fails if there is no target or if the target is already affected. Grass Pokemon are immune to this move, but not the effect.",

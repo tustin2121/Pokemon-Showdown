@@ -487,8 +487,8 @@ let leaguemon = {
 	'Bird Jesus': { //STPPB only
 		leagues: ["b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			SwitchIn: "PraiseIt Praise Helix! PraiseIt",
+			Faint: "Should have used pocket sand...",
 		},
 		species: 'Pidgeot', ability: 'Messiah', item: 'Flying Gem', gender: 'M',
 		moves: ['judgment', 'focusblast', 'roost', 'fireblast'],
@@ -549,17 +549,24 @@ let leaguemon = {
 			// Put quotes to the limit \o/
 			FirstTime: "I'm not very good at this whole competitive thing...",
 			SwitchIn: "Alright, time to try again.",
-			Faint: "I need to get back to work anyway.",
+			Faint: ["I need to get back to work anyway.", "Told you I suck at this..."],
 			"Move-afk-1": "brb",
 			"Move-afk-2": "b",
+			"Move-bluescreenofdeath": "Ctrl+Alt+DELETE!!",
+			"Move-coderefactor": ["showdown's code is so fucking dense that it's impossible to decipher half the time", "does this hunk of junk not have any crash protection?! SwiftRage", "t wouldn't be complicated, rather it would touch a lot of code", "BrokeBack, maybe we shouldn't have so many FUCKING FILES CALLED CONFIG! SwiftRage", "we need to trim back the server's branches. There no need to have so many"],
+			"Move-cheatcode": ["Time to exploit that.", "I have no skill in this, so I need to cheat to win.", "Don't mind me, just doing stuff!"],
 		},
 		
 		species: 'Typhlosion', ability: 'Blaze', item: 'Eviolite', gender: 'M',
 		moves: ['extrasensory', 'flamethrower', 'lavaplume', 'eruption'],
 		signatureMoves: [],
+		forceMega: false, // Never Mega Evolve (usually as a result of using a signiture move)
 		// evs: {atk:252, def:4, spe:252}, nature: 'Timid',
 		evs: {}, nature: "Serious",
 		ivs: {hp:0, atk:0, def:0, spa:0, spd:0, spe:0},
+		onBegin : function(pkmn) {
+			pkmn.details = "Quilava, M";
+		},
 		// baseStats: {hp: 78, atk: 84, def: 78, spa: 109, spd: 85, spe: 100}, //Typhlosion stats
 		// Quilava (with base power of a Typhlosion)
 		// Item: Reinforced Glass | If the holder is hit with a super effective move, that move is nullified, and this item breaks. Single Use.
@@ -567,7 +574,15 @@ let leaguemon = {
 		// ???
 		// Signiture Moves:
 		// Code Refactor | Special | Fire-Type | Power: 15 | Accuracy: 100% | PP: 15 | Hits 2-5 times | each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit. Says quotes about how horrible code is.
-		// Signiture Theif | Status | Normal-Type | Power: -- | Accuract: -- | PP: 15 | Picks a random signiture move from the STPPLB pool.
+		// Cheat Code | Status | Normal-Type | Power: -- | Accuracy: -- | PP: 5 | Picks a signiture move that is super effective against the opposing pokemon, or otherwise useful in the current situation.
+		// -> First Turn => bluescreenofdeath
+		// -> HP < 30% => keepcalmandfocus
+		// -> Best SE move => texttospeech, skullsmash, danceriot, wailofthebanshee, quityourbullshit, boost, rainbowspray, ganonssword, shadowsphere, godbird, ironfist, eternalstruggle, bestfcar, hyperwahahahahaha, darkfire
+		// Note: set move.isNonstandard on Cheat Code, so Super Glitch doesn't call it.
+		// When using the move, the move prints out something random in a fake /evalbattle call response (though the information is real). It can print out the opponent's types, the opponent's ability (which will then be revealed to the client), the current hp of the opponent, the last move in the moveset (which is basically always the signiture move). The quote then comes after it.
+		// >>> this.p1.active[0].types
+		// <<< [Fire,Flying]
+		// tustin2121: Time to exploit that.
 		
 	}
 	
@@ -693,13 +708,13 @@ exports.BattleScripts = {
 		return this.chooseTeamFor("b");
 	},
 	
-	pokemon : {
-		getDetails : function(side) {
-			if (this.illusion) return this.illusion.details + '|' + this.getHealth(side);
-			if (this.name == "tustin2121") return "Quilava, M|" + this.getHealth(side);
-			return this.details + '|' + this.getHealth(side);
-		},
-	},
+	// pokemon : {
+	// 	getDetails : function(side) {
+	// 		if (this.illusion) return this.illusion.details + '|' + this.getHealth(side);
+	// 		if (this.name == "tustin2121") return "Quilava, M|" + this.getHealth(side);
+	// 		return this.details + '|' + this.getHealth(side);
+	// 	},
+	// },
 	
 	// Copied from /data/scripts.js, and modified
 	getTeam: function (side, team) {
@@ -741,6 +756,7 @@ exports.BattleScripts = {
 	},
 	canMegaEvo: function (pokemon) {
 		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
+		if (pokemon.set.forceMega !== undefined) return pokemon.set.forceMega;
 
 		let item = pokemon.getItem();
 		if (item.megaStone) {
