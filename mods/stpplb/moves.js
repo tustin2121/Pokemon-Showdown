@@ -67,7 +67,7 @@ exports.BattleMovedex = {
 		id: "disappointment",
 		name: "Disappointment",
 		desc: "The user faints and the Pokemon brought out to replace it has its HP fully restored along with having any major status condition cured and getting a boost in all stats. Fails if the user is the last unfainted Pokemon in its party.",
-		shortDesc: "User faints. Replacement is fully healed with boosts.",
+		shortDesc: "User faints. Replacement is fully healed. Raises all stats of replacement by 1 (not acc/eva).",
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
@@ -125,7 +125,7 @@ exports.BattleMovedex = {
 		id: 'darkfire',
 		name: 'Darkfire',
 		desc: "20% chance to flinch the target. Mega Evolves user via Houndoomite.",
-		shortDesc: "20% chance to flinch the target. Mega Evolves user via Houndoomite.",
+		shortDesc: "Combines Fire in its type effectiveness. 20% chance to flinch the target. Mega Evolves user via Houndoomite.",
 		basePower: 90,
 		accuracy: 100,
 		category: 'Special',
@@ -265,7 +265,7 @@ exports.BattleMovedex = {
 		id: 'hexattack',
 		name: 'Hex Attack',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "25% chance to paralyze or burn or freeze or confuse or infatuate or sleep target.",
 		type: 'Ghost',
 		category: 'Special',
 		basePower: 100,
@@ -301,7 +301,7 @@ exports.BattleMovedex = {
 		id: 'projectilespam',
 		name: 'Projectile Spam',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Hits 8-11 times in one turn. Lasts 2-3 turns. Confuses the user afterwards.",
 		type: 'Fighting',
 		category: 'Physical',
 		pp: 20,
@@ -371,7 +371,7 @@ exports.BattleMovedex = {
 		id: "partingvoltturn",
 		name: "Parting Volt Turn",
 		desc: "Gets the fuck out of here.", // hue
-		shortDesc: "Uses Parting Shot, Volt Switch and U-Turn in the same turn.",
+		shortDesc: "Executes Parting Shot, Volt Switch and U-turn.",
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
@@ -396,7 +396,7 @@ exports.BattleMovedex = {
 		id: "evolutionbeam",
 		name: "Evolution Beam",
 		desc: "Hits once for every eeveelution.",
-		shortDesc: "Hits once for every eeveelution.",
+		shortDesc: "Hits 9 times in one turn, once for each Eeveelution type.",
 		accuracy: 100,
 		basePower: 10,
 		category: "Special",
@@ -470,7 +470,7 @@ exports.BattleMovedex = {
 		id: 'broadside',
 		name: 'Broadside',
 		desc: "Hits 5 times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits.",
-		shortDesc: "Hits 5 times in one turn.",
+		shortDesc: "Hits adjacent foes 5 times in one turn.",
 		accuracy: 100,
 		basePower: 18,
 		multihit: 5,
@@ -491,7 +491,7 @@ exports.BattleMovedex = {
 		id: 'bestfcar',
 		name: 'BEST F-CAR',
 		desc: "Has a 20% chance to burn the target. Raises the user's Special Attack by 1 stage.",
-		shortDesc: "20% chance to burn the target. Raises Sp.Atk by 1.",
+		shortDesc: "100% chance to raise the user's Sp. Atk by 1. 20% chance to burn the target. Thaws user.",
 		basePower: 60,
 		secondaries: [{chance: 20, status: 'brn'}, {chance: 100, self: {boosts: {spa: 1}}}],
 		accuracy: 100,
@@ -532,8 +532,8 @@ exports.BattleMovedex = {
 		num: 2014,
 		id: 'nofun',
 		name: 'No Fun',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		desc: "Stat changes are fun. No stat changes allowed.",
+		shortDesc: "Usually goes first. Eliminates the target's stat changes.",
 		category: 'Physical',
 		priority: 1,
 		basePower: 40,
@@ -553,7 +553,7 @@ exports.BattleMovedex = {
 		id: 'ironfist',
 		name: 'Iron Fist',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "The target's Ability becomes Defeatist. Mega Evolves user via Scizorite.",
 		category: 'Physical',
 		basePower: 90,
 		accuracy: 100,
@@ -591,7 +591,7 @@ exports.BattleMovedex = {
 		id: 'afk',
 		name: 'AFK',
 		desc: "This attack charges on the first and second turns and executes on the third, and shows how AFK the user can be. On the first and second turns, the user avoids all attacks.",
-		shortDesc: "Disappears turns 1 and 2. Hits turn 3.",
+		shortDesc: "Disappears turns 1 and 2. Hits turn 3. 20% chance to confuse. 10% chance to put the target to sleep.",
 		category: 'Special',
 		type: 'Fire',
 		basePower: 120,
@@ -638,7 +638,7 @@ exports.BattleMovedex = {
 		id: "godbird",
 		name: "God Bird",
 		desc: "If this move is successful, it breaks through the target's Detect, King's Shield, Protect, or Spiky Shield for this turn, allowing other Pokemon to attack the target normally. If the target's side is protected by Crafty Shield, Mat Block, Quick Guard, or Wide Guard, that protection is also broken for this turn and other Pokemon may attack the target's side normally. This attack charges on the first turn and executes on the second. On the first turn, the user avoids all attacks. If the user is holding a Power Herb, the move completes in one turn. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
-		shortDesc: "Soars in the sky turn 1. Hits turn 2. Breaks protection.",
+		shortDesc: "Soars in the sky turn 1. Hits turn 2. Breaks the target's protection for this turn. Mega Evolves the user via Pidgeotite.",
 		accuracy: 100,
 		basePower: 130,
 		category: "Special",
@@ -691,7 +691,7 @@ exports.BattleMovedex = {
 		id: 'reroll',
 		name: 'Re-Roll',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Uses another known move. Replaces user's item with random Mega Stone.",
 		accuracy: true,
 		basePower: 0,
 		category: 'Status',
@@ -806,7 +806,7 @@ exports.BattleMovedex = {
 		id: "drainforce",
 		name: "Drain Force",
 		desc: "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down. Has a 20% chance to lower the target's Attack and Speed by 1 stage, and raises the user's Special Attack and Speed by 1 stage.",
-		shortDesc: "User recovers 50% of the damage dealt. 20% chance to steal some stats.",
+		shortDesc: "User recovers 50% of the damage dealt. 20% chance to lower the target's Attack and Speed by 1 and raise the user's Sp. Atk and Speed by 1.",
 		accuracy: 100,
 		basePower: 75,
 		category: "Special",
@@ -877,7 +877,7 @@ exports.BattleMovedex = {
 		id: "bawk",
 		name: "BAWK!",
 		desc: "The user becomes flying type and restores 1/2 of its maximum HP, rounded half up.",
-		shortDesc: "Heals the user by 50% of its max HP. User becomes flying type.",
+		shortDesc: "Heals the user by 50% of its max HP. Adds Flying to the user's type(s).",
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
@@ -901,7 +901,7 @@ exports.BattleMovedex = {
 		id: "yiffyiff",
 		name: "Yiff Yiff",
 		desc: "Causes the user's Ability to become Fur Coat. Randomly executes a move based on the user's type.",
-		shortDesc: "The user's Ability becomes Fur Coat. Executes a random move.",
+		shortDesc: "The user's Ability becomes Fur Coat. Picks a random move from Earthquake, Icicle Crash, Stone Edge, plus Brave Bird if user has Flying type. 10% chance to raise the user's Attack, Sp. Def, Speed and Accuracy by 1.",
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
@@ -959,7 +959,7 @@ exports.BattleMovedex = {
 		id: "ganonssword",
 		name: "Ganon's Sword",
 		desc: "The user's defenses increase by two stages at the beginning of the turn. The user attacks last. The user's defenses drop by two stages at the end of the turn.",
-		shortDesc: "Sharply increases def. and sp. def. at the start of the turn. Attacks last and harshly lowers def. and sp. def.",
+		shortDesc: "Temporarily raises the user's Defense and Sp. Def by 2 until attacking.",
 		accuracy: 100,
 		basePower: 120,
 		category: "Physical",
@@ -997,8 +997,8 @@ exports.BattleMovedex = {
 		num: 2027,
 		id: 'toucan',
 		name: "Toucan",
-		desc: 'Confuses the target.',
-		shortdesc: 'Wow Description OneHand',
+		desc: 'Confuses the target. Wow description OneHand',
+		shortdesc: "Confuses the target. If successful, adds a random entry hazard to target's side.",
 		accuracy: 85,
 		basePower: 0,
 		category: "Status",
@@ -1124,7 +1124,7 @@ exports.BattleMovedex = {
 		id: 'setmine',
 		name: 'Set Mine',
 		desc: 'Lays a mine which will explode with a base power of 160 when a new pokemon is switched in.',
-		shortDesc: 'Lays a mine.',
+		shortDesc: "Hurts grounded foes on switch-in. Only works once. Max 1 mine. Damage factors in the user's current stats.",
 		accuracy: true,
 		basePower: 0,
 		category: 'Status',
@@ -1174,7 +1174,7 @@ exports.BattleMovedex = {
 		id: 'locknload',
 		name: `Lock 'n' Load`,
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Raises the user's critical hit ratio by 2. User's next move will not miss the target.",
 		accuracy: true,
 		basePower: 0,
 		category: 'Status',
@@ -1249,7 +1249,7 @@ exports.BattleMovedex = {
 		id: 'quicksketch',
 		name: 'Quick Sketch',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Permanently adds the last move used in the battle to the user's moveset, then executes that move. Replaces a random move from the first 8 moves instead if user has 8 or more moves. Fails if user already has the move.",
 		accuracy: true,
 		basePower: 0,
 		category: 'Status',
@@ -1291,7 +1291,7 @@ exports.BattleMovedex = {
 		id: 'keepcalmandfocus',
 		name: 'Keep Calm and Focus!',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "90% chance to heal the user by 50% of its max HP and raise the user's Defense and Sp. Def by 1. 10% chance to heal the user by 25% of its max HP and raise the user's Attack by 2. Mega Evolves user via Absolite.",
 		pp: 5,
 		priority: 0,
 		category: 'Status',
@@ -1325,7 +1325,7 @@ exports.BattleMovedex = {
 		id: 'quityourbullshit',
 		name: 'Quit your Bullshit',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Eliminates the target's stat changes and status conditions.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1350,7 +1350,7 @@ exports.BattleMovedex = {
 		id: 'typeroulette',
 		name: 'Type Roulette',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Uses a random type.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1367,24 +1367,24 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			let anim;
 			switch (move.type) {
-				case 'Normal':	anim = 'Mega Punch';	break;
-				case 'Fire':	anim = 'Fire Punch';	break;
-				case 'Fighting':anim = 'Close Combat';	break;
-				case 'Water':	anim = 'Waterfall'; 	break;
-				case 'Flying':	anim = 'Wing Attack';	break;
-				case 'Grass':	anim = 'Leaf Blade';	break;
-				case 'Poison':	anim = 'Poison Jab';	break;
-				case 'Electric':anim = 'Thunder Punch'; break;
-				case 'Ground':	anim = 'Drill Run'; 	break;
-				case 'Psychic':	anim = 'Zen Headbutt';	break;
-				case 'Rock':	anim = 'Head Smash';	break;
+				case 'Normal':		anim = 'Mega Punch';	break;
+				case 'Fire':		anim = 'Fire Punch';	break;
+				case 'Fighting':	anim = 'Close Combat';	break;
+				case 'Water':		anim = 'Waterfall'; 	break;
+				case 'Flying':		anim = 'Wing Attack';	break;
+				case 'Grass':		anim = 'Leaf Blade';	break;
+				case 'Poison':		anim = 'Poison Jab';	break;
+				case 'Electric':	anim = 'Thunder Punch'; break;
+				case 'Ground':		anim = 'Drill Run'; 	break;
+				case 'Psychic':		anim = 'Zen Headbutt';	break;
+				case 'Rock':		anim = 'Head Smash';	break;
 				case 'Ice':		anim = 'Ice Punch'; 	break;
 				case 'Bug':		anim = 'X-Scissor'; 	break;
-				case 'Dragon':	anim = 'Outrage';		break;
-				case 'Ghost':	anim = 'Shadow Punch';	break;
-				case 'Dark':	anim = 'Night Slash';	break;
-				case 'Steel':	anim = 'Heavy Slam';	break;
-				case 'Fairy':	anim = 'Play Rough';	break;
+				case 'Dragon':		anim = 'Outrage';	break;
+				case 'Ghost':		anim = 'Shadow Punch';	break;
+				case 'Dark':		anim = 'Night Slash';	break;
+				case 'Steel':		anim = 'Heavy Slam';	break;
+				case 'Fairy':		anim = 'Play Rough';	break;
 			}
 			this.add('-anim', source, anim, target);
 		},
@@ -1394,7 +1394,7 @@ exports.BattleMovedex = {
 		id: 'godswrath',
 		name: "God's Wrath",
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Attack depends on forme (default Ancient Power). Changes to another move on switch-in if user's ability is Invocation.",
 		pp: 20,
 		priority: 0,
 		category: 'Physical',
@@ -1408,15 +1408,15 @@ exports.BattleMovedex = {
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
 			case 'omastar':		move = 'abstartselect';		break;
-			case 'kabutops':	move = 'wait4baba';			break;
+			case 'kabutops':	move = 'wait4baba';		break;
 			case 'aerodactyl':	move = 'balancedstrike';	break;
 			case 'cradily':		move = 'texttospeech';		break;
-			case 'armaldo':		move = 'holyducttapeofclaw';break;
-			case 'bastiodon':	move = 'warecho';			break;
+			case 'armaldo':		move = 'holyducttapeofclaw';	break;
+			case 'bastiodon':	move = 'warecho';		break;
 			case 'rampardos':	move = 'skullsmash';		break;
-			case 'carracosta':	move = 'danceriot';			break;
+			case 'carracosta':	move = 'danceriot';		break;
 			case 'archeops':	move = 'bluescreenofdeath';	break;
-			case 'aurorus':		move = 'portaltospaaaaaaace';break;
+			case 'aurorus':		move = 'portaltospaaaaaaace';	break;
 			case 'tyrantrum':	move = 'doubleascent';		break;
 			}
 			this.useMove(move, pokemon, target);
@@ -1428,7 +1428,7 @@ exports.BattleMovedex = {
 		id: 'abstartselect',
 		name: "A+B+Start+Select",
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Eliminates the target's stat changes. 20% chance to confuse the target.",
 		pp: 10,
 		priority: 0,
 		category: 'Special',
@@ -1444,7 +1444,7 @@ exports.BattleMovedex = {
 		},
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {
-				default:['b+b+start+select', 'select+B+R+A', 'b+up', 'down+b', 'left+right', 'b+a+start'], 
+				default:['a+b+start+select', 'y+a+y', 'b+up', 'down+b', 'left+right', 'b+a+start'], 
 				target: target});
 			target.clearBoosts();
 			this.add('-clearboost', target);
@@ -1455,7 +1455,7 @@ exports.BattleMovedex = {
 		id: 'wait4baba',
 		name: 'Wait4baba',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "100% chance to lower the target's Speed by 1. 30% chance to flinch the target.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1471,7 +1471,7 @@ exports.BattleMovedex = {
 		},
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {
-				default:['start9','wait4baba','wait4abrightbastart','b9','a9','upstartdown'],
+				default:['start9', 'selectbra', 'wait4baba', 'wait4abrightbastart', '5,3+x+b3x', 'b9', 'a9', 'upstartdown', 'select+b008,135', 'homerxbaba'],
 				target: target});
 		},
 	},
@@ -1480,7 +1480,7 @@ exports.BattleMovedex = {
 		id: 'balancedstrike',
 		name: 'Balanced Strike',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "This move does not check accuracy. Averages all stat changes with target (including acc/eva) before hit. Removes hazards and screens from field.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1511,7 +1511,7 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Sky Attack', target);
 		},
 		onHit: function (target, source, move) {
-			this.sayQuote(source, "Move-"+move.id, {default:['anarchy','democracy'], target: target});
+			this.sayQuote(source, "Move-"+move.id, {default:['anarchy', 'democracy'], target: target});
 		},
 	},
 	'texttospeech': {
@@ -1519,7 +1519,7 @@ exports.BattleMovedex = {
 		id: 'texttospeech',
 		name: 'Text to Speech',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "The target's Ability becomes Insomnia. Inflicts Taunt, Torment, Leech Seed and Confused statuses on the target.",
 		pp: 10,
 		priority: 0,
 		category: 'Status',
@@ -1562,7 +1562,7 @@ exports.BattleMovedex = {
 		id: 'holyducttapeofclaw',
 		name: 'Holy Duct Tape of Claw',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "For 3 turns, the target can't use status moves. Traps and damages the target for 4-5 turns.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1586,7 +1586,7 @@ exports.BattleMovedex = {
 		id: 'warecho',
 		name: 'War Echo',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Raises the user's Attack by 2. Raises the Attack of Pokemon on the user's field by 2 two turns after being used.",
 		pp: 10,
 		priority: 0,
 		category: 'Status',
@@ -1619,7 +1619,7 @@ exports.BattleMovedex = {
 		id: 'skullsmash',
 		name: 'Skull Smash',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Has 1/8 recoil.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1637,14 +1637,13 @@ exports.BattleMovedex = {
 			this.sayQuote(source, "Move-"+move.id, {target: target});
 		},
 		recoil: [1, 8],
-		
 	},
 	'danceriot': {
 		num: 2046,
 		id: 'danceriot',
 		name: 'Dance Riot',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Lasts 2-3 turns. 50% chance to force the target to switch to a random ally.",
 		pp: 10,
 		priority: -6,
 		category: 'Physical',
@@ -1675,14 +1674,13 @@ exports.BattleMovedex = {
 				target.forceSwitchFlag = 1;
 			}
 		},
-		
 	},
 	'bluescreenofdeath': {
 		num: 2047,
 		id: 'bluescreenofdeath',
 		name: 'Blue Screen of Death',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Hits first. First turn out only. 100% flinch chance.",
 		pp: 10,
 		priority: 3,
 		category: 'Physical',
@@ -1705,21 +1703,20 @@ exports.BattleMovedex = {
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {
 				default: ['Oh no! err 03h was somehow tripped unexpectedly!', 
-					'KERNEL PANIC', 'A fatal exception BET-BOY has occurred'],
+					'KERNEL PANIC', 'A fatal exception BET-BOY has occurred', 'WutFace NotLikeThis'],
 				target: target});
 		},
 		secondary: {
 			chance: 100,
 			volatileStatus: 'flinch',
 		},
-		
 	},
 	'portaltospaaaaaaace': {
 		num: 2048,
 		id: 'portaltospaaaaaaace',
 		name: 'Portal to SPAAAAAAACE',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "10% chance to freeze. Super effective on Water, Ice, Steel, Fire.",
 		pp: 10,
 		priority: 0,
 		category: 'Special',
@@ -1745,7 +1742,7 @@ exports.BattleMovedex = {
 		id: 'doubleascent',
 		name: 'Double Ascent',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "Lasts 2 turns. Hits and disappears first turn. Reappears and hits second turn.",
 		pp: 10,
 		priority: 0,
 		category: 'Physical',
@@ -1794,8 +1791,8 @@ exports.BattleMovedex = {
 		num: 2050,
 		id: 'drama',
 		name: 'Drama',
-		desc: "Causes drama in the subreddit. Both the user and the target are poisoned and trapped.",
-		shortDesc: "Causes drama in the subreddit.",
+		desc: "Causes drama in the subreddit. Both the user and the target are badly poisoned and trapped. This move does not check accuracy.",
+		shortDesc: "Badly poisons both the target and the user. The target and the user cannot switch out. This move does not check accuracy.",
 		pp: 10,
 		priority: 0,
 		category: 'Status',
@@ -1819,8 +1816,8 @@ exports.BattleMovedex = {
 		num: 2051,
 		id: 'loratory',
 		name: 'Loratory',
-		desc: "Gives a lengthy speech about insane headcannon lore. The target is either left confused, or bored to sleep (50:50). (Loratory = Lore + Oratory)",
-		shortDesc: "Launches a headcannon. Contains either sleep powder or confuse rays",
+		desc: "Gives a lengthy speech about insane headcanon lore. The target is either left confused, or bored to sleep (50:50). (Loratory = Lore + Oratory)",
+		shortDesc: "50% chance to put the target to sleep. 50% chance to confuse the target.",
 		pp: 10,
 		priority: 0,
 		category: 'Status',
