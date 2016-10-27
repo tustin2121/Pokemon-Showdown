@@ -1369,7 +1369,6 @@ exports.Formats = [
 		searchShow: true,
 		team: 'randomtpplb',
 		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod'],
-		debug: true,
 		
 		onSwitchInPriority: 1,
 		onSwitchIn: function (pokemon) {
@@ -1971,6 +1970,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPP Bros.",
@@ -1986,6 +1987,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPPL Bros. Doubles",
@@ -2002,6 +2005,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPPL Bros. Plus Doubles",
@@ -2018,6 +2023,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPP Bros. Doubles",
@@ -2034,6 +2041,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPPL Bros. Triples",
@@ -2050,6 +2059,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPPL Bros. Plus Triples",
@@ -2066,6 +2077,8 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPP Bros. Triples",
@@ -2082,6 +2095,10 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
 	}, {
 		name: "Super TPPL Bros. Testing",
@@ -2096,7 +2113,54 @@ if (stpplb) {
 		onSwitchIn: stpplb.onSwitchIn,
 		onSwitchOut: stpplb.onSwitchOut,
 		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
 		onBegin: stpplb.onBegin,
+		debug: true,
+		validateSet: function(){ return false; } // Always validate
+	}, {
+		name: "Super TPPL Bros. Testing Doubles",
+		section: "STPPLB",
+		gameType: 'doubles',
+
+		mod: 'stpplb',
+		searchShow: false,
+		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
+		onUpdate: stpplb.onUpdate,
+		onModifyMove: stpplb.onModifyMove,
+		onSwitchInPriority: 1,
+		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
+		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
+		onBegin: stpplb.onBegin,
+		debug: true,
+		validateSet: function(){ return false; } // Always validate
+	}, {
+		name: "Super TPPL Bros. Testing Triples",
+		section: "STPPLB",
+		gameType: 'triples',
+
+		mod: 'stpplb',
+		searchShow: false,
+		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
+		onUpdate: stpplb.onUpdate,
+		onModifyMove: stpplb.onModifyMove,
+		onSwitchInPriority: 1,
+		onSwitchIn: stpplb.onSwitchIn,
+		onSwitchOut: stpplb.onSwitchOut,
+		onFaint: stpplb.onFaint,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
+		onCriticalHit: stpplb.onCriticalHit,
+		onAttract: stpplb.onAttract,
+		onBegin: stpplb.onBegin,
+		debug: true,
 		validateSet: function(){ return false; } // Always validate
 	});
 }

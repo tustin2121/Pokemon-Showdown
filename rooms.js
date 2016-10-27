@@ -780,7 +780,10 @@ class GlobalRoom {
 				reportRoom.update();
 			}
 		}
-		Bot.report(Tools.getFormat(format) + ' battle started between ' + p1.getIdentity() + ' and ' + p2.getIdentity() + ' -- tppleague.me/' + newRoom.id);
+		if (!Config.reportbattlesBotFilter || Config.reportbattlesBotFilter(Tools.getFormat(format)) !== false)
+		{
+			Bot.report(Tools.getFormat(format) + ' battle started between ' + p1.getIdentity() + ' and ' + p2.getIdentity() + ' -- tppleague.me/' + newRoom.id);
+		}
 		if (Config.logladderip && options.rated) {
 			if (!this.ladderIpLog) {
 				this.ladderIpLog = fs.createWriteStream('logs/ladderip/ladderip.txt', {flags: 'a'});
@@ -951,11 +954,10 @@ class BattleRoom extends Room {
 			this.battle.logData = null;
 		}
 		if (Config.autosavereplays) {
-			// let uploader = Users.get(winnerid);
-			// if (uploader && uploader.connections[0]) {
-				// Chat.parse('/savereplay', this, uploader, uploader.connections[0]);
-				Chat.parse('/savereplay', this, null, null);
-			// }
+			let uploader = Users.get(winnerid);
+			if (uploader && uploader.connections[0]) {
+				Chat.parse('/savereplay silent', this, uploader, uploader.connections[0]);
+			}
 		}
 		if (this.tour) {
 			this.tour.onBattleWin(this, winnerid);

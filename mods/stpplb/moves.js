@@ -77,8 +77,10 @@ exports.BattleMovedex = {
 		effect: {
 			noCopy: true, // doesn't get copied by Baton Pass
 			onStart: function (pokemon, source, effect) {
-				if (effect.id !== "superattract") { //skip this check if this is from superattract
+				this.debug("Start attract: "+effect.id)
+				if (effect.id !== "operationlove") { //skip this check if this is from operationlove
 					if (pokemon.set.attract) { 
+						this.debug("Testing clause attraction.")
 						// If the target pokemon's set has an attract clause
 						let gender = source.gender || "U"; //U == genderless
 						if (!pokemon.set.attract[gender]) { //If the source's gender is not in the clause, fail
@@ -86,6 +88,7 @@ exports.BattleMovedex = {
 							return false;
 						}
 					} else {
+						this.debug("Testing normal attraction.")
 						// Otherwise, follow normal rules
 						if (!(pokemon.gender === 'M' && source.gender === 'F') && !(pokemon.gender === 'F' && source.gender === 'M')) {
 							this.debug('incompatible gender');
@@ -93,11 +96,13 @@ exports.BattleMovedex = {
 						}
 					}
 				}
+				this.debug("Running attract event.")
 				if (!this.runEvent('Attract', pokemon, source)) {
 					this.debug('Attract event failed');
 					return false;
 				}
-
+				
+				this.debug("Completing attract event")
 				if (effect.id === 'cutecharm') {
 					this.add('-start', pokemon, 'Attract', '[from] ability: Cute Charm', '[of] ' + source);
 				} else if (effect.id === 'destinyknot') {
@@ -2131,10 +2136,38 @@ exports.BattleMovedex = {
 		},
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {target: target});
+			let move = Tools.getMove.call(this, "attract");
+			let addedMove = {
+				move: move.name,
+				id: move.id,
+				pp: move.pp,
+				maxpp: move.pp,
+				target: move.target,
+				disabled: false,
+				used: false,
+			};
+			source.moveset[0] = addedMove;
+			source.baseMoveset[0] = addedMove;
+			source.moves[0] = toId(move.name);
 		},
 		secondary: false,
-		target: "normal",
+		target: "allAdjacent",
 		type: "Normal",
 		contestType: "Cute",
+	},
+	"huntingforproctors": {
+		num: 2060,
+		id: 'huntingforproctors',
+		name: "Hunting for Proctors",
+		desc: "User picks up a random item from the ground. If the user does this, this attack deals double damage.",
+		shortDesc: "If possible, user recieves a random item, and doubles this move's power.",
+		pp: 10,
+		accuracy: 100,
+		basePower: 60,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		category: 'Physical',
+		target: "normal",
+		type: "Ground",
+		//TODO implement
 	},
 };

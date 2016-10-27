@@ -519,13 +519,16 @@ let leaguemon = {
 	// When a pokemon is complete, fill in the leagues and move it to where 
 	// appropriate above.
 	
-	
 	"masterleozangetsu": { // First Mon
 		leagues: [], 
 		quotes: {
 			SwitchIn: "Sup o/",
-			Faint: "I didn't want to win anyways, was gonna forfeit",
+			Faint: "gg",
 		},
+		species: 'Charizard-Mega-X', ability: 'SpeedRunner', item: 'Z-Sash', gender: 'M',
+		moves: ['bulldoze', 'dragonrush', 'roost', 'dragonclaw', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
+		signatureMoves: ['huntingforproctors', 'poweraboose'],
+		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
 		// http://pastebin.com/ZLgNhMR9
 	},
 	"Coryn216" : { // First Mon

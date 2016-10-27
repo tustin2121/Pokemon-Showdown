@@ -2967,7 +2967,7 @@ exports.commands = {
 	},
 
 	uploadreplay: 'savereplay',
-	savereplay: function (target, room, user, connection) {
+	savereplay: function (target, room, user, connection, silent) {
 		if (!room || !room.battle) return;
 		let logidx = Tools.getFormat(room.battle.format).team ? 3 : 0; // retrieve spectator log (0) if there are set privacy concerns
 		let data = room.getLog(logidx).join("\n");
@@ -2984,11 +2984,11 @@ exports.commands = {
 			// ANY CHANGES TO THE ABOVE ARE DEATH TO REPLAYS! DO NOT ACCEPT THEM --tustin2121
 		}, success => {
 			if (success && success.errorip) {
-				if (connection) connection.popup("This server's request IP " + success.errorip + " is not a registered server.");
+				if (target !== "silent") connection.popup("This server's request IP " + success.errorip + " is not a registered server.");
 				console.warn("This server's request IP " + success.errorip + " is not a registered server.");
 				return;
 			}
-			if (connection)
+			if (target !== "silent")
 				connection.send('|queryresponse|savereplay|' + JSON.stringify({
 					log: data,
 					id: room.id.substr(7),
