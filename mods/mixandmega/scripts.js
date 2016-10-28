@@ -119,3 +119,15 @@ exports.BattleScripts = {
 		return template;
 	},
 };
+
+// Call this method to inject all of the above scripts into another mod's BattleScripts.
+// This method will not override any function that is already present.
+exports.inject = function(mod){
+	if (mod.BattleScripts) { mod = mod.BattleScripts; }
+	if (!mod["init"]) mod["init"] = exports.BattleScripts["init"];
+	if (!mod["canMegaEvo"]) mod["canMegaEvo"] = exports.BattleScripts["canMegaEvo"];
+	if (!mod["runMegaEvo"]) mod["runMegaEvo"] = exports.BattleScripts["runMegaEvo"];
+	if (!mod["getMixedTemplate"]) mod["getMixedTemplate"] = exports.BattleScripts["getMixedTemplate"];
+	if (!mod["getMegaDeltas"]) mod["getMegaDeltas"] = exports.BattleScripts["getMegaDeltas"];
+	if (!mod["doGetMixedTemplate"]) mod["doGetMixedTemplate"] = exports.BattleScripts["doGetMixedTemplate"];
+};

@@ -493,8 +493,11 @@ let leaguemon = {
 	'Lyca': {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			FirstTime: "Lets see for how long I can greed.",
+			SwitchIn: "Another chance to greed?",
+			SwitchOut: "Nope.",
+			Faint: "Story of my life ;-;",
+			"Move-quityourbullshit": "Seriously.",
 		},
 		species: 'Absol', ability: 'Jack(y) of All Trades', item: 'Scope Lens', gender: 'F',
 		moves: ['nightslash', 'slash', 'psychocut', 'shadowclaw', 'playrough', 'knockoff'],
@@ -552,11 +555,11 @@ let leaguemon = {
 	"masterleozangetsu": { // First Mon
 		leagues: [], 
 		quotes: {
-			SwitchIn: "Sup o/",
-			Faint: "gg",
+			SwitchIn: "Sup o/, free to proctor?",
+			Faint: "gg no re",
 		},
 		species: 'Charizard-Mega-X', ability: 'SpeedRunner', item: 'Z-Sash', gender: 'M',
-		moves: ['bulldoze', 'dragonrush', 'roost', 'dragonclaw', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
+		moves: ['extremespeed', 'bulldoze', 'dragonrush', 'roost', 'dualchop', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
 		signatureMoves: ['huntingforproctors', 'poweraboose'],
 		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
 		// http://pastebin.com/ZLgNhMR9
@@ -573,9 +576,17 @@ let leaguemon = {
 		leagues: [],
 		quotes: {
 			SwitchIn: "Tuturu!",
-			Faint: "<-To-be-continued--", //Use !showimage https://i.imgur.com/blKyr6E.png
+			Faint: `|raw|<img src="https://i.imgur.com/blKyr6E.png" style="width: 200px;" />`,//"<-To-be-continued--",
 		},
 		// https://pp.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d98zyne/
+	},
+	"Gilbert": {
+		leagues: [],
+		quotes: {
+			SwitchIn: "Hello, world!",
+			Faint: "I was finally learning to love...",
+		},
+		// https://pp.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d9bjst9/
 	},
 	"Burrito": {
 		leagues: [],
@@ -603,17 +614,15 @@ let leaguemon = {
 			"Move-afk-1": "brb",
 			"Move-afk-2": "b",
 			"Move-bluescreenofdeath": "Ctrl+Alt+DELETE!!",
-			"Move-coderefactor": ["showdown's code is so fucking dense that it's impossible to decipher half the time", "does this hunk of junk not have any crash protection?! SwiftRage", "t wouldn't be complicated, rather it would touch a lot of code", "BrokeBack, maybe we shouldn't have so many FUCKING FILES CALLED CONFIG! SwiftRage", "we need to trim back the server's branches. There no need to have so many"],
+			"Move-coderefactor": ["showdown's code is so fucking dense that it's impossible to decipher half the time", "does this hunk of junk not have any crash protection?! SwiftRage", "it wouldn't be complicated, rather it would touch a lot of code", "BrokeBack, maybe we shouldn't have so many FUCKING FILES CALLED CONFIG! SwiftRage", "we need to trim back the server's branches. There no need to have so many"],
 			"Move-cheatcode": ["Time to exploit that.", "I have no skill in this, so I need to cheat to win.", "Don't mind me, just doing stuff!"],
 		},
 		
-		species: 'Typhlosion', ability: 'Blaze', item: 'Eviolite', gender: 'M',
+		species: 'Typhlosion', ability: 'Cheat Code', item: 'Reinforced Glass', gender: 'M',
 		moves: ['extrasensory', 'flamethrower', 'lavaplume', 'eruption'],
-		signatureMoves: [],
+		signatureMoves: ['coderefactor'],
 		attract: {M:1}, forceMega: false, // Never Mega Evolve (usually as a result of using a signiture move)
-		// evs: {atk:252, def:4, spe:252}, nature: 'Timid',
-		evs: {}, nature: "Serious",
-		ivs: {hp:0, atk:0, def:0, spa:0, spd:0, spe:0},
+		evs: {atk:252, def:4, spe:252}, nature: 'Timid', ivs: {atk:0},
 		onBegin : function(pkmn) {
 			pkmn.details = "Quilava, M";
 		},
@@ -791,30 +800,7 @@ exports.BattleScripts = {
 		}
 	},
 
-	// Mix and Mega stuff
-	init: function () {
-		let onTakeMegaStone = function (item) {
-			return false;
-		};
-		for (let id in this.data.Items) {
-			if (!this.data.Items[id].megaStone) continue;
-			this.modData('Items', id).onTakeItem = onTakeMegaStone;
-		}
-	},
-	canMegaEvo: function (pokemon) {
-		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
-		if (pokemon.set.forceMega !== undefined) return pokemon.set.forceMega;
-
-		let item = pokemon.getItem();
-		if (item.megaStone) {
-			if (item.megaStone === pokemon.species) return false;
-			return item.megaStone;
-		} else if (pokemon.set.moves.indexOf('dragonascent') >= 0) {
-			return 'Rayquaza-Mega';
-		} else {
-			return false;
-		}
-	},
+	// Mix and Mega override stuff
 	runMegaEvo: function (pokemon) {
 		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
 		let template = this.getMixedTemplate(pokemon.originalSpecies, pokemon.canMegaEvo);
@@ -861,58 +847,9 @@ exports.BattleScripts = {
 		pokemon.canMegaEvo = false;
 		return true;
 	},
-	getMixedTemplate: function (originalSpecies, megaSpecies) {
-		let originalTemplate = this.getTemplate(originalSpecies);
-		let megaTemplate = this.getTemplate(megaSpecies);
-		if (originalTemplate.baseSpecies === megaTemplate.baseSpecies) return megaTemplate;
-		let deltas = this.getMegaDeltas(megaTemplate);
-		let template = this.doGetMixedTemplate(originalTemplate, deltas);
-		return template;
-	},
-	getMegaDeltas: function (megaTemplate) {
-		let baseTemplate = this.getTemplate(megaTemplate.baseSpecies);
-		let deltas = {
-			ability: megaTemplate.abilities['0'],
-			baseStats: {},
-			weightkg: megaTemplate.weightkg - baseTemplate.weightkg,
-			originalMega: megaTemplate.species,
-			requiredItem: megaTemplate.requiredItem,
-		};
-		for (let statId in megaTemplate.baseStats) {
-			deltas.baseStats[statId] = megaTemplate.baseStats[statId] - baseTemplate.baseStats[statId];
-		}
-		if (megaTemplate.types.length > baseTemplate.types.length) {
-			deltas.type = megaTemplate.types[1];
-		} else if (megaTemplate.types.length < baseTemplate.types.length) {
-			deltas.type = baseTemplate.types[0];
-		} else if (megaTemplate.types[1] !== baseTemplate.types[1]) {
-			deltas.type = megaTemplate.types[1];
-		}
-		if (megaTemplate.isMega) deltas.isMega = true;
-		if (megaTemplate.isPrimal) deltas.isPrimal = true;
-		return deltas;
-	},
-	doGetMixedTemplate: function (template, deltas) {
-		if (!deltas) throw new TypeError("Must specify deltas!");
-		if (!template || typeof template === 'string') template = this.getTemplate(template);
-		template = Object.assign({}, template);
-		template.abilities = {'0': deltas.ability};
-		if (template.types[0] === deltas.type) {
-			template.types = [deltas.type];
-		} else if (deltas.type) {
-			template.types = [template.types[0], deltas.type];
-		}
-		let baseStats = template.baseStats;
-		template.baseStats = {};
-		for (let statName in baseStats) {
-			template.baseStats[statName] = this.clampIntRange(baseStats[statName] + deltas.baseStats[statName], 1, 255);
-		}
-		template.weightkg = Math.max(0.1, template.weightkg + deltas.weightkg);
-		template.originalMega = deltas.originalMega;
-		template.requiredItem = deltas.requiredItem;
-		if (deltas.isMega) template.isMega = true;
-		if (deltas.isPrimal) template.isPrimal = true;
-		return template;
-	},
+
 	
 };
+
+// Import the Mix and Mega scripts
+require("../mixandmega/scripts").inject(exports);

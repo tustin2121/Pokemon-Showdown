@@ -1342,7 +1342,7 @@ exports.Formats = [
 		mod: 'tppla',
 		column: 4,
 
-		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod'],
+		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Handlers'],
 	},
 	{
 		name: "TPPLA Doubles",
@@ -1350,7 +1350,7 @@ exports.Formats = [
 		mod: 'tppla',
 
 		gameType: 'doubles',
-		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod'],
+		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Handlers'],
 	},
 	{
 		name: "TPPLA Triples",
@@ -1358,7 +1358,7 @@ exports.Formats = [
 		mod: 'tppla',
 
 		gameType: 'triples',
-		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod'],
+		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Handlers'],
 	},
 	{
 		name: "Super TPPL Bros.",
@@ -1439,42 +1439,13 @@ exports.Formats = [
 		column: 2,
 		searchShow: true,
 		mod: 'stpplb',
-		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview'],
+		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview', 'Mix and Mega Handlers'],
 		banlist: ['No Fun Allowed', 'Wonder Guard', 'Physicalakazam', 'Defiant Plus', 'Messiah', 'Cursed Body', 'Moody', 'Little Engine', 'Unnerve', 'Magician', 'Pickpocket', 'Imposter', 'Iron Barbs', 'Rough Skin'],
 		maxLevel: 100,
 		defaultLevel: 100,
 
 		onBegin: function () {
 			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
-
-			// Mix and Mega stuff
-			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
-			for (let i = 0, len = allPokemon.length; i < len; i++) {
-				let pokemon = allPokemon[i];
-				pokemon.originalSpecies = pokemon.baseTemplate.species;
-			}
-		},
-
-		onSwitchInPriority: 1,
-		onSwitchIn: function (pokemon) {
-			// Mix and Mega stuff
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				// Place volatiles on the Pokémon to show its mega-evolved condition and details
-				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-				let oTemplate = this.getTemplate(pokemon.originalSpecies);
-				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-				}
-			}
-		},
-
-		onSwitchOut: function (pokemon) {
-			// Mix and Mega stuff
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-			}
 		},
 	},
 	
@@ -1485,42 +1456,13 @@ exports.Formats = [
 		column: 2,
 		searchShow: true,
 		mod: 'stpplb',
-		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview'],
+		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview', 'Mix and Mega Handlers'],
 		banlist: ['No Fun Allowed', 'Wonder Guard', 'Physicalakazam', 'Defiant Plus', 'Messiah', 'Cursed Body', 'Moody', 'Little Engine', 'Unnerve', 'Magician', 'Pickpocket', 'Imposter', 'Iron Barbs', 'Rough Skin'],
 		maxLevel: 100,
 		defaultLevel: 100,
 
 		onBegin: function () {
 			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
-
-			// Mix and Mega stuff
-			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
-			for (let i = 0, len = allPokemon.length; i < len; i++) {
-				let pokemon = allPokemon[i];
-				pokemon.originalSpecies = pokemon.baseTemplate.species;
-			}
-		},
-
-		onSwitchInPriority: 1,
-		onSwitchIn: function (pokemon) {
-			// Mix and Mega stuff
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				// Place volatiles on the Pokémon to show its mega-evolved condition and details
-				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-				let oTemplate = this.getTemplate(pokemon.originalSpecies);
-				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-				}
-			}
-		},
-
-		onSwitchOut: function (pokemon) {
-			// Mix and Mega stuff
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-			}
 		},
 	},
 	
@@ -1531,42 +1473,13 @@ exports.Formats = [
 		column: 2,
 		searchShow: true,
 		mod: 'stpplb',
-		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview'],
+		ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview', 'Mix and Mega Handlers'],
 		banlist: ['No Fun Allowed', 'Wonder Guard', 'Physicalakazam', 'Defiant Plus', 'Messiah', 'Cursed Body', 'Moody', 'Little Engine', 'Unnerve', 'Magician', 'Pickpocket', 'Imposter', 'Iron Barbs', 'Rough Skin'],
 		maxLevel: 100,
 		defaultLevel: 100,
 
 		onBegin: function () {
 			this.add('-message', "STPPLB wiki with all Pokemon descriptions: https://www.reddit.com/r/TPPLeague/wiki/stpplb");
-
-			// Mix and Mega stuff
-			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
-			for (let i = 0, len = allPokemon.length; i < len; i++) {
-				let pokemon = allPokemon[i];
-				pokemon.originalSpecies = pokemon.baseTemplate.species;
-			}
-		},
-
-		onSwitchInPriority: 1,
-		onSwitchIn: function (pokemon) {
-			// Mix and Mega stuff
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				// Place volatiles on the Pokémon to show its mega-evolved condition and details
-				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-				let oTemplate = this.getTemplate(pokemon.originalSpecies);
-				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-				}
-			}
-		},
-
-		onSwitchOut: function (pokemon) {
-			// Mix and Mega stuff
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-			}
 		},
 	},
 
@@ -1805,7 +1718,7 @@ exports.Formats = [
 				let ability = team[i].ability;
 				if (ability && ability.isTrademark) {
 					if (abilityTable[name]) {
-						return ["Your Pokémon must have different trademarked abilities.", "(You have more than one Pokémon with the " + abiility + " trademark)"];
+						return ["Your Pokémon must have different trademarked abilities.", "(You have more than one Pokémon with the " + ability + " trademark)"];
 					}
 					if (ability === "partingshot" || ability === "batonpass" || ability === "protect" || ability === "spikyshield") {
 						restrictedCount++;

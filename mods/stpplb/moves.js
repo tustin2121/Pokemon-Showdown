@@ -1392,7 +1392,8 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Calm Mind', source);
 		},
-		onHit: function (pokemon) {
+		onHit: function (pokemon, source, move) {
+			this.sayQuote(pokemon, "Move-"+move.id);
 			if (this.random(10) === 0) {
 				this.heal(this.modify(pokemon.maxhp, 0.25));
 				this.boost({atk: 2}, pokemon);
@@ -1427,7 +1428,8 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Close Combat', target);
 		},
-		onHit: function (target) {
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
 			target.clearBoosts();
 			target.cureStatus();
 			this.add('-clearboost', target);
