@@ -17,8 +17,7 @@ let leaguemon = {
 		},
 		species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
 		moves: ['moonblast', 'hyperbeam', 'fireblast'], //Random moves that will be filled in
-		signatureMove: 'darkfire', //Single move that this pokemon will alway have
-		signatureMoves: ['fakeout', 'partingvoltturn'], //OR multiple moves this pokemon will always have
+		signatureMoves: ['fakeout', 'partingvoltturn'], // moves this pokemon will always have
 		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
 		megaability: 'darkaura', //Including this will ensure mega evolutions will have this ability
 		onSwitchIn: function(pokemon) {}, //A function to run when switched in
@@ -33,7 +32,7 @@ let leaguemon = {
 		},
 		species: "Houndoom", ability: "Dark Aura", item: "Dark Gem", gender: "M",
 		moves: ['moonblast', 'hyperbeam', 'fireblast'],
-		signatureMove: 'darkfire',
+		signatureMoves: ['darkfire'],
 		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
 		megaability: 'darkaura',
 	},
@@ -85,8 +84,8 @@ let leaguemon = {
 	'TieSoul': {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			SwitchIn: "PLACEHOLDER MESSAGE PLEASE CONTACT TIESOUL",
+			Faint: "literally unusable",
 		},
 		species: 'Aggron', ability: 'Super Protean', item: 'Membrane', gender: 'M',
 		moves: ['playrough', 'firepunch', 'icepunch', 'thunderpunch', 'waterfall', 'heavyslam', 'stoneedge', 'nightslash', 'shadowclaw', 'earthquake', 'psychocut', 'dragonclaw', 'drillpeck', 'xscissor', 'poisonjab', 'brickbreak', 'leafblade', 'bodyslam'],
@@ -186,7 +185,7 @@ let leaguemon = {
 		},
 		species: "Ampharosmega", ability: "Little Engine", item: 'Life Orb', gender: 'M',
 		moves: ['surf', 'powergem', 'detect', 'wish', 'nastyplot'],
-		signatureMove: 'eternalstruggle',
+		signatureMoves: ['eternalstruggle'],
 		happiness: 0,
 		evs: {hp:252, spa:252, def:4}, nature: 'Modest',
 	},
@@ -198,7 +197,7 @@ let leaguemon = {
 		},
 		species: "Lucario", ability: "Scrappy", item: 'Assault Vest', gender: 'M',
 		moves: ['rockwrecker', 'megahorn', 'bulletpunch'],
-		signatureMove: 'projectilespam',
+		signatureMoves: ['projectilespam'],
 		evs: {hp:4, atk:252, spe:252}, nature: 'Jolly',
 	},
 	'Pokson': {
@@ -209,7 +208,7 @@ let leaguemon = {
 		},
 		species: 'Sharpedo', ability: 'Beat Misty', item: 'Misty Water', gender: 'M',
 		moves: ['agility', 'aquajet', 'waterfall', 'crunch', 'icefang', 'raindance', 'brine', 'hydrocannon', 'bide', 'rage', 'endure'],
-		signatureMove: 'beatingmist',
+		signatureMoves: ['beatingmist'],
 		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Hasty',
 		megaability: 'beatmisty',
 	},
@@ -232,7 +231,7 @@ let leaguemon = {
 		},
 		species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
 		moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
-		signatureMove: 'nofun',
+		signatureMoves: ['nofun'],
 		evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
 	},
 	'NoFunMantis':{ // STPPLB+ only
@@ -243,7 +242,7 @@ let leaguemon = {
 		},
 		species: "Scyther", ability: "No Fun Allowed", item: 'Eviolite', gender: 'M',
 		moves: ['knockoff', 'brickbreak', 'aerialace', 'swordsdance', 'agility', 'batonpass', 'roost'],
-		signatureMove: 'xscissor',
+		signatureMoves: ['xscissor'],
 		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
 	},
 	'DictatorMantis': { // STPPLB+ only
@@ -319,6 +318,8 @@ let leaguemon = {
 		quotes: {
 			SwitchIn: "ヽ༼ຈل͜ຈ༽ﾉ RIOT ヽ༼ຈل͜ຈ༽ﾉ",
 			Faint: "Wow Deku OneHand",
+			"Move-explosion": "KAPOW",
+			"Move-selfdestruct": "KAPOW",
 		},
 		species: 'Pikachu', ability: 'Pika Power', item: 'Light Ball', gender: 'M',
 		moves: ['thunder', 'thunderbolt', 'quickattack', 'voltswitch', 'irontail'],
@@ -336,7 +337,7 @@ let leaguemon = {
 		},
 		species: 'Poliwrath', ability: 'Ban Evade', item: 'BrightPowder', gender: 'M',
 		moves: ['closecombat', 'waterfall', 'icepunch', 'endure', 'bellydrum'],
-		signatureMove: 'thousandalts',
+		signatureMoves: ['thousandalts'],
 		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
 	},
 	'MihiraTheTiger': {
@@ -400,6 +401,23 @@ let leaguemon = {
 		quotes: {
 			SwitchIn: "Have time to listen to my lore?",
 			Faint: "I need time away from the sub to clear my head after this.",
+			"Move-loratory": [
+				"There's a chance that OLDEN is still alive, though weakened.",
+				"My headcanon is that Bill saving Abe in Anniversary Red...",
+				"OLDEN fled from Evan and Paul because it didn't trust them.",
+				"I'm not saying I believe it is or not; that's something I'm not ready to make a personal headcanon decision on yet.",
+				"My current headcanon is that MoonFlash...",
+				"On that note: what do you think his full name is? Because 'KKK' can't be his 'true' name.",
+				"Some people are saying that we've 'forced lore,' but my take on it...",
+			],
+			"Move-drama": [
+				"I'm just saying that we don't need to spend multiple posts repeating the same statement to each other.",
+				"You seem to have misinterpreted some of what I was trying to communicate.",
+				"And, quite frankly, it's quite tiring for me to even talk to you. I am not exaggerating. I am literally feeling physically drained from this conversation.",
+				"As far as I'm concerned, your sour attitude is only hurting your case.",
+				"I think it's quite clearly a matter of personal taste.",
+				"I would rather not have this argument with you on account that I have no desire to argue on the matter. We have different viewpoints on this; let's just accept that and move on. Okay?",
+			],
 		},
 		species: 'Mew', ability: 'No Guard', item: 'Eject Button', gender: 'M',
 		moves: ['recover', 'echoedvoice'],
@@ -457,7 +475,7 @@ let leaguemon = {
 		},
 		species: 'Relicanth', ability: 'Invocation', item: 'Leftovers', gender: 'M',
 		moves: ['stealthrock', 'stoneedge', 'toxic', 'earthpower', 'ancientpower'],
-		signatureMove: 'godswrath',
+		signatureMoves: ['godswrath'],
 		evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Serious',
 	},
 	'Liria_10': {
@@ -468,7 +486,7 @@ let leaguemon = {
 		},
 		species: 'Roserade', ability: 'Drawing Request', item: 'Black Sludge', gender: 'F',
 		moves: ['gigadrain', 'leechseed', 'sleeppowder', 'sludgebomb', 'spikes', 'toxicspikes', 'aromatherapy', 'synthesis'],
-		signatureMove: 'quicksketch',
+		signatureMoves: ['quicksketch'],
 		evs: {hp: 252, spd: 240, spe: 16}, nature: 'Calm',
 		ivs: {atk: 0},
 	},
@@ -484,6 +502,18 @@ let leaguemon = {
 		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
 		megaability: 'jackyofalltrades',
 	},
+	"Coryn216" : {
+		leagues: ["lb", "lb+", "b"],
+		quotes: {
+			SwitchIn: "o/",
+			Faint: "o7",
+		},
+		species: "Lapras", ability: "Slick Ice", item: "Leftovers", gender: "M",
+		moves: ['dragonpulse', 'recover', 'icebeam', 'surf', 'muddywater', 'dragonbreath', 'slackoff'],
+		signatureMoves: ['freezedry', 'absolutezero'],
+		evs: {hp:216, def:252, spa:40}, nature: "Bold",
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5podgs/
+	},
 	
 	'BEST': { // STPPB only
 		leagues: ["b"],
@@ -494,7 +524,7 @@ let leaguemon = {
 		species: 'Typhlosion', ability: 'Technician', item: 'Life Orb', gender: 'M',
 		moves: ['waterpulse', 'hiddenpowerice', 'shockwave'],
 		ivs: {atk:30, def:30}, // in order for HP Ice to be a thing.
-		signatureMove: 'bestfcar',
+		signatureMoves: ['bestfcar'],
 		evs: {spa:252, def:4, spe:252}, nature: 'Modest',
 	},
 	'Bird Jesus': { //STPPB only
@@ -505,7 +535,7 @@ let leaguemon = {
 		},
 		species: 'Pidgeot', ability: 'Messiah', item: 'Flying Gem', gender: 'M',
 		moves: ['judgment', 'focusblast', 'roost', 'fireblast'],
-		signatureMove: 'godbird',
+		signatureMoves: ['godbird'],
 		evs: {spa:252, def:4, spe:252}, nature: 'Timid',
 	},
 	
@@ -531,14 +561,6 @@ let leaguemon = {
 		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
 		// http://pastebin.com/ZLgNhMR9
 	},
-	"Coryn216" : { // First Mon
-		leagues: [],
-		quotes: {
-			SwitchIn: "o/",
-			Faint: "o7",
-		},
-		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5podgs/
-	},
 	"Redwings1340": { // First Mon
 		leagues: [],
 		quotes: {
@@ -546,6 +568,14 @@ let leaguemon = {
 			Faint: "That was fun. I'm going to rp now.",
 		},
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
+	},
+	"Mozilla Fennekin": {
+		leagues: [],
+		quotes: {
+			SwitchIn: "Tuturu!",
+			Faint: "<-To-be-continued--", //Use !showimage https://i.imgur.com/blKyr6E.png
+		},
+		// https://pp.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d98zyne/
 	},
 	"Burrito": {
 		leagues: [],
@@ -568,6 +598,7 @@ let leaguemon = {
 			// Put quotes to the limit \o/
 			FirstTime: "I'm not very good at this whole competitive thing...",
 			SwitchIn: "Alright, time to try again.",
+			Victory: "Holy crap, that actually worked!",
 			Faint: ["I need to get back to work anyway.", "Told you I suck at this..."],
 			"Move-afk-1": "brb",
 			"Move-afk-2": "b",

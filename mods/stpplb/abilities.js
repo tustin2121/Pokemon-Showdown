@@ -351,7 +351,10 @@ exports.BattleAbilities = { // define custom abilities here.
 		onFoeTryMove: function (target, source, effect) {
 			if (this.random(10) === 0) {
 				this.attrLastMove('[still]');
-				this.add("c|" + target.name + "|This move doesn't work because I say so!");
+				this.sayQuote(source, "Ability-"+effect.id, {
+					target: target, 
+					default: ["This move doesn't work because I say so!", "You are not allowed to use that move!", "Unauthorized use of that move!"]
+				});
 				return false;
 			}
 		},
@@ -376,7 +379,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				return;
 			}
 			if (this.random(10) === 1) {
-				this.add("c|" + target.name + "|KAPOW");
+				// this.add("c|" + target.name + "|KAPOW"); //Quote moved to the Move explosion
 				let newMove = this.getMoveCopy("explosion");
 				this.useMove(newMove, target, source);
 				return null;
@@ -782,5 +785,49 @@ exports.BattleAbilities = { // define custom abilities here.
 		shortDesc: "Cannot be Attracted, but gains +2 SpA, +2 SpD, and an attracted foe if tried.",
 		//TODO Implement
 		rating: 1,
+	},
+	"speedrunner": {
+		num: 2034,
+		id: "speedrunner",
+		name: "SpeedRunner",
+		desc: "On switching in, this pokemon gains +1 spe, and the opponent loses +1 spe. Further, this Pokemon's moves of 60 power or less have their power multiplied by 1.5, including Struggle.",
+		shortDesc: "Increase Speed of yourself by 1,decrease speed of opponent by 1(during switch in) +Technician",
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (basePower <= 60) {
+				this.debug('Technician boost');
+				return this.chainModify(1.5);
+			}
+		},
+		onStart: function (pokemon) {
+			this.add('-ability', pokemon, 'SpeedRunner', 'boost');
+			this.boost({spe: 1}, pokemon, pokemon);
+			let foeactive = pokemon.side.foe.active;
+			for (let i = 0; i < foeactive.length; i++) {
+				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
+				if (foeactive[i].volatiles['substitute']) {
+					this.add('-immune', foeactive[i], '[msg]');
+				} else {
+					this.boost({spe: -1}, foeactive[i], pokemon);
+				}
+			}
+		},
+	},
+	"slickice": {
+		num: 2035,
+		id: "slickice",
+		name: "Slick Ice",
+		desc: "All Ice type moves used by this Pokemon gain +1 Priority. Upon using an Ice type move this Pokemon gains Dragon typing as a third type.",
+		shortDesc: "All Ice type moves used by this Pokemon gain +1 Priority. Upon using an Ice type move this Pokemon gains Dragon typing as a third type.",
+		onModifyMove: function(move, pokemon) {
+			if (move.type === "Ice") {
+				move.priority = (move.priority || 0) + 1;
+				
+				if (!pokemon.hasType('Dragon')) {
+					if (pokemon.addType('Dragon')) {
+						this.add('-start', pokemon, 'typeadd', 'Dragon', '[from] ability: Slick Ice');
+					}
+				}
+			}
+		},
 	},
 };

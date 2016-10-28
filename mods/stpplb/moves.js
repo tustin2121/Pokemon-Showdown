@@ -130,6 +130,18 @@ exports.BattleMovedex = {
 			},
 		},
 	},
+	"explosion": {
+		inherit: true,
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
+		},
+	},
+	"selfdestruct": {
+		inherit: true,
+		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
+		},
+	},
 	
 	
 	////////////////////////////////////////////////////////////////////////////
@@ -643,7 +655,6 @@ exports.BattleMovedex = {
 			if (!bannedAbilities[target.ability]) {
 				let oldAbility = target.setAbility('defeatist');
 				if (oldAbility) {
-					this.add('-endability', target, oldAbility, '[from] move: Iron Fist');
 					this.add('-ability', target, 'Defeatist', '[from] move: Iron Fist');
 					return;
 				}
@@ -846,6 +857,10 @@ exports.BattleMovedex = {
 			target.item = megaStoneList[this.random(megaStoneList.length)];
 			target.canMegaEvo = this.canMegaEvo(target);
 			this.add('-item', target, target.getItem(), '[from] move: Re-Roll');
+			
+			if (target.isActive && !target.template.isPrimal) {
+				this.insertQueue({pokemon: target, choice: 'runPrimal'});
+			}
 		},
 		secondary: false,
 		target: 'self',
@@ -988,7 +1003,6 @@ exports.BattleMovedex = {
 			}
 			let oldAbility = pokemon.setAbility('furcoat');
 			if (oldAbility) {
-				// this.add('-endability', pokemon, oldAbility, '[from] move: Yiff Yiff');
 				this.add('-ability', pokemon, 'Fur Coat', '[from] move: Yiff Yiff');
 			}
 			return;
@@ -1620,7 +1634,6 @@ exports.BattleMovedex = {
 			if (!bannedAbilities[target.ability]) {
 				let oldAbility = target.setAbility('insomnia');
 				if (oldAbility) {
-					this.add('-endability', target, oldAbility, '[from] move: Text to Speech');
 					this.add('-ability', target, 'Insomnia', '[from] move: Text to Speech');
 					if (target.status === 'slp') {
 						target.cureStatus();
@@ -1884,6 +1897,7 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Taunt', source);
 		},
 		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
 			target.addVolatile('trapped', source, move, 'trapper');
 			source.addVolatile('trapped', target, move, 'trapper');
 		},
@@ -1907,6 +1921,7 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'Hypnosis', source);
 		},
 		onHit: function (target, source, move) {
+			this.sayQuote(source, "Move-"+move.id, {target: target});
 			if (Math.random() < 0.5) {
 				target.addVolatile('confusion');
 			} else {
@@ -2132,10 +2147,14 @@ exports.BattleMovedex = {
 		//TODO implement?
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add('-anim', source, 'Hypnosis', source);
+			if (!move.animActivated) {
+				move.animActivated = true;
+				this.add('-anim', source, 'Hypnosis', source);
+				this.sayQuote(source, "Move-"+move.id, {target: target});
+			}
 		},
-		onHit: function (target, source, move) {
-			this.sayQuote(source, "Move-"+move.id, {target: target});
+		onHit: function (target, source, me) {
+			if (target.side == source.side) return; //Don't replace moves of allies.
 			let move = Tools.getMove.call(this, "attract");
 			let addedMove = {
 				move: move.name,
@@ -2145,14 +2164,16 @@ exports.BattleMovedex = {
 				target: move.target,
 				disabled: false,
 				used: false,
+				virtual: true,
 			};
-			source.moveset[0] = addedMove;
-			source.baseMoveset[0] = addedMove;
-			source.moves[0] = toId(move.name);
+			target.moveset[0] = addedMove;
+			// target.baseMoveset[0] = addedMove;
+			target.moves[0] = toId(move.name);
 		},
 		secondary: false,
-		target: "allAdjacent",
-		type: "Normal",
+		target: "allAdjacentFoes",
+		// target: "allAdjacent",
+		type: "Fairy",
 		contestType: "Cute",
 	},
 	"huntingforproctors": {
@@ -2169,5 +2190,46 @@ exports.BattleMovedex = {
 		target: "normal",
 		type: "Ground",
 		//TODO implement
+	},
+	"poweraboose": {
+		num: 2061,
+		id: "poweraboose",
+		name: "Power Aboose",
+		desc: "",
+		shortDesc: "50% chance to burn, Heals back 25% of the damage dealt, High critical hit ratio",
+		pp: 15,
+		accuracy: 95,
+		critRatio: 2,
+		basePower: 80,
+		secondary: {
+			chance: 50,
+			status: 'brn',
+		},
+		flags: {protect:1, mirror:1, heal:1},
+		drain: [1, 4],
+		category: 'Physical',
+		target: "normal",
+		type: "Fire",
+	},
+	"absolutezero": {
+		num: 2062,
+		id: "absolutezero",
+		name: "Absolute Zero",
+		desc: "",
+		shortDesc: "100% change to freeze the opponent",
+		category: "Status",
+		pp: 5,
+		accuracy: 40,
+		basePower: 0,
+		flags: {protect: 1, reflectable: 1, mirror: 1, sound: 1, authentic: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'sheercold', target);
+		},
+		status: 'frz',
+		secondary: false,
+		target: "normal",
+		type: "Ice",
+		contestType: "Clever",
 	},
 };
