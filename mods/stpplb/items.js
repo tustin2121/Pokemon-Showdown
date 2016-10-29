@@ -170,16 +170,60 @@ exports.BattleItems = {
 		},
 		
 	},
-	// 'goatofarms': { //If you want this item, azum, YOU implement it OpieOP
-	// 	num: 2007,
-	// 	id: 'goatofarms',
-	// 	name: "Goat of Arms",
-	// 	desc: "Holder calls forth 1 extra goat to tag along. Works even if holder's ability isn't Summon Goats.",
-	// 	fling: {
-	// 		basePower: 20, // just make up a power depending on the estimated size/weight of the item
-	// 	}
-	// 	// I have no idea how to code Summon Goats and this.
-	// },
+	'goatofarms': { //If you want this item, azum, YOU implement it OpieOP
+		num: 2007,
+		id: 'goatofarms',
+		name: "Goat of Arms",
+		desc: "Holder calls fourth 1 extra goat to help with attacks. This will add +1 attack to all attacks except selfdestructive, charge, and spread hit attacks. This will lower the power of subsequent attacks on already existing multi-hit moves, because Azum is a TriHard. You cannot gain more than 5 goat followers. If this item is knocked off, the goats flee.",
+		shortDesc: "Holder calls forth 1 extra goat to tag along. Works even if holder's ability isn't Summon Goats.",
+		statusTags: {
+			goatofarms1: '<span class="good">+1&nbsp;Goat</span>',
+			goatofarms2: '<span class="good">+2&nbsp;Goats</span>',
+			goatofarms3: '<span class="good">+3&nbsp;Goats</span>',
+			goatofarms4: '<span class="good">+4&nbsp;Goats</span>',
+			goatofarms5: '<span class="good">+5&nbsp;Goats</span>',
+		},
+		fling: {
+			basePower: 20, // just make up a power depending on the estimated size/weight of the item
+		},
+		onHit: function(target, source, move) {
+			if (!target.hp) return; // Don't activate if we're dead now
+			if (move.category === "Status" || move.damage || move.damageCallback) return; //Ignore status and direct damage
+			if (move.id === 'knockoff') return; //Don't do this if the goatofarms is about to be knocked off.
+			target.addVolatile('goatofarms');
+		},
+		onTakeItem: function(item, pokemon, source) {
+			if (!this.debug) return true; // This will be true when KnockOff stupidly calls this function wrong
+			pokemon.removeVolatile('goatofarms');
+			return true;
+		},
+		effect: {
+			onStart: function(pokemon) {
+				this.effectData.num = 1;
+				this.add('-start', pokemon, 'goatofarms'+this.effectData.num, 
+					`[msg] ${pokemon.name}'s called in calvery with ${(pokemon.gender=='F')?'her':'his'} Goat of Arms!`);
+			},
+			onRestart: function(pokemon) {
+				this.add('-end', pokemon, 'goatofarms'+this.effectData.num, '[silent]');
+				this.effectData.num = Math.min(this.effectData.num+1, 5); //limit to +5
+				this.add('-start', pokemon, 'goatofarms'+this.effectData.num, 
+					`[msg] ${pokemon.name}'s called in more calvery with ${(pokemon.gender=='F')?'her':'his'} Goat of Arms!`);
+			},
+			onEnd: function (pokemon) {
+				this.add('-end', pokemon, 'goatofarms'+this.effectData.num, 
+					`[msg] ${pokemon.name}'s calvery fled!`);
+			},
+			onPrepareHitPriority: 8, //lower than Summon Goats ability
+			onPrepareHit: function (source, target, move) {
+				if (move.id in {iceball: 1, rollout: 1}) return;
+				if (move.category === 'Status') return;
+				if (move.selfdestruct || move.flags['charge'] || move.spreadHit) return;
+				
+				move.multihit = (move.multihit || 1) + this.effectData.num;
+				source.addVolatile('summongoats'); //Use the same effect as summongoats
+			},
+		}
+	},
 	'rockethooves': {
 		num: 2008,
 		id: "rockethooves",

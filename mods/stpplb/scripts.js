@@ -106,8 +106,12 @@ let leaguemon = {
 	"Soma Ghost": {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			FirstTime: "I'm a ghost. Boogidy Boo!",
+			SwitchIn: "Just Soma Ghost passing thr-oh crap, wrong line!",
+			SwitchOut: "I bet you switched your spoopy ghost out first, you TriHard.",
+			Faint: "You do know you can't kill ghosts, right? I just lowered my HP because I didn't want to be rude.",
+			CriticalHit: "RNG did a thing. Nice.",
+			Victory: "Shadow Rush GG",
 		},
 		species: 'Herdier', ability: 'Spoopify', item: 'Eviolite', gender: 'M',
 		moves: ['playrough', 'swordsdance', 'substitute', 'return', 'crunch', 'superpower', 'pursuit'],
@@ -123,11 +127,14 @@ let leaguemon = {
 	"Some Goats": { // STPPLB+ only
 		leagues: ["lb+", "b"],
 		quotes: {
-			SwitchIn: "Nothing to see here. Just Some Goats passing through.",
+			FirstTime: "Nothing to see here. Just Some Goats passing through.",
+			SwitchIn: "On my way to get your goat!",
 			SwitchOut: "Gotta Gogoat Fast!",
 			Faint: "BAHHHD GAME!",
+			CriticalHit: "One of them had to eventually.",
+			Victory: "Tell Rolf I said hi.",
 		},
-		species: 'Gogoat', ability: 'Summon Goats', item: 'Rocket Hooves', gender: 'M',
+		species: 'Gogoat', ability: 'Summon Goats', item: 'goatofarms', gender: 'M',
 		moves: ['earthquake', 'rockslide', 'aerialace', 'brickbreak', 'zenheadbutt', 'irontail', 'bulldoze', 'bulkup', 'milkdrink'],
 		signatureMoves: ['gigahornbreak', 'goatflu'],
 		evs: {hp:252, spd:216, spe:40}, nature: 'Careful',

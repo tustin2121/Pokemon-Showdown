@@ -751,7 +751,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				if (num < 12) num = 0;
 				else if (num < 24) num = 1;
 				else if (num < 36) num = 2;
-				else if (num < 48) num = 3
+				else if (num < 48) num = 3;
 				else num = 4;
 				move.multihit = num+1;
 				source.addVolatile('summongoats');
@@ -818,14 +818,13 @@ exports.BattleAbilities = { // define custom abilities here.
 		name: "Slick Ice",
 		desc: "All Ice type moves used by this Pokemon gain +1 Priority. Upon using an Ice type move this Pokemon gains Dragon typing as a third type.",
 		shortDesc: "All Ice type moves used by this Pokemon gain +1 Priority. Upon using an Ice type move this Pokemon gains Dragon typing as a third type.",
-		onModifyMove: function(move, pokemon) {
-			if (move.type === "Ice") {
-				move.priority = (move.priority || 0) + 1;
-				
-				if (!pokemon.hasType('Dragon')) {
-					if (pokemon.addType('Dragon')) {
-						this.add('-start', pokemon, 'typeadd', 'Dragon', '[from] ability: Slick Ice');
-					}
+		onModifyPriority: function(priority, pokemon, target, move) {
+			if (move && move.type === "Ice") return priority + 1;
+		},
+		onAfterMoveSecondarySelf: function (source, target, move) {
+			if (move.type === "Ice" && !source.hasType('Dragon')) {
+				if (source.addType('Dragon')) {
+					this.add('-start', source, 'typeadd', 'Dragon', '[from] ability: Slick Ice');
 				}
 			}
 		},

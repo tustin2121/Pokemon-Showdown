@@ -949,11 +949,11 @@ exports.BattleMovedex = {
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
 		onPrepareHit: function (target, pokemon) {
-			this.attrLastMove('[still]');
-			this.add('-anim', pokemon, 'Head Smash', target);
 			if (pokemon.hasType('Dark')) return;
 			if (!pokemon.addType('Dark')) return;
 			this.add('-start', pokemon, 'typeadd', 'Dark', '[from] move: Thousand Alts');
+			this.attrLastMove('[still]');
+			this.add('-anim', pokemon, 'Head Smash', target);
 		},
 		recoil: [1, 2],
 		secondary: {chance: 20,	volatileStatus: 'confusion'},
@@ -2096,6 +2096,7 @@ exports.BattleMovedex = {
 		name: "Goat Flu",
 		desc: "Inflicts the target with Goat Flu. The target loses 1/6 of its maximum HP, rounded down, at the end of each turn, and has its Attack and Speed halved while it is active. If the target uses Baton Pass, the replacement will continue to be affected. Fails if there is no target or if the target is already affected. Grass Pokemon are immune to this move, but not the effect.",
 		shortDesc: "The target is inflicted by Goat Flu.",
+		statusTag: '<span class="bad">Goat&nbsp;Flu</span>',
 		pp: 10,
 		flags: {protect: 1, reflectable: 1, mirror: 1},
 		accuracy: 100,
@@ -2117,7 +2118,8 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			onStart: function (pokemon, source) {
-				this.add('-start', pokemon, 'Goat Flu', '[of] ' + source);
+				this.add('-start', pokemon, 'Goat Flu', '[of] ' + source, 
+					`[msg] ${source.name} spread Goat Flu onto ${pokemon.name}!`);
 			},
 			onResidualOrder: 10,
 			onResidual: function (pokemon) {
