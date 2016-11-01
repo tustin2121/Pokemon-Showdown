@@ -829,4 +829,137 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 		},
 	},
+	"cheatcode": {
+		num: 2036,
+		id: "cheatcode",
+		name: "Cheat Code",
+		desc: "Upon switching in, and at the end of every turn, this pokemon gains two new signature moves, appended onto its move pool. One of the moves is from the opponent's set of signature moves, and the other is a random fossil god move (resolved in random order). Upon using an extra move, the move vanishes from the move set. This ability cannot add a move if there are already four extra moves. Moves are kept through switching.",
+		shortDesc: "Gains two signiture moves at the end of every turn.",
+		onResidualOrder: 28,
+		onResidual: function(pokemon) { //On end of turn
+			let self = this;
+			let methods = [];
+			this.debug("CheatCode activating...");
+			switch (this.random(2)) {
+				case 0: methods = [getOpponentMove, getGodMove]; break;
+				case 1: methods = [getGodMove, getOpponentMove]; break;
+			}
+			
+			let addedMoves = [];
+			while (methods.length > 0) {
+				if (pokemon.moves.length >= 8) break; //If there's more than 4 extra moves, don't add more
+				
+				let moveid = methods.pop().call(this);
+				this.debug("CheatCode: adding move "+moveid);
+				if (moveid === undefined) continue; //Can't add a move
+				addedMoves.push(moveid);
+				let move = this.getMove(moveid);
+				let sketchedMove = {
+					move: move.name,
+					id: move.id,
+					pp: move.pp,
+					maxpp: move.pp,
+					target: move.target,
+					disabled: false,
+					used: false,
+				};
+				pokemon.moveset.push(sketchedMove);
+				pokemon.baseMoveset.push(sketchedMove);
+				pokemon.moves.push(toId(move.name));
+			}
+			if (addedMoves.length == 0) {
+				this.debug("CheatCode failed to add any moves.");
+				return;
+			}
+			this.add('-ability', pokemon, 'Cheat Code');
+			if (pokemon.name === 'tustin2121') {
+				// If this is owned by tustin2121, act like he's using /evalbattle
+				// evalbattlePrint.call(this);
+			}
+			this.add(`raw|>>> this.${pokemon.toString().substr(0,2)}.active[${pokemon.side.active.indexOf(pokemon)}].moves.push(${addedMoves.toString()})`);
+			this.add(`raw|<<< ${pokemon.moves.length}`);
+			this.sayQuote(pokemon, "Ability-cheatcode");
+			
+			this.debug("CheatCode complete.");
+			return;
+			
+			function getOpponentMove() {
+				let moves = [];
+				let targets = pokemon.side.foe.active;
+				for (let i = 0; i < targets.length; i++) {
+					if (!targets[i] || targets[i].fainted) continue;
+					let sigmoves = targets[i].set.signatureMoves;
+					if (!sigmoves) continue;
+					for (let j = 0; j < sigmoves.length; j++) {
+						// Don't include moves we already have
+						if (pokemon.moves.indexOf(sigmoves[j]) > -1) continue;
+						moves.push(sigmoves[j]);
+					}
+				}
+				return moves[this.random(moves.length)];
+			}
+			
+			function getGodMove() {
+				let moves = [];
+				let godmoves = [
+					'abstartselect',
+					'wait4baba',
+					'balancedstrike',
+					'texttospeech',
+					'holyducttapeofclaw',
+					'warecho',
+					'skullsmash',
+					'danceriot',
+					'bluescreenofdeath',
+					'portaltospaaaaaaace',
+					'doubleascent',
+				];
+				for (let j = 0; j < godmoves.length; j++) {
+					// Don't include moves we already have
+					if (pokemon.moves.indexOf(godmoves[j]) > -1) continue;
+					moves.push(godmoves[j]);
+				}
+				return moves[this.random(moves.length)];
+			}
+			
+			function evalbattlePrint() {
+				let enemy = pokemon.side.foe.active;
+				let enemyid = Math.floor(Math.random()*enemy.length); //choose random pokemon
+				enemy = enemy[enemyid]; 
+				switch(Math.floor(Math.random()*10)) {
+					case 0:
+						this.add(`raw|>>> this.${enemy.toString().substr(0,2)}.active[${enemyid}].hp`);
+						this.add(`raw|<<< ${enemy.hp}`);
+						break;
+					case 1:
+						this.add(`raw|>>> this.${enemy.toString().substr(0,2)}.active[${enemyid}].moves`);
+						this.add(`raw|<<< ${enemy.moves}`);
+						break;
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+						this.add(`raw|>>> this.${enemy.toString().substr(0,2)}.active[${enemyid}].ability`);
+						this.add(`raw|<<< ${enemy.ability}`);
+						this.add('-ability', enemy, this.getAbility(enemy.ability), '[from] evalbattle', '[silent]');
+						break;
+				}
+				
+			}
+		},
+		onAfterMoveSecondarySelf: function (source, target, move) {
+			// Used an added move
+			let index = source.moves.indexOf(move.id);
+			if (index >= 4) {
+				this.debug("Removing move.id "+move.id+" from index "+index);
+				source.moves.splice(index, 4);
+				source.moveset.splice(index, 4);
+				source.baseMoveset.splice(index, 4);
+			}
+		},
+	},
 };

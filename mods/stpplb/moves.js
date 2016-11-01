@@ -2236,4 +2236,41 @@ exports.BattleMovedex = {
 		type: "Ice",
 		contestType: "Clever",
 	},
+	"coderefactor": {
+		num: 2063,
+		id: "coderefactor",
+		name: "codeRefactor();",
+		desc: "define(self)", //replaced at the bottom of this file :P
+		shortDesc: "Each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit.",
+		category: "Special",
+		pp: 15,
+		accuracy: 100,
+		type: "Fire",
+		flags: {contact: 1, protect: 1, mirror: 1},
+		multihit: [2, 5],
+		basePower: 12,
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.sayQuote(source, "Move-"+move.id, {target: target});
+			this.add('-anim', source, 'Double Team', target)
+			this.add('-anim', source, 'Fire Spin', target);
+			source.addVolatile("coderefactor");
+		},
+		effect: {
+			duration: 1,
+			onBasePowerPriority: 8,
+			onBasePower: function (basePower) {
+				if (this.effectData.hit) {
+					this.effectData.hit++;
+					return this.chainModify(Math.pow(2, this.effectData.hit));
+				} else {
+					this.effectData.hit = 1;
+				}
+			},
+		},
+		secondary: false,
+		target: "normal",
+	},
 };
+
+exports.BattleMovedex["coderefactor"].desc = require("util").inspect(exports.BattleMovedex["coderefactor"]);

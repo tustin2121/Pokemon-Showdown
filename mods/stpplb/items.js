@@ -246,5 +246,25 @@ exports.BattleItems = {
 		desc: "Sitrus Berry+Focus Sash(if sash activates sitrus berry also activates,if only sitrus berry activates z-sash is consumed)",
 		//TODO implement
 	},
-	
+	"reinforcedglass": {
+		num: 2010,
+		id: "reinforcedglass",
+		name: "Reinforced Glass",
+		desc: "If the holder is hit with a super effective move, that move is nullified, and this item breaks. Single Use.",
+		fling: {
+			basePower: 40,
+		},
+		onTryHit: function(target, source, move) {
+			if (target === source || move.category === 'Status' || move.type === '???' || move.id === 'struggle') 
+				return;
+			this.debug("Reinforced Glass immunity: "+move.id);
+			if (target.runEffectiveness(move) > 0) { //hit by super effective move
+				if (target.useItem()) {
+					this.add('-immune', target, '[from] item: Reinforced Glass', 
+						`[msg] ${target.name}'s Reinforced Glass took the brunt of the attack and shattered!`);
+					return null;
+				}
+			}
+		},
+	}
 };

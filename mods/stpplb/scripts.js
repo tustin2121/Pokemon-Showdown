@@ -622,11 +622,11 @@ let leaguemon = {
 			"Move-afk-2": "b",
 			"Move-bluescreenofdeath": "Ctrl+Alt+DELETE!!",
 			"Move-coderefactor": ["showdown's code is so fucking dense that it's impossible to decipher half the time", "does this hunk of junk not have any crash protection?! SwiftRage", "it wouldn't be complicated, rather it would touch a lot of code", "BrokeBack, maybe we shouldn't have so many FUCKING FILES CALLED CONFIG! SwiftRage", "we need to trim back the server's branches. There no need to have so many"],
-			"Move-cheatcode": ["Time to exploit that.", "I have no skill in this, so I need to cheat to win.", "Don't mind me, just doing stuff!"],
+			"Ability-cheatcode": ["Time to exploit that.", "I have no skill in this, so I need to cheat to win.", "Don't mind me, just doing stuff!"],
 		},
 		
 		species: 'Typhlosion', ability: 'Cheat Code', item: 'Reinforced Glass', gender: 'M',
-		moves: ['extrasensory', 'flamethrower', 'lavaplume', 'eruption'],
+		moves: ['fusionflare', 'energyball', 'eruption'],
 		signatureMoves: ['coderefactor'],
 		attract: {M:1}, forceMega: false, // Never Mega Evolve (usually as a result of using a signiture move)
 		evs: {atk:252, def:4, spe:252}, nature: 'Timid', ivs: {atk:0},
