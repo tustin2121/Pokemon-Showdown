@@ -204,6 +204,7 @@ exports.BattleItems = {
 					`[msg] ${pokemon.name}'s called in calvery with ${(pokemon.gender=='F')?'her':'his'} Goat of Arms!`);
 			},
 			onRestart: function(pokemon) {
+				if (this.effectData.num == 5) return; //limit to +5
 				this.add('-end', pokemon, 'goatofarms'+this.effectData.num, '[silent]');
 				this.effectData.num = Math.min(this.effectData.num+1, 5); //limit to +5
 				this.add('-start', pokemon, 'goatofarms'+this.effectData.num, 
@@ -243,7 +244,32 @@ exports.BattleItems = {
 		num: 2009,
 		id: "zsash",
 		name: "Z-Sash",
-		desc: "Sitrus Berry+Focus Sash(if sash activates sitrus berry also activates,if only sitrus berry activates z-sash is consumed)",
+		desc: "A band made of edible material. If the holder's HP is full, will survived an attack that would KO it with 1 HP. Restores 1/4 max HP when at 1/2 max HP or less. Single use.",
+		// desc: "Sitrus Berry+Focus Sash(if sash activates sitrus berry also activates,if only sitrus berry activates z-sash is consumed)",
+		isBerry: true, // Technically not a berry, but is as edible as one
+		naturalGift: {
+			basePower: 80,
+			type: "Psychic",
+		},
+		onDamage: function (damage, target, source, effect) {
+			if (target.hp === target.maxhp && damage >= target.hp && effect && effect.effectType === 'Move') {
+				if (target.eatItem()) {
+					return target.hp - 1;
+				}
+			}
+		},
+		onUpdate: function (pokemon) {
+			if (pokemon.hp <= pokemon.maxhp / 2) {
+				pokemon.eatItem();
+			}
+		},
+		onTryEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
+		onEat: function (pokemon) {
+			this.add('raw', `It's surprisingly tasty!`);
+			this.heal(pokemon.maxhp / 4);
+		},
 		//TODO implement
 	},
 	"reinforcedglass": {

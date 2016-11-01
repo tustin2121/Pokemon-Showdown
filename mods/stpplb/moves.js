@@ -1652,7 +1652,7 @@ exports.BattleMovedex = {
 		num: 2043,
 		id: 'holyducttapeofclaw',
 		name: 'Holy Duct Tape of Claw',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
+		desc: "For 3 turns, the target can't use status moves. Traps and damages the target for 4-5 turns.",
 		shortDesc: "For 3 turns, the target can't use status moves. Traps and damages the target for 4-5 turns.",
 		pp: 10,
 		priority: 0,
@@ -1770,7 +1770,7 @@ exports.BattleMovedex = {
 		num: 2047,
 		id: 'bluescreenofdeath',
 		name: 'Blue Screen of Death',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
+		desc: "Hits first. First turn out only. 100% flinch chance.",
 		shortDesc: "Hits first. First turn out only. 100% flinch chance.",
 		pp: 10,
 		priority: 3,
@@ -1806,7 +1806,7 @@ exports.BattleMovedex = {
 		num: 2048,
 		id: 'portaltospaaaaaaace',
 		name: 'Portal to SPAAAAAAACE',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
+		desc: "10% chance to freeze. Super effective on Water, Ice, Steel, Fire.",
 		shortDesc: "10% chance to freeze. Super effective on Water, Ice, Steel, Fire.",
 		pp: 10,
 		priority: 0,
@@ -1832,7 +1832,7 @@ exports.BattleMovedex = {
 		num: 2049,
 		id: 'doubleascent',
 		name: 'Double Ascent',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
+		desc: "Lasts 2 turns. Hits and disappears first turn. Reappears and hits second turn.",
 		shortDesc: "Lasts 2 turns. Hits and disappears first turn. Reappears and hits second turn.",
 		pp: 10,
 		priority: 0,
@@ -1843,6 +1843,10 @@ exports.BattleMovedex = {
 		accuracy: 95,
 		flags: {contact: 1, charge: 1, protect: 1, mirror: 1},
 		secondary: false,
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Fly', target);
+		},
 		onTry: function (attacker, defender, move) {
 			if (attacker.removeVolatile(move.id)) {
 				return;
@@ -2184,16 +2188,54 @@ exports.BattleMovedex = {
 		num: 2060,
 		id: 'huntingforproctors',
 		name: "Hunting for Proctors",
-		desc: "User picks up a random item from the ground. If the user does this, this attack deals double damage.",
+		desc: "User recycles a previous item, or picks up a random item from the ground. If the user does this, this attack deals double damage.",
 		shortDesc: "If possible, user recieves a random item, and doubles this move's power.",
 		pp: 10,
 		accuracy: 100,
 		basePower: 60,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		additionalPickup: [
+			'focussash', 'mentalherb', 'powerherb', 'absorbbulb', 'airballoon', 'berryjuice', 'cellbattery',
+			'ejectbutton', 'luminousmoss', 'redcard', 'snowball', 'weaknesspolicy', 'whiteherb',
+		],
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'Sand Tomb', target);
+		},
+		basePowerCallback: function (pokemon, target, move) {
+			if (pokemon.item) return move.basePower;
+			// if (pokemon.lastItem) {
+			// 	pokemon.setItem(pokemon.lastItem);
+			// 	this.add('-item', pokemon, pokemon.getItem(), '[from] move: Hunting for Proctors');
+			// 	return move.basePower * 2;
+			// } else {
+			let items = [];
+			for (let i in this.data.Items) {
+				let item = this.data.Items[i];
+				
+				let approved = false;
+				if (item.isGem) approved = true;
+				if (item.isBerry && item.onEat && item.gen !== 2) approved = true;
+				if (move.additionalPickup.includes(item.id)) approved = true;
+				
+				if (approved) {
+					items.push(i);
+				}
+			}
+			// this.debug("onBasePower: elegible items: "+items);
+			if (!items.length) return move.basePower;
+			let randItem = items[this.random(items.length)];
+			// this.debug("onBasePower: chosen item: "+randItem);
+			pokemon.setItem(randItem);
+			this.add('-anim', pokemon, 'Recycle', pokemon);
+			this.add('-item', pokemon, 'consumable item', '[from] move: Hunting for Proctors');
+			// this.add('-item', pokemon, pokemon.getItem(), '[from] move: Hunting for Proctors');
+			return move.basePower * 2;
+			// }
+		},
 		category: 'Physical',
 		target: "normal",
 		type: "Ground",
-		//TODO implement
 	},
 	"poweraboose": {
 		num: 2061,
@@ -2248,7 +2290,7 @@ exports.BattleMovedex = {
 		type: "Fire",
 		flags: {contact: 1, protect: 1, mirror: 1},
 		multihit: [2, 5],
-		basePower: 12,
+		basePower: 16,
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.sayQuote(source, "Move-"+move.id, {target: target});
@@ -2262,7 +2304,7 @@ exports.BattleMovedex = {
 			onBasePower: function (basePower) {
 				if (this.effectData.hit) {
 					this.effectData.hit++;
-					return this.chainModify(Math.pow(2, this.effectData.hit));
+					return this.chainModify(Math.pow(1.5, this.effectData.hit-1));
 				} else {
 					this.effectData.hit = 1;
 				}

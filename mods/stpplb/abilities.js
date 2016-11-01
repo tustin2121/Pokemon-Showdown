@@ -956,9 +956,9 @@ exports.BattleAbilities = { // define custom abilities here.
 			let index = source.moves.indexOf(move.id);
 			if (index >= 4) {
 				this.debug("Removing move.id "+move.id+" from index "+index);
-				source.moves.splice(index, 4);
-				source.moveset.splice(index, 4);
-				source.baseMoveset.splice(index, 4);
+				source.moves.splice(index, 1);
+				source.moveset.splice(index, 1);
+				source.baseMoveset.splice(index, 1);
 			}
 		},
 	},

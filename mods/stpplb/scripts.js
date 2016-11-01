@@ -621,8 +621,19 @@ let leaguemon = {
 			"Move-afk-1": "brb",
 			"Move-afk-2": "b",
 			"Move-bluescreenofdeath": "Ctrl+Alt+DELETE!!",
-			"Move-coderefactor": ["showdown's code is so fucking dense that it's impossible to decipher half the time", "does this hunk of junk not have any crash protection?! SwiftRage", "it wouldn't be complicated, rather it would touch a lot of code", "BrokeBack, maybe we shouldn't have so many FUCKING FILES CALLED CONFIG! SwiftRage", "we need to trim back the server's branches. There no need to have so many"],
-			"Ability-cheatcode": ["Time to exploit that.", "I have no skill in this, so I need to cheat to win.", "Don't mind me, just doing stuff!"],
+			"Move-coderefactor": [
+				"showdown's code is so fucking dense that it's impossible to decipher half the time", 
+				"does this hunk of junk not have any crash protection?! SwiftRage", 
+				"it wouldn't be complicated, rather it would touch a lot of code",
+				"BrokeBack, maybe we shouldn't have so many FUCKING FILES CALLED CONFIG! SwiftRage", 
+				"we need to trim back the server's branches. There no need to have so many",
+				`Smogon: "CONSISTENCY?! WHAT IS THAT?! BrokeBack"`
+			],
+			"Ability-cheatcode": [
+				"Time to exploit that.", 
+				"I have no skill in this, so I need to cheat to win.", 
+				"Don't mind me, just doing stuff!"
+			],
 		},
 		
 		species: 'Typhlosion', ability: 'Cheat Code', item: 'Reinforced Glass', gender: 'M',
@@ -808,6 +819,21 @@ exports.BattleScripts = {
 	},
 
 	// Mix and Mega override stuff
+	canMegaEvo: function (pokemon) {		
+ 		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;		
+ 		if (pokemon.set.forceMega !== undefined) return pokemon.set.forceMega;		
+ 		
+ 		let item = pokemon.getItem();		
+ 		if (item.megaStone) {		
+ 			if (item.megaStone === pokemon.species) return false;		
+ 			return item.megaStone;		
+ 		} else if (pokemon.set.moves.indexOf('dragonascent') >= 0) {		
+ 			return 'Rayquaza-Mega';		
+ 		} else {		
+ 			return false;		
+ 		}		
+ 	},
+	
 	runMegaEvo: function (pokemon) {
 		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
 		let template = this.getMixedTemplate(pokemon.originalSpecies, pokemon.canMegaEvo);
