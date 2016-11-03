@@ -38,6 +38,7 @@ class Tournament {
 		this.isRated = isRated;
 		this.scouting = true;
 		this.modjoin = false;
+		this.forceTimer = false;
 		this.autostartcap = false;
 		if (Config.tournamentDefaultPlayerCap && this.playerCap > Config.tournamentDefaultPlayerCap) {
 			Monitor.log('[TourMonitor] Room ' + room.id + ' starting a tour over default cap (' + this.playerCap + ')');
@@ -497,13 +498,13 @@ class Tournament {
 		}
 
 		if (!(userid in this.players)) {
-			sendReply('|tournament|error|UserNotAdded');
+			sendReply('|tournament|error|UserNotAdded|' + userid);
 			return false;
 		}
 
 		let player = this.players[userid];
 		if (this.disqualifiedUsers.get(player)) {
-			sendReply('|tournament|error|AlreadyDisqualified');
+			sendReply('|tournament|error|AlreadyDisqualified|' + userid);
 			return false;
 		}
 
@@ -777,6 +778,7 @@ class Tournament {
 
 		this.isBracketInvalidated = true;
 		if (this.autoDisqualifyTimeout !== Infinity) this.runAutoDisqualify(this.room);
+		if (this.forceTimer) room.requestKickInactive(false);
 		this.update();
 	}
 	forfeit(user) {
@@ -1025,7 +1027,7 @@ let commands = {
 			}
 			if (tournament.setBanlist(params, this)) {
 				const banlist = tournament.banlist.join(', ');
-				this.room.addRaw("<b>The tournament's banlist now includes:</b> " + banlist + ".");
+				this.room.addRaw("<b>The tournament's banlist is now:</b> " + Chat.escapeHTML(banlist) + ".");
 				this.privateModCommand("(" + user.name + " set the tournament's banlist to " + banlist + ".)");
 			}
 		},
@@ -1166,6 +1168,20 @@ let commands = {
 				this.privateModCommand("(The tournament was set to disallow modjoin by " + user.name + ")");
 			} else {
 				return this.sendReply("Usage: " + cmd + " <allow|disallow>");
+			}
+		},
+		forcetimer: function (tournament, user, params, cmd) {
+			let option = params.length ? params[0].toLowerCase() : 'on';
+			if (option === 'on' || option === 'true') {
+				tournament.forceTimer = true;
+				this.room.add('Forcetimer is now on for the tournament.');
+				this.privateModCommand("(The timer was turned on for the tournament by " + user.name + ")");
+			} else if (option === 'off' || option === 'false' || option === 'stop') {
+				tournament.forceTimer = false;
+				this.room.add('Forcetimer is now off for the tournament.');
+				this.privateModCommand("(The timer was turned off for the tournament by " + user.name + ")");
+			} else {
+				return this.sendReply("Usage: " + cmd + " <on|off>");
 			}
 		},
 	},
@@ -1331,6 +1347,7 @@ Chat.commands.tournamenthelp = function (target, room, user) {
 		"- runautodq: Manually run the automatic disqualifier.<br />" +
 		"- scouting &lt;allow|disallow>: Specifies whether joining tournament matches while in a tournament is allowed.<br />" +
 		"- modjoin &lt;allow|disallow>: Specifies whether players can modjoin their battles.<br />" +
+		"- forcetimer &lt;on|off>: Turn on the timer for tournament battles.<br />" +
 		"- getusers: Lists the users in the current tournament.<br />" +
 		"- on/enable &lt;%|@>: Enables allowing drivers or mods to start tournaments in the current room.<br />" +
 		"- off/disable: Disables allowing drivers and mods to start tournaments in the current room.<br />" +
