@@ -12,9 +12,10 @@
 		"node": true
 	},
 	"globals": {
+		"Bot": false,
 		"Config": false, "Monitor": false, "toId": false, "Tools": false, "LoginServer": false,
-		"Users": false, "Punishments": false, "Rooms": false, "Verifier": false, "Chat": false, "Simulator": false,
-		"Tournaments": false, "Dnsbl": false, "Sockets": false, "TeamValidator": false, "Ladders": false, "Bot": false
+		"Users": false, "Punishments": false, "Rooms": false, "Verifier": false, "Chat": false,
+		"Tournaments": false, "Dnsbl": false, "Sockets": false, "TeamValidator": false, "Ladders": false,
 	},
 	"rules": {
 		"comma-dangle": [1, "always-multiline"],
