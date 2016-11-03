@@ -809,8 +809,9 @@ exports.BattleScripts = {
 			}
 			return team; //CHANGES END HERE
 		} else {
-			// Reinitialize the RNG seed to create random teams.
-			this.startingSeed = this.startingSeed.concat(this.generateSeed());
+			// // Reinitialize the RNG seed to create random teams.
+			this.seed = this.generateSeed();
+			this.startingSeed = this.startingSeed.concat(this.seed);
 			team = this[teamGenerator || 'randomTeam'](side);
 			// Restore the default seed
 			this.seed = this.startingSeed.slice(0, 4);
