@@ -1,4 +1,5 @@
 /config/*
+!/config/formats/
 /logs/*
 /node_modules
 /eslint-cache

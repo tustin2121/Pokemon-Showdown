@@ -391,6 +391,7 @@ exports.BattleMovedex = {
 		category: 'Physical',
 		pp: 20,
 		basePower: 12,
+		accuracy: 100,
 		multihit: [8, 11],
 		flags: {protect: 1, mirror: 1},
 		secondary: false,

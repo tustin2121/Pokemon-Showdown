@@ -1200,7 +1200,7 @@ module.exports = (() => {
 		this.data.Aliases = BattleAliases;
 
 		// Load formats
-		let maybeFormats = tryRequire('./config/formats');
+		let maybeFormats = tryRequire('./config/formats/index.js');
 		if (maybeFormats instanceof Error) {
 			if (maybeFormats.code !== 'MODULE_NOT_FOUND') throw new Error("CRASH LOADING FORMATS:\n" + maybeFormats.stack);
 		}
@@ -1210,7 +1210,7 @@ module.exports = (() => {
 		for (let i = 0; i < BattleFormats.length; i++) {
 			let format = BattleFormats[i];
 			let id = toId(format.name);
-			console.log(`Loading format #${i+1}: ${format.name} [${id}]`);
+			// console.log(`Loading format #${i+1}: ${format.name} [${id}]`);
 			if (!id) throw new RangeError("Format #" + (i + 1) + " must have a name with alphanumeric characters");
 			if (this.data.Formats[id]) throw new Error("Format #" + (i + 1) + " has a duplicate ID: `" + id + "`");
 			format.effectType = 'Format';
@@ -1221,7 +1221,8 @@ module.exports = (() => {
 			if (!moddedTools[format.mod]) throw new Error("Format `" + format.name + "` requires nonexistent mod: `" + format.mod + "`");
 			this.installFormat(id, format);
 		}
-
+		
+		console.log("Formats loaded.");
 		this.formatsLoaded = true;
 		return this;
 	};
