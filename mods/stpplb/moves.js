@@ -1,7 +1,9 @@
 'use strict';
 
 // PLEASE organize your move so that the properties go in this order:
-//  num, id, name, desc, shortDesc, <the rest>
+//  num, accuracy, basePower, basePowerCallback, category, desc, shortDesc, id, name, pp, priority, flags,
+//  multihit/critRatio, drain/recoil, volatileStatus, onWhatever, boosts, selfDestruct, sideCondition, 
+//  effect, secondary/secondaries, target, type
 
 exports.BattleMovedex = {
 	////////////////////////////////////////////////////////////////////////////
@@ -149,14 +151,13 @@ exports.BattleMovedex = {
 	
 	"disappointment": {
 		num: 2000,
-		id: "disappointment",
-		name: "Disappointment",
-		desc: "The user faints and the Pokemon brought out to replace it has its HP fully restored along with having any major status condition cured and getting a boost in all stats. Fails if the user is the last unfainted Pokemon in its party.",
-		shortDesc: "User faints. Replacement is fully healed. Raises all stats of replacement by 1 (not acc/eva).",
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		isViable: true,
+		desc: "The user faints and the Pokemon brought out to replace it has its HP fully restored along with having any major status condition cured and getting a boost in all stats. Fails if the user is the last unfainted Pokemon in its party.",
+		shortDesc: "User faints. Replacement is fully healed. Raises all stats of replacement by 1 (not acc/eva).",
+		id: "disappointment",
+		name: "Disappointment",
 		pp: 10,
 		priority: 0,
 		flags: {snatch: 1, heal: 1},
@@ -202,26 +203,28 @@ exports.BattleMovedex = {
 				}
 			},
 		},
+		secondary: false,
 		target: "self",
 		type: "Normal",
 	},
 	'darkfire': {
 		num: 2001,
-		id: 'darkfire',
-		name: 'Darkfire',
+		accuracy: 100,
+		basePower: 90,
+		category: 'Special',
 		desc: "20% chance to flinch the target. Mega Evolves user via Houndoomite.",
 		shortDesc: "Combines Fire in its type effectiveness. 20% chance to flinch the target. Mega Evolves user via Houndoomite.",
-		basePower: 90,
-		accuracy: 100,
-		category: 'Special',
-		target: 'any',
+		id: 'darkfire',
+		name: 'Darkfire',
+		pp: 15,
+		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		onEffectiveness: function (typeMod, type, move) {
-			return typeMod + this.getEffectiveness('Fire', type); // includes Fire in its effectiveness.
-		},
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Flamethrower', target);
+		},
+		onEffectiveness: function (typeMod, type, move) {
+			return typeMod + this.getEffectiveness('Fire', type); // includes Fire in its effectiveness.
 		},
 		self: {
 			onHit: function (pokemon) { // Mega evolves dfg
@@ -236,46 +239,22 @@ exports.BattleMovedex = {
 			chance: 20,
 			volatileStatus: 'flinch',
 		},
-		priority: 0,
-		pp: 15,
+		target: 'any',
 		type: 'Dark',
 	},
 	'superglitch': {
 		num: 2002,
-		name: "(Super Glitch)",
-		id: "superglitch",
-		desc: "A random move is selected for use, other than After You, Assist, Belch, Bestow, Celebrate, Chatter, Copycat, Counter, Covet, Crafty Shield, Destiny Bond, Detect, Diamond Storm, Endure, Feint, Focus Punch, Follow Me, Freeze Shock, Happy Hour, Helping Hand, Hold Hands, Hyperspace Hole, Ice Burn, King's Shield, Light of Ruin, Mat Block, Me First, Metronome, Mimic, Mirror Coat, Mirror Move, Nature Power, Protect, Quash, Quick Guard, Rage Powder, Relic Song, Secret Sword, Sketch, Sleep Talk, Snarl, Snatch, Snore, Spiky Shield, Steam Eruption, Struggle, Switcheroo, Techno Blast, Thief, Thousand Arrows, Thousand Waves, Transform, Trick, V-create, or Wide Guard.",
-		shortDesc: "Picks 2-5 random moves.",
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
+		desc: "2-5 random moves are selected for use, other than After You, Assist, Belch, Celebrate, Copycat, Counter, Crafty Shield, Destiny Bond, Detect, Endure, Follow Me, Happy Hour, Helping Hand, Hold Hands, Hyperspace Fury, King's Shield, Mat Block, Me First, Mimic, Mirror Coat, Mirror Move, Nature Power, Protect, Quash, Quick Guard, Rage Powder, Relic Song, Sketch, Sleep Talk, Snatch, Snore, Spiky Shield, Struggle, Transform, or Wide Guard.",
+		shortDesc: "Picks 2-5 random moves.",
+		id: "superglitch",
+		name: "(Super Glitch)",
 		pp: 10,
 		priority: 0,
-		multihit: [2, 5],
 		flags: {},
-		onHit: function (target) {
-			let moves = [];
-			for (let i in exports.BattleMovedex) {
-				let move = exports.BattleMovedex[i];
-				if (i !== move.id) continue;
-				if (move.isNonstandard) continue;
-				let noMetronome = {
-					afteryou:1, assist:1, belch:1, bestow:1, celebrate:1, chatter:1, copycat:1, counter:1, covet:1, craftyshield:1, destinybond:1, detect:1, diamondstorm:1, dragonascent:1, endure:1, feint:1, focuspunch:1, followme:1, freezeshock:1, happyhour:1, helpinghand:1, holdhands:1, hyperspacefury:1, hyperspacehole:1, iceburn:1, kingsshield:1, lightofruin:1, matblock:1, mefirst:1, metronome:1, mimic:1, mirrorcoat:1, mirrormove:1, naturepower:1, originpulse:1, precipiceblades:1, protect:1, quash:1, quickguard:1, ragepowder:1, relicsong:1, secretsword:1, sketch:1, sleeptalk:1, snarl:1, snatch:1, snore:1, spikyshield:1, steameruption:1, struggle:1, switcheroo:1, technoblast:1, thief:1, thousandarrows:1, thousandwaves:1, transform:1, trick:1, vcreate:1, wideguard:1,
-				};
-				if (!noMetronome[move.id]) {
-					moves.push(move);
-				}
-			}
-			let randomMove = '';
-			if (moves.length) {
-				moves.sort((a, b) => a.num - b.num); //What purpose does this serve beyond slowing down the processing?
-				randomMove = moves[this.random(moves.length)].id;
-			}
-			if (!randomMove) {
-				return false;
-			}
-			this.useMove(randomMove, target);
-		},
+		multihit: [2, 5],
 		onTryHit: function (target, source) { // can cause TMTRAINER effect randomly
 			if (!source.isActive) return null;
 			if (this.random(777) !== 42) return; // 1/777 chance to cause TMTRAINER effect
@@ -310,29 +289,52 @@ exports.BattleMovedex = {
 			this.damage(source.maxhp * this.random(24, 48) * 0.01, source, source);
 			return null;
 		},
+		onHit: function (target) {
+			let moves = [];
+			for (let i in exports.BattleMovedex) {
+				let move = exports.BattleMovedex[i];
+				if (i !== move.id) continue;
+				if (move.isNonstandard) continue;
+				let noMetronome = {
+					afteryou:1, assist:1, belch:1, celebrate:1, copycat:1, counter:1, craftyshield:1, destinybond:1, detect:1, endure:1, followme:1, happyhour:1, helpinghand:1, holdhands:1, hyperspacefury:1, kingsshield:1, matblock:1, mefirst:1, mimic:1, mirrorcoat:1, mirrormove:1, naturepower:1, protect:1, quash:1, quickguard:1, ragepowder:1, relicsong:1, sketch:1, sleeptalk:1, snatch:1, snore:1, spikyshield:1, struggle:1, transform:1, wideguard:1,
+				};
+				if (!noMetronome[move.id]) {
+					moves.push(move);
+				}
+			}
+			let randomMove = '';
+			if (moves.length) {
+				moves.sort((a, b) => a.num - b.num); // What purpose does this serve beyond slowing down the processing?
+				randomMove = moves[this.random(moves.length)].id;
+			}
+			if (!randomMove) {
+				return false;
+			}
+			this.useMove(randomMove, target);
+		},
 		target: "self",
 		type: "Normal",
 	},
 	'tm56': {
 		num: 2003,
+		accuracy: 37,
+		basePower: 205,
+		category: 'Physical',
+		desc: "The user becomes a ??? type before attacking. The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down. Causes the target to become a ??? type if it hits. Raises the user's Accuracy and Evasion by 1 stage if it misses.",
+		shortDesc: "Changes user's type to ??? type before attacking. User recovers 50% of the damage dealt. Changes target's type to ??? type if it hits. Raises the user's Accuracy and Evasion by 1 if it misses.",
 		id: 'tm56',
 		name: 'TM56',
-		desc: "Changes user's type to ??? type before attacking. User recovers 50% of the damage dealt. Changes target's type to ??? type if it hits. Raises the user's Accuracy and Evasion by 1 if it misses.",
-		shortDesc: "Changes user's type to ??? type before attacking. User recovers 50% of the damage dealt. Changes target's type to ??? type if it hits. Raises the user's Accuracy and Evasion by 1 if it misses.",
-		type: '???',
-		basePower: 205,
-		accuracy: 37,
 		pp: 15,
+		priority: 0,
+		flags: {pulse: 1, bullet: 1, protect: 1, mirror: 1, heal: 1},
 		drain: [1, 2],
-		category: 'Physical',
-		flags: {pulse: 1, bullet: 1, protect: 1, mirror: 1},
-		secondary: false,
-		onPrepareHit: function (target, source, move) { // Turns user into ???-type.
+		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Wish', source);
-			if (!source.hasType('???')) { // turn user into ???-type and spout glitchy nonsense.
+			this.add('-anim', target, 'Water Pulse', target);
+			if (!source.hasType('???')) { // turns user into ???-type and spout glitchy nonsense.
 				this.sayQuote(source, "Move-"+move.id, {target:target, default: "9̜͉̲͇̱̘̼ͬ̈́̒͌̑̓̓7ͩ͊̚5ͨ̆͐͏̪̦6̗͎ͬ̿̍̍̉ͧ͢4̯̠ͤ͛͐̄͒͡2͐ͬ̀d̺͉̜̈ͯ̓x̩̖̥̦̥͛́ͥ͑̈́ͩ͊͠║̛̥̜̱̝͍͒̌ͣ̀͌͌̒'̣͎̗̬̯r̸̗͍ͫ̓͆ͣ̎͊ ̜̻̈D͓̰̳̝̥̙͙͋̀E͉͔̥͇̫͓͍̔ͬͣ͂̓̽x̰̗̬̖͊̏̄̑̒̿͊s̜̪̏́f̧̯̼̦̓͌̇̒o̱̾̓ͩ̆̓̀F̟̰͓̩̂̆͛ͤ▓̣̩̝̙̇̓͒͋̈͡1̡̹̹͓̬͖͐̑̉̔̏xͥ̀'̻͖͍̠̉͡v̫̼̹̳̤̱͉▓̄̏͂ͤͭ̋ͫ͏̠̦̝▓̟͉͇̣̠̦̓̄ͫͥ̐̍̂▓͔̦̫̦̜̖́▓͍ͯ͗̾͆▓̮̗̠̜͙̹̟͊̎ͤ̔̽ͬ̃▓̩̟̏ͪ̇̂̂̒▓̖̼̤͉ͤ̾̋ͥͣͬ͒▓̈́̿͂̌̓▓͇̞̗̽̔̂͊̌ͣ͐▓ͬ́ͥ̔͒͒̎▓̰̪̫̩͇̲̇̔̿͢ͅ▓̞̬͎▓̖͍̖̫ͪ͐̆̅̍̂ͨͅ▓̡̭̠̗̳̬̜̝▓̤͙̥̆̌ͨͪ̆͌▓̴͉̩̈́▓ͩ̌̌̂̿̑̐▓ͨ҉͕̠͍▓̹̌̅̂ͨ͋̃͑▓̯̰̣̝̯ͭͦ̂͋̇̾͠▓̸̺̣̜̯̙̂͋̈ͨ̎̾ͧ▓͢▓͔̚▓̭͎͖̟̼̄̈̃̎́▓̧̌ͧ▓̼̹͈͗̄̆"});
-				source.setType('Bird');
+				source.setType('???');
 				this.add('-start', source, 'typechange', '???');
 			}
 		},
@@ -344,26 +346,29 @@ exports.BattleMovedex = {
 		onMoveFail: function (target, source, move) {
 			this.boost({accuracy:1, evasion:1}, source);
 		},
+		secondary: false,
+		target: 'normal',
+		type: '???',
 	},
 	'hexattack': {
 		num: 2004,
+		accuracy: 90,
+		basePower: 100,
+		category: 'Special',
+		desc: "Has a 25% chance to either burn, paralyze, freeze, confuse, infatuate, or sleep the target.",
+		shortDesc: "25% chance to paralyze or burn or freeze or confuse or infatuate or sleep target.",
 		id: 'hexattack',
 		name: 'Hex Attack',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "25% chance to paralyze or burn or freeze or confuse or infatuate or sleep target.",
-		type: 'Ghost',
-		category: 'Special',
-		basePower: 100,
-		accuracy: 90,
 		pp: 5,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Tri Attack', target);
 		},
-		flags: {protect: 1, mirror: 1},
 		secondary: {
 			chance: 25,
-			onHit: function (target, source) { // random status.
+			onHit: function (target, source) { // random status
 				let result = this.random(6);
 				if (result === 0) {
 					target.trySetStatus('brn', source);
@@ -372,41 +377,45 @@ exports.BattleMovedex = {
 				} else if (result === 2) {
 					target.trySetStatus('frz', source);
 				} else if (result === 3) {
-					target.addVolatile('confusion');
+					target.addVolatile('confusion'); // has this ever worked?
 				} else if (result === 4) {
-					target.addVolatile('attract');
+					target.addVolatile('attract'); // has this ever worked?
 				} else {
 					target.trySetStatus('slp', source);
 				}
 			},
 		},
+		target: 'normal',
+		type: 'Ghost',
 	},
 	'projectilespam': {
 		num: 2005,
+		accuracy: 100,
+		basePower: 12,
+		category: 'Physical',
+		desc: "Deals damage to one adjacent foe at random. Hits eight to eleven times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit eleven times. The user spends two or three turns locked into this move and becomes confused after the last turn of the effect if it is not already. If the user is prevented from moving or the attack is not successful against the target on the first turn of the effect or the second turn of a three-turn effect, the effect ends without causing confusion. If this move is called by Sleep Talk, the move is used for one turn and does not confuse the user.",
+		shortDesc: "Hits 8-11 times in one turn. Lasts 2-3 turns. Confuses the user afterwards.",
 		id: 'projectilespam',
 		name: 'Projectile Spam',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "Hits 8-11 times in one turn. Lasts 2-3 turns. Confuses the user afterwards.",
-		type: 'Fighting',
-		category: 'Physical',
 		pp: 20,
-		basePower: 12,
-		accuracy: 100,
-		multihit: [8, 11],
+		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		secondary: false,
+		multihit: [8, 11],
+		self: {
+			volatileStatus: 'lockedmove',
+		},
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
 			this.add('-anim', source, 'Vacuum Wave', target);
-		},
-		self: {
-			volatileStatus: 'lockedmove',
 		},
 		onAfterMove: function (pokemon) {
 			if (pokemon.volatiles['lockedmove'] && pokemon.volatiles['lockedmove'].duration === 1) {
 				pokemon.removeVolatile('lockedmove');
 			}
 		},
+		secondary: false,
+		target: 'randomNormal',
+		type: 'Fighting',
 	},
 	'bulk': {
 		num: 2006,
@@ -2243,7 +2252,7 @@ exports.BattleMovedex = {
 		id: "poweraboose",
 		name: "Power Aboose",
 		desc: "",
-		shortDesc: "50% chance to burn, Heals back 25% of the damage dealt, High critical hit ratio",
+		shortDesc: "50% chance to burn the target. User recovers 25% of the damage dealt. High critical hit ratio.",
 		pp: 15,
 		accuracy: 95,
 		critRatio: 2,
@@ -2252,7 +2261,11 @@ exports.BattleMovedex = {
 			chance: 50,
 			status: 'brn',
 		},
-		flags: {protect:1, mirror:1, heal:1},
+		flags: {protect: 1, mirror: 1, heal: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
+			this.add('-anim', source, 'flame wheel', target);
+		},
 		drain: [1, 4],
 		category: 'Physical',
 		target: "normal",
@@ -2262,8 +2275,8 @@ exports.BattleMovedex = {
 		num: 2062,
 		id: "absolutezero",
 		name: "Absolute Zero",
-		desc: "",
-		shortDesc: "100% change to freeze the opponent",
+		desc: "Freezes the target. Get haxed.",
+		shortDesc: "Freezes the target.",
 		category: "Status",
 		pp: 5,
 		accuracy: 40,
@@ -2274,22 +2287,20 @@ exports.BattleMovedex = {
 			this.add('-anim', source, 'sheercold', target);
 		},
 		status: 'frz',
-		secondary: false,
 		target: "normal",
 		type: "Ice",
-		contestType: "Clever",
 	},
 	"coderefactor": {
 		num: 2063,
 		id: "coderefactor",
 		name: "codeRefactor();",
 		desc: "define(self)", //replaced at the bottom of this file :P
-		shortDesc: "Each hit doubles the power of the next hit. 10% chance to raise accuracy by 1 each hit.",
+		shortDesc: "Hits 2-5 times. Power is increased by 50% with each hit.",
 		category: "Special",
 		pp: 15,
 		accuracy: 100,
 		type: "Fire",
-		flags: {contact: 1, protect: 1, mirror: 1},
+		flags: {protect: 1, mirror: 1},
 		multihit: [2, 5],
 		basePower: 16,
 		onPrepareHit: function (target, source, move) { // animation
