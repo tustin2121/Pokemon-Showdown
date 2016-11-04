@@ -44,6 +44,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		desc: "Makes stuff Ghost on switch-in.",
 		shortDesc: "On switch-in, this Pokemon changes all opponents' primary type to Ghost.",
 		onStart: function (pokemon) {
+			this.add("-ability", pokemon, "Spoopify");
 			let activeFoe = pokemon.side.foe.active;
 			for (let i = 0; i < activeFoe.length; i++) {
 				let foe = activeFoe[i];
@@ -56,7 +57,7 @@ exports.BattleAbilities = { // define custom abilities here.
 					continue;
 				}
 				foe.types = tempTypes;
-				this.add('-start', foe, 'typechange', foe.types.join('/'));
+				this.add('-start', foe, 'typechange', foe.types.join('/'), '[from] Spoopify', '[of] '+pokemon);
 			}
 		},
 		rating: 4,
@@ -120,7 +121,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 				if (species !== '' && source.template.speciesid !== toId(species)) { // don't transform if type is not an eeveelution type or you are already that eeveelution.
 					source.formeChange(species);
-					this.add('-formechange', source, species, '[msg]');
+					this.add('-formechange', source, species, '[msg]', '[from] ability: Proteon');
 					source.setAbility('proteon');
 				}
 			}
@@ -151,18 +152,35 @@ exports.BattleAbilities = { // define custom abilities here.
 		shortDesc: "[PLACEHOLDER DESCRIPTION]",
 		onUpdate: function (pokemon) {
 			let list = ['embargo', 'encore', 'flinch', 'healblock', 'attract', 'nightmare', 'taunt', 'torment', 'confusion', 'sconfusion'];
+			let activated = false;
 			for (let i = 0; i < list.length; i++) {
 				if (pokemon.volatiles[list[i]]) {
 					pokemon.removeVolatile(list[i]);
+					activated = (activated || []);
+					activated.push(list[i]);
 				}
+			}
+			if (activated) {
+				this.add('-activate', pokemon, 'ability: Psychologist');
+				// For items that don't report themselves ending, report them ending.
+				activated.forEach(item => {
+					switch (item) {
+						case 'attract': 
+							this.add('-end', pokemon, 'move: Attract', '[from] ability: Psychologist'); 
+							break;
+						case 'nightmare':
+							this.add('-end', pokemon, 'Nightmare', '[from] ability: Psychologist'); 
+							break;
+					}
+				});
 			}
 		},
 		onImmunity: function (type, pokemon) {
 			let list = ['embargo', 'encore', 'flinch', 'healblock', 'attract', 'nightmare', 'taunt', 'torment', 'confusion', 'sconfusion'];
 			for (let i = 0; i < list.length; i++) {
 				if (type === list[i]) {
-					this.add('-immune', pokemon, list[i]);
-					return false;
+					this.add('-immune', pokemon, list[i], '[from] ability: Psychologist');
+					return null;
 				}
 			}
 		},
@@ -279,7 +297,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		onAnyTryMove: function (target, source, effect) {
 			if (effect.num >= 2000) {
 				this.attrLastMove('[still]');
-				this.add("raw|No Fun Mantis's No Fun Allowed suppressed the signature move!");
+				this.add('-ability', source, 'No Fun Allowed');
+				this.add('message', "No Fun Mantis's No Fun Allowed suppressed the signature move!");
 				return false;
 			}
 		},
@@ -355,6 +374,7 @@ exports.BattleAbilities = { // define custom abilities here.
 					target: target, 
 					default: ["This move doesn't work because I say so!", "You are not allowed to use that move!", "Unauthorized use of that move!"]
 				});
+				//TODO report ability!
 				return false;
 			}
 		},
@@ -410,6 +430,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			} else if (pokemon.hp <= pokemon.maxhp / 32 && pokemon.boosts.evasion < 6) {
 				this.boost({evasion: 6 - pokemon.boosts.evasion}, pokemon);
 			}
+			//TODO report ability!
 		},
 		rating: 3,
 	},
@@ -508,7 +529,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		onSourceHit: function (target, source, move) {
 			if (source && move && (move.id === "boost" || move.id === "spindash")) {
 				if (this.random(10) < 3) {
-					this.boost({spe: 12}, source);
+					this.boost({spe: 12}, source); //TODO report ability? Check Speed Boost on Ninjask
 				}
 			}
 		},
@@ -555,6 +576,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			};
 			pokemon.moves[0] = toId(move.name);
 			this.add('message', pokemon.name + ' acquired a new move using its Drawing Request!');
+			//TODO report ability!
 		},
 	},
 	"mindgames": {
@@ -604,7 +626,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				let foe = foes[i];
 				this.damage(damage, foe, source, newEffect);
 			}
-			return false;
+			return false; //TODO git blame this quote \/
 		},
 		// Would be totally broken on something holding Toxic Orb.
 		// Good thing I haven't done that, right?
@@ -625,7 +647,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 				tempTypes.push(type);
 				source.types = tempTypes;
-				this.add('-start', source, 'typechange', source.types.join('/'));
+				this.add('-start', source, 'typechange', source.types.join('/')); //TODO report ability!
 			}
 		},
 		rating: 4,
@@ -640,7 +662,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			let fossils = ['Omastar', 'Kabutops', 'Aerodactyl', 'Cradily', 'Armaldo', 'Bastiodon', 'Rampardos', 'Carracosta', 'Archeops', 'Aurorus', 'Tyrantrum'];
 			let fossil = fossils[this.random(fossils.length)];
 			pokemon.formeChange(fossil);
-			this.add('-formechange', pokemon, fossil, '[msg]');
+			this.add('-formechange', pokemon, fossil, '[msg]'); //TODO report ability!
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
 			case 'omastar':
@@ -710,7 +732,7 @@ exports.BattleAbilities = { // define custom abilities here.
 					result = true;
 				}
 			}
-			if (result) this.add('message', 'The Herald of Death has arrived. All opposing Pokemon will perish in 3 turns!');
+			if (result) this.add('message', 'The Herald of Death has arrived. All opposing Pokemon will perish in 3 turns!'); //TODO report ability!
 		},
 		rating: 3.5,
 	},
@@ -723,7 +745,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		onTryHit: function (target, source, move) {
 			if (target !== source && move.type === 'Water') {
 				if (!this.heal(target.maxhp / 4)) {
-					this.add('-immune', target, '[msg]', '[from] ability: Water Absorb');
+					this.add('-immune', target, '[msg]', '[from] ability: Beat Misty');
 				}
 				return null;
 			}
@@ -961,5 +983,6 @@ exports.BattleAbilities = { // define custom abilities here.
 				source.baseMoveset.splice(index, 1);
 			}
 		},
+		//TODO on end (no funed) remove all extra moves
 	},
 };

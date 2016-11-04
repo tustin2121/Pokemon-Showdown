@@ -275,6 +275,7 @@ exports.BattleMovedex = {
 				return false;
 			}
 			this.useMove(randomMove, target);
+			this.add('-next');
 		},
 		onTryHit: function (target, source) { // can cause TMTRAINER effect randomly
 			if (!source.isActive) return null;
@@ -477,6 +478,60 @@ exports.BattleMovedex = {
 		target: "self",
 		type: "Normal",
 	},
+	// 'evolutionbeam': {
+	// 	num: 2009,
+	// 	id: "evolutionbeam",
+	// 	name: "Evolution Beam",
+	// 	desc: "Hits once for every eeveelution.",
+	// 	shortDesc: "Hits 9 times in one turn, once for each Eeveelution type.",
+	// 	accuracy: 100,
+	// 	basePower: 10,
+	// 	category: "Special",
+	// 	pp: 10,
+	// 	priority: 0,
+	// 	flags: {protect: 1, mirror: 1},
+	// 	onPrepareHit: function (target, source, move) { // animation depending on type.
+	// 		this.attrLastMove('[still]');
+	// 		if (move.type === 'Normal') {
+	// 			this.add('-anim', source, "Swift", target);
+	// 		} else if (move.type === 'Fire') {
+	// 			this.add('-anim', source, "Flamethrower", target);
+	// 		} else if (move.type === 'Water') {
+	// 			this.add('-anim', source, "Hydro Pump", target);
+	// 		} else if (move.type === 'Electric') {
+	// 			this.add('-anim', source, "Zap Cannon", target);
+	// 		} else if (move.type === 'Psychic') {
+	// 			this.add('-anim', source, "Psybeam", target);
+	// 		} else if (move.type === 'Dark') {
+	// 			this.add('-anim', source, "Shadow Ball", target);
+	// 		} else if (move.type === 'Ice') {
+	// 			this.add('-anim', source, "Ice Beam", target);
+	// 		} else if (move.type === 'Grass') {
+	// 			this.add('-anim', source, 'Solar Beam', target);
+	// 		} else if (move.type === 'Fairy') {
+	// 			this.add('-anim', source, 'Dazzling Gleam', target);
+	// 		}
+	// 	},
+	// 	onTryHit: function (target, pokemon, move) {
+	// 		if (move.type === 'Normal') {
+	// 			let t = move.eeveelutiontypes.slice(0);
+	// 			move.accuracy = true; // What's this line for?
+	// 			for (let i = 0; i < move.eeveelutiontypes.length; i++) { // hit for all eeveelution types in random order.
+	// 				let r = this.random(t.length);
+	// 				move.type = t[r];
+	// 				t.splice(r, 1);
+	// 				this.useMove(move, pokemon, target);
+	// 				this.add('-next');
+	// 			}
+	// 			move.type = 'Normal';
+	// 			move.accuracy = 100;
+	// 		}
+	// 	},
+	// 	eeveelutiontypes: ['Fire', 'Water', 'Electric', 'Psychic', 'Dark', 'Grass', 'Ice', 'Fairy'],
+	// 	secondary: false,
+	// 	target: "normal",
+	// 	type: "Normal",
+	// },
 	'evolutionbeam': {
 		num: 2009,
 		id: "evolutionbeam",
@@ -491,41 +546,47 @@ exports.BattleMovedex = {
 		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation depending on type.
 			this.attrLastMove('[still]');
-			if (move.type === 'Normal') {
-				this.add('-anim', source, "Swift", target);
-			} else if (move.type === 'Fire') {
-				this.add('-anim', source, "Flamethrower", target);
-			} else if (move.type === 'Water') {
-				this.add('-anim', source, "Hydro Pump", target);
-			} else if (move.type === 'Electric') {
-				this.add('-anim', source, "Zap Cannon", target);
-			} else if (move.type === 'Psychic') {
-				this.add('-anim', source, "Psybeam", target);
-			} else if (move.type === 'Dark') {
-				this.add('-anim', source, "Shadow Ball", target);
-			} else if (move.type === 'Ice') {
-				this.add('-anim', source, "Ice Beam", target);
-			} else if (move.type === 'Grass') {
-				this.add('-anim', source, 'Solar Beam', target);
-			} else if (move.type === 'Fairy') {
-				this.add('-anim', source, 'Dazzling Gleam', target);
+			if (!source.volatiles['evolutionbeam']) return; //No animation for the parent move
+			switch (move.type) {
+				case 'Normal':		this.add('-anim', source, "Swift", target); break;
+				case 'Fire':		this.add('-anim', source, "Flamethrower", target); break;
+				case 'Water':		this.add('-anim', source, "Hydro Pump", target); break;
+				case 'Electric':	this.add('-anim', source, "Zap Cannon", target); break;
+				case 'Psychic': 	this.add('-anim', source, "Psybeam", target); break;
+				case 'Dark':		this.add('-anim', source, "Shadow Ball", target); break;
+				case 'Ice':			this.add('-anim', source, "Ice Beam", target); break;
+				case 'Grass':		this.add('-anim', source, 'Solar Beam', target); break;
+				case 'Fairy':		this.add('-anim', source, 'Dazzling Gleam', target); break;
 			}
 		},
-		onTryHit: function (target, pokemon, move) {
-			if (move.type === 'Normal') {
-				let t = move.eeveelutiontypes.slice(0);
-				move.accuracy = true; // What's this line for?
-				for (let i = 0; i < move.eeveelutiontypes.length; i++) { // hit for all eeveelution types in random order.
-					let r = this.random(t.length);
-					move.type = t[r];
-					t.splice(r, 1);
-					this.useMove(move, pokemon, target);
-				}
-				move.type = 'Normal';
-				move.accuracy = 100;
+		ignoreImmunity: true,
+		onTryHit: function(target, pokemon, move) {
+			if (pokemon.volatiles['evolutionbeam']) return; //don't do anything special
+			if (target.hasType('Ghost')) {
+				this.add('-immune', target, '[msg]');
+				return null;
 			}
+			
+			pokemon.addVolatile('evolutionbeam');
+			let types = move.eeveelutiontypes.slice();
+			move.accuracy = true; //Make sure all of the following hit
+			let name = move.name;
+			while (types.length) {
+				let t = this.random(types.length);
+				move.type = types[t];
+				move.name = `${types[t]} ${name}`;
+				types.splice(t, 1);
+				this.useMove(move, pokemon, target);
+				this.add("-next");
+			}
+			move.accuracy = 100; //Return to normal
+			pokemon.removeVolatile('evolutionbeam');
+			return null; //negate the parent move.
 		},
-		eeveelutiontypes: ['Fire', 'Water', 'Electric', 'Psychic', 'Dark', 'Grass', 'Ice', 'Fairy'],
+		onHit: function(target, pokemon, move) {
+			
+		},
+		eeveelutiontypes: ['Normal', 'Fire', 'Water', 'Electric', 'Psychic', 'Dark', 'Grass', 'Ice', 'Fairy'],
 		secondary: false,
 		target: "normal",
 		type: "Normal",

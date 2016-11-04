@@ -140,6 +140,7 @@ exports.Formats = [
 		name: "Super TPPL Bros. Testing",
 		team: undefined,
 		searchShow: false,
+		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
 		debug: true,
 		validateSet: function(){ return false; } // Always validate
 	}),
@@ -147,6 +148,7 @@ exports.Formats = [
 		name: "Super TPPL Bros. Doubles Testing",
 		gameType: 'doubles',
 		team: undefined,
+		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
 		searchShow: false,
 		debug: true,
 		validateSet: function(){ return false; } // Always validate
@@ -155,6 +157,7 @@ exports.Formats = [
 		name: "Super TPPL Bros. Triples Testing",
 		gameType: 'triples',
 		team: undefined,
+		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
 		searchShow: false,
 		debug: true,
 		validateSet: function(){ return false; } // Always validate

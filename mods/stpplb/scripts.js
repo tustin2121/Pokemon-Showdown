@@ -119,7 +119,7 @@ let leaguemon = {
 		evs: {atk:252, def:4, spe:252}, nature: 'Adamant',
 		onSwitchIn: function(pokemon) {
 			if (!pokemon.illusion) {
-				this.add('-start', pokemon, 'typechange', 'Normal/Ghost');
+				this.add('-start', pokemon, 'typechange', 'Normal/Ghost', '[silent]');
 				pokemon.types = ['Normal', 'Ghost'];
 			}
 		}
