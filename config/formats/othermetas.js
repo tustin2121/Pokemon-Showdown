@@ -301,5 +301,14 @@ exports.Formats = [
 			}
 		},
 	},
+	{
+		name: "FU",
+		desc: [
+			"The tier below PU. Only available here!",
+		],
+		section: "ORAS Singles",
 
+		ruleset: ['PU'],
+		banlist: ['PU', 'Chatter'],
+	},
 ];
