@@ -6,15 +6,16 @@ exports.Sections = {
 	"ORAS Doubles":		{ column: 1, sort: 2, },
 	"ORAS Triples":		{ column: 1, sort: 3, },
 	
-	"OM of the Week":   { column: 2, sort: 1, },
-	"OM of the Month":  { column: 2, sort: 2, },
-	"Other Metagames":  { column: 2, sort: 3, },
-	"Randomized Metas": { column: 2, sort: 4, },
+	"OM of the Week":	{ column: 2, sort: 1, },
+	"OM of the Month":	{ column: 2, sort: 2, },
+	"Other Metagames":	{ column: 2, sort: 3, },
+	"Randomized Metas":	{ column: 2, sort: 4, },
 	
-	"RoA Spotlight":    { column: 3, sort: 0.5, },
-	"BW2 Singles":      { column: 3, sort: 1, },
+	"RoA Spotlight":	{ column: 3, sort: 0.5, },
+	"BW2 Singles":		{ column: 3, sort: 1, },
 	'BW2 Doubles':		{ column: 3, sort: 2, },
 	"DPP Singles":		{ column: 3, sort: 3, },
-	"Past Generations": { column: 3, sort: 4, },
+	"DPP Doubles":		{ column: 3, sort: 3.5, },
+	"Past Generations":	{ column: 3, sort: 4, },
 };
 exports.Formats = [];
