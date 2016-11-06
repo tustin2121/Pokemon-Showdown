@@ -310,5 +310,7 @@ exports.Formats = [
 
 		ruleset: ['PU'],
 		banlist: ['PU', 'Chatter'],
+		
+		__subsort: formats => formats[toId("PU")].__subsort+0.1,
 	},
 ];

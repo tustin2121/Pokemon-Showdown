@@ -22,6 +22,8 @@ let leaguemon = {
 		megaability: 'darkaura', //Including this will ensure mega evolutions will have this ability
 		onSwitchIn: function(pokemon) {}, //A function to run when switched in
 		onSwitchOut: function(pokemon) {}, //A function to run when switched out
+		forceMega: false, //A mega pokemon to always force as able to mega evolve into, or false to block all mega evolving.
+		attract: {F:1}, //An override on how attract affects this pokemon. M = Male, F = Female, U = Genderless
 	},
 	 */
 	'darkfiregamer': {
@@ -386,6 +388,7 @@ let leaguemon = {
 		quotes: {
 			SwitchIn: "Iwa took Gengar. DansGame",
 			Faint: "Bruh",
+			"Move-ganonssword": "Don't get too hasty, boy! TriHard",
 		},
 		species: 'Bisharp', ability: 'Defiant Plus', item: 'Leftovers', gender: 'M',
 		moves: ['knockoff', 'drainpunch', 'ironhead', 'suckerpunch', 'bulletpunch'],
@@ -560,7 +563,7 @@ let leaguemon = {
 	// appropriate above.
 	
 	"masterleozangetsu": { // First Mon
-		leagues: [], 
+		leagues: ['lb', 'lb+', 'b'], 
 		quotes: {
 			SwitchIn: "Sup o/, free to proctor?",
 			Faint: "gg no re",
@@ -577,6 +580,10 @@ let leaguemon = {
 			SwitchIn: "Quick pokemon battle before rp?",
 			Faint: "That was fun. I'm going to rp now.",
 		},
+		species: "Articuno", ability: 'Mediator', item: 'Leftovers', gender: 'M',
+		moves: ['freezedry', 'blizzard', 'hurricane', 'substitute', 'roost', 'protect'],
+		signatureMoves: ['dramareduction'],
+		evs: {hp:252, spd: 252, def:4}, nature: 'Calm',
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
 	},
 	"Mozilla Fennekin": {

@@ -985,4 +985,33 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 		//TODO on end (no funed) remove all extra moves
 	},
+	"mediator": {
+		num: 2037,
+		id: "mediator",
+		name: "Mediator",
+		desc: "Every turn, has a 50% chance of healing a random ally's status condition, and has a 10% chance of healing his opponents status condition. In doubles or triples, each chance is calculated independently.",
+		shortDesc: "",
+		onResidualOrder: 18,
+		onResidual: function(pokemon) {
+			let activated = false;
+			pokemon.side.active.forEach(m => {
+				if (m.hp && m.status && this.random(2) === 0) {
+					if (!activated) { 
+						this.add('-activate', pokemon, 'ability: Mediator');
+						activated = true;
+					}
+					m.cureStatus();
+				}
+			});
+			pokemon.side.foe.active.forEach(m => {
+				if (m.hp && m.status && this.random(10) === 0) {
+					if (!activated) { 
+						this.add('-activate', pokemon, 'ability: Mediator');
+						activated = true;
+					}
+					m.cureStatus();
+				}
+			});
+		},
+	},
 };
