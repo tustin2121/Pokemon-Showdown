@@ -101,37 +101,46 @@ exports.Formats = [
 	// Singles
 	create(stpplb, {
 		name: "Super TPPL Bros.",
+		team: 'randomtpplb',
 	}),
 	create(stpplb, {
 		name: "Super TPPL Bros. Plus",
+		team: 'randomtpplbp',
 	}),
 	create(stpplb, {
 		name: "Super TPP Bros.",
+		team: 'randomtppb',
 	}),
 	// Doubles
 	create(stpplb, {
 		name: "Super TPPL Bros. Doubles",
+		team: 'randomtpplb',
 		gameType: 'doubles',
 	}),
 	create(stpplb, {
 		name: "Super TPPL Bros. Plus Doubles",
+		team: 'randomtpplbp',
 		gameType: 'doubles',
 	}),
 	create(stpplb, {
 		name: "Super TPP Bros. Doubles",
+		team: 'randomtppb',
 		gameType: 'doubles',
 	}),
 	// Triples
 	create(stpplb, {
 		name: "Super TPPL Bros. Triples",
+		team: 'randomtpplb',
 		gameType: 'triples',
 	}),
 	create(stpplb, {
 		name: "Super TPPL Bros. Plus Triples",
+		team: 'randomtpplbp',
 		gameType: 'triples',
 	}),
 	create(stpplb, {
 		name: "Super TPP Bros. Triples",
+		team: 'randomtppb',
 		gameType: 'triples',
 	}),
 	
@@ -145,7 +154,7 @@ exports.Formats = [
 		validateSet: function(){ return false; } // Always validate
 	}),
 	create(stpplb, {
-		name: "Super TPPL Bros. Doubles Testing",
+		name: "Super TPPL Bros. Testing Doubles",
 		gameType: 'doubles',
 		team: undefined,
 		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
@@ -154,7 +163,7 @@ exports.Formats = [
 		validateSet: function(){ return false; } // Always validate
 	}),
 	create(stpplb, {
-		name: "Super TPPL Bros. Triples Testing",
+		name: "Super TPPL Bros. Testing Triples",
 		gameType: 'triples',
 		team: undefined,
 		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],

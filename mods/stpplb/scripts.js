@@ -527,6 +527,18 @@ let leaguemon = {
 		evs: {hp:216, def:252, spa:40}, nature: "Bold",
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5podgs/
 	},
+	"masterleozangetsu": { // First Mon
+		leagues: ['lb', 'lb+', 'b'], 
+		quotes: {
+			SwitchIn: "Sup o/, free to proctor?",
+			Faint: "gg no re",
+		},
+		species: 'Charizard-Mega-X', ability: 'SpeedRunner', item: 'Z-Sash', gender: 'M',
+		moves: ['extremespeed', 'bulldoze', 'dragonrush', 'roost', 'dualchop', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
+		signatureMoves: ['huntingforproctors', 'poweraboose'],
+		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+		// http://pastebin.com/ZLgNhMR9
+	},
 	
 	'BEST': { // STPPB only
 		leagues: ["b"],
@@ -562,18 +574,6 @@ let leaguemon = {
 	// When a pokemon is complete, fill in the leagues and move it to where 
 	// appropriate above.
 	
-	"masterleozangetsu": { // First Mon
-		leagues: ['lb', 'lb+', 'b'], 
-		quotes: {
-			SwitchIn: "Sup o/, free to proctor?",
-			Faint: "gg no re",
-		},
-		species: 'Charizard-Mega-X', ability: 'SpeedRunner', item: 'Z-Sash', gender: 'M',
-		moves: ['extremespeed', 'bulldoze', 'dragonrush', 'roost', 'dualchop', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
-		signatureMoves: ['huntingforproctors', 'poweraboose'],
-		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
-		// http://pastebin.com/ZLgNhMR9
-	},
 	"Redwings1340": { // First Mon
 		leagues: [],
 		quotes: {
@@ -609,11 +609,11 @@ let leaguemon = {
 			Attract: "Oh, you are so cute! <3 VoHiYo",
 			CriticalHit: "Ow! What was that for?! BibleThump",
 			Faint: "All I wanted to do was spread the love... BibleThump",
-			"Move-operationlove": "<3 VoHiYo <3 Go out and spread the love! <3 VoHiYo <3"
+			"Move-operationlovebomb": "<3 VoHiYo <3 Go out and spread the love! <3 VoHiYo <3"
 		},
 		species: 'Espeon', ability: 'No Love Lost', item: 'Full Heal', gender: 'M',
 		moves: ['morningsun', 'flash', 'psychic', 'dazzlinggleam', 'shadowball'],
-		signatureMoves: ['operationlove'],
+		signatureMoves: ['operationlovebomb'],
 		evs: {hp:4, spa:252, spe:252}, nature: 'Timid',
 		attract: {M:1, F:1, U:1}, // pan, also allowing all Attract through to trigger No Love Lost
 	},
@@ -628,6 +628,7 @@ let leaguemon = {
 			"Move-afk-1": "brb",
 			"Move-afk-2": "b",
 			"Move-bluescreenofdeath": "Ctrl+Alt+DELETE!!",
+			"Move-operationlovebomb": "<3 Quilava! <3",
 			"Move-coderefactor": [
 				"showdown's code is so fucking dense that it's impossible to decipher half the time", 
 				"does this hunk of junk not have any crash protection?! SwiftRage", 

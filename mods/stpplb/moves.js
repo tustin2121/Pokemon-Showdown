@@ -80,7 +80,7 @@ exports.BattleMovedex = {
 			noCopy: true, // doesn't get copied by Baton Pass
 			onStart: function (pokemon, source, effect) {
 				this.debug("Start attract: "+effect.id)
-				if (effect.id !== "operationlove") { //skip this check if this is from operationlove
+				if (effect.id !== "operationlovebomb") { //skip this check if this is from operationlovebomb
 					if (pokemon.set.attract) { 
 						this.debug("Testing clause attraction.")
 						// If the target pokemon's set has an attract clause
@@ -539,6 +539,7 @@ exports.BattleMovedex = {
 			pokemon.addVolatile('evolutionbeam');
 			let types = move.eeveelutiontypes.slice();
 			move.accuracy = true; //Make sure all of the following hit
+			move.ignoreImmunity = false;
 			let name = move.name;
 			while (types.length) {
 				let t = this.random(types.length);
@@ -549,6 +550,7 @@ exports.BattleMovedex = {
 				this.add("-next");
 			}
 			move.accuracy = 100; //Return to normal
+			move.ignoreImmunity = true;
 			pokemon.removeVolatile('evolutionbeam');
 			return null; //negate the parent move.
 		},
@@ -574,7 +576,7 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		onPrepareHit: function (target, source, move) { // animation
-			this.attrLastMove('[anim] Boombusrt');
+			this.attrLastMove('[anim] Boomburst');
 		},
 		secondaries: [{chance: 20, status: 'par'}, {chance: 20, volatileStatus: 'confusion'}],
 		target: "normal",
@@ -2135,10 +2137,10 @@ exports.BattleMovedex = {
 		target: "normal",
 		type: "Grass",
 	},
-	"operationlove": {
+	"operationlovebomb": {
 		num: 2059,
-		id: "operationlove",
-		name: "Operation Love",
+		id: "operationlovebomb",
+		name: "Operation Lovebomb",
 		desc: "Spreads love throughout the world! Attracts the target, regardless of gender or sexual preference, and changes the target's first move to Attract.",
 		shortDesc: "A target becomes infaturated, and gains the move Attract over the target's first move.",
 		pp: 15,
@@ -2150,10 +2152,10 @@ exports.BattleMovedex = {
 		volatileStatus: 'attract',
 		//TODO implement?
 		onPrepareHit: function (target, source, move) {
-			this.attrLastMove('[still]');
+			// this.attrLastMove('[still]');
 			if (!move.animActivated) {
 				move.animActivated = true;
-				this.add('-anim', source, 'Hypnosis', source);
+				// this.add('-anim', source, 'Hypnosis', source);
 				this.sayQuote(source, "Move-"+move.id, {target: target});
 			}
 		},
@@ -2289,8 +2291,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 			this.sayQuote(source, "Move-"+move.id, {target: target});
-			this.add('-anim', source, 'Double Team', target)
-			this.add('-anim', source, 'Fire Spin', target);
+			this.add('-animcustom', source, target, 'doubleteam', '{delay}300', 'firespin');
 			source.addVolatile("coderefactor");
 		},
 		effect: {
@@ -2327,7 +2328,6 @@ exports.BattleMovedex = {
 			source.side.addSideCondition("dramareduction", source);
 		},
 		onHit: function(target, source, move) {
-			this.add('-activate', source, 'move: Drama Reduction');
 			let num = 0;
 			target.side.pokemon.forEach(m => {
 				num += (m.status)?1:0;
@@ -2351,8 +2351,16 @@ exports.BattleMovedex = {
 				let target = side.active[this.effectData.sourcePosition];
 				if (target && !target.fainted) {
 					let source = this.effectData.source;
-					let damage = this.heal(this.effectData.hp, target, target);
-					if (damage) this.add('-heal', target, target.getHealth, '[from] move: Drama Reduction', '[wisher] ' + source.name);
+					let damage = this.heal(this.effectData.hp, target, target, 'wish');
+					if (damage) {
+						this.add('-heal', target, target.getHealth, '[from] move: Drama Reduction', '[wisher] ' + source, '[silent]');
+						this.add('-animcustom', target, target, '{residual} wish', '{delay} 500'); //client manually adds delay for this animation usually
+						this.add(`raw|${source.name}'s Drama Reduction cooled ${target.name} off some!`);
+						if (target.name === 'Trollkitten') {
+							this.add(`raw|Trollkitten is grateful for the help!`);
+						}
+					}
+					
 				}
 			},
 		},
