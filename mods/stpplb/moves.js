@@ -2330,7 +2330,7 @@ exports.BattleMovedex = {
 		onHit: function(target, source, move) {
 			let num = 0;
 			target.side.pokemon.forEach(m => {
-				num += (m.status)?1:0;
+				num += (this.hp && m.status)?1:0;
 				m.cureStatus();
 			});
 			if (num > 0) {

@@ -305,6 +305,96 @@ exports.BattleFormats = {
 			this.makeRequest('teampreview', lengthData && lengthData.battle || '');
 		},
 	},
+	stadiumselection: {
+		effectType: 'Rule',
+		name: "Stadium Selection",
+		onStartPriority: -11,
+		onStart: function () {
+			try {
+				let bgmindex = Config.stadium.music();
+				let bgiindex = Config.stadium.background();
+				
+				this.stadium = {};
+				this.stadium.update = this.effect.updateStadium.bind(this);
+				this.stadium.update({
+					request: true,
+					m_battle: bgmindex.randBattle(),
+					bgimg: bgiindex.convertToId(bgiindex.getRandomBG(this.gen)),
+				});
+				
+				this.add('rule', "Stadium Selection: Combatants can use the Battle Options before battle to choose battle music and background selection.");
+			} catch (e) {
+				console.error("Stadium Selection rule failed."+
+					"The following error occurred while loading music and backgrounds:\n", e);
+				this.add('error', 'Stadium Selection rule failed. Please see console.');
+			}
+		},
+		onStadiumRequest: function(request) {
+			this.debug("StadiumRequest: "+request.join('|'));
+			if (!this.stadium || !this.stadium.request || !request) return;
+			try {
+				let bgmindex = Config.stadium.music();
+				let bgiindex = Config.stadium.background();
+				
+				switch (request[0]) {
+					case 'field': 
+						let id = bgiindex.convertToId(request[1]);
+						this.stadium.update({ bgimg: id });
+						break;
+					case 'music': 
+						if (!bgmindex.isValidBattle(request[1])) return;
+						this.stadium.update({ m_battle: request[1] });
+						break;
+					case 'vmusic': 
+						if (!bgmindex.isValidVictory(request[1])) return;
+						this.stadium.update({ m_victory: request[1] });
+						break;
+					case 'premusic': 
+						if (!bgmindex.isValid(request[1])) return;
+						this.stadium.update({ m_pre: request[1] });
+						break;
+				}
+			} catch (e) {
+				console.error("Error processing stadium request."+
+					"The command '/stadium "+request.join('|')+"' gave the following error occurred:\n", e);
+				this.add('error', 'Error processing stadium request.');
+			}
+		},
+		onSwitchInPriority: 1,
+		onSwitchIn: function() {
+			if (this.stadium) {
+				this.stadium.update({ request: false, });
+			}
+		},
+		updateStadium : function(changes){
+			if (!this.stadium) return;
+			let std = this.stadium;
+			let args = [];
+			if (changes.request !== undefined && changes.request !== std.request) {
+				std.request = changes.request;
+				args.push(std.request? '[request]' : '[norequest]'); //can change these options in this battle
+			}
+			if (changes.bgimg !== undefined && changes.bgimg !== std.bgimg) {
+				std.bgimg = changes.bgimg;
+				args.push('[bg] '+this.stadium.bgimg);
+			}
+			if (changes.m_battle !== undefined && changes.m_battle !== std.m_battle) {
+				std.m_battle = changes.m_battle;
+				args.push('[music] '+this.stadium.m_battle);
+			}
+			if (changes.m_victory !== undefined && changes.m_victory !== std.m_victory) {
+				std.m_victory = changes.m_victory;
+				args.push('[vmusic] '+this.stadium.m_victory);
+			}
+			if (changes.m_pre !== undefined && changes.m_pre !== std.m_pre) {
+				std.m_pre = changes.m_pre;
+				args.push('[premusic] '+this.stadium.m_pre);
+			}
+			if (args.length > 0) {
+				this.add('-stadium', args.join('|'));
+			}
+		},
+	},
 	littlecup: {
 		effectType: 'ValidatorRule',
 		name: 'Little Cup',
@@ -676,17 +766,15 @@ exports.BattleFormats = {
 			}
 		},
 	},
-	mixandmegahandlers: {
-		// NOTE: This is not a full solution: You still need the Mix and Mega BattleScripts
-		// Append this to the end of the script.js file:
-		//	  require("../mixandmega/scripts").inject(exports);
+	mixandmegamod: {
+		// NOTE: Do NOT use this mod if you plan on overridding any of the installed scripts!
+		//   This WILL overwrite custom scripts!
 		effectType: 'Rule',
-		name: "Mix and Mega Handlers",
-		// onBegin: function() {
-		// 	this.add('raw|mixandmegamod > onBegin');
-		// },
+		name: "Mix and Mega Mod",
 		onStart: function() {
-			// this.add("raw|mixandmegamod > onStart");
+			this.add('rule', 'Mix and Mega Mod: Any pokemon can mega evolve with any stone.');
+			Object.assign(this, this.effect.scripts); //assign our script functions into the battle
+			
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
 			for (let i = 0, len = allPokemon.length; i < len; i++) {
 				let pokemon = allPokemon[i];
@@ -695,7 +783,6 @@ exports.BattleFormats = {
 		},
 		onSwitchInPriority: 1,
 		onSwitchIn: function (pokemon) {
-			// this.add("raw|mixandmegamod > onSwitchIn");
 			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
 			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
 				// Place volatiles on the Pokémon to show its mega-evolved condition and details
@@ -707,11 +794,129 @@ exports.BattleFormats = {
 			}
 		},
 		onSwitchOut: function (pokemon) {
-			// this.add("raw|mixandmegamod > onSwitchOut");
 			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
 			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
 				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
 			}
+		},
+		scripts: {
+			init: function () {
+				let onTakeMegaStone = function (item) {
+					return false;
+				};
+				for (let id in this.data.Items) {
+					if (!this.data.Items[id].megaStone) continue;
+					this.modData('Items', id).onTakeItem = onTakeMegaStone;
+				}
+			},
+			canMegaEvo: function (pokemon) {
+				if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
+		
+				let item = pokemon.getItem();
+				if (item.megaStone) {
+					if (item.megaStone === pokemon.species) return false;
+					return item.megaStone;
+				} else if (pokemon.set.moves.indexOf('dragonascent') >= 0) {
+					return 'Rayquaza-Mega';
+				} else {
+					return false;
+				}
+			},
+			runMegaEvo: function (pokemon) {
+				if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
+				let template = this.getMixedTemplate(pokemon.originalSpecies, pokemon.canMegaEvo);
+				let side = pokemon.side;
+		
+				// Pokémon affected by Sky Drop cannot Mega Evolve. Enforce it here for now.
+				let foeActive = side.foe.active;
+				for (let i = 0; i < foeActive.length; i++) {
+					if (foeActive[i].volatiles['skydrop'] && foeActive[i].volatiles['skydrop'].source === pokemon) {
+						return false;
+					}
+				}
+		
+				pokemon.formeChange(template);
+				pokemon.baseTemplate = template; // Mega Evolution is permanent
+		
+				// Do we have a proper sprite for it?
+				if (this.getTemplate(pokemon.canMegaEvo).baseSpecies === pokemon.originalSpecies) {
+					pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
+					this.add('detailschange', pokemon, pokemon.details);
+					this.add('-mega', pokemon, template.baseSpecies, template.requiredItem);
+				} else {
+					let oTemplate = this.getTemplate(pokemon.originalSpecies);
+					let oMegaTemplate = this.getTemplate(template.originalMega);
+					if (template.originalMega === 'Rayquaza-Mega') {
+						this.add('message', "" + pokemon.side.name + "'s fervent wish has reached " + pokemon.species + "!");
+					} else {
+						this.add('message', "" + pokemon.species + "'s " + pokemon.getItem().name + " is reacting to " + pokemon.side.name + "'s Mega Bracelet!");
+					}
+					this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
+					this.add('message', template.baseSpecies + " has Mega Evolved into Mega " + template.baseSpecies + "!");
+					this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
+					if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
+						this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
+					}
+				}
+		
+				pokemon.setAbility(template.abilities['0']);
+				pokemon.baseAbility = pokemon.ability;
+				pokemon.canMegaEvo = false;
+				return true;
+			},
+			getMixedTemplate: function (originalSpecies, megaSpecies) {
+				let originalTemplate = this.getTemplate(originalSpecies);
+				let megaTemplate = this.getTemplate(megaSpecies);
+				if (originalTemplate.baseSpecies === megaTemplate.baseSpecies) return megaTemplate;
+				let deltas = this.getMegaDeltas(megaTemplate);
+				let template = this.doGetMixedTemplate(originalTemplate, deltas);
+				return template;
+			},
+			getMegaDeltas: function (megaTemplate) {
+				let baseTemplate = this.getTemplate(megaTemplate.baseSpecies);
+				let deltas = {
+					ability: megaTemplate.abilities['0'],
+					baseStats: {},
+					weightkg: megaTemplate.weightkg - baseTemplate.weightkg,
+					originalMega: megaTemplate.species,
+					requiredItem: megaTemplate.requiredItem,
+				};
+				for (let statId in megaTemplate.baseStats) {
+					deltas.baseStats[statId] = megaTemplate.baseStats[statId] - baseTemplate.baseStats[statId];
+				}
+				if (megaTemplate.types.length > baseTemplate.types.length) {
+					deltas.type = megaTemplate.types[1];
+				} else if (megaTemplate.types.length < baseTemplate.types.length) {
+					deltas.type = baseTemplate.types[0];
+				} else if (megaTemplate.types[1] !== baseTemplate.types[1]) {
+					deltas.type = megaTemplate.types[1];
+				}
+				if (megaTemplate.isMega) deltas.isMega = true;
+				if (megaTemplate.isPrimal) deltas.isPrimal = true;
+				return deltas;
+			},
+			doGetMixedTemplate: function (template, deltas) {
+				if (!deltas) throw new TypeError("Must specify deltas!");
+				if (!template || typeof template === 'string') template = this.getTemplate(template);
+				template = Object.assign({}, template);
+				template.abilities = {'0': deltas.ability};
+				if (template.types[0] === deltas.type) {
+					template.types = [deltas.type];
+				} else if (deltas.type) {
+					template.types = [template.types[0], deltas.type];
+				}
+				let baseStats = template.baseStats;
+				template.baseStats = {};
+				for (let statName in baseStats) {
+					template.baseStats[statName] = this.clampIntRange(baseStats[statName] + deltas.baseStats[statName], 1, 255);
+				}
+				template.weightkg = Math.max(0.1, template.weightkg + deltas.weightkg);
+				template.originalMega = deltas.originalMega;
+				template.requiredItem = deltas.requiredItem;
+				if (deltas.isMega) template.isMega = true;
+				if (deltas.isPrimal) template.isPrimal = true;
+				return template;
+			},
 		},
 	},
 	groundsourcemod: {

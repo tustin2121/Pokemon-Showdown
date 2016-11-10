@@ -4962,7 +4962,11 @@ class Battle extends Tools.BattleDex {
 		case 'undo':
 			this.undoChoice(data[2], data[3]);
 			break;
-
+		
+		case 'stadium':
+			this.runEvent('StadiumRequest', null, null, null, data.slice(3));
+			break;
+		
 		case 'eval': {
 			/* eslint-disable no-eval, no-unused-vars */
 			let battle = this;

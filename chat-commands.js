@@ -2970,6 +2970,13 @@ exports.commands = {
 
 		room.game.undo(user, target);
 	},
+	
+	stadium: function (target, room, user) {
+		if (!room.game) return this.errorReply("This room doesn't have an active game.");
+		if (!room.game.stadium) return this.errorReply("This game doesn't support /stadium");
+
+		room.game.stadium(user, target);
+	},
 
 	uploadreplay: 'savereplay',
 	savereplay: function (target, room, user, connection, silent) {

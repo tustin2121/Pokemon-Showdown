@@ -87,7 +87,7 @@ let superglitch = {
 	column: 2,
 	searchShow: true,
 	mod: 'stpplb',
-	ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview', 'Mix and Mega Handlers'],
+	ruleset: ['Super Glitch Clause', 'HP Percentage Mod', 'Species Clause', 'Cancel Mod', 'No Switching Clause', 'No Recycle Clause', 'Ability Clause', 'Team Preview', 'Mix and Mega Mod'],
 	banlist: ['No Fun Allowed', 'Wonder Guard', 'Physicalakazam', 'Defiant Plus', 'Messiah', 'Cursed Body', 'Moody', 'Little Engine', 'Unnerve', 'Magician', 'Pickpocket', 'Imposter', 'Iron Barbs', 'Rough Skin'],
 	maxLevel: 100,
 	defaultLevel: 100,
@@ -149,7 +149,7 @@ exports.Formats = [
 		name: "Super TPPL Bros. Testing",
 		team: undefined,
 		searchShow: false,
-		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview'],
+		ruleset: ['Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Team Preview', 'Stadium Selection'],
 		debug: true,
 		validateSet: function(){ return false; } // Always validate
 	}),

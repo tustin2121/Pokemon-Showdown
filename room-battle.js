@@ -164,6 +164,9 @@ class Battle {
 	undo(user, data) {
 		this.sendFor(user, 'undo', data);
 	}
+	stadium(user, data) {
+		this.sendFor(user, 'stadium', data);
+	}
 	joinGame(user, team) {
 		if (this.playerCount >= 2) {
 			user.popup("This battle already has two players.");
