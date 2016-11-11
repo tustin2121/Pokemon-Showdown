@@ -515,7 +515,7 @@ let leaguemon = {
 		evs: {hp: 252, atk: 252, spe: 4}, nature: 'Adamant',
 		megaability: 'jackyofalltrades',
 	},
-	"Coryn216" : {
+	"Coryn216": {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
 			SwitchIn: "o/",
@@ -527,7 +527,7 @@ let leaguemon = {
 		evs: {hp:216, def:252, spa:40}, nature: "Bold",
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5podgs/
 	},
-	"masterleozangetsu": { // First Mon
+	"MasterLeoZangetsu": { // First Mon
 		leagues: ['lb', 'lb+', 'b'], 
 		quotes: {
 			SwitchIn: "Sup o/, free to proctor?",
