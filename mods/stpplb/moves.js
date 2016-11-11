@@ -332,8 +332,7 @@ exports.BattleMovedex = {
 		drain: [1, 2],
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add('-anim', source, 'Wish', source);
-			this.add('-anim', target, 'Water Pulse', target);
+			this.add('-animcustom', source, target, '{move:ss}wish', '{delay}500', '{move:tt}waterpulse');
 			if (!source.hasType('???')) { // turns user into ???-type and spout glitchy nonsense.
 				this.sayQuote(source, "Move-"+move.id, {target:target, default: "9̜͉̲͇̱̘̼ͬ̈́̒͌̑̓̓7ͩ͊̚5ͨ̆͐͏̪̦6̗͎ͬ̿̍̍̉ͧ͢4̯̠ͤ͛͐̄͒͡2͐ͬ̀d̺͉̜̈ͯ̓x̩̖̥̦̥͛́ͥ͑̈́ͩ͊͠║̛̥̜̱̝͍͒̌ͣ̀͌͌̒'̣͎̗̬̯r̸̗͍ͫ̓͆ͣ̎͊ ̜̻̈D͓̰̳̝̥̙͙͋̀E͉͔̥͇̫͓͍̔ͬͣ͂̓̽x̰̗̬̖͊̏̄̑̒̿͊s̜̪̏́f̧̯̼̦̓͌̇̒o̱̾̓ͩ̆̓̀F̟̰͓̩̂̆͛ͤ▓̣̩̝̙̇̓͒͋̈͡1̡̹̹͓̬͖͐̑̉̔̏xͥ̀'̻͖͍̠̉͡v̫̼̹̳̤̱͉▓̄̏͂ͤͭ̋ͫ͏̠̦̝▓̟͉͇̣̠̦̓̄ͫͥ̐̍̂▓͔̦̫̦̜̖́▓͍ͯ͗̾͆▓̮̗̠̜͙̹̟͊̎ͤ̔̽ͬ̃▓̩̟̏ͪ̇̂̂̒▓̖̼̤͉ͤ̾̋ͥͣͬ͒▓̈́̿͂̌̓▓͇̞̗̽̔̂͊̌ͣ͐▓ͬ́ͥ̔͒͒̎▓̰̪̫̩͇̲̇̔̿͢ͅ▓̞̬͎▓̖͍̖̫ͪ͐̆̅̍̂ͨͅ▓̡̭̠̗̳̬̜̝▓̤͙̥̆̌ͨͪ̆͌▓̴͉̩̈́▓ͩ̌̌̂̿̑̐▓ͨ҉͕̠͍▓̹̌̅̂ͨ͋̃͑▓̯̰̣̝̯ͭͦ̂͋̇̾͠▓̸̺̣̜̯̙̂͋̈ͨ̎̾ͧ▓͢▓͔̚▓̭͎͖̟̼̄̈̃̎́▓̧̌ͧ▓̼̹͈͗̄̆"});
 				source.setType('???');
@@ -365,7 +364,7 @@ exports.BattleMovedex = {
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation
-			this.attrLastMove('[anim] Tri Attack');
+			this.add('-animcustom', source, target, 'triattack', '{delay}200', 'triattack');
 		},
 		secondary: {
 			chance: 25,
@@ -406,7 +405,7 @@ exports.BattleMovedex = {
 			volatileStatus: 'lockedmove',
 		},
 		onPrepareHit: function (target, source, move) {
-			this.attrLastMove('[anim] Vacuum Wave');
+			this.add('-animcustom', source, target, 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave');
 		},
 		onAfterMove: function (pokemon) {
 			if (pokemon.volatiles['lockedmove'] && pokemon.volatiles['lockedmove'].duration === 1) {
@@ -523,7 +522,7 @@ exports.BattleMovedex = {
 				case 'Electric':	this.attrLastMove("[anim] Zap Cannon"); break;
 				case 'Psychic': 	this.attrLastMove("[anim] Psybeam"); break;
 				case 'Dark':		this.attrLastMove("[anim] Shadow Ball"); break;
-				case 'Ice':			this.attrLastMove("[anim] Ice Beam"); break;
+				case 'Ice':		this.attrLastMove("[anim] Ice Beam"); break;
 				case 'Grass':		this.attrLastMove('[anim] Solar Beam'); break;
 				case 'Fairy':		this.attrLastMove('[anim] Dazzling Gleam'); break;
 			}
@@ -635,7 +634,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) {
-			this.attrLastMove('[anim] Volt Tackle');
+			this.attrLastMove('[anim] Gigavolt Havoc');
 		},
 		recoil: [1, 2],
 		onHit: function (target, source, move) {
@@ -714,7 +713,7 @@ exports.BattleMovedex = {
 		onTry: function (attacker, defender, move) {
 			this.attrLastMove('[still]');
 			if (attacker.volatiles[move.id] && attacker.volatiles[move.id].duration === 1) {
-				this.add('-anim', attacker, 'Flare Blitz', defender);
+				this.add('-anim', attacker, 'Inferno Overdrive', defender);
 				this.sayQuote(attacker, "Move-"+move.id+"-2", "back");
 				attacker.removeVolatile(move.id);
 				return;
@@ -1054,8 +1053,7 @@ exports.BattleMovedex = {
 		priority: 0,
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
-			this.add('-anim', target, 'Icicle Crash', target);
-			this.add('-anim', source, 'Slash', target);
+			this.add('-animcustom', source, target, 'iciclecrash', 'slash');
 		},
 		flags: {contact: 1, protect: 1, mirror: 1},
 		critRatio: 2,
@@ -1260,8 +1258,7 @@ exports.BattleMovedex = {
 					type: 'Fire',
 					onPrepareHit: function (target, source, move) { // animation
 						this.attrLastMove('[still]');
-						this.add('-anim', target, 'Explosion', target);
-						this.add('-anim', target, 'Sky Drop', target);
+						this.add('-animcustom', target, target, '{other}doomdesirehit');
 					},
 				};
 				this.effectData.moveSource = this.effectData.source;
