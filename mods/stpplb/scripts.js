@@ -52,8 +52,11 @@ let leaguemon = {
 	'azum4roll': {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: "What? I'm just a normal Azumarill.",
+			FirstTime: "What? I'm just a normal Azumarill.",
+			SwitchIn: "What? I'm still a normal Azu̴maͅrill.",
 			Faint: "This game doesn't have enough glitches!",
+			Victory: "metronome op",
+			"Move-bellydrum": "G R TriHard TriHard D",
 		},
 		species: "Azumarill", ability: "Glitchiate", item: "Metronome", gender: 'M',
 		moves: ['rollout', 'batonpass', 'swordsdance', 'bellydrum', 'extremespeed', 'playrough', 'thunderwave'],
@@ -63,14 +66,16 @@ let leaguemon = {
 	"Lass zeowx": { // STPPLB+ only
 		leagues: ["lb+", "b"],
 		quotes: {
-			SwitchIn: "Oh, a new challenger?",
+			FirstTime: "Oh, a new challenger?",
+			SwitchIn: "I'm determined!",
 			Faint: "When can I beat TPPLA BibleThump",
+			Victory: "I win! Oh wait this isn't TPPLA DansGame",
 			"Move-partingvoltturn": "I'm getting outta here! Byeeeee~",
 		},
 		species: 'Liepard', ability: 'Protean', item: 'Focus Sash', gender: 'F',
 		moves: ['suckerpunch', 'shadowsneak', 'bulletpunch', 'playrough', 'spikes', 'acrobatics'],
 		signatureMoves: ['fakeout', 'partingvoltturn'],
-		evs: {atk:252, spa:12, spe:244}, nature: 'Hasty',
+		evs: {atk:252, spa:8, spe:248}, nature: 'Hasty',
 	},
 	'Iwamiger': { 
 		leagues: ["lb", "lb+", "b"],
@@ -136,7 +141,7 @@ let leaguemon = {
 			CriticalHit: "One of them had to eventually.",
 			Victory: "Tell Rolf I said hi.",
 		},
-		species: 'Gogoat', ability: 'Summon Goats', item: 'goatofarms', gender: 'M',
+		species: 'Gogoat', ability: 'Summon Goats', item: 'Goat of Arms', gender: 'M',
 		moves: ['earthquake', 'rockslide', 'aerialace', 'brickbreak', 'zenheadbutt', 'irontail', 'bulldoze', 'bulkup', 'milkdrink'],
 		signatureMoves: ['gigahornbreak', 'goatflu'],
 		evs: {hp:252, spd:216, spe:40}, nature: 'Careful',
@@ -207,7 +212,7 @@ let leaguemon = {
 		species: "Lucario", ability: "Scrappy", item: 'Assault Vest', gender: 'M',
 		moves: ['rockwrecker', 'megahorn', 'bulletpunch'],
 		signatureMoves: ['projectilespam'],
-		evs: {hp:4, atk:252, spe:252}, nature: 'Jolly',
+		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Jolly',
 	},
 	'Pokson': {
 		leagues: ["lb", "lb+", "b"],
@@ -236,23 +241,23 @@ let leaguemon = {
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
 			SwitchIn: "gldhf",
-			Faint: ["GGioz", "GGCtrl27"],
+			Faint: ["GGioz", "GGCtrl27", "GGoats"],
 		},
 		species: "Scyther", shiny: true, ability: "Dictator", item: 'Eviolite', gender: 'M',
 		moves: ['bravebird', 'aerialace', 'swordsdance', 'roost', 'xscissor', 'knockoff', 'earthquake'],
 		signatureMoves: ['nofun'],
-		evs: {hp:216, atk:40, spe:252}, nature: 'Jolly',
+		evs: {hp: 216, atk: 40, spe: 252}, nature: 'Jolly',
 	},
 	'NoFunMantis':{ // STPPLB+ only
 		leagues: ["lb+", "b"],
 		quotes: {
-			SwitchIn: "gldhf",
-			Faint: ["GGioz", "GGCtrl27"],
+			SwitchIn: "No fun allowed!",
+			Faint: ["GGioz", "GGCtrl27", "GGoats"],
 		},
 		species: "Scyther", ability: "No Fun Allowed", item: 'Eviolite', gender: 'M',
 		moves: ['knockoff', 'brickbreak', 'aerialace', 'swordsdance', 'agility', 'batonpass', 'roost'],
 		signatureMoves: ['xscissor'],
-		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+		evs: {atk: 252, def: 4, spe: 252}, nature: 'Adamant',
 	},
 	'DictatorMantis': { // STPPLB+ only
 		leagues: ["lb+", "b"],
@@ -263,7 +268,7 @@ let leaguemon = {
 		species: 'Scizor', ability: 'Technicality', item: 'Occa Berry', gender: 'M',
 		moves: ['barrier', 'craftyshield', 'trick', 'block', 'disable', 'stickyweb', 'embargo', 'quash', 'taunt', 'knockoff', 'bulletpunch'],
 		signatureMove: 'ironfist',
-		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+		evs: {hp: 4, atk: 252, spe: 252}, nature: 'Adamant',
 		megaability: 'Technicality',
 	},
 	'MegaCharizard': {
@@ -275,7 +280,7 @@ let leaguemon = {
 		species: 'Charizard', ability: 'Truant', item: 'Charizardite Y', gender: 'M',
 		moves: ['airslash', 'earthpower', 'roost', 'slackoff', 'flamethrower'],
 		signatureMove: 'afk',
-		evs: {hp: 4, spa: 252, spe: 252}, nature: 'Timid',
+		evs: {def: 4, spa: 252, spe: 252}, nature: 'Timid',
 	},
 	'Natsugan': {
 		leagues: ["lb", "lb+", "b"],
@@ -287,7 +292,7 @@ let leaguemon = {
 		item: randomMegaStone,
 		moves: ['earthquake', 'earthpower', 'uturn', 'dragonclaw', 'fireblast', 'boomburst', 'dragonpulse', 'return', 'stoneedge', 'crunch', 'ironhead', 'dragondance', 'quiverdance'],
 		signatureMove: 'reroll',
-		evs: {hp:88, atk: 84, def: 84, spa: 84, spd: 84, spe: 84}, nature: 'Serious',
+		evs: {hp: 252, atk: 84, spa: 84, spe: 88}, nature: 'Hardy', // TriHard
 	},
 	'GroundCtrl27': {
 		leagues: ["lb", "lb+", "b"],
@@ -309,7 +314,7 @@ let leaguemon = {
 		species: 'Sneasel', ability: 'Technician', item: 'Dark Gem', gender: 'F',
 		moves: ['aerialace', 'stormthrow', 'thief'],
 		signatureMove: 'arcticslash',
-		evs: {atk: 252, hp: 4, spe: 252}, nature: 'Jolly',
+		evs: {atk: 252, spd: 4, spe: 252}, nature: 'Jolly',
 	},
 	'WhatevsFur': { // STPPLB+ only
 		leagues: ["lb+", "b"],
@@ -335,7 +340,7 @@ let leaguemon = {
 		signatureMove: 'toucan',
 		evs: {spa: 252, spd: 4, spe: 252}, nature: 'Hasty',
 		onSwitchIn: function(pokemon) {
-			this.boost({def:1, spd:1}, pokemon);
+			this.boost({def: 1, spd: 1}, pokemon);
 		}
 	},
 	'Tadpole_0f_Doom': {
@@ -524,7 +529,7 @@ let leaguemon = {
 		species: "Lapras", ability: "Slick Ice", item: "Leftovers", gender: "M",
 		moves: ['dragonpulse', 'recover', 'icebeam', 'surf', 'muddywater', 'dragonbreath', 'slackoff'],
 		signatureMoves: ['freezedry', 'absolutezero'],
-		evs: {hp:216, def:252, spa:40}, nature: "Bold",
+		evs: {hp: 216, def: 252, spa: 40}, nature: "Bold",
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5podgs/
 	},
 	"MasterLeoZangetsu": { // First Mon
@@ -536,7 +541,7 @@ let leaguemon = {
 		species: 'Charizard-Mega-X', ability: 'SpeedRunner', item: 'Z-Sash', gender: 'M',
 		moves: ['extremespeed', 'bulldoze', 'dragonrush', 'roost', 'dualchop', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
 		signatureMoves: ['huntingforproctors', 'poweraboose'],
-		evs: {hp:4, atk:252, spe:252}, nature: 'Adamant',
+		evs: {hp: 12, atk: 252, spe: 244}, nature: 'Adamant',
 		// http://pastebin.com/ZLgNhMR9
 	},
 	
@@ -548,9 +553,9 @@ let leaguemon = {
 		},
 		species: 'Typhlosion', ability: 'Technician', item: 'Life Orb', gender: 'M',
 		moves: ['waterpulse', 'hiddenpowerice', 'shockwave'],
-		ivs: {atk:30, def:30}, // in order for HP Ice to be a thing.
+		ivs: {atk: 30, def: 30}, // in order for HP Ice to be a thing.
 		signatureMoves: ['bestfcar'],
-		evs: {spa:252, def:4, spe:252}, nature: 'Modest',
+		evs: {def: 4, spa: 252, spe: 252}, nature: 'Modest',
 	},
 	'Bird Jesus': { //STPPB only
 		leagues: ["b"],
@@ -561,7 +566,7 @@ let leaguemon = {
 		species: 'Pidgeot', ability: 'Messiah', item: 'Flying Gem', gender: 'M',
 		moves: ['judgment', 'focusblast', 'roost', 'fireblast'],
 		signatureMoves: ['godbird'],
-		evs: {spa:252, def:4, spe:252}, nature: 'Timid',
+		evs: {def: 4, spa: 252, spe: 252}, nature: 'Timid',
 	},
 	
 	////////////////////////////////////////////////////////////////////////////
@@ -583,16 +588,16 @@ let leaguemon = {
 		species: "Articuno", ability: 'Mediator', item: 'Leftovers', gender: 'M',
 		moves: ['freezedry', 'blizzard', 'hurricane', 'substitute', 'roost', 'protect'],
 		signatureMoves: ['dramareduction'],
-		evs: {hp:252, spd: 252, def:4}, nature: 'Calm',
+		evs: {hp: 252, def: 4, spd: 252}, nature: 'Calm',
 		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
 	},
 	"Mozilla Fennekin": {
 		leagues: [],
 		quotes: {
 			SwitchIn: "Tuturu!",
-			Faint: `|raw|<img src="https://i.imgur.com/blKyr6E.png" style="width: 200px;" />`,//"<-To-be-continued--",
+			Faint: `|raw|<img src="https://i.imgur.com/blKyr6E.png" style="width: 200px;" />`, // "<-To-be-continued--",
 		},
-		// https://pp.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d98zyne/
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d98zyne/
 	},
 	"Gilbert": {
 		leagues: [],
@@ -600,7 +605,7 @@ let leaguemon = {
 			SwitchIn: "Hello, world!",
 			Faint: "I was finally learning to love...",
 		},
-		// https://pp.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d9bjst9/
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d9bjst9/
 	},
 	"Burrito": {
 		leagues: [],
