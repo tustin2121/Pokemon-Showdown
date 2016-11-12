@@ -1482,9 +1482,9 @@ exports.BattleMovedex = {
 				case 'Ground':		anim = 'Drill Run'; 	break;
 				case 'Psychic':		anim = 'Zen Headbutt';	break;
 				case 'Rock':		anim = 'Head Smash';	break;
-				case 'Ice':			anim = 'Ice Punch'; 	break;
-				case 'Bug':			anim = 'X-Scissor'; 	break;
-				case 'Dragon':		anim = 'Outrage';		break;
+				case 'Ice':		anim = 'Ice Punch'; 	break;
+				case 'Bug':		anim = 'X-Scissor'; 	break;
+				case 'Dragon':		anim = 'Outrage';	break;
 				case 'Ghost':		anim = 'Shadow Punch';	break;
 				case 'Dark':		anim = 'Night Slash';	break;
 				case 'Steel':		anim = 'Heavy Slam';	break;
@@ -1512,13 +1512,13 @@ exports.BattleMovedex = {
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
 			case 'omastar':		move = 'abstartselect';		break;
-			case 'kabutops':	move = 'wait4baba';			break;
+			case 'kabutops':	move = 'wait4baba';		break;
 			case 'aerodactyl':	move = 'balancedstrike';	break;
 			case 'cradily':		move = 'texttospeech';		break;
 			case 'armaldo':		move = 'holyducttapeofclaw';	break;
-			case 'bastiodon':	move = 'warecho';			break;
+			case 'bastiodon':	move = 'warecho';		break;
 			case 'rampardos':	move = 'skullsmash';		break;
-			case 'carracosta':	move = 'danceriot';			break;
+			case 'carracosta':	move = 'danceriot';		break;
 			case 'archeops':	move = 'bluescreenofdeath';	break;
 			case 'aurorus':		move = 'portaltospaaaaaaace';	break;
 			case 'tyrantrum':	move = 'doubleascent';		break;
@@ -1631,7 +1631,10 @@ exports.BattleMovedex = {
 		accuracy: 85,
 		flags: {protect: 1, reflectable: 1, mirror: 1, sound: 1, authentic: 1},
 		onPrepareHit: function (target, source) {
-			this.attrLastMove('[anim] Hyper Voice');
+			this.attrLastMove('[still]');
+			this.add('-animcustom', source, target, 'Hyper Voice', '{move:tt} Giga Drain', '{delay}100',
+				 'Chatter', '{other:tt} anger', '{delay}100',
+				 'Boomburst', '{delay}100', 'Uproar');
 		},
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {default:[
@@ -1673,7 +1676,7 @@ exports.BattleMovedex = {
 		flags: {protect: 1, mirror: 1},
 		volatileStatus: 'partiallytrapped',
 		onPrepareHit: function (target, source) {
-			this.attrLastMove('[anim] Giga Drain');
+			this.attrLastMove('[anim] Block');
 		},
 		onHit: function (target, source, move) {
 			this.sayQuote(source, "Move-"+move.id, {default:"...", target: target});
@@ -2187,7 +2190,7 @@ exports.BattleMovedex = {
 		shortDesc: "If possible, user recieves a random item, and doubles this move's power.",
 		pp: 10,
 		accuracy: 100,
-		basePower: 60,
+		basePower: 65,
 		flags: {contact: 1, protect: 1, mirror: 1},
 		additionalPickup: [
 			'focussash', 'mentalherb', 'powerherb', 'absorbbulb', 'airballoon', 'berryjuice', 'cellbattery',
