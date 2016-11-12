@@ -186,31 +186,14 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 		rating: 4,
 	},
-	'seaandsky': { // Kap'n Kooma's ability: Primordial Sea plus Swift Swim.
+	'seaandsky': { // Kap'n Kooma's nerfed ability: Drizzle plus Swift Swim.
 		num: 2008,
 		id: 'seaandsky',
 		name: 'Sea and Sky',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		desc: "On switch-in, this Pokemon summons Rain Dance. If Rain Dance is active, this Pokemon's Speed is doubled.",
+		shortDesc: "On switch-in, this Pokemon summons Rain Dance. If Rain Dance is active, this Pokemon's Speed is doubled.",
 		onStart: function (source) {
-			this.setWeather('primordialsea');
-		},
-		onAnySetWeather: function (target, source, weather) {
-			if (this.getWeather().id === 'primordialsea' && !(weather.id in {desolateland:1, primordialsea:1, deltastream:1})) return false; // no more Sandstorm overwriting the Heavy Rain!
-		},
-		onEnd: function (pokemon) {
-			if (this.weatherData.source !== pokemon) return;
-			for (let i = 0; i < this.sides.length; i++) {
-				for (let j = 0; j < this.sides[i].active.length; j++) {
-					let target = this.sides[i].active[j];
-					if (target === pokemon) continue;
-					if (target && target.hp && (target.ability === 'primordialsea' || target.ability === 'seaandsky') && (!target.ignore || target.ignore['Ability'] !== true)) {
-						this.weatherData.source = target;
-						return;
-					}
-				}
-			}
-			this.clearWeather();
+			this.setWeather('raindance');
 		},
 		onModifySpe: function (spe, pokemon) {
 			if (this.isWeather(['raindance', 'primordialsea'])) {
@@ -374,7 +357,7 @@ exports.BattleAbilities = { // define custom abilities here.
 					target: target, 
 					default: ["This move doesn't work because I say so!", "You are not allowed to use that move!", "Unauthorized use of that move!"]
 				});
-				//TODO report ability!
+				this.add('-ability', source, 'Technicality');
 				return false;
 			}
 		},
@@ -383,15 +366,15 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2016,
 		id: 'megaplunder',
 		name: 'Mega Plunder',
-		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		desc: "Just a placeholder TriHard",
+		shortDesc: "Does nothing.",
 		rating: 0,
 	},
 	'pikapower': {
 		num: 2017,
 		id: "pikapower",
 		name: "Pika Power",
-		desc: "This Pok&#xe9;mon has a 10% chance of exploding if you target it.",
+		desc: "This Pokemon has a 10% chance of exploding if you target it.",
 		shortdesc: "May explode when hit.",
 		rating: 2,
 		onTryHit: function (target, source, move) {
@@ -442,7 +425,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		shortDesc: "This Pokemon's Normal type moves become Fire type and have 1.3x power.",
 		onModifyMovePriority: -1,
 		onModifyMove: function (move, pokemon) {
-			if (move.id !== 'struggle' && move.type === 'Normal') { // don't mess with Struggle, only change normal moves.
+			if (move.type === 'Normal' && move.id !== 'naturalgift') { // Struggle is ??? type anyway
 				move.type = 'Fire';
 				if (move.category !== 'Status') pokemon.addVolatile('incinerate');
 			}
@@ -451,12 +434,12 @@ exports.BattleAbilities = { // define custom abilities here.
 			duration: 1,
 			onBasePowerPriority: 8,
 			onBasePower: function (basePower, pokemon, target, move) {
-				return this.chainModify([0x14CD, 0x1000]); // not sure how this one works but this was in the Aerilate code in Pokemon Showdown.
+				return this.chainModify([0x14CD, 0x1000]); // multiplies BP by 5325/4096 (~1.3000488), like in the games
 			},
 		},
 		rating: 3.5,
 	},
-	'physicalakazam': { // Makes Alakazam into a physical tank
+	'physicalakazam': { // Makes Alakazam into a physical tank (not really)
 		num: 2020,
 		id: "physicalakazam",
 		name: "Physicalakazam",
@@ -524,12 +507,13 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: 'gottagofast',
 		name: 'Gotta Go Fast',
 		desc: "Chance of boosting speed when using signature move",
-		shortDesc: "Chance of boost when using special move",
+		shortDesc: "If this Pokemon uses Boost or Spindash, there is a 30% chance its Speed is raised 12 stages.",
 		rating: 2.5,
 		onSourceHit: function (target, source, move) {
 			if (source && move && (move.id === "boost" || move.id === "spindash")) {
 				if (this.random(10) < 3) {
-					this.boost({spe: 12}, source); //TODO report ability? Check Speed Boost on Ninjask
+					source.setBoost({atk: 6});
+					this.add('-setboost', source, 'atk', 12, '[from] ability: Gotta Go Fast');
 				}
 			}
 		},
@@ -579,7 +563,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			//TODO report ability!
 		},
 	},
-	"mindgames": {
+	"mindgames": { // Zorua Trainer's ability
 		num: 2025,
 		id: "mindgames",
 		name: "Mind Games",
@@ -597,8 +581,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2026,
 		id: 'jackyofalltrades',
 		name: 'Jack(y) of All Trades',
-		desc: '[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]',
-		shortDesc: '[PLACEHOLDER DESCRIPTION]',
+		desc: "This Pokemon's moves of 80 power or less have their power multiplied by 1.5. Does affect Struggle.",
+		shortDesc: "This Pokemon's moves of 80 power or less have 1.5x power. Includes Struggle.",
 		rating: 4,
 		onBasePowerPriority: 8,
 		onBasePower: function (basePower, attacker, defender, move) {
@@ -647,7 +631,7 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 				tempTypes.push(type);
 				source.types = tempTypes;
-				this.add('-start', source, 'typechange', source.types.join('/')); //TODO report ability!
+				this.add('-start', source, 'typechange', source.types.join('/')); //TODO report ability! (but protean doesn't do that...)
 			}
 		},
 		rating: 4,
@@ -662,7 +646,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			let fossils = ['Omastar', 'Kabutops', 'Aerodactyl', 'Cradily', 'Armaldo', 'Bastiodon', 'Rampardos', 'Carracosta', 'Archeops', 'Aurorus', 'Tyrantrum'];
 			let fossil = fossils[this.random(fossils.length)];
 			pokemon.formeChange(fossil);
-			this.add('-formechange', pokemon, fossil, '[msg]'); //TODO report ability!
+			this.add('-formechange', pokemon, fossil, '[msg]', '[from] ability: Invocation');
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
 			case 'omastar':
@@ -764,18 +748,17 @@ exports.BattleAbilities = { // define custom abilities here.
 		name: "Summon Goats",
 		desc: "Summons additional goats to attack with a fraction of power the higher the current HP is. X is equal to (user's current HP * 48 / user's maximum HP), rounded down; the number of additional hits is 0 if X is 0 to 12, 1 if X is 13 to 24, 2 if X is 25 to 36, 3 if X is 37 to 47, and 4 if X is 48. The second hit has its damage halved; the third hit has its damage thirded, etc. Does not affect multi-hit moves or moves that have multiple targets. tl;dr: Parental Bond with more possible hits.", // Sticking to game mechanics TriHard
 		shortDesc: "This Pokemon's damaging moves hit multiple times depending on its current HP. Damage decreases from the second hit onwards.",
-		onPrepareHitPriority: 10, //higher than Goat of Arms item
+		onPrepareHitPriority: 10, // higher than Goat of Arms item
 		onPrepareHit: function (source, target, move) {
 			if (move.id in {iceball: 1, rollout: 1}) return;
 			if (move.category !== 'Status' && !move.selfdestruct && !move.multihit && !move.flags['charge'] && !move.spreadHit) {
-				
 				let num = Math.floor(source.hp * 48 / source.maxhp);
 				if (num < 12) num = 0;
 				else if (num < 24) num = 1;
 				else if (num < 36) num = 2;
 				else if (num < 48) num = 3;
 				else num = 4;
-				move.multihit = num+1;
+				move.multihit = num + 1;
 				source.addVolatile('summongoats');
 			}
 		},
@@ -803,7 +786,7 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2033,
 		id: "nolovelost",
 		name: "No Love Lost",
-		desc: "This pokemon is immune to the effects of Attract. If the pokemon is hit by Attract, the user is instead attracted to this pokemon, and this pokemon gains +2 SpA and +2 SpD.",
+		desc: "This Pokemon is immune to the effects of Attract. If this Pokemon is hit by Attract, the user is instead attracted to this Pokemon, and this Pokemon gains +2 SpA and +2 SpD.",
 		shortDesc: "Cannot be Attracted, but gains +2 SpA, +2 SpD, and an attracted foe if tried.",
 		//TODO Implement
 		rating: 1,
@@ -812,14 +795,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2034,
 		id: "speedrunner",
 		name: "SpeedRunner",
-		desc: "On switching in, this pokemon gains +1 spe, and the opponent loses +1 spe. Further, this Pokemon's moves of 60 power or less have their power multiplied by 1.5, including Struggle.",
-		shortDesc: "Increase Speed of yourself by 1,decrease speed of opponent by 1(during switch in) +Technician",
-		onBasePower: function (basePower, attacker, defender, move) {
-			if (basePower <= 60) {
-				this.debug('Technician boost');
-				return this.chainModify(1.5);
-			}
-		},
+		desc: "On switch-in, this Pokemon raises the Speed of itself by 1 stage, and lowers the Speed of adjacent opposing Pokemon by 1 stage. Opposing Pokemon behind a substitute are immune.",
+		shortDesc: "On switch-in, this Pokemon raises the Speed of itself by 1 stage, and lowers the Speed of adjacent opponents by 1 stage.",
 		onStart: function (pokemon) {
 			this.add('-ability', pokemon, 'SpeedRunner', 'boost');
 			this.boost({spe: 1}, pokemon, pokemon);
@@ -838,8 +815,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2035,
 		id: "slickice",
 		name: "Slick Ice",
-		desc: "All Ice type moves used by this Pokemon gain +1 Priority. Upon using an Ice type move this Pokemon gains Dragon typing as a third type.",
-		shortDesc: "All Ice type moves used by this Pokemon gain +1 Priority. Upon using an Ice type move this Pokemon gains Dragon typing as a third type.",
+		desc: "This Pokemon's Ice-type moves have their priority increased by 1. Upon using an Ice type move the Dragon type is added to this Pokemon, unless it is already a Dragon type. If Forest's Curse or Trick-or-Treat adds a type to this Pokemon, it replaces the type added by this ability and vice versa.",
+		shortDesc: "This Pokemon's Ice-type moves have their priority increased by 1. Upon using an Ice type move the Dragon type is added to this Pokemon.",
 		onModifyPriority: function(priority, pokemon, target, move) {
 			if (move && move.type === "Ice") return priority + 1;
 		},
