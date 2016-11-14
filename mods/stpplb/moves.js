@@ -222,7 +222,7 @@ exports.BattleMovedex = {
 			this.attrLastMove("[still]");
 			// this.attrLastMove('[anim] Flamethrower');
 			// this.add("-animcustom", source, target, "Flamethrower", "{status:tt} focuspunch");
-			this.add("-animcustom", source, target, "flamethrower", "shadowball");
+			this.add("-animcustom", source, target, "shadowball", "{delay}300", "flamethrower");
 		},
 		onEffectiveness: function (typeMod, type, move) {
 			return typeMod + this.getEffectiveness('Fire', type); // includes Fire in its effectiveness.
@@ -364,6 +364,7 @@ exports.BattleMovedex = {
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[still]');
 			this.add('-animcustom', source, target, 'triattack', '{delay}200', 'triattack');
 		},
 		secondary: {
@@ -405,6 +406,7 @@ exports.BattleMovedex = {
 			volatileStatus: 'lockedmove',
 		},
 		onPrepareHit: function (target, source, move) {
+			this.attrLastMove('[still]');
 			this.add('-animcustom', source, target, 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave', '{delay}50', 'vacuumwave');
 		},
 		onAfterMove: function (pokemon) {
@@ -975,8 +977,7 @@ exports.BattleMovedex = {
 			if (pokemon.hasType('Dark')) return;
 			if (!pokemon.addType('Dark')) return;
 			this.add('-start', pokemon, 'typeadd', 'Dark', '[from] move: Thousand Alts');
-			this.attrLastMove('[still]');
-			this.add('-anim', pokemon, 'Head Smash', target);
+			this.attrLastMove('[anim] Head Smash');
 		},
 		recoil: [1, 2],
 		secondary: {chance: 20,	volatileStatus: 'confusion'},
