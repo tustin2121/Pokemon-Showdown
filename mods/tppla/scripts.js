@@ -4,4 +4,4 @@ exports.BattleScripts = {
 };
 
 // Import the Mix and Mega scripts
-require("../mixandmega/scripts").inject(exports);
+// require("../mixandmega/scripts").inject(exports);

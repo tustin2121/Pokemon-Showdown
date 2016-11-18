@@ -80,8 +80,8 @@ let leaguemon = {
 	'Iwamiger': { 
 		leagues: ["lb", "lb+", "b"],
 		quotes: {
-			SwitchIn: undefined,
-			Faint: undefined,
+			SwitchIn: "good old human road blocks",
+			Faint: "such is life",
 		},
 		species: "Gengar", ability: 'Serene Grace Plus', item: "Life Orb", gender: 'M',
 		moves: ['shadowball', 'flamethrower', 'icebeam', 'crunch'],

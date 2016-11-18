@@ -14,7 +14,7 @@ exports.Formats = [
 		mod: 'tppla',
 		column: 4,
 
-		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Stadium Selection'],
+		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Mod', 'Stadium Selection'],
 	},
 	{
 		name: "TPPLA Doubles",
@@ -22,7 +22,7 @@ exports.Formats = [
 		mod: 'tppla',
 
 		gameType: 'doubles',
-		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Stadium Selection'],
+		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Mod', 'Stadium Selection'],
 	},
 	{
 		name: "TPPLA Triples",
@@ -30,7 +30,7 @@ exports.Formats = [
 		mod: 'tppla',
 
 		gameType: 'triples',
-		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Stadium Selection'],
+		ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Mod', 'Stadium Selection'],
 	},
 	
 	{
