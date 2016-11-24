@@ -2691,7 +2691,7 @@ exports.BattleFormatsData = {
 		randomBattleMoves: ["swordsdance", "ironhead", "firefang", "substitute", "playrough", "suckerpunch", "knockoff", "focuspunch"],
 		randomDoubleBattleMoves: ["swordsdance", "ironhead", "firefang", "substitute", "playrough", "suckerpunch", "knockoff", "protect"],
 		requiredItem: "Mawilite",
-		tier: "Uber",
+		tier: "OU",
 	},
 	aron: {
 		randomBattleMoves: ["headsmash", "ironhead", "earthquake", "superpower", "stealthrock", "endeavor"],
@@ -5137,7 +5137,7 @@ exports.BattleFormatsData = {
 			{"generation": 6, "level": 50, "nature": "Adamant", "ivs": {"hp": 31, "atk": 31, "def": 31, "spa": 1, "spd": 31, "spe": 24}, "isHidden": false, "moves":["earthquake", "knockoff", "uturn", "rocktomb"], "pokeball": "cherishball"},
 		],
 		eventOnly: true,
-		tier: "Uber",
+		tier: "OU",
 	},
 	landorustherian: {
 		randomBattleMoves: ["swordsdance", "rockpolish", "earthquake", "stoneedge", "uturn", "superpower", "stealthrock"],
@@ -5223,7 +5223,7 @@ exports.BattleFormatsData = {
 			{"generation": 6, "level": 100, "moves":["technoblast", "magnetbomb", "solarbeam", "signalbeam"], "pokeball": "cherishball"},
 		],
 		eventOnly: true,
-		tier: "Uber",
+		tier: "OU",
 	},
 	genesectburn: {
 		randomBattleMoves: ["uturn", "bugbuzz", "icebeam", "technoblast", "thunderbolt", "ironhead", "extremespeed"],
@@ -5296,7 +5296,7 @@ exports.BattleFormatsData = {
 			{"generation": 6, "level": 36, "ivs": {"spe": 31}, "isHidden": true, "moves":["watershuriken", "shadowsneak", "hydropump", "substitute"], "pokeball": "cherishball"},
 			{"generation": 6, "level": 100, "isHidden": true, "moves":["hydrocannon", "gunkshot", "matblock", "happyhour"], "pokeball": "cherishball"},
 		],
-		tier: "Uber",
+		tier: "OU",
 	},
 	greninjaash: {
 		gen: 7,
@@ -5436,7 +5436,7 @@ exports.BattleFormatsData = {
 		eventPokemon: [
 			{"generation": 6, "level": 50, "gender": "F", "nature": "Quiet", "moves":["wideguard", "kingsshield", "shadowball", "flashcannon"], "pokeball": "cherishball"},
 		],
-		tier: "Uber",
+		tier: "OU",
 	},
 	aegislashblade: {
 		battleOnly: true,
@@ -5722,7 +5722,7 @@ exports.BattleFormatsData = {
 		randomBattleMoves: ["nastyplot", "substitute", "psyshock", "psychic", "darkpulse", "focusblast", "hyperspacefury", "zenheadbutt", "icepunch", "drainpunch", "gunkshot", "knockoff", "trick"],
 		randomDoubleBattleMoves: ["psychic", "darkpulse", "focusblast", "protect", "hyperspacefury", "zenheadbutt", "icepunch", "drainpunch", "gunkshot"],
 		eventOnly: true,
-		tier: "Uber",
+		tier: "OU",
 	},
 	volcanion: {
 		randomBattleMoves: ["substitute", "steameruption", "fireblast", "sludgewave", "hiddenpowerice", "earthpower", "superpower"],
