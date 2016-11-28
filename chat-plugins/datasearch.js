@@ -389,7 +389,7 @@ function runDexsearch(target, cmd, canAll, message) {
 
 			if (target === 'recovery') {
 				if (parameters.length > 1) return {reply: "The parameter 'recovery' cannot have alternative parameters"};
-				let recoveryMoves = ["recover", "roost", "moonlight", "morningsun", "synthesis", "milkdrink", "slackoff", "softboiled", "wish", "healorder"];
+				let recoveryMoves = ["recover", "roost", "moonlight", "morningsun", "synthesis", "milkdrink", "slackoff", "softboiled", "wish", "healorder", "shoreup"];
 				for (let k = 0; k < recoveryMoves.length; k++) {
 					let invalid = validParameter("moves", recoveryMoves[k], isNotSearch, target);
 					if (invalid) return {reply: invalid};
@@ -653,7 +653,7 @@ function runDexsearch(target, cmd, canAll, message) {
 			let lsetData = {fastCheck: true, set: {}};
 			for (let group = 0; group < moveGroups.length; group++) {
 				for (let i = 0; i < moveGroups[group].length; i++) {
-					let problem = TeamValidator('anythinggoes').checkLearnset(moveGroups[group][i], mon, lsetData);
+					let problem = TeamValidator('gen7ou').checkLearnset(moveGroups[group][i], mon, lsetData);
 					if (!problem) break;
 					if (i === moveGroups[group].length - 1) return false;
 				}

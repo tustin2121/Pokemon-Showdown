@@ -203,7 +203,7 @@ exports.BattleFormats = {
 			let battleForme = template.battleOnly && template.species;
 			if (battleForme) {
 				if (template.requiredAbility && set.ability !== template.requiredAbility) {
-					problems.push("" + template.species + " transforms in-battle with " + template.requiredAbility + "."); // Darmanitan-Zen, Greninja-Ash, Zygarde-Complete
+					problems.push("" + template.species + " transforms in-battle with " + template.requiredAbility + "."); // Darmanitan-Zen, Zygarde-Complete
 				}
 				if (template.requiredItems && !template.requiredItems.includes(item.name)) {
 					problems.push("" + template.species + " transforms in-battle with " + Chat.plural(template.requiredItems.length, "either ") + template.requiredItems.join(" or ") + '.'); // Mega or Primal
@@ -259,6 +259,12 @@ exports.BattleFormats = {
 			}
 
 			return problems;
+		},
+		onValidateSet: function (set) {
+			let template = this.getTemplate(set.species || set.name);
+			if (template.species === 'Greninja-Ash') {
+				set.species = 'Greninja';
+			}
 		},
 	},
 	hoennpokedex: {
@@ -537,6 +543,22 @@ exports.BattleFormats = {
 		onStart: function () {
 			this.add('rule', 'Evasion Moves Clause: Evasion moves are banned');
 		},
+		onValidateSet: function (set, format, setHas) {
+			let item = this.getItem(set.item);
+			if (!item.zMove) return;
+			let evasionBoosted = false;
+			for (let i = 0; i < set.moves.length; i++) {
+				let move = this.getMove(set.moves[i]);
+				if (move.type === item.zMoveType) {
+					if (move.zMoveBoost && move.zMoveBoost.evasion > 0) {
+						evasionBoosted = true;
+						break;
+					}
+				}
+			}
+			if (!evasionBoosted) return;
+			return [(set.name || set.species) + " can boost Evasion, which is banned by Evasion Clause."];
+		},
 	},
 	endlessbattleclause: {
 		effectType: 'Rule',
@@ -602,6 +624,7 @@ exports.BattleFormats = {
 				speedBoosted = true;
 				nonSpeedBoosted = true;
 			}
+			let item = this.getItem(set.item);
 			for (let i = 0; i < set.moves.length; i++) {
 				let move = this.getMove(set.moves[i]);
 				if (move.boosts && move.boosts.spe > 0) {
@@ -609,6 +632,14 @@ exports.BattleFormats = {
 				}
 				if (move.boosts && (move.boosts.atk > 0 || move.boosts.def > 0 || move.boosts.spa > 0 || move.boosts.spd > 0)) {
 					nonSpeedBoosted = true;
+				}
+				if (item.zMove && move.type === item.zMoveType) {
+					if (move.zMoveBoost && move.zMoveBoost.spe > 0) {
+						speedBoosted = true;
+					}
+					if (move.zMoveBoost && (move.zMoveBoost.atk > 0 || move.zMoveBoost.def > 0 || move.zMoveBoost.spa > 0 || move.zMoveBoost.spd > 0)) {
+						nonSpeedBoosted = true;
+					}
 				}
 			}
 
@@ -655,10 +686,16 @@ exports.BattleFormats = {
 			if (toId(set.item) === 'eeviumz') {
 				speedBoosted = true;
 			}
+			let item = this.getItem(set.item);
 			for (let i = 0; i < set.moves.length; i++) {
 				let move = this.getMove(set.moves[i]);
 				if (move.boosts && move.boosts.spe > 0) {
 					speedBoosted = true;
+				}
+				if (item.zMove && move.type === item.zMoveType) {
+					if (move.zMoveBoost && move.zMoveBoost.spe > 0) {
+						speedBoosted = true;
+					}
 				}
 			}
 
