@@ -55,7 +55,7 @@ exports.BattleFormatsData = {
 		tier: "NFE",
 	},
 	charizard: {
-		randomBattleMoves: ["fireblast", "airslash", "focusblast", "roost", "swordsdance", "flareblitz", "acrobatics", "earthquake"],
+		randomBattleMoves: ["fireblast", "airslash", "focusblast", "roost", "swordsdance", "flamecharge", "acrobatics", "earthquake", "willowisp"],
 		randomDoubleBattleMoves: ["heatwave", "fireblast", "airslash", "overheat", "dragonpulse", "roost", "tailwind", "protect"],
 		eventPokemon: [
 			{"generation": 3, "level": 70, "moves":["wingattack", "slash", "dragonrage", "firespin"]},
@@ -1456,7 +1456,7 @@ exports.BattleFormatsData = {
 		eventPokemon: [
 			{"generation": 5, "level": 10, "isHidden": true, "moves":["tackle", "conversion", "sharpen", "psybeam"]},
 		],
-		tier: "LC",
+		tier: "LC Uber",
 	},
 	porygon2: {
 		randomBattleMoves: ["triattack", "icebeam", "recover", "toxic", "thunderwave", "thunderbolt"],
@@ -2319,8 +2319,8 @@ exports.BattleFormatsData = {
 		tier: "NFE",
 	},
 	sceptile: {
-		randomBattleMoves: ["substitute", "gigadrain", "leafstorm", "hiddenpowerice", "focusblast", "hiddenpowerfire"],
-		randomDoubleBattleMoves: ["substitute", "gigadrain", "leafstorm", "hiddenpowerice", "focusblast", "hiddenpowerfire", "protect"],
+		randomBattleMoves: ["gigadrain", "leafstorm", "hiddenpowerice", "focusblast", "hiddenpowerflying"],
+		randomDoubleBattleMoves: ["gigadrain", "leafstorm", "hiddenpowerice", "focusblast", "hiddenpowerfire", "protect"],
 		eventPokemon: [
 			{"generation": 5, "level": 50, "shiny": 1, "isHidden": false, "moves":["leafstorm", "dragonpulse", "focusblast", "rockslide"], "pokeball": "cherishball"},
 		],
@@ -3606,8 +3606,8 @@ exports.BattleFormatsData = {
 		tier: "LC",
 	},
 	bibarel: {
-		randomBattleMoves: ["return", "waterfall", "curse", "quickattack", "stealthrock", "rest"],
-		randomDoubleBattleMoves: ["return", "waterfall", "curse", "quickattack", "protect", "rest"],
+		randomBattleMoves: ["return", "waterfall", "swordsdance", "quickattack", "aquajet"],
+		randomDoubleBattleMoves: ["return", "waterfall", "curse", "aquajet", "quickattack", "protect", "rest"],
 		tier: "FU",
 	},
 	kricketot: {
@@ -3734,7 +3734,7 @@ exports.BattleFormatsData = {
 		tier: "LC Uber",
 	},
 	drifblim: {
-		randomBattleMoves: ["acrobatics", "willowisp", "substitute", "destinybond", "shadowball"],
+		randomBattleMoves: ["acrobatics", "willowisp", "substitute", "destinybond", "shadowball", "hex"],
 		randomDoubleBattleMoves: ["shadowball", "substitute", "hypnosis", "hiddenpowerfighting", "thunderbolt", "destinybond", "willowisp", "protect"],
 		tier: "PU",
 	},
@@ -5306,6 +5306,8 @@ exports.BattleFormatsData = {
 		],
 		eventOnly: true,
 		gen: 7,
+		requiredAbility: "Battle Bond",
+		battleOnly: true,
 		tier: "New",
 	},
 	bunnelby: {
@@ -5680,6 +5682,8 @@ exports.BattleFormatsData = {
 		eventPokemon: [
 			{"generation": 6, "level": 70, "moves":["crunch", "earthquake", "camouflage", "dragonpulse"]},
 			{"generation": 6, "level": 100, "moves":["landswrath", "extremespeed", "glare", "outrage"], "pokeball": "cherishball"},
+			{"generation": 7, "level": 50, "moves":["bind", "landswrath", "sandstorm", "haze"]},
+			{"generation": 7, "level": 50, "isHidden": true, "moves":["bind", "landswrath", "sandstorm", "haze"]},
 		],
 		eventOnly: true,
 		tier: "BL",
@@ -5688,6 +5692,7 @@ exports.BattleFormatsData = {
 		randomBattleMoves: ["dragondance", "thousandarrows", "outrage", "extremespeed", "irontail", "substitute"],
 		eventPokemon: [
 			{"generation": 7, "level": 30, "moves":["safeguard", "dig", "bind", "landswrath"]},
+			{"generation": 7, "level": 50, "isHidden": true, "moves":["safeguard", "dig", "bind", "landswrath"]},
 		],
 		eventOnly: true,
 		gen: 7,
@@ -5946,7 +5951,7 @@ exports.BattleFormatsData = {
 	},
 	typenull: {
 		eventPokemon: [
-			{"generation": 7, "level": 40, "moves":["crushclaw", "scaryface", "xscissor", "takedown"]},
+			{"generation": 7, "level": 40, "shiny": 1, "moves":["crushclaw", "scaryface", "xscissor", "takedown"]},
 		],
 		eventOnly: true,
 		tier: "NFE",
