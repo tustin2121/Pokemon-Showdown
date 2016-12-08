@@ -276,6 +276,25 @@ class Battle {
 		case 'score':
 			this.score = [parseInt(lines[2]), parseInt(lines[3])];
 			break;
+		
+		case 'champion':
+			switch (lines[2]) {
+				case 'prep':
+					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle will be beginning soon!`);
+					break;
+				case 'begin':
+					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle has begun! tppleague.me/${this.id}`);
+					break;
+				case 'ongoing': //sent about every 10 rounds
+					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle is in progress! tppleague.me/${this.id}`);
+					break;
+				case 'finished': //sent about every 10 rounds
+					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle has completed! tppleague.me/${this.id}`);
+					break;
+			}
+			//Rooms.global
+			
+			break;
 		}
 		Monitor.activeIp = null;
 	}
@@ -492,7 +511,7 @@ if (process.send && module === process.mainModule) {
 						let ministack = Chat.escapeHTML(err.stack).split("\n").slice(0, 2).join("<br />");
 						process.send(id + '\nupdate\n|html|<div class="broadcast-red"><b>A BATTLE PROCESS HAS CRASHED:</b> ' + ministack + '</div>');
 					} else {
-						process.send(id + '\nupdate\n|html|<div class="broadcast-red"><b>The battle crashed!</b><br />Don\'t worry, we\'re working on fixing it.</div>');
+						process.send(id + '\nupdate\n|html|<div class="broadcast-red"><b>The battle crashed!</b><br />Everybody panic! <img src="/emotes/twitchplayspokemon/tppRiot.png" alt="tppRiot" title="tppRiot" class="emote" /></div>');
 					}
 				}
 			}

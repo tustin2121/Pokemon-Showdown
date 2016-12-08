@@ -298,7 +298,7 @@ class CommandContext {
 				message: this.message,
 			});
 			Rooms.global.reportCrash(err);
-			this.sendReply(`|html|<div class="broadcast-red"><b>Pokemon Showdown crashed!</b><br />Don't worry, we\'re working on fixing it.</div>`);
+			this.sendReply(`|html|<div class="broadcast-red"><b>Pokemon Showdown crashed!</b><br />Everybody panic! <img src="/emotes/twitchplayspokemon/tppRiot.png" alt="tppRiot" title="tppRiot" class="emote" /></div>`);
 		}
 		if (result === undefined) result = false;
 

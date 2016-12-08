@@ -3104,6 +3104,7 @@ class Battle extends Tools.BattleDex {
 		this.active = false;
 		this.currentRequest = '';
 		this.currentRequestDetails = '';
+		this.runEvent("BattleFinished");
 		return true;
 	}
 	switchIn(pokemon, pos) {

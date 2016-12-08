@@ -822,6 +822,7 @@ class GlobalRoom {
 				}
 			}
 		});
+		if (global.LeagueSetup) LeagueSetup.forceSave();
 
 		this.lockdown = true;
 		this.lastReportedCrash = Date.now();

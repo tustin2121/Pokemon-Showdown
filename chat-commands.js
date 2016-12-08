@@ -2430,6 +2430,11 @@ exports.commands = {
 						ProcessManagers.delete(PM);
 					}
 				}
+				if (global.LeagueSetup) {
+					global.LeagueSetup.forceSave();
+					global.LeagueSetup.dispose();
+					global.LeagueSetup = null;
+				}
 
 				Chat.uncacheTree('./chat');
 				delete require.cache[require.resolve('./chat-commands')];
@@ -2471,6 +2476,13 @@ exports.commands = {
 				Chat.uncacheTree('./bot');
 				global.Bot = require('./bot');
 				return this.sendReply("The IRC Bot has been hot-patched.");
+			} else if (target === 'league' || target === 'tppla') {
+				return this.parse('/adventbuilder reload');
+				
+			} else if (target === 'stadium' || target === 'music') {
+				Config.stadium.uncache();
+				return this.sendReply("Stadium requires uncached successfully.");
+				
 			} else if (target === 'loginserver') {
 				fs.unwatchFile('./config/custom.css');
 				Chat.uncacheTree('./loginserver');

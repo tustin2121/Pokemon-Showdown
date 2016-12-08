@@ -599,16 +599,17 @@ exports.BattleAbilities = { // define custom abilities here.
 		desc: 'Pokemon bounces residual damage. Curse and Substitute on use, Belly Drum, Pain Split, Struggle recoil, and confusion damage are considered direct damage.',
 		shortDesc: 'This Pokemon bounces residual damage.',
 		onDamage: function (damage, target, source, effect) {
-			console.log(arguments);
+			console.log("Mirror Guard Arguments:", arguments);
 			if (effect.effectType === 'Move' || effect.wasMirrored) {
 				return;
 			}
 			let newEffect = Object.create(effect);
 			newEffect.wasMirrored = true;
+			this.effectData.sourceEffect = effect; //Need to find a way to get to the parent effectData.sourceDffect
 			let foes = target.side.foe.active;
 			for (let i = 0; i < foes.length; i++) {
 				let foe = foes[i];
-				this.damage(damage, foe, source, newEffect);
+				this.damage(damage, foe, source, newEffect); //this.damage(damage, foe, target, newEffect);
 			}
 			return false; //TODO git blame this quote \/
 		},
@@ -616,6 +617,45 @@ exports.BattleAbilities = { // define custom abilities here.
 		// Good thing I haven't done that, right?
 		rating: 5,
 	},
+	/* 
+CRASH: TypeError: Cannot read property 'fullname' of undefined
+    at Battle.damage (/home/showdown/server/battle-engine.js:3609:90)
+    at Battle.exports.BattleAbilities.mirrorguard.onDamage (/home/showdown/server/mods/stpplb/abilities.js:611
+:10)
+    at Battle.runEvent (/home/showdown/server/battle-engine.js:2711:38)
+    at Battle.damage (/home/showdown/server/battle-engine.js:3593:18)
+    at Battle.exports.BattleStatuses.partiallytrapped.onResidual (/home/showdown/server/data/statuses.js:235:1
+0)
+    at Battle.singleEvent (/home/showdown/server/battle-engine.js:2497:39)
+    at Battle.residualEvent (/home/showdown/server/battle-engine.js:2446:9)
+    at Battle.runDecision (/home/showdown/server/battle-engine.js:4460:9)
+    at Battle.go (/home/showdown/server/battle-engine.js:4554:9)
+    at Battle.commitDecisions (/home/showdown/server/battle-engine.js:4886:8)
+
+|move|p2a: Azelf|Infestation|p1a: xfix
+|debug|randBW(100) = 2
+|debug|randBW(16) = 13
+|debug|randBW(16) = 3
+|-damage|p1a: xfix|315/334
+|debug|randBW(5, 7) = 5
+|-activate|p1a: xfix|move: Infestation|[of] p2a: Azelf
+|move|p1a: xfix|Roost|p1a: xfix
+|-heal|p1a: xfix|334/334
+|
+|html|<div class="broadcast-red"><b>The battle crashed</b><br />You can keep playing but it might crash again.
+</div>
+
+|move|p2a: Azelf|Infestation|p1a: xfix|[from]Mirror Guard
+|debug|randBW(100) = 22
+|debug|randBW(16) = 12
+|debug|randBW(16) = 1
+|-damage|p1a: xfix|315/334 tox
+|move|p1a: xfix|Roost|p1a: xfix|[from]Mirror Guard
+|-heal|p1a: xfix|334/334 tox
+|
+|-damage|p2a: Azelf|230/291|[from] psn
+|debug|damage event failed
+	*/
 	'superprotean': {
 		num: 2028,
 		id: 'superprotean',

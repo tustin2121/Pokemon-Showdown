@@ -55,11 +55,26 @@ for (let i = 0; i < sublists.length; i++) {
 		sectionList = Object.assign(sectionList, info.Sections);
 	}
 	// For each format in the list
+	let section = '';
+	let column = 1;
+	let order = 1;
 	for (let f = 0; f < info.Formats.length; f++) {
 		let format = info.Formats[f];
 		if (!format) continue;
 		if (!format.name) {
-			console.error(`Format #${f} in file '${sublists[i]}' has no name! Skipping!`);
+			if (format.section) {
+				section = format.section;
+				if (!sectionList[section]) {
+					sectionList[section] = {
+						column: format.column || 1,
+						sort: order,
+					};
+					if (column == format.column) { order++; }
+					else { column = format.column; order = 1; }
+				}
+			} else {
+				console.error(`Format #${f} in file '${sublists[i]}' has no name! Skipping!`);
+			}
 			continue;
 		}
 		let id = toId(format.name);
@@ -71,6 +86,10 @@ for (let i = 0; i < sublists.length; i++) {
 		if (format.section && sectionList[format.section]) {
 			format.column = sectionList[format.section].column;
 			format.__sectionSort = sectionList[format.section].sort;
+		} else if (sectionList[section]) {
+			format.section = section;
+			format.column = sectionList[section].column;
+			format.__sectionSort = sectionList[section].sort;
 		}
 		if (!format.__subsort) format.__subsort = f;
 		if (typeof format.__subsort === 'function') format.__subsort = format.__subsort(formatList);

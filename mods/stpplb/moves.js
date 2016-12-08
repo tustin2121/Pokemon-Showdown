@@ -332,11 +332,13 @@ exports.BattleMovedex = {
 		drain: [1, 2],
 		onPrepareHit: function (target, source, move) {
 			this.attrLastMove('[still]');
-			this.add('-animcustom', source, target, '{move:ss}wish', '{delay}500', '{move:tt}waterpulse');
 			if (!source.hasType('???')) { // turns user into ???-type and spout glitchy nonsense.
 				this.sayQuote(source, "Move-"+move.id, {target:target, default: "9̜͉̲͇̱̘̼ͬ̈́̒͌̑̓̓7ͩ͊̚5ͨ̆͐͏̪̦6̗͎ͬ̿̍̍̉ͧ͢4̯̠ͤ͛͐̄͒͡2͐ͬ̀d̺͉̜̈ͯ̓x̩̖̥̦̥͛́ͥ͑̈́ͩ͊͠║̛̥̜̱̝͍͒̌ͣ̀͌͌̒'̣͎̗̬̯r̸̗͍ͫ̓͆ͣ̎͊ ̜̻̈D͓̰̳̝̥̙͙͋̀E͉͔̥͇̫͓͍̔ͬͣ͂̓̽x̰̗̬̖͊̏̄̑̒̿͊s̜̪̏́f̧̯̼̦̓͌̇̒o̱̾̓ͩ̆̓̀F̟̰͓̩̂̆͛ͤ▓̣̩̝̙̇̓͒͋̈͡1̡̹̹͓̬͖͐̑̉̔̏xͥ̀'̻͖͍̠̉͡v̫̼̹̳̤̱͉▓̄̏͂ͤͭ̋ͫ͏̠̦̝▓̟͉͇̣̠̦̓̄ͫͥ̐̍̂▓͔̦̫̦̜̖́▓͍ͯ͗̾͆▓̮̗̠̜͙̹̟͊̎ͤ̔̽ͬ̃▓̩̟̏ͪ̇̂̂̒▓̖̼̤͉ͤ̾̋ͥͣͬ͒▓̈́̿͂̌̓▓͇̞̗̽̔̂͊̌ͣ͐▓ͬ́ͥ̔͒͒̎▓̰̪̫̩͇̲̇̔̿͢ͅ▓̞̬͎▓̖͍̖̫ͪ͐̆̅̍̂ͨͅ▓̡̭̠̗̳̬̜̝▓̤͙̥̆̌ͨͪ̆͌▓̴͉̩̈́▓ͩ̌̌̂̿̑̐▓ͨ҉͕̠͍▓̹̌̅̂ͨ͋̃͑▓̯̰̣̝̯ͭͦ̂͋̇̾͠▓̸̺̣̜̯̙̂͋̈ͨ̎̾ͧ▓͢▓͔̚▓̭͎͖̟̼̄̈̃̎́▓̧̌ͧ▓̼̹͈͗̄̆"});
+				this.add('-animcustom', source, target, '{other}glitch', '{delay}700', '{move:tt}waterpulse');
 				source.setType('???');
 				this.add('-start', source, 'typechange', '???');
+			} else {
+				this.add('-animcustom', source, target, '{other}glitch', '{delay}700', '{move:tt}waterpulse');
 			}
 		},
 		onHit: function (target, source) { // Turns target into ???-type.
@@ -500,33 +502,15 @@ exports.BattleMovedex = {
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
 		onPrepareHit: function (target, source, move) { // animation depending on type.
-			// this.attrLastMove('[still]');
-			// if (!source.volatiles['evolutionbeam']) return; //No animation for the parent move
-			// switch (move.type) {
-			// 	case 'Normal':		this.add('-anim', source, "Swift", target); break;
-			// 	case 'Fire':		this.add('-anim', source, "Flamethrower", target); break;
-			// 	case 'Water':		this.add('-anim', source, "Hydro Pump", target); break;
-			// 	case 'Electric':	this.add('-anim', source, "Zap Cannon", target); break;
-			// 	case 'Psychic': 	this.add('-anim', source, "Psybeam", target); break;
-			// 	case 'Dark':		this.add('-anim', source, "Shadow Ball", target); break;
-			// 	case 'Ice':			this.add('-anim', source, "Ice Beam", target); break;
-			// 	case 'Grass':		this.add('-anim', source, 'Solar Beam', target); break;
-			// 	case 'Fairy':		this.add('-anim', source, 'Dazzling Gleam', target); break;
-			// }
 			if (!source.volatiles['evolutionbeam']) {
 				this.attrLastMove('[still]');
 				return; //No animation for the parent move
 			}
-			switch (move.type) {
-				case 'Normal':		this.attrLastMove("[anim] Swift"); break;
-				case 'Fire':		this.attrLastMove("[anim] Flamethrower"); break;
-				case 'Water':		this.attrLastMove("[anim] Hydro Pump"); break;
-				case 'Electric':	this.attrLastMove("[anim] Zap Cannon"); break;
-				case 'Psychic': 	this.attrLastMove("[anim] Psybeam"); break;
-				case 'Dark':		this.attrLastMove("[anim] Shadow Ball"); break;
-				case 'Ice':		this.attrLastMove("[anim] Ice Beam"); break;
-				case 'Grass':		this.attrLastMove('[anim] Solar Beam'); break;
-				case 'Fairy':		this.attrLastMove('[anim] Dazzling Gleam'); break;
+			let anim = move.moveanims[move.type];
+			if (typeof anim === 'string') {
+				this.attrLastMove(`[anim] ${anim}`);
+			} else if (Array.isArray(anim)) {
+				this.add.apply(this, ['-animcustom', source, target].concat(anim));
 			}
 		},
 		ignoreImmunity: true,
@@ -559,6 +543,27 @@ exports.BattleMovedex = {
 			
 		},
 		eeveelutiontypes: ['Normal', 'Fire', 'Water', 'Electric', 'Psychic', 'Dark', 'Grass', 'Ice', 'Fairy'],
+		moveanims: {
+			'Fire': 'Flamethrower',
+			'Water': 'Hydro Pump',
+			'Grass': 'Solar Beam',
+			'Electric': 'Zap Cannon',
+			'Psychic': 'Psybeam',
+			'Ice': 'Ice Beam',
+			'Dragon': 'Dragon Breath',
+			'Dark': 'Shadow Ball',
+			'Fairy': 'Dazzling Gleam',
+			'Normal': 'Swift',
+			'Fighting': 'Focus Blast',
+			'Flying': 'Aeroblast',
+			'Poison': 'Gunk Shot',
+			'Ground': 'Mud Shot',
+			'Rock': 'Rock Blast',
+			'Bug': 'Signal Beam',
+			'Ghost': 'Dark Pulse',
+			'Steel': 'Magnet Bomb',
+			'???': ['thousandwaves', '{delay}1000', '{other:tt}glitch'],
+		},
 		secondary: false,
 		target: "normal",
 		type: "Normal",

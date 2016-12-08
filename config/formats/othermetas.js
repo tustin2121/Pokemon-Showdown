@@ -7,8 +7,7 @@ exports.Formats = [
 
 	{
 		name: "Acid Rain",
-		section: "OM of the Week",
-		column: 2,
+		section: "Other Metagames",
 
 		mod: 'acidrain',
 		onBegin: function () {
@@ -23,7 +22,7 @@ exports.Formats = [
 	},
 	{
 		name: "Old School Machops",
-		section: "OM of the Week",
+		section: "Other Metagames",
 
 		ruleset: ['Ubers'],
 		banlist: [],
@@ -42,7 +41,7 @@ exports.Formats = [
 	},
 	{
 		name: "5 Star Battalion",
-		section: "OM of the Week",
+		section: "Other Metagames",
 
 		ruleset: ['Ubers'],
 		banlist: ['Allow More Moves'],
@@ -55,8 +54,7 @@ exports.Formats = [
 	{
 		name: "Extreme Tier Shift",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3540047/\">Extreme Tier Shift</a>"],
-		section: "OM of the Month",
-		column: 2,
+		section: "Other Metagames",
 
 		mod: 'extremetiershift',
 		ruleset: ['Ubers'],
@@ -65,7 +63,7 @@ exports.Formats = [
 	{
 		name: "BH Doubles",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3489849/\">Balanced Hackmons</a>"],
-		section: "OM of the Month",
+		section: "Other Metagames",
 
 		gameType: 'doubles',
 		ruleset: ['Balanced Hackmons'],
@@ -79,7 +77,7 @@ exports.Formats = [
 			"The base power of the move in the first slot is determined the same way as Return.",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3566102/\">Return'd</a>",
 		],
-		section: "OM of the Month",
+		section: "Other Metagames",
 
 		ruleset: ['OU'],
 		banlist: ['Pinsirite'],
@@ -169,6 +167,7 @@ exports.Formats = [
 			}
 		},
 	},
+	/* Uncomment this if Mix and Mega is ever removed from smogon's formats, for whatever reason.
 	{
 		name: "Mix and Mega",
 		desc: [
@@ -225,7 +224,7 @@ exports.Formats = [
 			}
 		},
 	},
-
+	*/
 	{
 		name: "Type Omelette",
 		section: "Other Metagames",
@@ -312,5 +311,19 @@ exports.Formats = [
 		banlist: ['PU', 'Chatter'],
 		
 		__subsort: formats => formats[toId("PU")].__subsort+0.1,
+	},
+	{
+		name: "LC Supreme",
+		section: "ORAS Singles",
+		desc: [
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3505710/\">LC Metagame Discussion</a>",
+			"&bullet; <a href=\"https://www.smogon.com/dex/xy/formats/lc/\">LC Banlist</a>",
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3547566/\">LC Viability Ranking</a>",
+		],
+		__subsort: formats => formats[toId("LC")].__subsort+0.1,
+
+		maxLevel: 100,
+		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Little Cup'],
+		banlist: ['LC Uber', 'Gligar', 'Misdreavus', 'Scyther', 'Sneasel', 'Tangela', 'Dragon Rage', 'Sonic Boom', 'Swagger'],
 	},
 ];
