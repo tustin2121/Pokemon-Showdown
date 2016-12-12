@@ -6,7 +6,7 @@ exports.Formats = [
 	///////////////////////////////////////////////////////////////////
 
 	{
-		name: "Acid Rain",
+		name: "[Gen 0] Acid Rain",
 		section: "Other Metagames",
 
 		mod: 'acidrain',
@@ -21,9 +21,9 @@ exports.Formats = [
 		__subsort: -1,
 	},
 	{
-		name: "Old School Machops",
+		name: "[Gen 0] Old School Machops",
 		section: "Other Metagames",
-
+		
 		ruleset: ['Ubers'],
 		banlist: [],
 		onValidateSet: function (set) {
@@ -40,9 +40,9 @@ exports.Formats = [
 		},
 	},
 	{
-		name: "5 Star Battalion",
+		name: "[Gen 0] 5 Star Battalion",
 		section: "Other Metagames",
-
+		
 		ruleset: ['Ubers'],
 		banlist: ['Allow More Moves'],
 		onValidateSet: function (set) {
@@ -52,7 +52,7 @@ exports.Formats = [
 		},
 	},
 	{
-		name: "Extreme Tier Shift",
+		name: "[Gen 0] Extreme Tier Shift",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3540047/\">Extreme Tier Shift</a>"],
 		section: "Other Metagames",
 
@@ -61,7 +61,7 @@ exports.Formats = [
 		banlist: ['Eviolite'],
 	},
 	{
-		name: "BH Doubles",
+		name: "[Gen 0] BH Doubles",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3489849/\">Balanced Hackmons</a>"],
 		section: "Other Metagames",
 
@@ -69,10 +69,10 @@ exports.Formats = [
 		ruleset: ['Balanced Hackmons'],
 		banlist: [],
 		
-		__subsort: formats => formats[toId("Balanced Hackmons")].__subsort+0.1,
+		// __subsort: formats => formats[toId("Balanced Hackmons")].__subsort+0.1,
 	},
 	{
-		name: "Return'd",
+		name: "[Gen 0] Return'd",
 		desc: [
 			"The base power of the move in the first slot is determined the same way as Return.",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3566102/\">Return'd</a>",
@@ -97,7 +97,7 @@ exports.Formats = [
 	// 	banlist: [],
 	// },
 	{
-		name: "Almost Any Ability",
+		name: "[Gen 0] Almost Any Ability",
 		desc: [
 			"Pok&eacute;mon can use any ability, barring the few that are banned.",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3528058/\">Almost Any Ability</a>",
@@ -125,7 +125,7 @@ exports.Formats = [
 		},
 	},
 	{
-		name: "Gendermons",
+		name: "[Gen 0] Gendermons",
 		section: "Other Metagames",
 
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Swagger Clause', 'Baton Pass Clause'],
@@ -226,7 +226,7 @@ exports.Formats = [
 	},
 	*/
 	{
-		name: "Type Omelette",
+		name: "[Gen 0] Type Omelette",
 		section: "Other Metagames",
 
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Swagger Clause', 'Baton Pass Clause'],
@@ -241,7 +241,7 @@ exports.Formats = [
 	},
 
 	{
-		name: "Accessorize",
+		name: "[Gen 0] Accessorize",
 		desc: ["&bullet; <a href=\"http://www.smogon.com/forums/threads/3546902/\">Accessorize</a>"],
 		section: "Other Metagames",
 
@@ -267,7 +267,7 @@ exports.Formats = [
 		},
 	},
 	{
-		name: "Protean Palace",
+		name: "[Gen 0] Protean Palace",
 		section: "Other Metagames",
 
 		ruleset: ['Pokemon', 'Standard', 'Team Preview'],

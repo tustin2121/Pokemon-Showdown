@@ -794,6 +794,7 @@ class User {
 			//console.log('' + name + ' renaming: socket ' + i + ' of ' + this.connections.length);
 			let initdata = `|updateuser|${this.name}|${this.named ? 1 : 0}|${this.avatar}`;
 			this.connections[i].send(initdata);
+			if (global.LeagueSetup) Chat.parse('/pendingchallenges silent', null, this, this.connections[i]);
 		}
 		this.games.forEach(roomid => {
 			const room = Rooms(roomid);
@@ -877,6 +878,7 @@ class User {
 			}
 		});
 		this.updateSearch(true, connection);
+		if (global.LeagueSetup) Chat.parse('/pendingchallenges silent', null, this, connection);
 	}
 	debugData() {
 		let str = '' + this.group + this.name + ' (' + this.userid + ')';

@@ -1,7 +1,7 @@
 // Metas for Kappa Cup Season 3
 
 exports.Sections = {
-	"Kappa Cup Season 3": { column: 4, sort: 4, },
+	"Kappa Cup Season 3": { column: 5, sort: 4, },
 };
 exports.Formats = [
 	{

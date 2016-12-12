@@ -3103,7 +3103,7 @@ class Battle extends Tools.BattleDex {
 		this.active = false;
 		this.currentRequest = '';
 		this.currentRequestDetails = '';
-		this.runEvent("BattleFinished");
+		this.runEvent("BattleFinished", null, null, null, side);
 		return true;
 	}
 	switchIn(pokemon, pos) {
@@ -3480,11 +3480,16 @@ class Battle extends Tools.BattleDex {
 		this.started = true;
 		this.p2.foe = this.p1;
 		this.p1.foe = this.p2;
+		
+		let format = this.getFormat();
+		if (format.onPreSetup) {
+			if (format.onPreSetup.call(this, format) === false) return;
+			format = this.getFormat();
+		}
 
 		this.add('gametype', this.gameType);
 		this.add('gen', this.gen);
 
-		let format = this.getFormat();
 		Tools.mod(format.mod).getBanlistTable(format); // fill in format ruleset
 
 		this.add('tier', format.name);

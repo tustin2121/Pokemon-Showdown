@@ -703,6 +703,7 @@ exports.Formats = [
 
 	{
 		section: "ORAS Doubles/Triples",
+		column: 3,
 	},
 	{
 		name: "Doubles OU",

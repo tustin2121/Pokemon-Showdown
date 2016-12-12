@@ -55,6 +55,13 @@ function commandCheck(ctx) {
 	return true;
 }
 
+function createTrainerID() {
+	let id = require("crypto").randomBytes(4);
+	let secretId = id.readUInt16LE(0);
+	let trainerId = id.readUInt16LE(2);
+	return [secretId, trainerId];
+}
+
 // function sendFormats(){
 // 	let list = [
 // 		// ValidatorRules
@@ -74,19 +81,25 @@ function getGymInfo(json){
 	json.elites = {};
 	json.gyms = {};
 	Object.keys(LeagueSetup.elites).forEach((key)=>{
+		if (LeagueSetup.elites[key].isHidden) return;
 		json.elites[key] = {
 			name: LeagueSetup.elites[key].name,
 			types: LeagueSetup.elites[key].types,
 			battletype: LeagueSetup.elites[key].battletype,
+			avatar:  LeagueSetup.elites[key].avatar,
 			isChamp: LeagueSetup.elites[key].isChamp,
+			banlist: LeagueSetup.elites[key].banlist,
 		};
 	});
 	Object.keys(LeagueSetup.gyms).forEach((key)=>{
+		if (LeagueSetup.gyms[key].isHidden) return;
 		json.gyms[key] = {
 			name: LeagueSetup.gyms[key].name,
 			types: LeagueSetup.gyms[key].types,
 			battletype: LeagueSetup.gyms[key].battletype,
+			avatar:  LeagueSetup.gyms[key].avatar,
 			badge: LeagueSetup.gyms[key].badge,
+			banlist: LeagueSetup.gyms[key].banlist,
 		};
 	});
 	return json;
@@ -96,8 +109,19 @@ exports.commands = {
 	adventbuilder : {
 		reload : function() {
 			if (!this.can('hotpatch')) return false;
-			LeagueSetup.dispose();
-			global.LeagueSetup = proxy(LEAGUE_CONFIG_FILE, '\t');
+			try {
+				let setup = proxy(LEAGUE_CONFIG_FILE, '\t');
+				LeagueSetup.dispose();
+				global.LeagueSetup = setup;
+			} catch (e) {
+				if (e.name === 'SyntaxError') {
+					this.errorReply("League Setup file is malformatted! Fix your JSON!");
+					this.errorReply(e.message);
+				} else {
+					this.errorReply("Unexpected error while reloading league setup: "+e.message);
+				}
+				return;
+			}
 			return this.sendReply("The TPPLeague setup has been reloaded from disk.");
 		},
 		request : {
@@ -109,6 +133,7 @@ exports.commands = {
 				if (LeagueSetup.admins.includes(user.userid)) {
 					opts.push("league-admin");
 				}
+				opts.push("view-league");
 				if (LeagueSetup.elites[user.userid]) {
 					if (LeagueSetup.elites[user.userid].isChamp) {
 						opts.push("league-champ");
@@ -136,11 +161,13 @@ exports.commands = {
 				};
 				Object.keys(LeagueSetup.challengers).forEach((key)=>{
 					resp.info.challengers[key] = {
+						trainerid: LeagueSetup.challengers[key].trainerid,
 						badges: LeagueSetup.challengers[key].badges,
 					};
 				});
 				this.connection.send(`|queryresponse|adventbuilder|${JSON.stringify( resp )}`);
 			},
+			'league-champ': 'league-elite',
 			'league-elite': function(target, room, user) {
 				if (!commandCheck(this)) return;
 				if (!LeagueSetup.elites[user.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
@@ -148,6 +175,10 @@ exports.commands = {
 				let resp = {
 					screen: 'league-elite',
 					info: LeagueSetup.elites[user.userid],
+					user: {
+						name: this.user.name,
+						avatar: this.user.avatar,
+					},
 				};
 				this.connection.send(`|queryresponse|adventbuilder|${JSON.stringify(resp)}`);
 			},
@@ -158,6 +189,19 @@ exports.commands = {
 				let resp = {
 					screen: 'league-gym',
 					info: LeagueSetup.gyms[user.userid],
+					user: {
+						name: this.user.name,
+						avatar: this.user.avatar,
+					},
+				};
+				this.connection.send(`|queryresponse|adventbuilder|${JSON.stringify(resp)}`);
+			},
+			'view-league': function(target, room, user) {
+				if (this.cmdToken === '!') { this.errorReply("You cannot broadcast this command."); return false; }
+				
+				let resp = {
+					screen: 'view-league',
+					league: getGymInfo(),
 				};
 				this.connection.send(`|queryresponse|adventbuilder|${JSON.stringify(resp)}`);
 			},
@@ -167,8 +211,17 @@ exports.commands = {
 				
 				let resp = {
 					screen: 'league-challenge',
-					info: getGymInfo({ challenge: LeagueSetup.challengers[user.userid] }),
+					//must clone this, so we don't modify the original below
+					info: Object.assign({}, LeagueSetup.challengers[user.userid]), 
+					league: getGymInfo(),
+					user: {
+						name: this.user.name,
+						avatar: this.user.avatar,
+					},
 				};
+				// Gen 7 trainer ids: secretid + trainerid * 65536, last 6 digits
+				let trid = resp.info.trainerid;
+				resp.info.trainerid = String(trid[0] + trid[1] * 65536).substr(-6);
 				this.connection.send(`|queryresponse|adventbuilder|${JSON.stringify(resp)}`);
 			},
 		}, 
@@ -181,15 +234,16 @@ exports.commands = {
 				LeagueSetup.challengers[user.userid] = {
 					teams : {},
 					badges: {},
+					trainerid: createTrainerID(),
+					startdate: Date.now(),
 				};
 				LeagueSetup.markDirty();
 				
 				let resp = {
-					screen: 'league-challenge',
-					info: getGymInfo({ challenge: LeagueSetup.challengers[user.userid] }),
-					welcome: true,
+					welcome: "league-challenge",
 				};
 				this.connection.send(`|queryresponse|adventbuilder|${JSON.stringify(resp)}`);
+				this.parse('/adventbuilder request league-challenge');
 			},
 		},
 		'del' : {
@@ -261,6 +315,7 @@ exports.commands = {
 					name: other.name,
 					types: [],
 					battletype: 'singles',
+					avatar: 167, // Questionmark Napoleon
 					pending: [],
 				};
 				LeagueSetup.markDirty();
@@ -297,7 +352,8 @@ exports.commands = {
 					isChamp: false,
 					types: [],
 					battletype: 'singles',
-					name: other.name,
+					name: "",
+					avatar: 167, // Questionmark Napoleon
 					pending: [],
 				};
 				LeagueSetup.markDirty();
@@ -355,16 +411,49 @@ exports.commands = {
 				try {
 					let obj = JSON.parse(target);
 					let save = LeagueSetup.elites[this.user.userid];
-					// Limit the values we save
-					let vals = ['name','types','bgimg','bgmusic','battletype','rulesets'];
-					vals.forEach((val)=>{
-						if (obj[val]) save[val] = obj[val];
-					});
+					// Limit the values we save, and validate them on the way in.
+					if (obj.name) {
+						save.name = Chat.escapeHTML(obj.name.substr(0, 32));
+					}
+					if (obj.types) {
+						let val = obj.types
+						//TODO validate
+						save.types = val; 
+					}
+					if (obj.bgimg) {
+						let val = obj.bgimg;
+						save.bgimg = Config.stadium.background().convertToId(val);
+					}
+					if (obj.bgmusic) {
+						let val = obj.bgmusic;
+						if (Config.stadium.music().isValidBattle(val)) {
+							save.bgmusic = val;
+						}
+					}
+					if (obj.battletype) {
+						let val = obj.battletype;
+						if (/singles|doubles|triples/.test(val)) {
+							save.battletype = val;
+						}
+					}
+					if (obj.ruleset) {
+						let val = obj.ruleset;
+						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
+							save.ruleset = val;
+						}
+					}
+					if (obj.banlist) {
+						let val = obj.banlist;
+						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
+							save.banlist = val;
+						}
+					}
+					save.avatar = this.user.avatar; //Save off the avatar for later use by others
 					LeagueSetup.markDirty();
 				} catch (e) {
 					console.log("Illegal commit: "+target);
 					console.log("Error: ", e);
-					return this.sendReplyBox('Illegal commit. Please use the "TPPLeague" tab. If you were using that tab, please report this error to Tustin2121.');
+					return this.popupReply('Illegal commit. Please use the "TPPLeague" tab. If you were using that tab, please report this error to Tustin2121.');
 				}
 				
 				this.connection.send(`|queryresponse|adventbuilder|{"success":"Settings saved!!"}`);
@@ -379,15 +468,55 @@ exports.commands = {
 					let obj = JSON.parse(target);
 					let save = LeagueSetup.gyms[this.user.userid];
 					// Limit the values we save
-					let vals = ['name','types','bgimg','bgmusic','battletype','rulesets','badge'];
-					vals.forEach((val)=>{
-						if (obj[val]) save[val] = obj[val];
-					});
+					// Limit the values we save, and validate them on the way in.
+					if (obj.name) {
+						save.name = Chat.escapeHTML(obj.name.substr(0, 16));
+					}
+					if (obj.badge) {
+						var val = obj.badge;
+						if (val === 'undefined' || val === '') val = undefined;
+						else val = val.replace(/[^a-zA-Z- ]/, "").substr(0, 32)
+						save.badge = val;
+					}
+					if (obj.types) {
+						let val = obj.types
+						//TODO validate
+						save.types = val; 
+					}
+					if (obj.bgimg) {
+						let val = obj.bgimg;
+						save.bgimg = Config.stadium.background().convertToId(val);
+					}
+					if (obj.bgmusic) {
+						let val = obj.bgmusic;
+						if (Config.stadium.music().isValidBattle(val)) {
+							save.bgmusic = val;
+						}
+					}
+					if (obj.battletype) {
+						let val = obj.battletype;
+						if (/singles|doubles|triples|trial/.test(val)) {
+							save.battletype = val;
+						}
+					}
+					if (obj.ruleset) {
+						let val = obj.ruleset;
+						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
+							save.ruleset = val;
+						}
+					}
+					if (obj.banlist) {
+						let val = obj.banlist;
+						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
+							save.banlist = val;
+						}
+					}
+					save.avatar = this.user.avatar; //Save off the avatar for later use by others
 					LeagueSetup.markDirty();
 				} catch (e) {
 					console.log("Illegal commit: "+target);
 					console.log("Error: ", e);
-					return this.sendReplyBox('Illegal commit. Please use the "TPPLeague" tab. If you were using that tab, please report this error to Tustin2121.');
+					return this.popupReply('Illegal commit. Please use the "TPPLeague" tab. If you were using that tab, please report this error to Tustin2121.');
 				}
 				
 				this.connection.send(`|queryresponse|adventbuilder|{"success":"Settings saved!!"}`);
@@ -399,10 +528,39 @@ exports.commands = {
 		'/adventbuilder - Command used internally by the Adventure Builder. Use the "TPPLeague" tab instead.',
 	],
 	
-	givebadge : function(target) {
-		if (ctx.cmdToken === '!') return this.errorReply('You cannot broadcast this command.');
+	pendingchallenges : function(target) {
+		if (this.cmdToken === '!') return this.errorReply('You cannot broadcast this command.');
 		if (Rooms.global.lockdown) return this.errorReply('The server is in lockdown. You cannot hand out badges at this time.');
-		if (!ctx.user.registered) return this.errorReply('Please log in first.');
+		if (!this.user.registered) return this.errorReply('Please log in first.');
+		
+		let silent = (target === 'silent');
+		
+		let gym = LeagueSetup.gyms[this.user.userid];
+		if (gym) {
+			if (gym.pending.length) {
+				this.sendReply("Challengers waiting to fight your gym: "+gym.pending.join(","));
+			} else if (!silent) {
+				this.sendReply("There are no challengers waiting to fight your gym right now.");
+			}
+		}
+		
+		gym = LeagueSetup.elites[this.user.userid];
+		if (gym) {
+			if (gym.pending.length) {
+				this.sendReply("Challengers waiting to fight your E4 team: "+gym.pending.join(","));
+			} else if (!silent) {
+				this.sendReply("There are no challengers waiting to fight your E4 team right now.");
+			}
+		}
+	},
+	pendingchallengeshelp : [
+		'/pendingchallenges - Show any pending challenges you have.',
+	],
+	
+	givebadge : function(target) {
+		if (this.cmdToken === '!') return this.errorReply('You cannot broadcast this command.');
+		if (Rooms.global.lockdown) return this.errorReply('The server is in lockdown. You cannot hand out badges at this time.');
+		if (!this.user.registered) return this.errorReply('Please log in first.');
 		
 		let gym = LeagueSetup.gyms[this.user.userid];
 		if (!gym && !LeagueSetup.admins.includes(this.user.userid)) {
@@ -444,11 +602,10 @@ exports.commands = {
 		}
 		challenge.badges[badge] = 1;
 		LeagueSetup.markDirty();
-		this.add(`|html|<div class="infobox" style="text-align:center;"><p style='font-weight:bold;'>${this.user.name} presents ${other.name} with the ${badge} Badge!</p><img src="/badges/${badge}.png" width="80" height="80"/></div>`);
+		this.add(`|html|<div class="infobox badgeget" for="${other.userid}" style="text-align:center;"><p style='font-weight:bold;'>${this.user.name} presents ${other.name} with the ${badge} Badge!</p><img src="/badges/${badge}.png" width="80" height="80"/></div>`);
 		other.send(`|badgeget|${badge}`);
 	},
 	givebadgehelp: [
-		'/givebadge - If you are a gym leader, gives your gym badge to your opponent if you are in a gym battle.',
 		'/givebadge [user] - If you are a gym leader, gives your gym badge to the named user. User must be present.',
 	],
 };

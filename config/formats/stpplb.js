@@ -1,7 +1,7 @@
 //
 
 exports.Sections = {
-	"STPPLB":	{ column: 4, sort: 2, },
+	"STPPLB":	{ column: 5, sort: 2, },
 };
 
 function create(base, mod) {

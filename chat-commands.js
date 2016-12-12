@@ -3203,7 +3203,33 @@ exports.commands = {
 	challenge: function (target, room, user, connection) {
 		target = this.splitTarget(target);
 		let targetUser = this.targetUser;
+		
+		let gym;
+		if (global.LeagueSetup && target.startsWith("tppleague")) {
+			switch (target) {
+				case 'tppleaguegym':
+					gym = LeagueSetup.gyms[toId(this.targetUsername)];
+					break;
+				case 'tppleagueelitefour':
+					gym = LeagueSetup.elites[toId(this.targetUsername)];
+					if (gym.isChamp) gym = null;
+					break;
+				case 'tppleaguechampion':
+					gym = LeagueSetup.elites[toId(this.targetUsername)];
+					if (!gym.isChamp) gym = null;
+					break;
+			}
+		}
+		
 		if (!targetUser || !targetUser.connected) {
+			if (gym){
+				if (!gym.pending.includes(user.userid)) {
+					gym.pending.push(user.userid);
+					return this.popupReply(`The user '${this.targetUsername}' is not online right now. You have been added to their pending fights list.`);
+				} else {
+					return this.popupReply(`The user '${this.targetUsername}' is not online right now. You are already on their pending fights list.`);
+				}
+			}
 			return this.popupReply("The user '" + this.targetUsername + "' was not found.");
 		}
 		if (user.locked && !targetUser.locked) {
@@ -3223,8 +3249,22 @@ exports.commands = {
 				return false;
 			}
 		}
-		user.prepBattle(Tools.getFormat(target).id, 'challenge', connection).then(result => {
-			if (result) user.makeChallenge(targetUser, target);
+		let supBanlist = undefined;
+		if (gym && gym.banlist) {
+			supBanlist = gym.banlist;
+		}
+		user.prepBattle(Tools.getFormat(target).id, 'challenge', connection, supBanlist).then(result => {
+			if (result) {
+				if (gym) {
+					let pendingIndex = gym.pending.indexOf(user.userid);
+					if (pendingIndex > -1) {
+						gym.pending.splice(pendingIndex, 1);
+						LeagueSetup.markDirty();
+					}
+				}
+				
+				user.makeChallenge(targetUser, target);
+			}
 		});
 	},
 

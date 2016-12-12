@@ -280,16 +280,18 @@ class Battle {
 		case 'champion':
 			switch (lines[2]) {
 				case 'prep':
-					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle will be beginning soon!`);
+					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle will be beginning soon!`);
+					Users.users.forEach(curUser => curUser.send('|champnotify|notify') );
 					break;
 				case 'begin':
-					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle has begun! tppleague.me/${this.id}`);
+					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle has begun! tppleague.me/${this.id}`);
 					break;
 				case 'ongoing': //sent about every 10 rounds
-					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle is in progress! tppleague.me/${this.id}`);
+					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle is in progress! tppleague.me/${this.id}`);
 					break;
 				case 'finished': //sent about every 10 rounds
-					Bot.connection.send('NOTICE', '#tppleague' `TPPLeague Champion Battle has completed! tppleague.me/${this.id}`);
+					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle has completed! tppleague.me/${this.id}`);
+					Users.users.forEach(curUser => curUser.send('|champnotify|finished') );
 					break;
 			}
 			//Rooms.global
