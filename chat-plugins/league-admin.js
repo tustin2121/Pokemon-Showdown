@@ -587,9 +587,11 @@ exports.commands = {
 				}
 			}
 		}
-		
 		if (!badge) {
 			return this.errorReply(`You have not defined a badge for your gym.`);
+		}
+		if (other === this.user || other.userid === this.user.userid) {
+			return this.errorReply('You cannot give your own badge to yourself, cheater.');
 		}
 		
 		let challenge = LeagueSetup.challengers[other.userid];
@@ -604,6 +606,8 @@ exports.commands = {
 		LeagueSetup.markDirty();
 		this.add(`|html|<div class="infobox badgeget" for="${other.userid}" style="text-align:center;"><p style='font-weight:bold;'>${this.user.name} presents ${other.name} with the ${badge} Badge!</p><img src="/badges/${badge}.png" width="80" height="80"/></div>`);
 		other.send(`|badgeget|${badge}`);
+		
+		setTimeout(()=>this.parse('/savereplay silent', this, this.user, this.user.connections[0]), 30*1000); //30 seconds
 	},
 	givebadgehelp: [
 		'/givebadge [user] - If you are a gym leader, gives your gym badge to the named user. User must be present.',

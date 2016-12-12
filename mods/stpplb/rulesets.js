@@ -1,126 +1,81 @@
 'use strict';
 
 exports.BattleFormats = {
-	superglitchclause: {
+	
+	switchingrule: {
 		effectType: 'Rule',
+		name: 'Switching Rule',
 		onStart: function () {
-			this.add('rule', 'Super Glitch Clause: Every pokemon must hold a Leppa Berry and know Recycle and Super Glitch. No Fun Allowed is banned.');
+			this.add('rule', 'Switching Rule: Cannot switch. Except if you used Imprison, then you must switch.');
 		},
-		onValidateSet: function (set) {
-			let issues = [];
-			set.item = 'Leppa Berry';
-			let metronomeFound = false;
-			let recycleFound = false;
-			let i;
-			let movesLength = set.moves.length;
-			for (i = 0; i < movesLength; i++) {
-				let move = set.moves[i];
-				switch (move.toLowerCase()) {
-				case 'superglitch':
-					if (metronomeFound) {
-						issues.push(set.species + " cannot have more than one Super Glitch.");
-					}
-					metronomeFound = true;
-					break;
-				case 'recycle':
-					if (recycleFound) {
-						issues.push(set.species + " cannot have more than one Recycle.");
-					}
-					recycleFound = true;
-					break;
-				// Allow empty move.
-				case '':
-					break;
-				default:
-					issues.push(set.species + " cannot have " + move + ".");
-					break;
+		// Called on NextTurn, before a move is requested from the player
+		onTrapPokemonPriority: -100, //Run after all other effects
+		onTrapPokemon: function(pokemon) {
+			if (!pokemon.volatiles['imprison']) {
+				pokemon.trapped = true; //Forced the trapped status
+			} else {
+				pokemon.trapped = false;
+				pokemon.switchFlag = true; //Force the user to switch
+			}
+		}
+	},
+	
+	recyclerule: {
+		effectType: 'Rule',
+		name: 'Recycle Rule',
+		onStart: function () {
+			this.add('rule', 'Recycle Rule: You cannot use Recycle when you can use Super Glitch, unless your Leppa Berry has been consumed.');
+		},
+		// Called on NextTurn, before a move is requested from the player
+		onDisableMovePriority: -100, // after everyone else
+		onDisableMove: function(pokemon){
+			let shouldEnable = false; // assume we're disabling it
+			// If you cannot use Super Glitch, enable
+			for (let move of pokemon.moveset) {
+				if (move.id === 'superglitch') {
+					shouldEnable = move.disabled;
 				}
 			}
-			if (!metronomeFound) {
-				set.moves = set.moves.concat('superglitch');
+			// If you can recycle a Leppa Berry, enable
+			if (!pokemon.item && pokemon.lastItem === 'leppaberry') {
+				shouldEnable = true;
 			}
-			if (!recycleFound) {
-				set.moves.push("Recycle");
+			if (!shouldEnable) {
+				pokemon.disableMove('recycle');
 			}
-			let totalEV = 0;
-			for (let k in set.evs) {
-				if (typeof set.evs[k] !== 'number' || set.evs[k] < 0) {
-					set.evs[k] = 0;
-				}
-				totalEV += set.evs[k];
-			}
-			if (totalEV > 510) {
-				issues.push(set.species + " has more than 510 total EVs.");
-			}
+		}
+	},
+
+	bstlimitrule: {
+		effectType: 'ValidatorRule',
+		name: 'BST Limit Rule',
+		onStart: function() {
+			this.add('rule', 'BST Limit Rule: Cannot use a Pokemon with a BST higher than 600.');
+		},
+		onValidateSet: function (set){
 			let template = Tools.getTemplate(set.species);
 			let totalBST = 0;
 			for (let k in template.baseStats) {
 				totalBST += template.baseStats[k];
 			}
 			if (totalBST > 600) {
-				issues.push(set.species + " has more than 600 BST.");
+				return [(set.name || set.species) + " has more than 600 BST (BST Limit Rule)."];
 			}
-			return issues;
+			return [];
 		},
 	},
-
-	noswitchingclause: {
-		effectType: 'rule',
-		onStart: function () {
-			this.add('rule', 'No Switching Clause: Cannot switch');
+	
+	duplicateabilityrule: {
+		effectType: 'ValidatorRule',
+		name: 'Duplicate Ability Rule',
+		onStart: function() {
+			this.add('rule', 'Duplicate Ability Rule: Cannot have two pokemon with the same ability.');
 		},
-		onModifyPokemon: function (pokemon) {
-			if (!pokemon.volatiles['imprison']) {
-				pokemon.tryTrap();
-			} else {
-				pokemon.side.switchFlag = true;
-			}
-		},
-	},
-
-	norecycleclause: {
-		effectType: 'rule',
-		onStart: function () {
-			this.add('rule', 'No Recycle Clause: Cannot use Recycle while holding Leppa Berry');
-		},
-		onModifyPokemon: function (pokemon) {
-			if ((pokemon.item || !pokemon.lastItem) && !(pokemon.volatiles.torment && pokemon.lastMove === 'metronome')) {
-				let moves = pokemon.moveset;
-				let pp = 0;
-				let recycle = null;
-				for (let i = 0; i < moves.length; i++) {
-					if (moves[i].id === 'recycle') {
-						recycle = i;
-					} else {
-						pp += moves[i].pp * !moves[i].disabled;
-					}
-				}
-				if (pp && recycle !== null) {
-					moves[recycle].disabled = true;
-				}
+		onValidateSet: function (set, format, setHas, teamHas){
+			if (teamHas[toId(set.ability)] > 1) {
+				return ["You may not have the same ability on two or more pokemon by the Duplicate Ability Rule.", `(You have more than one ${this.getAbility(set.ability).name})`];
 			}
 		},
 	},
 
-	abilityclause: {
-		effectType: 'Rule',
-		onStart: function () {
-			this.add('rule', 'Ability Clause: Limit one of each ability');
-		},
-		onValidateTeam: function (team, format) {
-			let abilityTable = {};
-			for (let i = 0; i < team.length; i++) {
-				let ability = toId(team[i].ability);
-				if (!ability) continue;
-				if (ability in abilityTable) {
-					if (abilityTable[ability] >= 1) {
-						return ["You are limited to one of each ability by the Ability Clause.", "(You have more than one " + this.getAbility(ability).name + ")"];
-					}
-					abilityTable[ability]++;
-				} else {
-					abilityTable[ability] = 1;
-				}
-			}
-		},
-	},
 };

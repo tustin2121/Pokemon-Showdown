@@ -2356,6 +2356,7 @@ class Battle extends Tools.BattleDex {
 		}
 	}
 
+	// NOTE: Numbers go from highest to lowest. -100 always goes last using this method.
 	static comparePriority(a, b) {
 		a.priority = a.priority || 0;
 		a.subPriority = a.subPriority || 0;
