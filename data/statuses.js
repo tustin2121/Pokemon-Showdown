@@ -674,3 +674,8 @@ exports.BattleStatuses = {
 		},
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/statuses.js");
+	Object.assign(exports.BattleStatuses, tpp.BattleStatuses);
+} catch (e) { console.error("Could not load TPP BattleStatuses!", e); }

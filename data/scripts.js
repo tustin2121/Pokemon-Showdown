@@ -2176,7 +2176,8 @@ exports.BattleScripts = {
 		let levelScale = {
 			LC: 87,
 			'LC Uber': 86,
-			NFE: 84,
+			NFE: 85,
+			FU: 84,
 			PU: 83,
 			BL4: 82,
 			NU: 81,
@@ -3477,3 +3478,8 @@ exports.BattleScripts = {
 		return pokemon;
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/scripts.js");
+	Object.assign(exports.BattleScripts, tpp.BattleScripts);
+} catch (e) { console.error("Could not load TPP BattleScripts!", e); }

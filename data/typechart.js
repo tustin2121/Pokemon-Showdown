@@ -443,3 +443,8 @@ exports.BattleTypeChart = {
 		HPdvs: {"atk":14, "def":13},
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/typechart.js");
+	Object.assign(exports.BattleTypeChart, tpp.BattleTypeChart);
+} catch (e) { console.error("Could not load TPP BattleTypeChart!", e); }

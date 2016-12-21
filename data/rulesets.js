@@ -726,7 +726,7 @@ exports.BattleFormats = {
 	},
 };
 
-let tppmods = require("./rulesets-tpp.js");
-Object.keys(tppmods).forEach((key)=>{
-	exports.BattleFormats[key] = tppmods[key];
-});
+try {
+	let tpp = require("../mods/tppextras/rulesets.js");
+	Object.assign(exports.BattleFormats, tpp.BattleFormats);
+} catch (e) { console.error("Could not load TPP BattleFormats!", e); }

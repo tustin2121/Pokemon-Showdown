@@ -544,6 +544,18 @@ let leaguemon = {
 		evs: {hp: 12, atk: 252, spe: 244}, nature: 'Adamant',
 		// http://pastebin.com/ZLgNhMR9
 	},
+	"Redwings1340": { // First Mon
+		leagues: ['lb', 'lb+', 'b'],
+		quotes: {
+			SwitchIn: "Quick pokemon battle before rp?",
+			Faint: "That was fun. I'm going to rp now.",
+		},
+		species: "Articuno", ability: 'Mediator', item: 'Leftovers', gender: 'M',
+		moves: ['freezedry', 'blizzard', 'hurricane', 'substitute', 'roost', 'protect'],
+		signatureMoves: ['dramareduction'],
+		evs: {hp: 252, def: 4, spd: 252}, nature: 'Calm',
+		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
+	},
 	
 	'BEST': { // STPPB only
 		leagues: ["b"],
@@ -579,18 +591,6 @@ let leaguemon = {
 	// When a pokemon is complete, fill in the leagues and move it to where 
 	// appropriate above.
 	
-	"Redwings1340": { // First Mon
-		leagues: [],
-		quotes: {
-			SwitchIn: "Quick pokemon battle before rp?",
-			Faint: "That was fun. I'm going to rp now.",
-		},
-		species: "Articuno", ability: 'Mediator', item: 'Leftovers', gender: 'M',
-		moves: ['freezedry', 'blizzard', 'hurricane', 'substitute', 'roost', 'protect'],
-		signatureMoves: ['dramareduction'],
-		evs: {hp: 252, def: 4, spd: 252}, nature: 'Calm',
-		// https://www.reddit.com/r/TPPLeague/comments/4tvc1r/submit_newold_stpplb_mons_here/d5tckcz/
-	},
 	"Mozilla Fennekin": {
 		leagues: [],
 		quotes: {

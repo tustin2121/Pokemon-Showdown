@@ -6323,3 +6323,8 @@ exports.BattleFormatsData = {
 		tier: "CAP",
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/formats-data.js");
+	Object.assign(exports.BattleFormatsData, tpp.BattleFormatsData);
+} catch (e) { console.error("Could not load TPP BattleFormatsData!", e); }

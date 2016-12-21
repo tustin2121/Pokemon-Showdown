@@ -277,26 +277,31 @@ class Battle {
 			this.score = [parseInt(lines[2]), parseInt(lines[3])];
 			break;
 		
-		case 'champion':
-			switch (lines[2]) {
-				case 'prep':
-					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle will be beginning soon!`);
-					Users.users.forEach(curUser => curUser.send('|champnotify|notify') );
-					break;
-				case 'begin':
-					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle has begun! tppleague.me/${this.id}`);
-					break;
-				case 'ongoing': //sent about every 10 rounds
-					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle is in progress! tppleague.me/${this.id}`);
-					break;
-				case 'finished': //sent about every 10 rounds
-					Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle has completed! tppleague.me/${this.id}`);
-					Users.users.forEach(curUser => curUser.send('|champnotify|finished') );
-					break;
-			}
-			//Rooms.global
-			
-			break;
+		case 'e4fight': {
+			let p1 = (this.p1)?this.p1.userid:null;
+			let p2 = (this.p2)?this.p2.userid:null;
+			LeagueSetup.send({
+				type:'e4fight', 
+				event:lines[2], 
+				p1:p1, p2:p2, 
+				battleid:this.id, 
+				room:this.room,
+				otherInfo:lines.slice(3),
+			});
+		} break;
+		
+		case 'champion': {
+			let p1 = (this.p1)?this.p1.userid:null;
+			let p2 = (this.p2)?this.p2.userid:null;
+			LeagueSetup.send({
+				type:'champion', 
+				event:lines[2], 
+				p1:p1, p2:p2, 
+				battleid:this.id, 
+				room:this.room, 
+				otherInfo:lines.slice(3),
+			});
+		} break;
 		}
 		Monitor.activeIp = null;
 	}

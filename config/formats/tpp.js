@@ -46,6 +46,7 @@ create(leagueFormat, {
 	searchShow: true,
 	challengeShow: true,
 	tournamentShow: true,
+	
 });
 
 create(leagueFormat, {
@@ -131,6 +132,21 @@ create(leagueFormat, {
 		this.add('-stadium', '[norequest]', `[bg] ${img}`, `[music] ${bgm}`, `[premusic] ${pre}`);
 		this.add('title', `${this.p2.name} vs. ${(gym.name || 'Elite Four')} ${this.p1.name}`);
 	},
+	
+	// Custom Event sent just after the win messages are sent
+	onBattleFinished: function(sideWon) {
+		if (this.turn === 0) return; //If this is before a fight even begins, ignore it.
+		if (sideWon === this.p2) {
+			// Challenger won
+			this.send('e4fight', 'advance');
+		} else if (sideWon === this.p1) {
+			// Challenger lost
+			this.send('e4fight', 'restart');
+		} else {
+			// Draw
+			
+		}
+	},
 });
 
 create(leagueFormat, {
@@ -190,7 +206,19 @@ create(leagueFormat, {
 	
 	// Custom Event sent just after the win messages are sent
 	onBattleFinished: function(sideWon) {
+		if (this.turn === 0) return; //If this is before a fight even begins, ignore it.
 		this.send('champion', 'finished');
+		if (sideWon === this.p2) {
+			// Challenger won
+			let team = this.p2.pokemon.map(x => `${x.name}|${x.species}|${x.gender||"N"}${x.set.shiny?"*":""}`);
+			this.send('e4fight', 'complete', team.join('['));
+		} else if (sideWon === this.p1) {
+			// Challenger lost
+			this.send('e4fight', 'restart');
+		} else {
+			// Draw
+			
+		}
 	},
 });
 	

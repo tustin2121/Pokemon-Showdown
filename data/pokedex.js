@@ -13110,3 +13110,8 @@ exports.BattlePokedex = {
 		eggGroups: ["Human-Like", "Ground"],
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/pokedex.js");
+	Object.assign(exports.BattlePokedex, tpp.BattlePokedex);
+} catch (e) { console.error("Could not load TPP BattlePokedex!", e); }

@@ -3038,11 +3038,11 @@ exports.commands = {
 			// ANY CHANGES TO THE ABOVE ARE DEATH TO REPLAYS! DO NOT ACCEPT THEM --tustin2121
 		}, success => {
 			if (success && success.errorip) {
-				if (target !== "silent") connection.popup("This server's request IP " + success.errorip + " is not a registered server.");
+				if (target !== "silent" && connection) connection.popup("This server's request IP " + success.errorip + " is not a registered server.");
 				console.warn("This server's request IP " + success.errorip + " is not a registered server.");
 				return;
 			}
-			if (target !== "silent")
+			if (target !== "silent" && connection)
 				connection.send('|queryresponse|savereplay|' + JSON.stringify({
 					log: data,
 					id: room.id.substr(7),
