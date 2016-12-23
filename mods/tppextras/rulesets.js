@@ -230,5 +230,5 @@ let mixandmegamod = {
 	},
 	scripts: {},
 };
-require("../mods/mixandmega/scripts.js").inject(mixandmegamod.scripts);
+require("../mixandmega/scripts.js").inject(mixandmegamod.scripts);
 exports.BattleFormats["mixandmegamod"] = mixandmegamod;

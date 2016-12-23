@@ -326,4 +326,122 @@ exports.Formats = [
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Little Cup'],
 		banlist: ['LC Uber', 'Gligar', 'Misdreavus', 'Scyther', 'Sneasel', 'Tangela', 'Dragon Rage', 'Sonic Boom', 'Swagger'],
 	},
+	
+	{
+		name: "[Gen 7] Totem Battle",
+		section: "SM Singles (beta)",
+		desc: ["Player 1 is a Totem Pokemon."],
+		gameType: 'totem',
+		mod: 'totembattle',
+		
+		maxLevel: 1000,
+		defaultLevel: 100,
+		ruleset: ['HP Percentage Mod', 'Cancel Mod'],
+		banlist: ['Perish Song'],
+		
+		// Custom PseudoEvent called before anything is sent to the client (save for join messages)
+		onPreSetup : function() {
+			// this.gameType = 'doubles';
+		},
+		
+		// Called first
+		validateTeam: function(team, removeNicknames) {
+			this.tools.getName = this.format.getName;
+			return this.baseValidateTeam(team, removeNicknames);
+		},
+		
+		// Called last
+		onValidateTeam: function(team, format, teamHas) {
+			// Encode Totem boosts into gender so they survive the transfer to the battle sim process
+			for (let i = 0; i < team.length; i++) {
+				if (team[i].totemboost) {
+					let str = "";
+					Object.keys(team[i].totemboost).forEach(k => {
+						let b = team[i].totemboost[k];
+						while (b > 0) {
+							str += k; b--;
+						}
+					});
+					team[i].gender = (team[i].gender||"") + str;
+				}
+			}
+		},
+		
+		getName : function(name) {
+			if (typeof name !== 'string' && typeof name !== 'number') return '';
+			name = ('' + name).replace(/[\|\s\u202e]+/g, ' ').trim();
+	
+			// remove zalgo
+			name = name.replace(/[\u0300-\u036f\u0483-\u0489\u0610-\u0615\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06ED\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]{3,}/g, '');
+			name = name.replace(/[\u239b-\u23b9]/g, '');
+	
+			return name;
+		},
+		
+		onChangeSet: function(set, format) {
+			let name = set.name;
+			if (!name) return;
+			let boosts = {};
+			let idx1 = name.indexOf("[");
+			let idx2 = name.indexOf("]");
+			console.log(`MON=${set.name||set.species}  IDX1=${idx1} 2=${idx2}`);
+			if (idx1 > -1 && idx2 > idx1) {
+				let str = name.slice(idx1, idx2+1);
+				name = name.replace(str, '').trim();
+				str = str.slice(1,-1);
+				console.log(`STR="${str}`);
+				str = str.split(/\s*,\s*/i);
+				console.log(`STR2="${str}"`);
+				let n = 0;
+				for (let i = 0; i < str.length && n < 5; i++) {
+					let res;
+					if ((res = /([\+\-])(atk|def|spe|spd|spa)/i.exec(str[i]))) {
+						let stat = res[2].toLowerCase();
+						boosts[stat] = (boosts[stat]||0) + (res[1]==='+')?1:-1;
+						n++;
+					}
+				}
+				if (n === 0) {
+					boosts.def = 1; //default to 1 defense boost
+				}
+				set.totemboost = boosts;
+			}
+			
+			name = name.replace(/[\,\[\]]+/g, ' ').trim();
+			if (name.length > 18) name = name.substr(0, 18).trim();
+			set.name = name;
+			console.log(`BOOSTS: ${JSON.stringify(boosts)} NAME="${set.name}"`);
+		},
+		
+		onBegin: function(){
+			// Move the pokemon with the totem boosts to the front of player 1's party, so it comes out first.
+			let totem = null;
+			for (let i = 0; i < this.p1.pokemon.length; i++) {
+				if (this.p1.pokemon[i].set.totemboost) {
+					totem = this.p1.pokemon[i];
+					this.p1.pokemon[i].totemboost = this.p1.pokemon[i].set.totemboost;
+					break;
+				}
+			}
+			if (!totem) {
+				this.p1.pokemon[0].totemboost = {def:1};
+			}
+		},
+		
+		onSwitchIn: function(pokemon) {
+			if (pokemon.totemboost && pokemon.side === this.p1) {
+				pokemon.addVolatile("totemaura");
+			}
+		},
+		
+		onResidualOrder: 100, //Run last (Residuals use ascending order priority)
+		onResidual: function () {
+			if (this.turn === 1 && this.p1.pokemonLeft > 1) { //Turn 1 
+				// this.add(`Totem ${"Pokemon"}'s aura flared to life!`);
+				this.add('message', `${this.p1.active[0].name} called its ally pokemon!`);
+				this.p1.active.push(null); //expand array to 2
+				this.switchIn(this.p1.pokemon[1], 1);
+			}
+		},
+	}
 ];
