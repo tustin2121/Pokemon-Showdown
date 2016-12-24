@@ -19,15 +19,15 @@ exports.BattlePokedex = {
 	////////////////////////////////////
 	// Gen 1 Glitchmon
 	////////////////////////////////////
-	/* rb202: {
+	rb202: {
 		num: -202,
 		species: "PC 4S H",
-		types: ["Normal", "Ground"],
+		types: ["Nοrmal", "Grοund"],
 		baseStats: {hp: 232, atk: 147, def: 145, spa: 136, spd: 136, spe: 128},
-		abilities: {0: "Fake Types"},
+		abilities: {0: ""},
 		heightm: 66.1,
 		weightkg: 975.3,
 		color: "Black",
 		eggGroups: ["Undiscovered"],
-	}, */
+	},
 };
