@@ -257,15 +257,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2012,
 		id: "nofunallowed",
 		name: "No Fun Allowed",
-		desc: "Makes opponent's ability No Fun. Causes all custom moves to fail.",
-		shortDesc: "Makes opponent's ability No Fun. Causes all custom moves to fail.",
-		onFoeSwitchIn: function (pokemon) {
-			let oldAbility = pokemon.setAbility('nofun', pokemon, 'nofun', true);
-			if (oldAbility) {
-				this.add('-endability', pokemon, oldAbility, '[from] ability: No Fun Allowed');
-				this.add('-ability', pokemon, 'No Fun', '[from] ability: No Fun Allowed');
-			}
-		},
+		desc: "On switch-in, makes opponent's ability No Fun. Causes all custom moves to fail.",
+		shortDesc: "On switch-in, makes opponent's ability No Fun. Causes all custom moves to fail.",
 		onStart: function (pokemon) {
 			let foeactive = pokemon.side.foe.active;
 			for (let i = 0; i < foeactive.length; i++) {
@@ -315,8 +308,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		num: 2014,
 		id: "messiah",
 		name: "Messiah",
-		desc: "This Pokemon blocks certain status moves and instead uses the move against the original user. Increases Sp.Attack by 2 when triggered",
-		shortDesc: "This Pokemon blocks certain status moves and bounces them back to the user. Also gets a SpA boost when triggered",
+		desc: "This Pokemon blocks certain status moves and instead uses the move against the original user. This Pokemon's Special Attack is raised by 2 stages if triggered.",
+		shortDesc: "This Pokemon blocks certain status moves and bounces them back to the user. This Pokemon's Sp. Atk is raised by 2 afterward.",
 		onTryHitPriority: 1,
 		onTryHit: function (target, source, move) {
 			if (target === source || move.hasBounced || !move.flags['reflectable']) {
@@ -349,11 +342,11 @@ exports.BattleAbilities = { // define custom abilities here.
 		id: 'technicality',
 		name: 'Technicality',
 		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
-		shortDesc: "[PLACEHOLDER DESCRIPTION]",
+		shortDesc: "10% chance a move used by any opposing Pokemon will fail.",
 		onFoeTryMove: function (target, source, effect) {
 			if (this.random(10) === 0) {
 				this.attrLastMove('[still]');
-				this.sayQuote(source, "Ability-"+effect.id, {
+				this.sayQuote(target, "Ability-"+effect.id, {
 					target: target, 
 					default: ["This move doesn't work because I say so!", "You are not allowed to use that move!", "Unauthorized use of that move!"]
 				});
@@ -512,8 +505,8 @@ exports.BattleAbilities = { // define custom abilities here.
 		onSourceHit: function (target, source, move) {
 			if (source && move && (move.id === "boost" || move.id === "spindash")) {
 				if (this.random(10) < 3) {
-					source.setBoost({atk: 6});
-					this.add('-setboost', source, 'atk', 12, '[from] ability: Gotta Go Fast');
+					source.setBoost({spe: 12});
+					this.add('-setboost', source, 'spe', 12, '[from] ability: Gotta Go Fast');
 				}
 			}
 		},
@@ -850,6 +843,13 @@ CRASH: TypeError: Cannot read property 'fullname' of undefined
 				}
 			}
 		},
+		onResidual: function (pokemon) {
+			if (pokemon.activeTurns === 2) {
+				this.add('-ability', pokemon, 'SpeedRunner', 'boost');
+				this.add('message', pokemon.name + ' cannot find a proctor anymore!');
+				this.boost({spe: -1}, pokemon, pokemon);
+			}
+		},
 	},
 	"slickice": {
 		num: 2035,
@@ -1006,8 +1006,8 @@ CRASH: TypeError: Cannot read property 'fullname' of undefined
 		num: 2037,
 		id: "mediator",
 		name: "Mediator",
-		desc: "Every turn, has a 50% chance of healing a random ally's status condition, and has a 10% chance of healing his opponents status condition. In doubles or triples, each chance is calculated independently.",
-		shortDesc: "",
+		desc: "There is a 50% chance of curing this Pokemon and its allies' major status conditions, and a 10% chance of curing its opponents' major status conditions at the end of each turn. Each Pokemon on the field is checked independently.",
+		shortDesc: "50% chance of curing this Pokemon and its allies' status, and 10% chance of curing its opponents' status at the end of each turn.",
 		onResidualOrder: 18,
 		onResidual: function(pokemon) {
 			let activated = false;

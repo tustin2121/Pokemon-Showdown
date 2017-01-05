@@ -147,7 +147,7 @@ function LeagueSetupSend(msg) {
 					num: LeagueSetup.hallOfFame.length+1,
 					name: msg.user.name,
 					trainerid: chall.trainerid,
-					team: [],
+					team: msg.team,
 				};
 				LeagueSetup.hallOfFame.unshift(hof);
 			}
@@ -155,9 +155,9 @@ function LeagueSetupSend(msg) {
 	} return;
 	
 	case 'e4fight': {
-		if (!msg.p1) return msg.room.add('html', '<div class="broadcast-red">Unable to determine elite member! Tustin, you fucked it up!</div>');
-		if (!msg.p2) return msg.room.add('html', '<div class="broadcast-red">Unable to determine challenger! Tustin, you fucked it up!</div>');
-		if (!LeagueSetup.challengers[msg.p2]) return msg.room.add('error', `Unable to ${msg.event} challenger: Challenger has no league challenge!`);
+		if (!msg.p1) return msg.room.add('|html|<div class="broadcast-red">Unable to determine elite member! Tustin, you fucked it up!</div>');
+		if (!msg.p2) return msg.room.add('|html|<div class="broadcast-red">Unable to determine challenger! Tustin, you fucked it up!</div>');
+		if (!LeagueSetup.challengers[msg.p2]) return msg.room.add(`|error|Unable to ${msg.event} challenger: Challenger has no league challenge!`);
 		let user = Users.get(msg.p2);
 		let elite = Users.get(msg.p1) || {};
 		if (!LeagueSetup.challengers[msg.p2].e4wins) LeagueSetup.challengers[msg.p2].e4wins = {};
@@ -166,7 +166,7 @@ function LeagueSetupSend(msg) {
 				// A challenger failed their e4 fight
 				LeagueSetup.challengers[msg.p2].e4wins = {};
 				LeagueSetup.markDirty();
-				msg.room.add('html', `<div class="broadcast-blue">The challenger ${user.name} has lost the battle against ${elite.name}. The challenger will have to restart their Elite Four run.</div>`);
+				msg.room.add(`|html|<div class="broadcast-blue">The challenger ${user.name} has lost the battle against ${elite.name}. The challenger will have to restart their Elite Four run.</div>`);
 				return;
 			case 'advance':
 				// A challenger advanced in their e4 fight
@@ -176,7 +176,7 @@ function LeagueSetupSend(msg) {
 				if (Object.keys(LeagueSetup.challengers[msg.p2].e4wins).length >= 4) {
 					adv = "The challenger is ready to challenge the League Champion!";
 				}
-				msg.room.add('html', `<div class="broadcast-blue">The challenger ${user.name} has won the battle against ${elite.name}. ${adv}</div>`);
+				msg.room.add(`|html|<div class="broadcast-blue">The challenger ${user.name} has won the battle against ${elite.name}. ${adv}</div>`);
 				return;
 			case 'complete': {
 				// A challenger has defeated the champion and has become champion himself!
@@ -197,8 +197,8 @@ function LeagueSetupSend(msg) {
 				let num = LeagueSetup.hallOfFame.length;
 				num = num + (['th','st','nd','rd'][num%10]||'th');
 				if (num==='11st'||num==='12nd'||num==='13rd') num=num.slice(0,2)+"th";
-				msg.room.add('html', `<div class="broadcast-blue"><b>The challenger ${user.name} has won against ${elite.name}! Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
-				Rooms.global.add('html', `<div class="broadcast-blue"><b>Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
+				msg.room.add(`|html|<div class="broadcast-blue"><b>The challenger ${user.name} has won against ${elite.name}! Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
+				Rooms.global.add(`|html|<div class="broadcast-blue"><b>Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
 				Bot.connection.send('NOTICE', '#tppleague', `Congratuations to our new ${num} TPPLeague Champion, ${user.name}!`);
 			} return;
 		}
@@ -544,7 +544,7 @@ exports.commands = {
 					if (obj.name) {
 						if (LeagueSetup.options.titleRename) {
 							save.name = Chat.escapeHTML(obj.name.substr(0, 32));
-						} else {
+						} else if (obj.name !== save.name) {
 							errors.push("Changing of E4 titles is not allowed at this time by League Admin mandate.");
 						}
 					}
@@ -618,7 +618,7 @@ exports.commands = {
 					if (obj.name) {
 						if (LeagueSetup.options.gymRename){
 							save.name = Chat.escapeHTML(obj.name.substr(0, 16));
-						} else {
+						} else if (obj.name !== save.name) {
 							errors.push("Changing of gym names is not allowed at this time by League Admin mandate.");
 						}
 					}
@@ -650,7 +650,7 @@ exports.commands = {
 								// 	}
 								// });
 							}
-						} else {
+						} else if (obj.badge !== save.badge) {
 							errors.push("Changing of badge names is not allowed at this time by League Admin mandate.");
 						}
 					}
@@ -807,6 +807,7 @@ exports.commands = {
 		LeagueSetup.markDirty();
 		this.add(`|html|<div class="infobox badgeget" for="${other.userid}" style="text-align:center;"><p style='font-weight:bold;'>${this.user.name}${admin} presents ${other.name} with the ${badge} Badge!</p><img src="/badges/${badge}.png" width="80" height="80"/></div>`);
 		other.send(`|badgeget|${badge}`);
+		this.parse('/savereplay silent');
 	},
 	givebadgehelp: [
 		'/givebadge [user] - If you are a gym leader, gives your gym badge to the named user. User must be present.',

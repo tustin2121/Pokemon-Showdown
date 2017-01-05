@@ -35,7 +35,63 @@ let leagueFormat = {
 	tournamentShow: false,
 	
 	mod: 'tppleague',
-	ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
+	ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview'], //'Mega Rayquaza Clause'
+	
+	onValidateSet: function(set, format, setHas, teamHas) {
+		let pkmn = toId(set.species);
+		let isArceusTier = ()=>{
+			if (pkmn === 'arceus') return true;
+			if (pkmn === 'xerneas') return true;
+			
+			if (pkmn === 'rayquaza' && setHas[toId('Dragon Ascent')]) return true;
+			if (pkmn === 'rayquazamega') return true;
+			
+			if (pkmn === 'groudonprimal') return true;
+			if (pkmn === 'groudon' && setHas[toId('Red Orb')]) return true;
+			
+			if (pkmn === 'mewtwomegax') return true;
+			if (pkmn === 'mewtwomegay') return true;
+			if (pkmn === 'mewtwo' && (setHas[toId('Mewtwonite X')] || setHas[toId('Mewtwonite Y')])) return true;
+			return false;
+		}
+		teamHas['arceusTier'] = (teamHas['arceusTier'] || 0) + (isArceusTier()? 1 : 0);
+		
+		if (setHas[toId('Extreme Evoboost')] && setHas[toId('Baton Pass')]) {
+			teamHas['EEBST + BP'] = (teamHas['EEBST + BP'] || 0) + 1;
+		}
+		
+		return [];
+	},
+	
+	onValidateTeam: function(team, format, teamHas) {
+		let problems = [];
+		if (teamHas['arceusTier'] > 1) {
+			problems.push('You are allowed only 1 "Arceus Tier" mon.');
+		}
+		// if (teamHas['arceusTier'] && (teamHas['Uber'] || teamHas['OU'] || teamHas['UU'])) {
+		// 	problems.push('If you use an "Arceus Tier" TPP mon (see the list of TPP pokemon below), then you can only use un-tiered NFE and LC mons on your team to accompany that Arceus Tier mon.');
+		// }
+		if (teamHas['arceusTier'] && teamHas[toId('EEBST + BP')]) {
+			problems.push('Extreme Evoboost + Baton Pass is banned on Arceus tier teams.');
+		}
+		return problems;
+	},
+	/**
+	 &BigFatMantis: I want to add two new rules to the meta
+[23:29:03] &BigFatMantis: can we implement them?
+[23:29:08] ~tustin2121: what are they?
+[23:29:15] &BigFatMantis: * Mega Rayquaza is unbanned for Arceus tier teams, meaning it can be used in league play.
+[23:29:15] &BigFatMantis: * Extreme Evoboost + Baton Pass is banned on Arceus tier teams.
+[23:30:17] ~tustin2121: um, yes, they can be implemented
+[23:30:30] &BigFatMantis: I mean the first one is easy
+[23:30:33] ~tustin2121: if it was without the arceus team conditions, it would be simple to add the evo rule
+[23:30:34] &BigFatMantis: not sure how easy the other one was
+[23:30:56] &BigFatMantis: I guess you can do something like
+[23:31:04] ~tustin2121: well, ok, what makes an "arceus tier team"?
+[23:31:12] &BigFatMantis: if P-Groudon or MegaRay or Xerneas or Arceus etc exit, then no EEBST + BP
+[23:31:18] ~tustin2121: or rather, what makes a team arceus tier
+[23:31:28] &BigFatMantis: If you use an "Arceus Tier" TPP mon (see the list of TPP pokemon below), then you can only use un-tiered NFE and LC mons on your team to accompany that Arceus Tier mon. As of this post, the only "Arceus Tier" Pokemon are Arceus, Primal Groudon, Mega Rayquaza, Xerneas, and Mega Mewtwo X/Y.
+	 */
 	
 	onBegin: function() {
 		this.add('error','This format is for general fights (like to test out your teams). Please don\'t use this format for gym, elite four, or champion battles.');
@@ -265,7 +321,7 @@ create({
 	},
 	onFaintPriority: 100,
 	onFaint: function (pokemon) {
-		if (pokemon.side.pokemonLeft === 1) {
+		if (pokemon.side.pokemonLeft === 0) {
 			if (this.p1.snowballs > this.p2.snowballs) {
 				this.win(this.p1);
 			} else if (this.p2.snowballs > this.p1.snowballs) {

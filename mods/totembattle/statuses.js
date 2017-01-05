@@ -18,6 +18,11 @@ exports.BattleStatuses = {
 			pokemon.trapped = true;
 		},
 		
+		onDragOut: function(pokemon) {
+			this.add('raw', 'The totem pokemon refused to budge!');
+			return null;
+		},
+		
 		onFaint: function(pokemon) {
 			let side = pokemon.side;
 			// Manaully faint all inactive pokemon on the Totem player's side

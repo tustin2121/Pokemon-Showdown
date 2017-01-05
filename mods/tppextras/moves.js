@@ -12,6 +12,7 @@ exports.BattleMovedex = {
 		desc: "Executes code from address F928 if the opponent doesn't faint. Not really codeable here, so I'll just give you an opcode error. :/",
 		shortDesc: "Crashes the game (sorta).",
 		id: "superglitch00",
+		ignoreImmunity: true,
 		isNonstandard: true,
 		name: "Super Glitch 00",
 		pp: 13,
@@ -35,6 +36,7 @@ exports.BattleMovedex = {
 		desc: "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
 		shortDesc: "User recovers 50% of the damage dealt.",
 		id: "superglitcha7",
+		ignoreImmunity: true,
 		isNonstandard: true,
 		name: "Super Glitch A7",
 		pp: 0,
@@ -56,6 +58,7 @@ exports.BattleMovedex = {
 		desc: "Raises the user's evasiveness by 2 stages.",
 		shortDesc: "Raises the user's evasiveness by 2.",
 		id: "tm05",
+		ignoreImmunity: true,
 		isNonstandard: true,
 		name: "TM05",
 		pp: 33,
@@ -63,6 +66,9 @@ exports.BattleMovedex = {
 		flags: {snatch: 1},
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove("[still]");
+		},
+		boosts: {
+			evasion: 2,
 		},
 		secondary: false,
 		target: "self",
@@ -96,6 +102,7 @@ exports.BattleMovedex = {
 		desc: "The user faints after using this move, even if this move fails for having no target. This move is prevented from executing if any active Pokemon has the Ability Damp.",
 		shortDesc: "The user faints.",
 		id: "tm09",
+		ignoreImmunity: true,
 		isNonstandard: true,
 		name: "TM09",
 		pp: 16,
@@ -103,6 +110,9 @@ exports.BattleMovedex = {
 		flags: {protect: 1, mirror: 1, contact: 1},
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Fire Punch');
+		},
+		onMoveFail: function (target, source, move) {
+			this.faint(source);
 		},
 		selfdestruct: true,
 		secondary: false,
@@ -157,6 +167,7 @@ exports.BattleMovedex = {
 		desc: "No additional effect.",
 		shortDesc: "No additional effect.",
 		id: "tm45",
+		ignoreImmunity: true,
 		isNonstandard: true,
 		name: "TM45",
 		pp: 16,
@@ -177,6 +188,7 @@ exports.BattleMovedex = {
 		desc: "Hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "tm50",
+		ignoreImmunity: true,
 		isNonstandard: true,
 		name: "TM50",
 		pp: 25,

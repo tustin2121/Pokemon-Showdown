@@ -539,7 +539,7 @@ let leaguemon = {
 			Faint: "gg no re",
 		},
 		species: 'Charizard-Mega-X', ability: 'SpeedRunner', item: 'Z-Sash', gender: 'M',
-		moves: ['extremespeed', 'bulldoze', 'dragonrush', 'roost', 'dualchop', 'swordsdance', 'dragondance', 'honeclaws', 'bite'],
+		moves: ['extremespeed', 'earthquake', 'dragonrush', 'roost', 'dualchop', 'crunch'],
 		signatureMoves: ['huntingforproctors', 'poweraboose'],
 		evs: {hp: 12, atk: 252, spe: 244}, nature: 'Adamant',
 		// http://pastebin.com/ZLgNhMR9
