@@ -20,7 +20,7 @@ exports.BattleTPP = {
 	makuhita:1, hariyama:1,
 	poochyena:1, mightyena:1, 
 	oddish:1, gloom:1, vileplume:1, bellossom:1, 
-	geodude:1, graveler:1, golem:1, 
+	geodude:1, graveler:1, golem:1, geodudealola:1, graveleralola:1, golemalola:1, 
 	tentacool:1, tentacruel:1, 
 	azurill:1, marill:1, azumarill:1,
 	// FireRed
@@ -28,7 +28,7 @@ exports.BattleTPP = {
 	mew:1,
 	surskit:1, masquerain:1,
 	squirtle:1, wartortle:1, blastoise:1, blastoisemega:1, 
-	sandshrew:1, sandslash:1,
+	sandshrew:1, sandslash:1, sandshrewalola:1, sandslashalola:1, 
 	slakoth:1, vigoroth:1, slaking:1, 
 	// Platinum
 	shinx:1, luxio:1, luxray:1,
@@ -75,11 +75,11 @@ exports.BattleTPP = {
 	kabuto:1, kabutops:1, 
 	shellder:1, cloyster:1, 
 	paras:1, parasect:1, 
-	grimer:1, muk:1, 
+	grimer:1, muk:1, grimeralola:1, mukalola:1, 
 	abra:1, kadabra:1, alakazam:1, alakazammega:1,
 	bellsprout:1, weepinbell:1, victreebel:1, 
 	// Moemon / Touhoumon
-	diglett:1, dugtrio:1, 
+	diglett:1, dugtrio:1, diglettalola:1, dugtrioalola:1, 
 	elekid:1, electabuzz:1, electivire:1, 
 	// TODO: Insert Sanae, Cirno, Momiji, Satori, Tokiko, Mima here for Touhoumon
 	// AlphaSapphire
@@ -119,7 +119,7 @@ exports.BattleTPP = {
 	phanpy:1, donphan:1,
 	krabby:1, kingler:1, 
 	// Prism
-	vulpix:1, ninetales:1, 
+	vulpix:1, ninetales:1, vulpixalola:1, ninetalesalola:1,
 	buneary:1, lopunny:1, lopunnymega:1, 
 	ralts:1, kirlia:1, gardevoir:1, gardevoirmega:1,gallade:1, gallademega:1, 
 	larvitar:1, pupitar:1, tyranitar:1, tyranitarmega:1, 
@@ -130,7 +130,7 @@ exports.BattleTPP = {
 	zygarde:1, 
 	rattataalola:1, raticatealola:1,
 	spearow:1, fearow:1, 
-	buzzwole:1, 
+	buzzwole:0, 
 
 
 
@@ -189,7 +189,7 @@ exports.BattleTPP = {
 	beldum:1, metang:1, metagross:1, metagrossmega:1, 
 	// OR
 	caterpie:1, metapod:1, butterfree:1, 
-	pichu:1, pikachu:1, raichu:1,
+	pichu:1, pikachu:1, raichu:1, raichualola:1,
 	pikachucosplay:1, pikachurockstar:1, pikachubelle:1, pikachupopstar:1, pikachuphd:1, pikachulibre:1,
 	poliwag:1, poliwhirl:1, poliwrath:1, politoed:1,
 	croagunk:1, toxicroak:1,
@@ -200,9 +200,9 @@ exports.BattleTPP = {
 ////// Season 2 
 	// Anniversary Red
 	mimejr:1, mrmime:1, 
-	meowth:1, persian:1, 
+	meowth:1, persian:1, meowthalola:1, persianalola:1, 
 	magikarp:1, gyarados:1, gyaradosmega:1, 
-	cubone:1, marowak:1, 
+	cubone:1, marowak:1, marowakalola:1,
 	scatterbug:1, spewpa:1, vivillon:1, 
 	// Viernamese Crystal (Intermission Game)
 	cyndaquil:1, quilava:1, typhlosion:1, 
