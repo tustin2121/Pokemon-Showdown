@@ -321,7 +321,8 @@ exports.Formats = [
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3547566/\">LC Viability Ranking</a>",
 		],
 		__subsort: formats => formats[toId("LC")].__subsort+0.1,
-
+		
+		defaultLevel: 100,
 		maxLevel: 100,
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Little Cup'],
 		banlist: ['LC Uber', 'Gligar', 'Misdreavus', 'Scyther', 'Sneasel', 'Tangela', 'Dragon Rage', 'Sonic Boom', 'Swagger'],

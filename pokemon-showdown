@@ -2,7 +2,6 @@
 'use strict';
 
 // Make sure we're Node 6+
-
 try {
 	eval('{ let [a] = [1]; }');
 } catch (e) {

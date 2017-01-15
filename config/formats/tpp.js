@@ -35,7 +35,14 @@ let leagueFormat = {
 	tournamentShow: false,
 	
 	mod: 'tppleague',
-	ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview'], //'Mega Rayquaza Clause'
+	ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'], //'Mega Rayquaza Clause'
+	
+	additionalRulesets: {
+		'singles': ['Swagger Clause', 'Sleep Clause Mod',],
+		'doubles': [],
+		'triples:': [],
+		'trial': [],
+	},
 	
 	onValidateSet: function(set, format, setHas, teamHas) {
 		let pkmn = toId(set.species);

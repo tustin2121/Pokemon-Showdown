@@ -3212,11 +3212,11 @@ exports.commands = {
 					break;
 				case 'tppleagueelitefour':
 					gym = LeagueSetup.elites[toId(this.targetUsername)];
-					if (gym.isChamp) gym = null;
+					if (gym && gym.isChamp) gym = null;
 					break;
 				case 'tppleaguechampion':
 					gym = LeagueSetup.elites[toId(this.targetUsername)];
-					if (!gym.isChamp) gym = null;
+					if (gym && !gym.isChamp) gym = null;
 					break;
 			}
 		}
@@ -3226,9 +3226,8 @@ exports.commands = {
 				if (!gym.pending.includes(user.userid)) {
 					gym.pending.push(user.userid);
 					return this.popupReply(`The user '${this.targetUsername}' is not online right now. You have been added to their pending fights list.`);
-				} else {
-					return this.popupReply(`The user '${this.targetUsername}' is not online right now. You are already on their pending fights list.`);
 				}
+				return this.popupReply(`The user '${this.targetUsername}' is not online right now. You are already on their pending fights list.`);
 			}
 			return this.popupReply("The user '" + this.targetUsername + "' was not found.");
 		}
