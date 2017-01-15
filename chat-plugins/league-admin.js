@@ -155,6 +155,9 @@ function LeagueSetupSend(msg) {
 	} return;
 	
 	case 'e4fight': {
+		
+		console.log(msg.otherInfo);
+		
 		if (!msg.p1) return msg.room.add('|html|<div class="broadcast-red">Unable to determine elite member! Tustin, you fucked it up!</div>');
 		if (!msg.p2) return msg.room.add('|html|<div class="broadcast-red">Unable to determine challenger! Tustin, you fucked it up!</div>');
 		if (!LeagueSetup.challengers[msg.p2]) return msg.room.add(`|error|Unable to ${msg.event} challenger: Challenger has no league challenge!`);
@@ -434,7 +437,10 @@ exports.commands = {
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
 				target = target.split(" ");
-				let other = Users.get(target[0]) || { userid: toId(target[0]), name: target[0] };
+				let other = { userid: toId(target[0]), name: target[0] };
+				if (!LeagueSetup.challengers[other.userid]) {
+					other = Users.get(target[0]) || { userid: toId(target[0]), name: target[0] };
+				}
 				if (!LeagueSetup.challengers[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"There is no Challenger profile for '${other.name}'"}`);
 				
 				if (!confirmToken(target[1])) {
@@ -452,7 +458,10 @@ exports.commands = {
 				if (!commandCheck(this)) return;
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
-				let other = Users.get(target) || { userid: toId(target), name: target };
+				let other = { userid: toId(target), name: target };
+				if (!LeagueSetup.gyms[other.userid]) {
+					other = Users.get(target) || { userid: toId(target), name: target };
+				}
 				if (LeagueSetup.gyms[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"Gym already exists for user ${other.name}."}`);
 				LeagueSetup.send({type:"new", event:"gym", userid: other.userid, username: other.name});
 				this.connection.send(`|queryresponse|adventbuilder|{"success":"Gym for '${other.name}' added!"}`);
@@ -464,7 +473,10 @@ exports.commands = {
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
 				target = target.split(" ");
-				let other = Users.get(target[0]) || { userid: toId(target[0]), name: target[0] };
+				let other = { userid: toId(target[0]), name: target[0] };
+				if (!LeagueSetup.gyms[other.userid]) {
+					other = Users.get(target[0]) || { userid: toId(target[0]), name: target[0] };
+				}
 				if (!LeagueSetup.gyms[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"There is no Gym for '${other.name}'"}`);
 				
 				if (!confirmToken(target[1])) {
@@ -482,7 +494,10 @@ exports.commands = {
 				if (!commandCheck(this)) return;
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
-				let other = Users.get(target) || { userid: toId(target), name: target };
+				let other = { userid: toId(target), name: target };
+				if (!LeagueSetup.elites[other.userid]) {
+					other = Users.get(target) || { userid: toId(target), name: target };
+				}
 				if (LeagueSetup.elites[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"Elite settings already exist for user ${other.name}."}`);
 				LeagueSetup.send({type:"new", event:"elite", userid: other.userid, username: other.name});
 				this.connection.send(`|queryresponse|adventbuilder|{"success":"Elite for '${other.name}' added!"}`);
@@ -494,7 +509,10 @@ exports.commands = {
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
 				target = target.split(" ");
-				let other = Users.get(target[0]) || { userid: toId(target[0]), name: target[0] };
+				let other = { userid: toId(target[0]), name: target[0] };
+				if (!LeagueSetup.elites[other.userid]) {
+					other = Users.get(target[0]) || { userid: toId(target[0]), name: target[0] };
+				}
 				if (!LeagueSetup.elites[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"There is no Elite settings for '${other.name}'"}`);
 				
 				if (!confirmToken(target[1])) {
@@ -512,7 +530,10 @@ exports.commands = {
 				if (!commandCheck(this)) return;
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
-				let other = Users.get(target) || { userid: toId(target), name: target };
+				let other = { userid: toId(target), name: target };
+				if (!LeagueSetup.elites[other.userid]) {
+					other = Users.get(target) || { userid: toId(target), name: target };
+				}
 				if (!LeagueSetup.elites[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"There is no Elite settings for '${other.name}"}'`);
 				LeagueSetup.elites[other.userid].isChamp = true;
 				LeagueSetup.markDirty();
@@ -524,7 +545,10 @@ exports.commands = {
 				if (!commandCheck(this)) return;
 				if (!LeagueSetup.admins.includes(this.user.userid)) return this.connection.send(`|queryresponse|adventbuilder|{"err":"unauthed"}`);
 				
-				let other = Users.get(target) || { userid: toId(target), name: target };
+				let other = { userid: toId(target), name: target };
+				if (!LeagueSetup.elites[other.userid]) {
+					other = Users.get(target) || { userid: toId(target), name: target };
+				}
 				if (!LeagueSetup.elites[other.userid]) return this.connection.send(`|queryresponse|adventbuilder|{"err":"There is no Elite settings for '${other.name}"}'`);
 				LeagueSetup.elites[other.userid].isChamp = false;
 				LeagueSetup.markDirty();
@@ -724,10 +748,12 @@ exports.commands = {
 	
 	pendingchallenges : function(target) {
 		if (this.cmdToken === '!') return this.errorReply('You cannot broadcast this command.');
-		// if (Rooms.global.lockdown) return this.errorReply('The server is in lockdown. You cannot hand out badges at this time.');
-		if (!this.user.registered) return this.errorReply('Please log in first.');
-		
 		let silent = (target === 'silent');
+		// if (Rooms.global.lockdown) return this.errorReply('The server is in lockdown. You cannot hand out badges at this time.');
+		if (!this.user.registered) {
+			if (!silent) this.errorReply('Please log in first.');
+			return;
+		}
 		
 		let gym = LeagueSetup.gyms[this.user.userid];
 		if (gym) {

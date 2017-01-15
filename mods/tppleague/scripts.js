@@ -38,6 +38,12 @@ exports.BattleScripts = {
 					break; 
 			}
 		}
+		// Append more standard rules to the format's rulesets
+		if (format.additionalRulesets) {
+			let addRules = format.additionalRulesets[this.gameType] || [];
+			format.ruleset.push(...addRules);
+		}
+		
 		// Append new rulesets to the format's rulesets.
 		if (Array.isArray(gym.rulesets)) {
 			for (let i = 0; i < gym.rulesets.length; i++) {

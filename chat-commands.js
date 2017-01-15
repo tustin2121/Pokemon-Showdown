@@ -2070,6 +2070,7 @@ exports.commands = {
 	},
 	unnamelockhelp: ["/unnamelock [username] - Unnamelocks the user. Requires: % @ * & ~"],
 
+	clearchat: 'hidetext',
 	hidetext: function (target, room, user) {
 		if (!target) return this.parse('/help hidetext');
 
