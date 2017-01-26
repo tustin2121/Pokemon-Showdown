@@ -37,6 +37,7 @@ class Room {
 		this.reportJoins = Config.reportjoins;
 
 		this.users = Object.create(null);
+		this.aliases = Object.create(null);
 
 		this.log = [];
 
@@ -252,6 +253,22 @@ class Room {
 				user.sendTo(this, data);
 			}
 		}
+	}
+	
+	// Aliases for In-Character speaking
+	setAlias(user, alias) {
+		if (!user) return;
+		if (this.id === 'lobby') return; // No aliases in the lobby
+		if (alias) {
+			this.aliases[user.userid] = alias;
+		} else {
+			delete this.aliases[user.userid];
+		}
+		return true;
+	}
+	getAlias(user) {
+		if (!user) return;
+		return this.aliases[user.userid]
 	}
 }
 
@@ -789,10 +806,7 @@ class GlobalRoom {
 				reportRoom.update();
 			}
 		}
-		if (!Config.reportbattlesBotFilter || Config.reportbattlesBotFilter(Tools.getFormat(format)) !== false)
-		{
-			Bot.report(Tools.getFormat(format) + ' battle started between ' + p1.getIdentity() + ' and ' + p2.getIdentity() + ' -- tppleague.me/' + newRoom.id);
-		}
+		BotManager.announceBattle(format, p1, p2, newRoom.id);
 		if (Config.logladderip && options.rated) {
 			if (!this.ladderIpLog) {
 				this.ladderIpLog = fs.createWriteStream('logs/ladderip/ladderip.txt', {flags: 'a'});

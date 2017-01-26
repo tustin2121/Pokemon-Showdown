@@ -4,11 +4,12 @@
   "description": "The server for the Pokémon Showdown battle simulator",
   "version": "0.11.0",
   "dependencies": {
-    "sockjs": "0.3.18",
-    "sugar": "1.4.1",
+    "discord.js": "^11.0.0",
+    "generic-pool": "~3.1.6",
     "irc": "~0.4.0",
     "pg-native": "~1.9.0",
-    "generic-pool": "~2.2.0"
+    "sockjs": "0.3.18",
+    "sugar": "1.4.1"
   },
   "optionalDependencies": {
     "cloud-env": "0.1.1",

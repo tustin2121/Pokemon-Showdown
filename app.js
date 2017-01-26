@@ -99,7 +99,7 @@ if (Config.watchconfig) {
  * Set up most of our globals
  *********************************************************/
 
-global.Bot = require('./bot');
+global.BotManager = require('./bots');
 
 global.Monitor = require('./monitor');
 

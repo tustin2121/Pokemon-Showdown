@@ -1958,15 +1958,17 @@ class BattleSide {
 			this.active[i] = null;
 		}
 		this.active = null;
-
-		if (this.choiceData.decisions && this.choiceData.decisions !== true) {
-			this.choiceData.decisions.forEach(decision => {
-				delete decision.side;
-				delete decision.pokemon;
-				delete decision.target;
-			});
+		
+		if (this.choiceData) {
+			if (this.choiceData.decisions && this.choiceData.decisions !== true) {
+				this.choiceData.decisions.forEach(decision => {
+					delete decision.side;
+					delete decision.pokemon;
+					delete decision.target;
+				});
+			}
+			this.choiceData = null;
 		}
-		this.choiceData = null;
 
 		// get rid of some possibly-circular references
 		this.battle = null;
@@ -5109,7 +5111,7 @@ class Battle extends Tools.BattleDex {
 				this.inactiveSide = inactiveSide;
 			}
 		}
-
+		
 		if (this.log.length > logPos) {
 			if (alreadyEnded !== undefined && this.ended && !alreadyEnded) {
 				if (this.rated || Config.logchallenges) {
@@ -5137,7 +5139,9 @@ class Battle extends Tools.BattleDex {
 
 		// deallocate children and get rid of references to them
 		for (let i = 0; i < this.sides.length; i++) {
-			if (this.sides[i]) this.sides[i].destroy();
+			try {
+				if (this.sides[i]) this.sides[i].destroy();
+			} catch (e) { console.error("Error in destroy: "+e.stack); }
 			this.sides[i] = null;
 		}
 		this.p1 = null;

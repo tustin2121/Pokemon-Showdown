@@ -142,14 +142,17 @@ function LeagueSetupSend(msg) {
 			}
 			case 'hallOfFame': {
 				if (typeof msg.user === 'string') msg.user = Users.get(msg.user);
+				let hof = LeagueSetup.hallOfFame[msg.type || 'singles'];
 				let chall = LeagueSetup.challengers[msg.user.userid];
-				let hof = {
-					num: LeagueSetup.hallOfFame.length+1,
+				let entry = {
+					num: hof.length+1,
 					name: msg.user.name,
 					trainerid: chall.trainerid,
 					team: msg.team,
 				};
-				LeagueSetup.hallOfFame.unshift(hof);
+				hof.unshift(entry);
+				LeagueSetup.markDirty();
+				return entry;
 			}
 		}
 	} return;
@@ -169,7 +172,7 @@ function LeagueSetupSend(msg) {
 				// A challenger failed their e4 fight
 				LeagueSetup.challengers[msg.p2].e4wins = {};
 				LeagueSetup.markDirty();
-				msg.room.add(`|html|<div class="broadcast-blue">The challenger ${user.name} has lost the battle against ${elite.name}. The challenger will have to restart their Elite Four run.</div>`);
+				setTimeout(()=>msg.room.add(`|html|<div class="broadcast-blue">The challenger ${user.name} has lost the battle against ${elite.name}. The challenger will have to restart their Elite Four run.</div>`), 4000);
 				return;
 			case 'advance':
 				// A challenger advanced in their e4 fight
@@ -179,15 +182,16 @@ function LeagueSetupSend(msg) {
 				if (Object.keys(LeagueSetup.challengers[msg.p2].e4wins).length >= 4) {
 					adv = "The challenger is ready to challenge the League Champion!";
 				}
-				msg.room.add(`|html|<div class="broadcast-blue">The challenger ${user.name} has won the battle against ${elite.name}. ${adv}</div>`);
+				setTimeout(()=>msg.room.add(`|html|<div class="broadcast-blue">The challenger ${user.name} has won the battle against ${elite.name}. ${adv}</div>`), 4000);
 				return;
 			case 'complete': {
 				// A challenger has defeated the champion and has become champion himself!
-				LeagueSetup.send({
+				let hof = LeagueSetup.send({
 					type:"new",
 					event:"hallOfFame",
 					user:user,
-					team: msg.otherInfo[0],
+					type: msg.otherInfo[0],
+					team: msg.otherInfo[1],
 				});
 				
 				let settings = LeagueSetup.send({type:"new", event:"elite", userid: user.userid, username: user.name});
@@ -197,12 +201,12 @@ function LeagueSetupSend(msg) {
 				LeagueSetup.elites[elite.userid].isFormerChamp = true;
 				LeagueSetup.elites[elite.userid].isHidden = true;
 				
-				let num = LeagueSetup.hallOfFame.length;
+				let num = hof.num;
 				num = num + (['th','st','nd','rd'][num%10]||'th');
 				if (num==='11st'||num==='12nd'||num==='13rd') num=num.slice(0,2)+"th";
-				msg.room.add(`|html|<div class="broadcast-blue"><b>The challenger ${user.name} has won against ${elite.name}! Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
+				setTimeout(()=>msg.room.add(`|html|<div class="broadcast-blue"><b>The challenger ${user.name} has won against ${elite.name}! Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`), 4000);
 				Rooms.global.add(`|html|<div class="broadcast-blue"><b>Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
-				Bot.connection.send('NOTICE', '#tppleague', `Congratuations to our new ${num} TPPLeague Champion, ${user.name}!`);
+				BotManager.announceNotify(`Congratuations to our new ${num} TPPLeague Champion, ${user.name}!`);
 			} return;
 		}
 	} return;
@@ -210,17 +214,17 @@ function LeagueSetupSend(msg) {
 	case 'champion': {
 		switch (msg.event) {
 			case 'prep':
-				Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle will be beginning soon!`);
+				BotManager.announceNotify(`TPPLeague Champion Battle will be beginning soon!`);
 				Users.users.forEach(curUser => curUser.send('|champnotify|notify') );
 				return;
 			case 'begin':
-				Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle has begun! tppleague.me/${msg.battleid}`);
+				BotManager.announceNotify(`TPPLeague Champion Battle has begun! tppleague.me/${msg.battleid}`);
 				return;
 			case 'ongoing': //sent about every 10 rounds
-				Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle is in progress! tppleague.me/${msg.battleid}`);
+				BotManager.announceNotify(`TPPLeague Champion Battle is in progress! tppleague.me/${msg.battleid}`);
 				return;
 			case 'finished': //sent about every 10 rounds
-				Bot.connection.send('NOTICE', '#tppleague', `TPPLeague Champion Battle has completed! tppleague.me/${msg.battleid}`);
+				BotManager.announceNotify(`TPPLeague Champion Battle has completed! tppleague.me/${msg.battleid}`);
 				Users.users.forEach(curUser => curUser.send('|champnotify|finished') );
 				return;
 		}

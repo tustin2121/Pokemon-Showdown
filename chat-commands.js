@@ -109,6 +109,21 @@ exports.commands = {
 
 		return target;
 	},
+	
+	as: function(target, room, user) {
+		let alias, msg;
+		if (target.indexOf(',') > 0) {
+			alias = target.slice(0, target.indexOf(',')).trim();
+			msg = target.slice(target.indexOf(',')+1).trim();
+		} else {
+			alias = target.trim();
+		}
+		if (!room) return this.errorReply('Cannot set an alias here. Must be in a room that allows it.');
+		if (room.id === 'lobby') return this.errorReply('Cannot set an alias in the lobby.');
+		room.setAlias(user, alias);
+		
+		return `"${msg}"`;
+	},
 
 	'!battle': true,
 	'battle!': 'battle',
@@ -2553,11 +2568,11 @@ exports.commands = {
 				Rooms.global.send(Rooms.global.formatListText);
 
 				return this.sendReply("Formats have been hotpatched.");
-			} else if (target === 'bot') {
-				Bot.connection.disconnect();
-				Chat.uncacheTree('./bot');
-				global.Bot = require('./bot');
-				return this.sendReply("The IRC Bot has been hot-patched.");
+			} else if (target === 'bot' || target === 'bots') {
+				BotManager.destroy();
+				Chat.uncacheTree('./bots');
+				global.BotManager = require('./bots');
+				return this.sendReply("The Bots have been hot-patched.");
 			} else if (target === 'league' || target === 'tppla') {
 				return this.parse('/adventbuilder reload');
 				

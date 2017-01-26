@@ -273,8 +273,8 @@ create(leagueFormat, {
 		this.send('champion', 'finished');
 		if (sideWon === this.p2) {
 			// Challenger won
-			let team = this.p2.pokemon.map(x => `${x.name}|${x.species}|${x.gender||"N"}${x.set.shiny?"*":""}`);
-			this.send('e4fight', 'complete', team.join('['));
+			let team = this.p2.pokemon.map(x => `${x.name}|${x.species}|${x.gender||"N"}${x.set.shiny?"*":""}`).join('[');
+			this.send('e4fight', ['complete', this.gameType, team]);
 		} else if (sideWon === this.p1) {
 			// Challenger lost
 			this.send('e4fight', 'restart');

@@ -549,16 +549,13 @@ if (process.send && module === process.mainModule) {
 					});
 
 					let logPos = battle.log.length;
-					battle.add('html', '<div class="broadcast-red"><b>The battle crashed</b><br />You can keep playing but it might crash again.</div>');
-					let nestedError;
+					battle.add('html', '<div class="broadcast-red"><b>The battle crashed</b><br />Everybody panic! <img src="/emotes/twitchplayspokemon/tppRiot.png" alt="tppRiot" title="tppRiot" class="emote" /></div>');
 					try {
 						battle.makeRequest(prevRequest, prevRequestDetails);
+						battle.sendUpdates(logPos);
 					} catch (e) {
-						nestedError = e;
-					}
-					battle.sendUpdates(logPos);
-					if (nestedError) {
-						throw nestedError;
+						battle.send('update', battle.log.slice(logPos));
+						throw e;
 					}
 				}
 			} else if (data[1] === 'eval') {

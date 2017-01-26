@@ -394,7 +394,7 @@ class User {
 	popup(message) {
 		this.send(`|popup|` + message.replace(/\n/g, '||'));
 	}
-	getIdentity(roomid) {
+	getIdentity(roomid, inChar) {
 		if (this.locked) {
 			return '‽' + this.name;
 		}
@@ -408,6 +408,16 @@ class User {
 			}
 			if (room.isMuted(this)) {
 				return '!' + this.name;
+			}
+			if (inChar !== undefined) {
+				let alias = room.getAlias(this);
+				if (alias) {
+					if (inChar) {
+						return `${room.getAuth(this)}${alias}{${this.name}`;
+					} else {
+						return `${room.getAuth(this)}${this.name}{[OC]`;
+					}
+				}
 			}
 			return room.getAuth(this) + this.name;
 		}

@@ -175,7 +175,18 @@ class CommandContext {
 				this.pmTarget.lastPM = this.user.userid;
 				this.user.lastPM = this.pmTarget.userid;
 			} else {
-				this.room.add(`|c|${this.user.getIdentity(this.room.id)}|${message}`);
+				let inChar;
+				if (this.room.getAlias(this.user)) {
+					inChar = false;
+					let msgtest = message.replace('/me','').trim();
+					if (msgtest.slice(-1) === '"' && msgtest.charAt(0) === '"') inChar = true;
+					if (inChar) {
+						let f = message.indexOf('"');
+						let l = message.lastIndexOf('"');
+						message = message.slice(0,f)+message.slice(f+1,l)+message.slice(l+1);
+					}
+				}
+				this.room.add(`|c|${this.user.getIdentity(this.room.id, inChar)}|${message}`);
 			}
 		}
 
@@ -276,9 +287,10 @@ class CommandContext {
 		this.cmdToken = cmdToken;
 		this.target = target;
 		this.fullCmd = fullCmd;
+		this.cmdName = (typeof curCommands[cmd] === 'string' ? curCommands[cmd] : cmd);
 
 		if (typeof commandHandler === 'function' && (this.pmTarget || this.room === Rooms.global)) {
-			if (!curCommands['!' + (typeof curCommands[cmd] === 'string' ? curCommands[cmd] : cmd)]) {
+			if (!curCommands['!' + this.cmdName]) {
 				return '!';
 			}
 		}
