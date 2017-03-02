@@ -56,7 +56,7 @@ function checkPlural(variable, plural, singular) {
 }
 
 class Giveaway {
-	constructor(host, giver, room, ot, tid, prize) {
+	constructor(host, giver, room, ot, tid, fc, prize) {
 		if (room.gaNumber) {
 			room.gaNumber++;
 		} else {
@@ -67,6 +67,8 @@ class Giveaway {
 		this.room = room;
 		this.ot = ot;
 		this.tid = tid;
+		this.fc = `${fc.substr(0, 4)}-${fc.substr(4, 4)}-${fc.substr(8, 4)}`;
+
 		this.prize = prize;
 		this.phase = 'pending';
 
@@ -146,10 +148,10 @@ class Giveaway {
 		}
 		// the previous regex doesn't match "nidoran-m" or "nidoran male"
 		if (/\bnidoran\W{0,1}m(ale){0,1}\b/.test(text)) {
-			mons.set('nidoranm', Tools.getTemplate('nidoranm'));
+			mons.set('Nidoran-M', Tools.getTemplate('nidoranm'));
 		}
 		if (/\bnidoran\W{0,1}f(emale){0,1}\b/.test(text)) {
-			mons.set('nidoranf', Tools.getTemplate('nidoranf'));
+			mons.set('Nidoran-F', Tools.getTemplate('nidoranf'));
 		}
 		text = toId(text);
 		if (mons.size) {
@@ -263,8 +265,8 @@ class Giveaway {
 }
 
 class QuestionGiveaway extends Giveaway {
-	constructor(host, giver, room, ot, tid, prize, question, answers) {
-		super(host, giver, room, ot, tid, prize);
+	constructor(host, giver, room, ot, tid, fc, prize, question, answers) {
+		super(host, giver, room, ot, tid, fc, prize);
 		this.type = 'question';
 
 		this.question = question;
@@ -296,8 +298,10 @@ class QuestionGiveaway extends Giveaway {
 		if (!this.answered[user.userid]) this.answered[user.userid] = 0;
 		if (this.answered[user.userid] >= 3) return user.sendTo(this.room, "You have already guessed three times. You cannot guess anymore in this giveaway.");
 
+		let sanitized = toId(guess);
+
 		for (let i = 0; i < this.answers.length; i++) {
-			if (toId(this.answers[i]) === toId(guess)) {
+			if (toId(this.answers[i]) === sanitized) {
 				this.winner = user;
 				this.clearTimer();
 				return this.end();
@@ -339,10 +343,10 @@ class QuestionGiveaway extends Giveaway {
 				this.changeUhtml('<p style="text-align:center;font-size:13pt;font-weight:bold;">The giveaway has ended! Scroll down to see the answer.</p>');
 				this.phase = 'ended';
 				this.clearTimer();
-				this.room.modlog(`${this.winner.name} won ${this.giver.name}'s giveaway for a "${this.prize}" (OT: ${this.ot} TID: ${this.tid})`);
+				this.room.modlog(`${this.winner.name} won ${this.giver.name}'s giveaway for a "${this.prize}" (OT: ${this.ot} TID: ${this.tid} FC: ${this.fc})`);
 				this.send(this.generateWindow(`<p style="text-align:center;font-size:12pt;"><b>${Chat.escapeHTML(this.winner.name)}</b> won the giveaway! Congratulations!</p>` +
 				`<p style="text-align:center;">${this.question}<br />Correct answer${Chat.plural(this.answers)}: ${this.answers.join(', ')}</p>`));
-				if (this.winner.connected) this.winner.popup(`You have won the giveaway. PM **${Chat.escapeHTML(this.giver.name)}** to claim your prize!`);
+				if (this.winner.connected) this.winner.popup(`You have won the giveaway. PM **${Chat.escapeHTML(this.giver.name)}** (FC: ${this.fc}) to claim your prize!`);
 				if (this.giver.connected) this.giver.popup(`${Chat.escapeHTML(this.winner.name)} has won your question giveaway!`);
 			}
 		}
@@ -350,14 +354,18 @@ class QuestionGiveaway extends Giveaway {
 		delete this.room.giveaway;
 	}
 
+	static sanitize(str) {
+		return str.toLowerCase().replace(/[^a-z0-9 .-]+/ig, "").trim();
+	}
+
 	static sanitizeAnswers(answers) {
-		return answers.map(val => val.replace(/[^a-z0-9 .-]+/ig, "").trim()).filter((val, index, array) => toId(val).length && array.indexOf(val) === index);
+		return answers.map(val => QuestionGiveaway.sanitize(val)).filter((val, index, array) => toId(val).length && array.indexOf(val) === index);
 	}
 }
 
 class LotteryGiveaway extends Giveaway {
-	constructor(host, giver, room, ot, tid, prize, winners) {
-		super(host, giver, room, ot, tid, prize);
+	constructor(host, giver, room, ot, tid, fc, prize, winners) {
+		super(host, giver, room, ot, tid, fc, prize);
 
 		this.type = 'lottery';
 
@@ -440,10 +448,10 @@ class LotteryGiveaway extends Giveaway {
 			this.changeUhtml(`<p style="text-align:center;font-size:13pt;font-weight:bold;">The giveaway has ended! Scroll down to see the winner${Chat.plural(this.winners)}.</p>`);
 			this.phase = 'ended';
 			let winnerNames = this.winners.map(winner => winner.name).join(', ');
-			this.room.modlog(`${winnerNames} won ${this.giver.name}'s giveaway for "${this.prize}" (OT: ${this.ot} TID: ${this.tid})`);
+			this.room.modlog(`${winnerNames} won ${this.giver.name}'s giveaway for "${this.prize}" (OT: ${this.ot} TID: ${this.tid} FC: ${this.fc})`);
 			this.send(this.generateWindow(`<p style="text-align:center;font-size:10pt;font-weight:bold;">Lottery Draw</p><p style="text-align:center;">${Object.keys(this.joined).length} users joined the giveaway.<br />Our lucky winner${Chat.plural(this.winners)}: <b>${Chat.escapeHTML(winnerNames)}!</b> Congratulations!</p>`));
 			for (let i = 0; i < this.winners.length; i++) {
-				if (this.winners[i].connected) this.winners[i].popup(`You have won the lottery giveaway! PM **${this.giver.name}** to claim your prize!`);
+				if (this.winners[i].connected) this.winners[i].popup(`You have won the lottery giveaway! PM **${this.giver.name}** (FC: ${this.fc}) to claim your prize!`);
 			}
 			if (this.giver.connected) this.giver.popup(`The following users have won your lottery giveaway:\n${Chat.escapeHTML(winnerNames)}`);
 		}
@@ -459,17 +467,19 @@ let commands = {
 		if (room.id !== 'wifi' || !target) return false;
 		if (room.giveaway) return this.errorReply("There is already a giveaway going on!");
 
-		let [giver, ot, tid, prize, question, ...answers] = target.split(target.includes('|') ? '|' : ',').map(param => param.trim());
-		if (!(giver && ot && tid && prize && question && answers.length)) return this.errorReply("Invalid arguments specified - /question giver, ot, tid, prize, question, answer(s)");
+		let [giver, ot, tid, fc, prize, question, ...answers] = target.split(target.includes('|') ? '|' : ',').map(param => param.trim());
+		if (!(giver && ot && tid && fc && prize && question && answers.length)) return this.errorReply("Invalid arguments specified - /question giver, ot, tid, fc, prize, question, answer(s)");
 		tid = toId(tid);
-		if (!parseInt(tid) && tid.length !== 6) return this.errorReply("Invalid TID");
+		if (!parseInt(tid) || tid.length < 5 || tid.length > 6) return this.errorReply("Invalid TID");
+		fc = toId(fc);
+		if (!parseInt(fc) || fc.length !== 12) return this.errorReply("Invalid FC");
 		let targetUser = Users(giver);
 		if (!targetUser || !targetUser.connected) return this.errorReply(`User '${giver}' is not online.`);
 		if (!this.can('warn', null, room) && !(this.can('broadcast', null, room) && user === targetUser)) return this.errorReply("Permission denied.");
 		if (!targetUser.autoconfirmed) return this.errorReply(`User '${targetUser.name}' needs to be autoconfirmed to give something away.`);
 		if (Giveaway.checkBanned(room, targetUser)) return this.errorReply(`User '${targetUser.name}' is giveaway banned.`);
 
-		room.giveaway = new QuestionGiveaway(user, targetUser, room, ot, tid, prize, question, answers);
+		room.giveaway = new QuestionGiveaway(user, targetUser, room, ot, tid, fc, prize, question, answers);
 
 		this.privateModCommand(`(${user.name} started a question giveaway for ${targetUser.name})`);
 	},
@@ -510,10 +520,12 @@ let commands = {
 		if (room.id !== 'wifi' || !target) return false;
 		if (room.giveaway) return this.errorReply("There is already a giveaway going on!");
 
-		let [giver, ot, tid, prize, winners] = target.split(target.includes('|') ? '|' : ',').map(param => param.trim());
-		if (!(giver && ot && tid && prize)) return this.errorReply("Invalid arguments specified - /lottery giver, ot, tid, prize, winners");
+		let [giver, ot, tid, fc, prize, winners] = target.split(target.includes('|') ? '|' : ',').map(param => param.trim());
+		if (!(giver && ot && tid && fc && prize)) return this.errorReply("Invalid arguments specified - /lottery giver, ot, tid, fc, prize, winners");
 		tid = toId(tid);
-		if (!parseInt(tid) && tid.length !== 6) return this.errorReply("Invalid TID");
+		if (!parseInt(tid) || tid.length < 5 || tid.length > 6) return this.errorReply("Invalid TID");
+		fc = toId(fc);
+		if (!parseInt(fc) || fc.length !== 12) return this.errorReply("Invalid FC");
 		let targetUser = Users(giver);
 		if (!targetUser || !targetUser.connected) return this.errorReply(`User '${giver}' is not online.`);
 		if (!this.can('warn', null, room) && !(this.can('broadcast', null, room) && user === targetUser)) return this.errorReply("Permission denied.");
@@ -526,7 +538,7 @@ let commands = {
 			if (isNaN(numWinners) || numWinners < 1 || numWinners > 10) return this.errorReply("The lottery giveaway can have a minimum of 1 and a maximum of 10 winners.");
 		}
 
-		room.giveaway = new LotteryGiveaway(user, targetUser, room, ot, tid, prize, numWinners);
+		room.giveaway = new LotteryGiveaway(user, targetUser, room, ot, tid, fc, prize, numWinners);
 
 		this.privateModCommand(`(${user.name} started a lottery giveaway for ${targetUser.name})`);
 	},
@@ -620,10 +632,10 @@ let commands = {
 		let reply = '';
 		switch (target) {
 		case 'staff':
-			if (!this.can('warn', null, room)) return;
+			if (!this.can('broadcast', null, room)) return;
 			reply = '<strong>Staff commands:</strong><br />' +
-			        '- question or qg <em>User | OT | TID | Prize | Question | Answer[ | Answer2 | Answer3]</em> - Start a new question giveaway (voices can only host for themselves, staff can for all users) (Requires: + % @ * # & ~)<br />' +
-			        '- lottery or lg <em>User | OT | TID | Prize[| Number of Winners]</em> - Starts a lottery giveaway (voices can only host for themselves, staff can for all users) (Requires: + % @ * # & ~)<br />' +
+			        '- question or qg <em>User | OT | TID | Friend Code | Prize | Question | Answer[ | Answer2 | Answer3]</em> - Start a new question giveaway (voices can only host for themselves, staff can for all users) (Requires: + % @ * # & ~)<br />' +
+			        '- lottery or lg <em>User | OT | TID | Friend Code | Prize[| Number of Winners]</em> - Starts a lottery giveaway (voices can only host for themselves, staff can for all users) (Requires: + % @ * # & ~)<br />' +
 			        '- changequestion - Changes the question of a question giveaway (Requires: giveaway host)<br />' +
 			        '- changeanswer - Changes the answer of a question giveaway (Requires: giveaway host)<br />' +
 					'- viewanswer - Shows the answer in a question giveaway (only to giveaway host/giver)<br />' +
@@ -645,7 +657,7 @@ let commands = {
 			if (!this.runBroadcast()) return;
 			reply = '<b>Wi-Fi room Giveaway help and info</b><br />' +
 			'- help user - shows list of participation commands<br />' +
-			'- help staff - shows giveaway staff commands (Requires: % @ * # & ~)';
+			'- help staff - shows giveaway staff commands (Requires: + % @ * # & ~)';
 		}
 		this.sendReplyBox(reply);
 	},
