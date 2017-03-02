@@ -222,6 +222,7 @@ class Battle {
 				this.ended = true;
 				this.room.win(lines[2]);
 				this.removeAllPlayers();
+				BotManager.announceBattleFinished(this.room.id, toId(lines[2]));
 			}
 			this.checkActive();
 			break;

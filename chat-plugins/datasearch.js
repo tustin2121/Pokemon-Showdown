@@ -88,6 +88,8 @@ exports.commands = {
 	dexsearch: function (target, room, user, connection, cmd, message) {
 		if (!this.canBroadcast()) return;
 		if (!target) return this.parse('/help dexsearch');
+		if (global.AntiCheat) AntiCheat.emit('dexsearch', target, room, user);
+		if (this.broadcastMessage && room.noDexsearchBroadcast) return this.errorReply('Cannot broadcast dexsearch in this room.');
 
 		return runSearch({
 			target: target,

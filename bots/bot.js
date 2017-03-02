@@ -157,6 +157,9 @@ class Bot {
 		this.isAnnouncing = true;
 		this.isListening = true;
 		this.nickname = nickname;
+		
+		this.battleData = {};
+		this.tournyData = {};
 	}
 	
 	destroy() { // Must Override
@@ -179,9 +182,10 @@ class Bot {
 	}
 	
 	/** Announce a message into the remote room, no notification. */
-	announceBattle(format, p1, p2, roomid) {
-		
-	}
+	announceBattle(format, p1, p2, roomid) {}
+	announceBattleFinished(roomid) {}
+	
+	announceTourny(format, roomid, state, etc) {} // Can override 
 	
 	/** Announce a message to everyone in the room, notifying everyone. */
 	announce(message) {
@@ -258,6 +262,7 @@ class Bot {
 			user: user,
 			connection: user.connections[0],
 		});
+		cmd.sendReply = function(data){ this.connection.sendTo(null, data); };
 		let handler = cmd.splitCommand();
 		if (handler === '!' || !remoteCommands[cmd.cmdName]) {
 			return `I cannot run that command remotely. Please log into the server to use that command.`;

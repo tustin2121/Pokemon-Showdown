@@ -144,7 +144,7 @@ class Tournament {
 		return true;
 	}
 
-	forceEnd() {
+	forceEnd(output) {
 		if (this.isTournamentStarted) {
 			if (this.autoDisqualifyTimer) clearTimeout(this.autoDisqualifyTimer);
 			this.inProgressMatches.forEach(match => {
@@ -161,6 +161,9 @@ class Tournament {
 		}
 		this.room.add('|tournament|forceend');
 		this.isEnded = true;
+		BotManager.announceTourny(this.format, this.room.id, 'forceended', {
+			by: (output)? output.user.name : 'an admin',
+		});
 	}
 
 	updateFor(targetUser, connection) {
@@ -218,6 +221,10 @@ class Tournament {
 				this.isBracketInvalidated = false;
 				this.room.send('|tournament|update|' + JSON.stringify({bracketData: this.bracketCache}));
 			}
+			BotManager.announceTourny(this.format, this.room.id, 'update', {
+				players: Object.keys(this.players),
+				open: !this.isTournamentStarted,
+			});
 		}
 
 		if (this.isTournamentStarted && this.isAvailableMatchesInvalidated) {
@@ -891,6 +898,9 @@ class Tournament {
 		for (let i in this.players) {
 			this.players[i].destroy();
 		}
+		BotManager.announceTourny(this.format, this.room.id, 'ended', {
+			results: this.generator.getResults().map(usersToNames),
+		});
 	}
 }
 
@@ -1342,6 +1352,9 @@ Chat.commands.tournament = function (paramString, room, user) {
 				let tourRoom = Rooms.search(Config.tourroom || 'tournaments');
 				if (tourRoom && tourRoom !== room) tourRoom.addRaw('<div class="infobox"><a href="/' + room.id + '" class="ilink"><strong>' + Chat.escapeHTML(Tools.getFormat(tour.format).name) + '</strong> tournament created in <strong>' + Chat.escapeHTML(room.title) + '</strong>.</a></div>').update();
 			}
+			BotManager.announceTourny(tour.format, room.id, 'create', {
+				creator: user.name,
+			});
 		}
 	} else {
 		let tournament = getTournament(room.id);

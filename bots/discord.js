@@ -1,5 +1,6 @@
 // discord.js
 // Home of the Discord bot class
+/* global Tools, Users, LeagueSetup */
 
 const { Bot } = require('./bot.js');
 const discord = require('discord.js');
@@ -17,9 +18,9 @@ class DiscordBot extends Bot {
 				// 'GUILD_UPDATE',
 				// 'GUILD_MEMBER_ADD',
 				// 'GUILD_MEMBER_REMOVE',
-				// 'MESSAGE_REACTION_ADD',
-				// 'MESSAGE_REACTION_REMOVE',
-				// 'MESSAGE_REACTION_REMOVE_ALL',
+				'MESSAGE_REACTION_ADD',
+				'MESSAGE_REACTION_REMOVE',
+				'MESSAGE_REACTION_REMOVE_ALL',
 				'VOICE_STATE_UPDATE',
 				'TYPING_START',
 				'VOICE_SERVER_UPDATE',
@@ -39,6 +40,7 @@ class DiscordBot extends Bot {
 			console.log('Discord bot has connected and is ready.');
 		});
 		this.client.on('message', (msg)=>{
+			if (msg.author.id === this.client.user.id) return; //Don't rspond to own message
 			if (msg.channel.type === 'text') {
 				this.onMessage(msg.author.id, msg.content, msg.channel.id);
 			} else if (msg.channel.type === 'dm') {
@@ -69,8 +71,10 @@ class DiscordBot extends Bot {
 	}
 	
 	say(roomid, message) {
-		if (!message) return;
+		// console.log(`DISCORD BOT PRE: [${roomid}] [${message}]`);
 		message = this.filter(message);
+		// console.log(`DISCORD BOT SAY: [${roomid}] [${message}]`);
+		if (!message) return;
 		let channel = this.client.channels.get(roomid);
 		channel.sendMessage(message, {
 			disableEveryone: true,
@@ -80,23 +84,141 @@ class DiscordBot extends Bot {
 	}
 	
 	announceBattle(format, p1, p2, roomid) {
-		this.defaultRoom.sendMessage(
-			`${Tools.getFormat(format)} battle started between **${p1.getIdentity()}** and **${p2.getIdentity()}**`,
+		let f = Tools.getFormat(format);
+		f += /battle$/i.test(f)?"":" battle";
+		
+		let msg = `${f} started between **${p1.getIdentity().slice(1)}** and **${p2.getIdentity().slice(1)}**`;
+		
+		if (format.slice(0,9) === 'tppleague') {
+			let f = Tools.getFormat(format);
+			let gym;
+			switch (format.slice(9)) {
+				case 'gym':
+					gym = LeagueSetup.gyms[p1.userid];
+					if (!gym) break;
+					msg = `A Gym battle has started: **${p2.getIdentity().slice(1)}** is challenging ${(gym.battletype==='trial')?"Captain":"Leader"} **${p1.getIdentity().slice(1)}** of the ${gym.name} ${(gym.battletype==='trial')?"Trial":"Gym"}!`;
+					break;
+				case 'elitefour':
+					gym = LeagueSetup.elites[p1.userid];
+					if (!gym) break;
+					msg = `An Elite Four battle has started: **${p2.getIdentity().slice(1)}** is challenging "${gym.name}" **${p1.getIdentity().slice(1)}** of the Elite Four!`;
+					break;
+				case 'champion':
+					gym = LeagueSetup.elites[p1.userid];
+					if (!gym) break;
+					msg = `@everyone A Champion battle has started: **${p2.getIdentity().slice(1)}** is challenging the Champion, "${gym.name}" **${p1.getIdentity().slice(1)}**!!`;
+					break;
+				default: break;
+			}
+		}
+		
+		this.battleData[roomid] = this.defaultRoom.sendMessage(
+			msg,
 			{
 				disableEveryone: true,
 				embed: {
 					title: `${p1.getIdentity()} vs ${p2.getIdentity()}`,
 					type: 'rich',
-					description: `A ${Tools.getFormat(format)} battle on the TPPLeague server.`,
+					description: `${f}!`,
 					url: `https://tppleague.me/${roomid}`,
-					timestamp: new Date(),
+					// timestamp: new Date(),
 				},
 			}
 		);
+		this.battleData[roomid]._p1 = p1.userid;
+		this.battleData[roomid]._p2 = p2.userid;
+	}
+	announceBattleFinished(roomid, winnerid) {
+		if (!this.battleData[roomid]) return;
+		let bd = this.battleData[roomid];
+		bd.then(msg => {
+			let e = {
+				title: msg.embeds[0].title, 
+				type: msg.embeds[0].type,
+				description: msg.embeds[0].description, 
+				url: `https://tppleague.me/replay/${roomid.slice(7)}`, 
+				// timestamp: msg.embeds[0].timestamp || new Date(), 
+			};
+			let txt = msg.content.replace('started', 'finished');
+			if (winnerid) {
+				if (winnerid === bd._p1) {
+					txt = txt.replace('is challenging', 'has lost against');
+				} else if (winnerid === bd._p2) {
+					txt = txt.replace('is challenging', 'has defeated');
+				}
+			}
+			msg.edit(txt,
+			{
+				embed: e,
+			});
+		});
+		delete this.battleData[roomid];
+	}
+	
+	announceTourny(format, roomid, state, etc) {
+		let data = this.tournyData[`${roomid}/${format}`];
+		switch (state) {
+			case 'create': {
+				data = this.tournyData[`${roomid}/${format}`] = {};
+				data.format = format;
+				data.roomid = roomid;
+				data.isOpen = true;
+				data.players = [];
+				data.message = this.defaultRoom.sendMessage(
+					`A ${Tools.getFormat(format)} tournament has been created (by ${etc.creator})!`,
+					{
+						disableEveryone: true,
+						embed: {
+							title: `Tournament on the TPPLeague server!`,
+							type: 'rich',
+							url: `https://tppleague.me/#${roomid}`,
+							// timestamp: new Date(),
+						}
+					}
+				);
+			} break;
+			case 'update': {
+				if (!data) return;
+				data.players = etc.players.map(p => Users.get(p).getIdentity());
+				data.isOpen = etc.open;
+				if (data.isOpen) {
+					data.message.then(m=>{
+						m.edit(`A ${Tools.getFormat(format)} tournament is open on the server, with ${data.players.join(', ') || 'nobody yet'} joined. **Come join in!**`);
+					});
+				} else {
+					data.message.then(m=>{
+						m.edit(`A ${Tools.getFormat(format)} tournament is underway on the server, with ${data.players.join(', ') || 'nobody'} playing!`);
+					});
+				}
+			} break;
+			case 'ended': {
+				if (!data) return;
+				data.message.then(m=>{
+					m.edit(`A ${Tools.getFormat(format)} tournament finished on the server, with ${arrayToPhrase(etc.results[0])} emerging victorious!`);
+				});
+				delete this.tournyData[`${roomid}/${format}`];
+			} break;
+			case 'forceended': {
+				if (!data) return;
+				data.message.then(m=>{
+					m.edit(`The ${Tools.getFormat(format)} tournament has been cancelled by ${etc.by}!`);
+				});
+				delete this.tournyData[`${roomid}/${format}`];
+			} break;
+		}
+		
+		return;
+		function arrayToPhrase(array, finalSeparator) {
+			if (array.length <= 1)
+				return array.join();
+			finalSeparator = finalSeparator || "and";
+			return array.slice(0, -1).join(", ") + " " + finalSeparator + " " + array.slice(-1)[0];
+		}
 	}
 	
 	announce(message) {
 		if (!message) return;
+		if (message === `TPPLeague Champion Battle will be beginning soon!`) return; //already handled
 		message = this.filter(message);
 		
 		this.defaultRoom.sendMessage(`@everyone ${message}`);

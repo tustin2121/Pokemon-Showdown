@@ -270,17 +270,18 @@ create(leagueFormat, {
 	// Custom Event sent just after the win messages are sent
 	onBattleFinished: function(sideWon) {
 		if (this.turn === 0) return; //If this is before a fight even begins, ignore it.
-		this.send('champion', 'finished');
 		if (sideWon === this.p2) {
 			// Challenger won
 			let team = this.p2.pokemon.map(x => `${x.name}|${x.species}|${x.gender||"N"}${x.set.shiny?"*":""}`).join('[');
+			this.send('champion', 'finished');
 			this.send('e4fight', ['complete', this.gameType, team]);
 		} else if (sideWon === this.p1) {
 			// Challenger lost
+			this.send('champion', 'finished-lose');
 			this.send('e4fight', 'restart');
 		} else {
 			// Draw
-			
+			this.send('champion', 'finished');
 		}
 	},
 });

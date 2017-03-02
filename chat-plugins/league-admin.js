@@ -218,13 +218,17 @@ function LeagueSetupSend(msg) {
 				Users.users.forEach(curUser => curUser.send('|champnotify|notify') );
 				return;
 			case 'begin':
-				BotManager.announceNotify(`TPPLeague Champion Battle has begun! tppleague.me/${msg.battleid}`);
+				BotManager.announceNotify(`TPPLeague Champion Battle has begun! https://tppleague.me/${msg.battleid}`);
 				return;
 			case 'ongoing': //sent about every 10 rounds
-				BotManager.announceNotify(`TPPLeague Champion Battle is in progress! tppleague.me/${msg.battleid}`);
+				BotManager.announceNotify(`TPPLeague Champion Battle is in progress! https://tppleague.me/${msg.battleid}`);
 				return;
-			case 'finished': //sent about every 10 rounds
-				BotManager.announceNotify(`TPPLeague Champion Battle has completed! tppleague.me/${msg.battleid}`);
+			case 'finished':
+				BotManager.announceNotify(`TPPLeague Champion Battle has completed! https://tppleague.me/${msg.battleid}`);
+				Users.users.forEach(curUser => curUser.send('|champnotify|finished') );
+				return;
+			case 'finished-lose':
+				BotManager.announceNotify(`TPPLeague Champion Battle has completed! The Champion has defended their title! https://tppleague.me/${msg.battleid}`);
 				Users.users.forEach(curUser => curUser.send('|champnotify|finished') );
 				return;
 		}

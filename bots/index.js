@@ -25,20 +25,31 @@ class BotManager {
 	
 	say(message) {
 		this.botList.forEach((bot)=>{
-			bot.say(bot.defaultRoom, message);
+			try { bot.say(bot.defaultRoom, message); } catch (e) { console.error('BOT ERROR'+e.stack); }
 		});
 	}
 	
 	announceBattle(format, p1, p2, roomid) {
 		if (Config.reportbattlesBotFilter && Config.reportbattlesBotFilter(Tools.getFormat(format)) === false) return;
 		this.botList.forEach((bot)=>{
-			bot.announceBattle(format, p1, p2, roomid);
+			try { bot.announceBattle(format, p1, p2, roomid);  } catch (e) { console.error('BOT ERROR'+e.stack); }
+		});
+	}
+	announceBattleFinished(roomid, winnerid) {
+		this.botList.forEach((bot)=>{
+			try { bot.announceBattleFinished(roomid, winnerid); } catch (e) { console.error('BOT ERROR'+e.stack); }
+		});
+	}
+	
+	announceTourny(format, roomid, state, etc) {
+		this.botList.forEach((bot)=>{
+			try { bot.announceTourny(format, roomid, state, etc);  } catch (e) { console.error('BOT ERROR'+e.stack); }
 		});
 	}
 	
 	announceNotify(message) {
 		this.botList.forEach((bot)=>{
-			bot.announce(message);
+			try { bot.announce(message); } catch (e) { console.error('BOT ERROR'+e.stack); }
 		});
 	}
 }

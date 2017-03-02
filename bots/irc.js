@@ -1,5 +1,6 @@
 // irc.js
 // Home of the IRC bot class
+/* global Tools, LeagueSetup */
 
 const { Bot } = require('./bot.js');
 const irc = require('irc');
@@ -58,8 +59,41 @@ class IrcBot extends Bot {
 	
 	/** Announce a message into the remote room, no notification. */
 	announceBattle(format, p1, p2, roomid) {
-		let msg = `${Tools.getFormat(format)} battle started between ${p1.getIdentity()} and ${p2.getIdentity()} -- tppleague.me/${roomid}`;
+		let f = Tools.getFormat(format);
+		f += /battle$/i.test(f)?"":" battle";
+		let msg = `${f} started between ${p1.getIdentity()} and ${p2.getIdentity()}`;
+		
+		if (format.slice(0,9) === 'tppleague') {
+			let f = Tools.getFormat(format);
+			let gym;
+			switch (format.slice(9)) {
+				case 'gym':
+					gym = LeagueSetup.gyms[p1.userid];
+					if (!gym) break;
+					msg = `A Gym battle has started: ${p2.getIdentity().slice(1)} is challenging ${(gym.battletype==='trial')?"Captain":"Leader"} ${p1.getIdentity().slice(1)} of the ${gym.name} ${(gym.battletype==='trial')?"Trial":"Gym"}!`;
+					break;
+				case 'elitefour':
+					gym = LeagueSetup.elites[p1.userid];
+					if (!gym) break;
+					msg = `An Elite Four battle has started: ${p2.getIdentity().slice(1)} is challenging "${gym.name}" ${p1.getIdentity().slice(1)} of the Elite Four!`;
+					break;
+				case 'champion':
+					gym = LeagueSetup.elites[p1.userid];
+					if (!gym) break;
+					msg = `A Champion battle has started: ${p2.getIdentity().slice(1)} is challenging the Champion, "${gym.name}" ${p1.getIdentity().slice(1)}!`;
+					break;
+				default: break;
+			}
+		}
+		msg += ` -- tppleague.me/${roomid}`;
 		this.say(this.reportRoom, msg);
+	}
+	
+	announceTourny(format, roomid, state, etc) {
+		if (state === 'created') {
+			let msg = `A ${Tools.getFormat(format)} tournament has been created by ${etc.creator} -- tppleague.me/#${roomid}`;
+			this.say(this.reportRoom, msg);
+		}
 	}
 	
 	/** Announce a message to everyone in the room, notifying everyone. */
