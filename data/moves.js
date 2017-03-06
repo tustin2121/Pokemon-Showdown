@@ -442,10 +442,12 @@ exports.BattleMovedex = {
 		pp: 20,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
-		onHit: function (target, source, move) {
-			if (source.isActive) target.addVolatile('trapped', source, move, 'trapper');
+		secondary: {
+			chance: 100,
+			onHit: function (target, source, move) {
+				if (source.isActive) target.addVolatile('trapped', source, move, 'trapper');
+			},
 		},
-		secondary: false,
 		target: "normal",
 		type: "Steel",
 		zMovePower: 160,
@@ -6236,10 +6238,13 @@ exports.BattleMovedex = {
 		priority: 0,
 		flags: {},
 		isZ: "mewniumz",
-		onHit: function () {
-			this.setTerrain('psychicterrain');
+		secondary: {
+			dustproof: true,
+			chance: 100,
+			onHit: function () {
+				this.setTerrain('psychicterrain');
+			},
 		},
-		secondary: false,
 		target: "normal",
 		type: "Psychic",
 		contestType: "Cool",
@@ -15394,10 +15399,12 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1},
-		onHit: function (target, source, move) {
-			if (source.isActive) target.addVolatile('trapped', source, move, 'trapper');
+		secondary: {
+			chance: 100,
+			onHit: function (target, source, move) {
+				if (source.isActive) target.addVolatile('trapped', source, move, 'trapper');
+			},
 		},
-		secondary: false,
 		target: "normal",
 		type: "Ghost",
 		zMovePower: 160,
@@ -15609,10 +15616,13 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1, mirror: 1, sound: 1, authentic: 1},
-		onHit: function (target) {
-			if (target.status === 'brn') target.cureStatus();
+		secondary: {
+			dustproof: true,
+			chance: 100,
+			onHit: function (target) {
+				if (target.status === 'brn') target.cureStatus();
+			},
 		},
-		secondary: false,
 		target: "allAdjacent",
 		type: "Water",
 		zMovePower: 175,
@@ -17210,7 +17220,6 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
-		volatileStatus: 'throatchop',
 		effect: {
 			duration: 2,
 			onStart: function (target) {
@@ -17228,7 +17237,12 @@ exports.BattleMovedex = {
 				this.add('-end', target, 'Throat Chop', '[silent]');
 			},
 		},
-		secondary: false,
+		secondary: {
+			chance: 100,
+			onHit: function (target) {
+				target.addVolatile('throatchop');
+			},
+		},
 		target: "normal",
 		type: "Dark",
 		zMovePower: 160,
