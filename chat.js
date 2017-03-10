@@ -167,25 +167,26 @@ class CommandContext {
 		// Output the message
 
 		if (message && message !== true && typeof message.then !== 'function') {
+			let inChar;
+			if ((this.pmTarget && this.user.pmAlias) || (this.room && this.room.getAlias(this.user)) ) {
+				inChar = false;
+				let msgtest = message.replace('/mee','').replace('/me','').trim();
+				if (msgtest.slice(-1) === '"' && msgtest.charAt(0) === '"') inChar = true;
+				if (inChar) {
+					let f = message.indexOf('"');
+					let l = message.lastIndexOf('"');
+					message = message.slice(0,f)+message.slice(f+1,l)+message.slice(l+1);
+				}
+			}
+			
 			if (this.pmTarget) {
-				let buf = `|pm|${this.user.getIdentity()}|${this.pmTarget.getIdentity()}|${message}`;
+				let buf = `|pm|${this.user.getIdentity(undefined, inChar)}|${this.pmTarget.getIdentity()}|${message}`;
 				this.user.send(buf);
 				if (this.pmTarget !== this.user) this.pmTarget.send(buf);
 
 				this.pmTarget.lastPM = this.user.userid;
 				this.user.lastPM = this.pmTarget.userid;
 			} else {
-				let inChar;
-				if (this.room.getAlias(this.user)) {
-					inChar = false;
-					let msgtest = message.replace('/me','').trim();
-					if (msgtest.slice(-1) === '"' && msgtest.charAt(0) === '"') inChar = true;
-					if (inChar) {
-						let f = message.indexOf('"');
-						let l = message.lastIndexOf('"');
-						message = message.slice(0,f)+message.slice(f+1,l)+message.slice(l+1);
-					}
-				}
 				this.room.add(`|c|${this.user.getIdentity(this.room.id, inChar)}|${message}`);
 			}
 		}

@@ -2134,6 +2134,7 @@ exports.commands = {
 		} else {
 			uptimeText = Chat.toDurationString(uptime * 1000);
 		}
+		if (user.userid === 'azum4roll') uptimeText = "Fuck off, Azum";
 		this.sendReplyBox("Uptime: <b>" + uptimeText + "</b>");
 	},
 

@@ -26,7 +26,7 @@ function create(base, mod) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TPP League Formats
 let leagueFormat = {
-	name: "TPPLeague",
+	name: "[Gen 7] TPPLeague",
 	desc: ["The Format used by TPPLeague for normal and test fights."],
 	section: "TPP",
 	team: undefined,
@@ -113,7 +113,7 @@ create(leagueFormat, {
 });
 
 create(leagueFormat, {
-	name: "TPPLeague (Gym)",
+	name: "[Gen 7] TPPLeague (Gym)",
 	desc: ["The Format used by TPPLeague Gym and Trial fights."],
 	
 	// Custom PseudoEvent called before anything is sent to the client (save for join messages)
@@ -159,7 +159,7 @@ create(leagueFormat, {
 });
 
 create(leagueFormat, {
-	name: "TPPLeague (Elite Four)",
+	name: "[Gen 7] TPPLeague (Elite Four)",
 	desc: ["The Format used by TPPLeague Elite Four fights."],
 	
 	// Custom PseudoEvent called before anything is sent to the client (save for join messages)
@@ -213,7 +213,7 @@ create(leagueFormat, {
 });
 
 create(leagueFormat, {
-	name: "TPPLeague (Champion)",
+	name: "[Gen 7] TPPLeague (Champion)",
 	desc: ["The Format used by TPPLeague Champion fights."],
 	
 	// Custom PseudoEvent called before anything is sent to the client (save for join messages)
@@ -310,7 +310,7 @@ create(tppla, {
 });
 	
 create({
-	name: 'Snowball Fight',
+	name: '[Gen 7] Snowball Fight',
 	section: 'TPP',
 	column: 4,
 	ruleset: ['Ubers'],

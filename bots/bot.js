@@ -187,8 +187,14 @@ class Bot {
 	
 	announceTourny(format, roomid, state, etc) {} // Can override 
 	
-	/** Announce a message to everyone in the room, notifying everyone. */
+	/** Announce a generic message to everyone in the room. */
 	announce(message) {
+		// Must Override
+		if (message.indexOf('\n') > -1) throw new Error('Notices cannot have newlines!');
+	}
+	
+	/** Announce a generic message to everyone in the room, notifying everyone. */
+	announceNotify(message) {
 		// Must Override
 		if (message.indexOf('\n') > -1) throw new Error('Notices cannot have newlines!');
 	}

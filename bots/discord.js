@@ -5,6 +5,10 @@
 const { Bot } = require('./bot.js');
 const discord = require('discord.js');
 
+function reportError(err){
+	console.error("DISCORD PROMISE ERROR: ", err);
+}
+
 class DiscordBot extends Bot {
 	constructor(opts) {
 		if (!opts.token) throw new Error("Invalid Discord configuration!");
@@ -78,7 +82,7 @@ class DiscordBot extends Bot {
 		let channel = this.client.channels.get(roomid);
 		channel.sendMessage(message, {
 			disableEveryone: true,
-		});
+		}).catch(reportError);
 		
 		//TODO logging, when it is needed
 	}
@@ -88,6 +92,7 @@ class DiscordBot extends Bot {
 		f += /battle$/i.test(f)?"":" battle";
 		
 		let msg = `${f} started between **${p1.getIdentity().slice(1)}** and **${p2.getIdentity().slice(1)}**`;
+		let tryPin = false;
 		
 		if (format.slice(0,9) === 'tppleague') {
 			let f = Tools.getFormat(format);
@@ -107,12 +112,13 @@ class DiscordBot extends Bot {
 					gym = LeagueSetup.elites[p1.userid];
 					if (!gym) break;
 					msg = `@everyone A Champion battle has started: **${p2.getIdentity().slice(1)}** is challenging the Champion, "${gym.name}" **${p1.getIdentity().slice(1)}**!!`;
+					tryPin = true;
 					break;
 				default: break;
 			}
 		}
 		
-		this.battleData[roomid] = this.defaultRoom.sendMessage(
+		let battle = this.battleData[roomid] = this.defaultRoom.sendMessage(
 			msg,
 			{
 				disableEveryone: true,
@@ -124,9 +130,19 @@ class DiscordBot extends Bot {
 					// timestamp: new Date(),
 				},
 			}
-		);
-		this.battleData[roomid]._p1 = p1.userid;
-		this.battleData[roomid]._p2 = p2.userid;
+		).catch(reportError);
+		battle._p1 = p1.userid;
+		battle._p2 = p2.userid;
+		
+		if (tryPin && battle.pinnable) {
+			this.defaultRoom.fetchPinnedMessages().then((messages)=>{
+				// Find and unpin our last message
+				let prevPin = messages.find(x => x.author.id === this.client.user.id);
+				if (prevPin) prevPin.unpin();
+				// Now pin this message
+				battle.pin();
+			}).catch(reportError);
+		}
 	}
 	announceBattleFinished(roomid, winnerid) {
 		if (!this.battleData[roomid]) return;
@@ -150,7 +166,7 @@ class DiscordBot extends Bot {
 			msg.edit(txt,
 			{
 				embed: e,
-			});
+			}).catch(reportError);
 		});
 		delete this.battleData[roomid];
 	}
@@ -175,7 +191,7 @@ class DiscordBot extends Bot {
 							// timestamp: new Date(),
 						}
 					}
-				);
+				).catch(reportError);
 			} break;
 			case 'update': {
 				if (!data) return;
@@ -221,7 +237,15 @@ class DiscordBot extends Bot {
 		if (message === `TPPLeague Champion Battle will be beginning soon!`) return; //already handled
 		message = this.filter(message);
 		
-		this.defaultRoom.sendMessage(`@everyone ${message}`);
+		this.defaultRoom.sendMessage(`${message}`, { disableEveryone: true, }).catch(reportError);
+	}
+	
+	announceNotify(message) {
+		if (!message) return;
+		if (message === `TPPLeague Champion Battle will be beginning soon!`) return; //already handled
+		message = this.filter(message);
+		
+		this.defaultRoom.sendMessage(`@everyone ${message}`).catch(reportError);
 	}
 	
 	verifyParts(parts) {
@@ -260,6 +284,8 @@ class DiscordBot extends Bot {
 			.replace(/&amp;/g, "&")
 			.split(/<br\s*\/?>/);
 	}
+	
+	// /eval BotManager.botList[1].defaultRoom.fetchPinnedMessages().then((msg)=>{ console.log(msg); });
 	
 	//TODO: /eval BotManager.botList[1].defaultRoom.sendMessage('test', {embed:{title:'test', type:'rich', image:{url:'https://tppleague.me/sprites/bw/jigglypuff.png', width:80, height:80}, fields:[ {name:'Name', value:'Jigglypuff', inline:true}, {name:'Type', value: 'Fairy', inline: true}, {name:'Something', value:'random', inline:true} ]}});
 	// https://images.discordapp.net/.eJwFwdENhCAMANBdGIAWKipuQ5CgUVsCNfdxud3vva95-202c6i2sQHs58jSdztUeqrFVpF6l9TOYbM8kFRTPp7COsDF1UWiOFF0GGZaA_iFyCFiQCT080QeXr5YPmwbV_P7AwXnIsQ.S0ilxXt-olpf6_ryDktuEqfn-H0?width=511&height=481

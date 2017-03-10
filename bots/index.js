@@ -47,9 +47,14 @@ class BotManager {
 		});
 	}
 	
-	announceNotify(message) {
+	announce(message) {
 		this.botList.forEach((bot)=>{
 			try { bot.announce(message); } catch (e) { console.error('BOT ERROR'+e.stack); }
+		});
+	}
+	announceNotify(message) {
+		this.botList.forEach((bot)=>{
+			try { bot.announceNotify(message); } catch (e) { console.error('BOT ERROR'+e.stack); }
 		});
 	}
 }

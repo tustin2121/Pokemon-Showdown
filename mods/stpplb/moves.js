@@ -34,6 +34,44 @@ exports.BattleMovedex = {
 			},
 		},
 	},
+	"ttwister": {
+		num: 20007,
+		accuracy: 100,
+		basePower: 40,
+		category: "Special",
+		desc: "If this move is successful and the user has not fainted, the effects of Leech Seed and partial-trapping moves end for the user, and all hazards are removed from the user's side of the field.",
+		shortDesc: "Frees user from hazards/partial trap/Leech Seed.",
+		id: "ttwister",
+		isViable: true,
+		name: "T-Twister",
+		pp: 30,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Twister');
+		},
+		self: {
+			onHit: function (pokemon) {
+				if (pokemon.hp && pokemon.removeVolatile('leechseed')) {
+					this.add('-end', pokemon, 'Leech Seed', '[from] move: T-Twister', '[of] ' + pokemon);
+				}
+				let sideConditions = {spikes:1, toxicspikes:1, stealthrock:1, stickyweb:1};
+				for (let i in sideConditions) {
+					if (pokemon.hp && pokemon.side.removeSideCondition(i)) {
+						this.add('-sideend', pokemon.side, this.getEffect(i).name, '[from] move: T-Twister', '[of] ' + pokemon);
+					}
+				}
+				if (pokemon.hp && pokemon.volatiles['partiallytrapped']) {
+					pokemon.removeVolatile('partiallytrapped');
+				}
+			},
+		},
+		secondary: false,
+		target: "normal",
+		type: "Electric",
+		zMovePower: 100,
+		contestType: "Cool",
+	},
 	"defog": {
 		inherit: true,
 		onHit: function (target, source, move) {

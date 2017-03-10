@@ -2,6 +2,15 @@
 
 exports.BattleFormatsData = {
 	////////////////////////////////////
+	// TPPLeague Fakemon
+	////////////////////////////////////
+	gumblegoose: {
+		randomBattleMoves: ["originpulse", "hurricane", "quiverdance", "freezedry", "roost", "scald", "aurasphere"],
+		isNonstandard: true,
+		tier: "TPPLeague",
+	},
+	
+	////////////////////////////////////
 	// Prism Fakemon
 	////////////////////////////////////
 	phancero: {
@@ -19,5 +28,53 @@ exports.BattleFormatsData = {
 	rb202: {
 		isNonstandard: true,
 		tier: "Glitch",
-	}
+	},
+	
+	////////////////////////////////////
+	// Touhoumon
+	////////////////////////////////////
+	chibisanae: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	sanae: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	chibimomiji: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	momiji: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	chibitokiko: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	tokiko: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	defensemomiji: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	attacktokiko: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	tensoku: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	attacksanae: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	technicalsanae: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
 };

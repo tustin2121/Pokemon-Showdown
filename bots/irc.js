@@ -96,8 +96,20 @@ class IrcBot extends Bot {
 		}
 	}
 	
-	/** Announce a message to everyone in the room, notifying everyone. */
+	/** Announce a message to the room. */
 	announce(message) {
+		if (!message) return;
+		if (!this.reportRoom) return; // Can't announce when there's nothing set up to announce to...
+		message = this.filter(message);
+		if (message.indexOf('\n') > -1) throw new Error('Notices cannot have newlines!');
+		this.connection.say(this.reportRoom, message);
+		
+		if (!this.isLogging) return;
+		this.log(1, this.nickname, message);
+	}
+	
+	/** Announce a message to the room, notifying everyone. */
+	announceNotify(message) {
 		if (!message) return;
 		if (!this.reportRoom) return; // Can't announce when there's nothing set up to announce to...
 		message = this.filter(message);
