@@ -64,7 +64,7 @@ exports.Formats = [
 		banlist: ['OU', 'BL', 'Drizzle', 'Power Construct', 'Mewnium Z', 'Baton Pass'],
 	},
 	{
-		name: "[Gen 7] RU (alpha)",
+		name: "[Gen 7] RU (beta)",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3587352/\">RU Metagame Discussion</a>"],
 
 		mod: 'gen7',
@@ -80,9 +80,20 @@ exports.Formats = [
 		],
 
 		mod: 'gen7',
+		searchShow: false,
 		maxLevel: 5,
 		ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview', 'Little Cup'],
 		banlist: ['Cutiefly', 'Drifloon', 'Gligar', 'Gothita', 'Meditite', 'Misdreavus', 'Murkrow', 'Porygon', 'Scyther', 'Sneasel', 'Swirlix', 'Tangela', 'Yanma', 'Eevium Z', 'Dragon Rage', 'Sonic Boom'],
+	},
+	{
+		name: "[Gen 7] LC (suspect test)",
+		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3597499/\">LC Suspect Discussion</a>"],
+
+		mod: 'gen7',
+		challengeShow: false,
+		maxLevel: 5,
+		ruleset: ['[Gen 7] LC'],
+		banlist: [],
 	},
 	{
 		name: "[Gen 7] Anything Goes",
@@ -167,7 +178,6 @@ exports.Formats = [
 				return [template.baseSpecies + " is not in the Kanto or Alola Pokédex."];
 			}
 		},
-		requirePentagon: true,
 	},
 	{
 		name: "[Gen 7] Custom Game",
@@ -205,11 +215,22 @@ exports.Formats = [
 
 		mod: 'gen7',
 		gameType: 'doubles',
+		searchShow: false,
 		ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
 		banlist: ['Arceus', 'Dialga', 'Giratina', 'Giratina-Origin', 'Groudon', 'Ho-Oh', 'Kyogre', 'Kyurem-White', 'Lugia',
 			'Lunala', 'Magearna', 'Mewtwo', 'Palkia', 'Rayquaza', 'Reshiram', 'Solgaleo', 'Xerneas', 'Yveltal', 'Zekrom',
 			'Power Construct', 'Eevium Z', 'Dark Void', 'Gravity ++ Grass Whistle', 'Gravity ++ Hypnosis', 'Gravity ++ Lovely Kiss', 'Gravity ++ Sing', 'Gravity ++ Sleep Powder',
 		],
+	},
+	{
+		name: "[Gen 7] Doubles OU (suspect test)",
+		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3597456/\">np: DOU Stage 1</a>"],
+
+		mod: 'gen7',
+		gameType: 'doubles',
+		challengeShow: false,
+		ruleset: ['[Gen 7] Doubles OU'],
+		banlist: [],
 	},
 	{
 		name: "[Gen 7] Doubles Ubers",
@@ -271,13 +292,13 @@ exports.Formats = [
 	{
 		name: "[Gen 7] Full Potential",
 		desc: [
-			"A Pok&eacute;mon's highest stat is used when calculating the damage their attacks inflict.",
+			"A Pok&eacute;mon's highest stat, barring HP, is used when calculating the damage their attacks inflict.",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3596777/\">Full Potential</a>",
 		],
 
 		mod: 'fullpotential',
-		ruleset: ['[Gen 7] OU'],
-		banlist: ['Dugtrio-Base', 'Pheromosa', 'Shuckle', 'Speed Boost'],
+		ruleset: ['[Gen 7] OU', 'Item Clause'],
+		banlist: ['Dugtrio-Base', 'Pheromosa', 'Shuckle', 'Speed Boost', 'Unburden'],
 	},
 	{
 		name: "[Gen 7] Automagic",
@@ -289,15 +310,14 @@ exports.Formats = [
 		mod: 'automagic',
 		searchShow: false,
 		ruleset: ['[Gen 7] OU'],
-		banlist: [],
+		banlist: ["King's Rock", 'Razor Fang'],
 		onAfterSecondaryEffect: function (target, source, move) {
-			let moreSetup = ['bellydrum'];
+			let moreSetup = ['acupressure', 'bellydrum', 'stockpile'];
 			if (!source.types.includes("Ghost")) moreSetup.push("curse");
 			source.baseMoveset.forEach(curmove => {
 				let move = this.getMove(curmove.id);
 				if (moreSetup.includes(move.id) || (move.category === "Status" && move.boosts && move.target === "self")) {
 					this.useMove(move, source);
-					curmove.pp = target.hasAbility("pressure") ? (curmove.pp - 2) : (curmove.pp - 1);
 				}
 			});
 		},
@@ -305,9 +325,8 @@ exports.Formats = [
 			if (move.id !== "genesissupernova") return;
 			source.baseMoveset.forEach(curmove => {
 				let move = this.getMove(curmove.id);
-				if ((move.id === 'bellydrum' || (move.category === "Status" && move.boosts && move.target === "self")) && this.terrain === "psychicterrain") {// This is so that its confirmed that it successfully set PTerrain
+				if ((move.id === 'bellydrum' || (move.category === "Status" && move.boosts && move.target === "self")) && this.terrain === "psychicterrain") { // Confirm that it successfully set Psychic Terrain
 					this.useMove(move, source);
-					curmove.pp = target.hasAbility("pressure") ? (curmove.pp - 2) : (curmove.pp - 1);
 				}
 			});
 		},
@@ -327,7 +346,7 @@ exports.Formats = [
 
 		mod: 'gen7',
 		ruleset: ['Pokemon', 'Ability Clause', 'OHKO Clause', 'Evasion Moves Clause', 'CFZ Clause', 'Endless Battle Clause', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod'],
-		banlist: ['Arena Trap', 'Huge Power', 'Moody', 'Parental Bond', 'Protean', 'Pure Power', 'Shadow Tag', 'Wonder Guard', 'Chatter', 'Comatose + Sleep Talk'],
+		banlist: ['Arena Trap', 'Huge Power', 'Moody', 'Parental Bond', 'Protean', 'Pure Power', 'Shadow Tag', 'Water Bubble', 'Wonder Guard', 'Chatter', 'Comatose + Sleep Talk'],
 	},
 	{
 		name: "[Gen 7] 1v1",
@@ -367,7 +386,7 @@ exports.Formats = [
 		],
 	},
 	{
-		name: "[Gen 7] Mix and Mega",
+		name: "[Gen 7] Mix and Mega (suspect test)",
 		desc: [
 			"Mega Stones and Primal Orbs can be used on almost any fully evolved Pok&eacute;mon with no Mega Evolution limit.",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587740/\">Mix and Mega</a>",
@@ -471,7 +490,7 @@ exports.Formats = [
 			'Power Construct', 'Shadow Tag', 'Gengarite', 'Kangaskhanite', 'Lucarionite', 'Salamencite',
 			'Arena Trap + Dark Void', 'Arena Trap + Grass Whistle', 'Arena Trap + Hypnosis', 'Arena Trap + Relic Song', 'Arena Trap + Sing', 'Arena Trap + Sleep Powder',
 		],
-		noSketch: ['Celebrate', 'Conversion', "Forest's Curse", 'Geomancy', 'Happy Hour', 'Hold Hands', 'Lovely Kiss', 'Purify', 'Shell Smash', 'Shift Gear', 'Sketch', 'Spore', 'Trick-or-Treat'],
+		noSketch: ['Belly Drum', 'Celebrate', 'Conversion', "Forest's Curse", 'Geomancy', 'Happy Hour', 'Hold Hands', 'Lovely Kiss', 'Purify', 'Shell Smash', 'Shift Gear', 'Sketch', 'Spore', 'Trick-or-Treat'],
 		onValidateTeam: function (team) {
 			let sketchedMoves = {};
 			for (let i = 0; i < team.length; i++) {
@@ -492,7 +511,6 @@ exports.Formats = [
 		],
 
 		searchShow: false,
-		mod: 'hiddentype',
 		ruleset: ['[Gen 7] OU'],
 		onModifyTemplate: function (template, pokemon) {
 			if (template.types.includes(pokemon.hpType)) return;
@@ -716,15 +734,8 @@ exports.Formats = [
 		name: "Inverse Battle",
 
 		searchShow: false,
-		ruleset: ['Pokemon', 'Endless Battle Clause', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod'],
+		ruleset: ['Pokemon', 'Inverse Mod', 'Endless Battle Clause', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod'],
 		banlist: ['Illegal', 'Unreleased'],
-		onNegateImmunity: false,
-		onEffectiveness: function (typeMod, target, type, move) {
-			// The effectiveness of Freeze Dry on Water isn't reverted
-			if (move && move.id === 'freezedry' && type === 'Water') return;
-			if (move && !this.getImmunity(move, type)) return 1;
-			return -typeMod;
-		},
 	},
 	{
 		name: "[Gen 6] Random Battle",
