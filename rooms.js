@@ -160,25 +160,16 @@ class Room {
 		return user.group;
 	}
 	checkModjoin(user) {
-		if (this.staffRoom && !user.isStaff && (!this.auth || (this.auth[user.userid] || ' ') === ' ')) return false;
-		if (user.userid in this.users) return true;
 		if (!this.modjoin) return true;
-		const userGroup = user.can('makeroom') ? user.group : this.getAuth(user);
-
+		if (user.userid in this.users) return true;
+		if (user.can('makeroom')) return true;
+		if (this.staffRoom && !user.isStaff) return false;
+		let userGroup = this.getAuth(user);
 		let modjoinGroup = this.modjoin !== true ? this.modjoin : this.modchat;
-		if (!modjoinGroup) return true;
-
-		if (modjoinGroup === 'trusted') {
-			if (user.trusted) return true;
-			modjoinGroup = Config.groupsranking[1];
+		if (Config.groupsranking.indexOf(userGroup) < Config.groupsranking.indexOf(modjoinGroup)) {
+			return false;
 		}
-		if (modjoinGroup === 'autoconfirmed') {
-			if (user.autoconfirmed) return true;
-			modjoinGroup = Config.groupsranking[1];
-		}
-		if (!(userGroup in Config.groups)) return false;
-		if (!(modjoinGroup in Config.groups)) throw new Error(`Invalid modjoin setting in ${this.id}: ${modjoinGroup}`);
-		return Config.groups[userGroup].rank >= Config.groups[modjoinGroup].rank;
+		return true;
 	}
 	mute(user, setTime) {
 		let userid = user.userid;
@@ -1296,7 +1287,7 @@ class BattleRoom extends Room {
 		if (this.users[user.userid]) return user;
 
 		if (user.named) {
-			this.add((this.reportJoins && !user.locked ? '|j|' : '|J|') + user.name).update();
+			this.add((this.reportJoins ? '|j|' : '|J|') + user.name).update();
 		}
 
 		this.users[user.userid] = user;
@@ -1309,7 +1300,7 @@ class BattleRoom extends Room {
 	}
 	onRename(user, oldid, joining) {
 		if (joining) {
-			this.add((this.reportJoins && !user.locked ? '|j|' : '|J|') + user.name);
+			this.add((this.reportJoins ? '|j|' : '|J|') + user.name);
 		}
 		delete this.users[oldid];
 		this.users[user.userid] = user;
@@ -1325,7 +1316,7 @@ class BattleRoom extends Room {
 		}
 		delete this.users[user.userid];
 		this.userCount--;
-		this.add((this.reportJoins && !user.locked ? '|l|' : '|L|') + user.name);
+		this.add((this.reportJoins ? '|l|' : '|L|') + user.name);
 
 		if (this.game && this.game.onLeave) {
 			this.game.onLeave(user);

@@ -35,8 +35,4 @@ exports.BattleStatuses = {
 			return false;
 		},
 	},
-	choicelock: {
-		inherit: true,
-		onBeforeMove: function () {},
-	},
 };
