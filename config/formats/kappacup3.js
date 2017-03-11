@@ -291,18 +291,6 @@ exports.Formats = [
 		onModifyMovePriority: -100,
 	},
 	{
-		name: "Hidden Type",
-		desc: [
-			"Pok&eacute;mon have an added type determined by their IVs. Same as the Hidden Power type.",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3516349/\">Hidden Type</a>",
-		],
-		section: "Kappa Cup Season 3",
-
-		searchShow: false,
-		mod: 'hiddentype',
-		ruleset: ['OU'],
-	},
-	{
 		name: "Reverse Type Matchup",
 		desc: [
 			"The Attackers and Defenders on the type chart are reversed.",
