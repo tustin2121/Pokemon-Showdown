@@ -2,8 +2,9 @@
 
 const assert = require('assert');
 const Tools = require('./../tools').includeFormats();
+const PRNG = require('./../prng');
+const MockBattle = require('./mocks/Battle');
 
-let battleNum = 1;
 const cache = new Map();
 
 const RULE_FLAGS = {
@@ -18,6 +19,11 @@ const RULE_FLAGS = {
 function capitalize(word) {
 	return word.charAt(0).toUpperCase() + word.slice(1);
 }
+
+/**
+ * The default random number generator seed used if one is not given.
+ */
+const DEFAULT_SEED = [0x09917, 0x06924, 0x0e1c8, 0x06af0];
 
 class TestTools {
 	constructor(options) {
@@ -39,9 +45,9 @@ class TestTools {
 
 	mod(mod) {
 		if (cache.has(mod)) return cache.get(mod);
-		if (Tools.moddedTools[mod]) return new TestTools({mod: mod});
+		if (Tools.dexes[mod]) return new TestTools({mod: mod});
 		const baseFormat = Tools.getFormat(mod);
-		if (baseFormat.effectType === 'Format') return new TestTools({mod: 'base', baseFormat});
+		if (baseFormat.effectType === 'Format') return new TestTools({mod: baseFormat.mod, baseFormat});
 		throw new Error(`Mod ${mod} does not exist`);
 	}
 
@@ -86,13 +92,29 @@ class TestTools {
 		return format;
 	}
 
-	createBattle(options, teams) {
+	/**
+	 * Creates a new Battle and returns it.
+	 *
+	 * @param {Object} [options]
+	 * @param {Team[]} [teams]
+	 * @param {PRNG} [prng] A pseudo-random number generator. If not provided, a pseudo-random number
+	 * generator will be generated for the user with a seed that is guaranteed to be the same across
+	 * test executions to help with determinism.
+	 * @returns {MockBattle} A mocked battle. This has mostly the same behaviour as regular Battles,
+	 * but some behaviour may differ specifically for testing.
+	 */
+	createBattle(options, teams, prng = new PRNG(DEFAULT_SEED)) {
 		if (Array.isArray(options)) {
 			teams = options;
 			options = {};
 		}
 		const format = this.getFormat(options || {});
-		const battle = BattleEngine.Battle.construct(`battle-test-${battleNum++}`, format.id);
+		const battle = MockBattle.construct(
+			format.id,
+			undefined,
+			undefined,
+			prng
+		);
 		if (options && options.partialDecisions) battle.supportPartialDecisions = true;
 		if (teams) {
 			for (let i = 0; i < teams.length; i++) {
@@ -107,4 +129,4 @@ class TestTools {
 
 const common = exports = module.exports = new TestTools();
 cache.set('base', common);
-cache.set('gen6', common);
+cache.set('gen7', common);

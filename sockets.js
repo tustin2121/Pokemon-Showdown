@@ -18,7 +18,7 @@ global.Config = require('./config/config');
 
 if (cluster.isMaster) {
 	cluster.setupMaster({
-		exec: require('path').resolve(__dirname, 'sockets.js'),
+		exec: require('path').resolve(__dirname, 'sockets'),
 	});
 
 	let workers = exports.workers = {};
@@ -31,10 +31,11 @@ if (cluster.isMaster) {
 			// console.log('master received: ' + data);
 			switch (data.charAt(0)) {
 			case '*': {
-				// *socketid, ip
+				// *socketid, ip, protocol
 				// connect
 				let nlPos = data.indexOf('\n');
-				Users.socketConnect(worker, id, data.substr(1, nlPos - 1), data.substr(nlPos + 1));
+				let nlPos2 = data.indexOf('\n', nlPos + 1);
+				Users.socketConnect(worker, id, data.slice(1, nlPos), data.slice(nlPos + 1, nlPos2), data.slice(nlPos2 + 1));
 				break;
 			}
 
@@ -61,7 +62,7 @@ if (cluster.isMaster) {
 
 	cluster.on('disconnect', worker => {
 		// worker crashed, try our best to clean up
-		require('./crashlogger.js')(new Error("Worker " + worker.id + " abruptly died"), "The main process");
+		require('./crashlogger')(new Error("Worker " + worker.id + " abruptly died"), "The main process");
 
 		// this could get called during cleanup; prevent it from crashing
 		worker.send = () => {};
@@ -106,10 +107,9 @@ if (cluster.isMaster) {
 	};
 
 	exports.killWorker = function (worker) {
-		let idd = worker.id + '-';
 		let count = 0;
-		Users.connections.forEach((connection, connectionid) => {
-			if (connectionid.substr(idd.length) === idd) {
+		Users.connections.forEach(connection => {
+			if (connection.worker === worker) {
 				Users.socketDisconnect(worker, worker.id, connection.socketid);
 				count++;
 			}
@@ -182,12 +182,12 @@ if (cluster.isMaster) {
 
 	// It's optional if you don't need these features.
 
-	global.Cidr = require('./cidr');
+	global.Dnsbl = require('./dnsbl');
 
 	if (Config.crashguard) {
 		// graceful crash
 		process.on('uncaughtException', err => {
-			require('./crashlogger.js')(err, 'Socket process ' + cluster.worker.id + ' (' + process.pid + ')', true);
+			require('./crashlogger')(err, 'Socket process ' + cluster.worker.id + ' (' + process.pid + ')', true);
 		});
 	}
 
@@ -244,7 +244,7 @@ if (cluster.isMaster) {
 	let sockjs = require('sockjs');
 
 	let server = sockjs.createServer({
-		sockjs_url: "//play.pokemonshowdown.com/js/lib/sockjs-0.3.min.js",
+		sockjs_url: "//play.pokemonshowdown.com/js/lib/sockjs-1.1.1-nwjsfix.min.js",
 		log: (severity, message) => {
 			if (severity === 'error') console.log('ERROR: ' + message);
 		},
@@ -424,7 +424,7 @@ if (cluster.isMaster) {
 	});
 
 	// this is global so it can be hotpatched if necessary
-	let isTrustedProxyIp = Cidr.checker(Config.proxyip);
+	let isTrustedProxyIp = Dnsbl.checker(Config.proxyip);
 	let socketCounter = 0;
 	server.on('connection', socket => {
 		if (!socket) {
@@ -454,7 +454,7 @@ if (cluster.isMaster) {
 			}
 		}
 
-		process.send('*' + socketid + '\n' + socket.remoteAddress);
+		process.send('*' + socketid + '\n' + socket.remoteAddress + '\n' + socket.protocol);
 
 		socket.on('data', message => {
 			// drop empty messages (DDoS?)
@@ -495,5 +495,5 @@ if (cluster.isMaster) {
 
 	console.log('Test your server at http://' + (Config.bindaddress === '0.0.0.0' ? 'localhost' : Config.bindaddress) + ':' + Config.port);
 
-	require('./repl.js').start('sockets-', cluster.worker.id + '-' + process.pid, cmd => eval(cmd));
+	require('./repl').start('sockets-', cluster.worker.id + '-' + process.pid, cmd => eval(cmd));
 }

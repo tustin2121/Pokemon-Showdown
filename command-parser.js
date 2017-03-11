@@ -60,34 +60,18 @@ exports.multiLinePattern = {
  * Load command files
  *********************************************************/
 
-let baseCommands = exports.baseCommands = require('./commands.js').commands;
+let baseCommands = exports.baseCommands = require('./commands').commands;
 let commands = exports.commands = Object.assign({}, baseCommands);
 
 // Install plug-in commands
 
 // info always goes first so other plugins can shadow it
-Object.assign(commands, require('./chat-plugins/info.js').commands);
+Object.assign(commands, require('./chat-plugins/info').commands);
 
 for (let file of fs.readdirSync(path.resolve(__dirname, 'chat-plugins'))) {
 	if (file.substr(-3) !== '.js' || file === 'info.js') continue;
 	Object.assign(commands, require('./chat-plugins/' + file).commands);
 }
-
-/*********************************************************
- * Modlog
- *********************************************************/
-
-let modlog = exports.modlog = {
-	lobby: fs.createWriteStream(path.resolve(__dirname, 'logs/modlog/modlog_lobby.txt'), {flags:'a+'}),
-	battle: fs.createWriteStream(path.resolve(__dirname, 'logs/modlog/modlog_battle.txt'), {flags:'a+'}),
-};
-
-let writeModlog = exports.writeModlog = function (roomid, text) {
-	if (!modlog[roomid]) {
-		modlog[roomid] = fs.createWriteStream(path.resolve(__dirname, 'logs/modlog/modlog_' + roomid + '.txt'), {flags:'a+'});
-	}
-	modlog[roomid].write('[' + (new Date().toJSON()) + '] ' + text + '\n');
-};
 
 /*********************************************************
  * Parser
@@ -111,6 +95,35 @@ class CommandContext {
 		this.targetUser = null;
 		this.targetUsername = '';
 		this.inputUsername = '';
+	}
+
+	checkFormat(room, message) {
+		if (!room) return false;
+		if (!room.filterStretching && !room.filterCaps) return false;
+		let formatError = [];
+		// Removes extra spaces and null characters
+		message = message.trim().replace(/[ \u0000\u200B-\u200F]+/g, ' ');
+
+		let stretchMatch = room.filterStretching && message.match(/(.+?)\1{7,}/i);
+		let capsMatch = room.filterCaps && message.match(/[A-Z\s]{18,}/);
+
+		if (stretchMatch) {
+			formatError.push("too much stretching");
+		}
+		if (capsMatch) {
+			formatError.push("too many capital letters");
+		}
+		if (formatError.length > 0) {
+			return formatError.join(' and ') + ".";
+		}
+		return false;
+	}
+
+	checkSlowchat(room, user) {
+		if (!room || !room.slowchat) return true;
+		let lastActiveSeconds = (Date.now() - user.lastMessageTime) / 1000;
+		if (lastActiveSeconds < room.slowchat) return false;
+		return true;
 	}
 
 	checkBanwords(room, message) {
@@ -143,8 +156,11 @@ class CommandContext {
 			this.sendReply('|html|<div class="message-error">' + Tools.escapeHTML(message).replace(/\n/g, '<br />') + '</div>');
 		}
 	}
+	addBox(html) {
+		this.add('|html|<div class="infobox">' + html + '</div>');
+	}
 	sendReplyBox(html) {
-		this.sendReply('|raw|<div class="infobox">' + html + '</div>');
+		this.sendReply('|html|<div class="infobox">' + html + '</div>');
 	}
 	popupReply(message) {
 		this.connection.popup(message);
@@ -155,34 +171,13 @@ class CommandContext {
 	send(data) {
 		this.room.send(data);
 	}
-	privateModCommand(data, noLog) {
-		this.sendModCommand(data);
-		this.logEntry(data);
-		this.logModCommand(data);
-	}
 	sendModCommand(data) {
-		let users = this.room.users;
-		let auth = this.room.auth;
-
-		for (let i in users) {
-			let user = users[i];
-			// hardcoded for performance reasons (this is an inner loop)
-			if (user.isStaff || (auth && (auth[user.userid] || '+') !== '+')) {
-				user.sendTo(this.room, data);
-			}
-		}
+		this.room.sendModCommand(data);
 	}
-	logEntry(data) {
-		this.room.logEntry(data);
-	}
-	addModCommand(text, logOnlyText) {
-		this.add(text);
-		this.logModCommand(text + (logOnlyText || ""));
-	}
-	logModCommand(text) {
-		let roomid = (this.room.battle ? 'battle' : this.room.id);
-		if (this.room.isPersonal) roomid = 'groupchat';
-		writeModlog(roomid, '(' + this.room.id + ') ' + text);
+	privateModCommand(data) {
+		this.room.sendModCommand(data);
+		this.logEntry(data);
+		this.room.modlog(data);
 	}
 	globalModlog(action, user, text) {
 		let buf = "(" + this.room.id + ") " + action + ": ";
@@ -194,7 +189,17 @@ class CommandContext {
 			if (user.autoconfirmed && user.autoconfirmed !== userid) buf += " ac:[" + user.autoconfirmed + "]";
 		}
 		buf += text;
-		writeModlog('global', buf);
+		Rooms.global.modlog(buf);
+	}
+	logEntry(data) {
+		this.room.logEntry(data);
+	}
+	addModCommand(text, logOnlyText) {
+		this.add(text);
+		this.room.modlog(text + (logOnlyText || ""));
+	}
+	logModCommand(text) {
+		this.room.modlog(text);
 	}
 	can(permission, target, room) {
 		if (!this.user.can(permission, target, room)) {
@@ -205,11 +210,6 @@ class CommandContext {
 	}
 	canBroadcast(suppressMessage) {
 		if (!this.broadcasting && this.cmdToken === BROADCAST_TOKEN) {
-			if (this.user.broadcasting) {
-				this.errorReply("You can't broadcast another command too soon.");
-				return false;
-			}
-
 			let message = this.canTalk(suppressMessage || this.message);
 			if (!message) return false;
 			if (!this.user.can('broadcast', null, this.room)) {
@@ -229,7 +229,6 @@ class CommandContext {
 
 			this.message = message;
 			this.broadcastMessage = broadcastMessage;
-			this.user.broadcasting = this.cmd;
 		}
 		return true;
 	}
@@ -249,7 +248,6 @@ class CommandContext {
 		this.room.lastBroadcastTime = Date.now();
 
 		this.broadcasting = true;
-		this.user.broadcasting = false;
 
 		return true;
 	}
@@ -278,7 +276,7 @@ class CommandContext {
 		try {
 			result = commandHandler.call(this, this.target, this.room, this.user, this.connection, this.cmd, this.message);
 		} catch (err) {
-			if (require('./crashlogger.js')(err, 'A chat command', {
+			if (require('./crashlogger')(err, 'A chat command', {
 				user: this.user.name,
 				room: this.room.id,
 				message: this.message,
@@ -286,7 +284,7 @@ class CommandContext {
 				let ministack = Tools.escapeHTML(err.stack).split("\n").slice(0, 2).join("<br />");
 				if (Rooms.lobby) Rooms.lobby.send('|html|<div class="broadcast-red"><b>POKEMON SHOWDOWN HAS CRASHED:</b> ' + ministack + '</div>');
 			} else {
-				this.sendReply('|html|<div class="broadcast-red"><b>Pokemon Showdown crashed!</b><br />Don\'t worry, we\'re working on fixing it.</div>');
+				this.sendReply('|html|<div class="broadcast-red"><b>Pokemon Showdown crashed!</b><br />Everybody panic! <img src="/emotes/twitchplayspokemon/tppRiot.png" alt="tppRiot" title="tppRiot" class="emote" /></div>');
 			}
 		}
 		if (result === undefined) result = false;
@@ -359,14 +357,24 @@ class CommandContext {
 				return false;
 			}
 
+			if (this.checkFormat(room, message) && !user.can('mute', null, room)) {
+				this.errorReply("Your message was not sent because it contained " + this.checkFormat(room, message));
+				return false;
+			}
+
+			if (!this.checkSlowchat(room, user) && !user.can('mute', null, room)) {
+				this.errorReply("This room has slow-chat enabled. You can only talk once every " + room.slowchat + " seconds.");
+				return false;
+			}
+
 			if (!this.checkBanwords(room, message) && !user.can('mute', null, room)) {
 				this.errorReply("Your message contained banned words.");
 				return false;
 			}
 
-			if (room && room.id === 'lobby') {
+			if (room) {
 				let normalized = message.trim();
-				if ((normalized === user.lastMessage) &&
+				if (room.id === 'lobby' && (normalized === user.lastMessage) &&
 						((Date.now() - user.lastMessageTime) < MESSAGE_COOLDOWN)) {
 					this.errorReply("You can't send the same message again so soon.");
 					return false;
@@ -384,9 +392,11 @@ class CommandContext {
 		return true;
 	}
 	canEmbedURI(uri, isRelative) {
+		// return uri; // Fuck all of that below. --tustin2121 2016-08-24
 		if (uri.startsWith('https://')) return uri;
 		if (uri.startsWith('//')) return uri;
 		if (uri.startsWith('data:')) return uri;
+		if (uri.indexOf(':') == -1) return uri;
 		if (!uri.startsWith('http://')) {
 			if (/^[a-z]+\:\/\//.test(uri) || isRelative) {
 				return this.errorReply("URIs must begin with 'https://' or 'http://' or 'data:'");

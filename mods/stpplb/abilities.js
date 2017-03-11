@@ -2,6 +2,9 @@
 
 exports.BattleAbilities = { // define custom abilities here.
 	"glitchiate": {
+		num: 2001,
+		id: "glitchiate",
+		name: "Glitchiate",
 		desc: "This Pokemon's moves become ???-type moves and have their power multiplied by 1.3. This effect comes after other effects that change a move's type, but before Ion Deluge and Electrify's effects.",
 		shortDesc: "This Pokemon's moves become ??? type and have 1.3x power.",
 		onModifyMovePriority: -1,
@@ -16,12 +19,12 @@ exports.BattleAbilities = { // define custom abilities here.
 				return this.chainModify([0x14CD, 0x1000]); // multiplies BP by 5325/4096 (~1.3000488), like in the games
 			},
 		},
-		id: "glitchiate",
-		name: "Glitchiate",
 		rating: 4,
-		num: 192,
 	},
 	"serenegraceplus": {
+		num: 2002,
+		id: "serenegraceplus",
+		name: "Serene Grace Plus",
 		desc: "This Pokemon's moves have their secondary chances multiplied by 3.",
 		shortDesc: "This Pokemon's moves have their secondary chances multiplied by 3.",
 		onModifyMovePriority: -2,
@@ -32,22 +35,20 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 			}
 		},
-		id: "serenegraceplus",
-		name: "Serene Grace Plus",
 		rating: 5,
-		num: 193,
 	},
 	'spoopify': {
+		num: 2003,
+		id: "spoopify",
+		name: "Spoopify",
 		desc: "Makes stuff Ghost on switch-in.",
 		shortDesc: "On switch-in, this Pokemon changes all opponents' primary type to Ghost.",
 		onStart: function (pokemon) {
+			this.add("-ability", pokemon, "Spoopify");
 			let activeFoe = pokemon.side.foe.active;
 			for (let i = 0; i < activeFoe.length; i++) {
 				let foe = activeFoe[i];
-				let tempTypes = [];
-				for (let j = 0; j < foe.types.length; i++) {
-					tempTypes[i] = foe.types[i];
-				}
+				let tempTypes = foe.types.slice();
 				if (!foe.hasType('Ghost')) {
 					tempTypes[0] = 'Ghost';
 				} else if (foe.types[0] !== 'Ghost') {
@@ -56,15 +57,15 @@ exports.BattleAbilities = { // define custom abilities here.
 					continue;
 				}
 				foe.types = tempTypes;
-				this.add('-start', foe, 'typechange', foe.types.join('/'));
+				this.add('-start', foe, 'typechange', foe.types.join('/'), '[from] Spoopify', '[of] '+pokemon);
 			}
 		},
-		id: "spoopify",
-		name: "Spoopify",
 		rating: 4,
-		num: 194,
 	},
 	/*'scrubterrain': { // MLZekrom pls, Scrub Terrain was really hacky. Happy it's out of the meta.
+		num: 2004,
+		id: 'scrubterrain',
+		name: 'Scrub Terrain',
 		desc: '',
 		shortDesc: '',
 		onStart: function (pokemon) {
@@ -87,13 +88,13 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 			this.clearWeather();
 		},
-		id: 'scrubterrain',
-		name: 'Scrub Terrain',
 		rating: 4,
-		num: 195,
 	},*/
 	'proteon': { // Eeveelutionlvr's ability.
-		desc: '',
+		num: 2005,
+		id: 'proteon',
+		name: 'Proteon',
+		desc: "This Pokemon transforms into an Eeveelution to match the type of the move it is about to use, if possible.",
 		shortDesc: "This Pokemon transforms into an Eeveelution to match the type of the move it is about to use, if possible.",
 		onPrepareHit: function (source, target, move) {
 			let type = move.type;
@@ -120,86 +121,91 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 				if (species !== '' && source.template.speciesid !== toId(species)) { // don't transform if type is not an eeveelution type or you are already that eeveelution.
 					source.formeChange(species);
-					this.add('-formechange', source, species, '[msg]');
+					this.add('-formechange', source, species, '[msg]', '[from] ability: Proteon');
 					source.setAbility('proteon');
 				}
 			}
 		},
-		id: 'proteon',
-		name: 'Proteon',
 		rating: 4.5,
-		num: 196,
 	},
 	'swahahahahaggers': { // Sohippy's ability: con on switch-in.
-		desc: '',
+		num: 2006,
+		id: 'swahahahahaggers',
+		name: 'Swahahahahaggers',
+		desc: "On switch-in, all opponents become confused for 1 turn, with 70% self-hit chance.",
 		shortDesc: "On switch-in, all opponents become confused for 1 turn, with 70% self-hit chance.",
 		onStart: function (pokemon) {
+			this.add('-ability', pokemon, 'Swahahahahaggers');
 			let activeFoe = pokemon.side.foe.active;
 			for (let i = 0; i < activeFoe.length; i++) {
 				let foe = activeFoe[i];
 				foe.addVolatile('sconfusion');
 			}
 		},
-		id: 'swahahahahaggers',
-		name: 'Swahahahahaggers',
 		rating: 4,
-		num: 197,
 	},
 	'psychologist': { // Kooma's ability: immune to all "mental" volatile statuses.
+		num: 2007,
+		id: 'psychologist',
+		name: 'Psychologist',
+		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
+		shortDesc: "[PLACEHOLDER DESCRIPTION]",
 		onUpdate: function (pokemon) {
 			let list = ['embargo', 'encore', 'flinch', 'healblock', 'attract', 'nightmare', 'taunt', 'torment', 'confusion', 'sconfusion'];
+			let activated = false;
 			for (let i = 0; i < list.length; i++) {
 				if (pokemon.volatiles[list[i]]) {
 					pokemon.removeVolatile(list[i]);
+					activated = (activated || []);
+					activated.push(list[i]);
 				}
+			}
+			if (activated) {
+				this.add('-activate', pokemon, 'ability: Psychologist');
+				// For items that don't report themselves ending, report them ending.
+				activated.forEach(item => {
+					switch (item) {
+						case 'attract': 
+							this.add('-end', pokemon, 'move: Attract', '[from] ability: Psychologist'); 
+							break;
+						case 'nightmare':
+							this.add('-end', pokemon, 'Nightmare', '[from] ability: Psychologist'); 
+							break;
+					}
+				});
 			}
 		},
 		onImmunity: function (type, pokemon) {
 			let list = ['embargo', 'encore', 'flinch', 'healblock', 'attract', 'nightmare', 'taunt', 'torment', 'confusion', 'sconfusion'];
 			for (let i = 0; i < list.length; i++) {
 				if (type === list[i]) {
-					this.add('-immune', pokemon, list[i]);
-					return false;
+					this.add('-immune', pokemon, list[i], '[from] ability: Psychologist');
+					return null;
 				}
 			}
 		},
-		id: 'psychologist',
-		name: 'Psychologist',
 		rating: 4,
-		num: 198,
 	},
-	'seaandsky': { // Kap'n Kooma's ability: Primordial Sea plus Swift Swim.
+	'seaandsky': { // Kap'n Kooma's nerfed ability: Drizzle plus Swift Swim.
+		num: 2008,
+		id: 'seaandsky',
+		name: 'Sea and Sky',
+		desc: "On switch-in, this Pokemon summons Rain Dance. If Rain Dance is active, this Pokemon's Speed is doubled.",
+		shortDesc: "On switch-in, this Pokemon summons Rain Dance. If Rain Dance is active, this Pokemon's Speed is doubled.",
 		onStart: function (source) {
-			this.setWeather('primordialsea');
-		},
-		onAnySetWeather: function (target, source, weather) {
-			if (this.getWeather().id === 'primordialsea' && !(weather.id in {desolateland:1, primordialsea:1, deltastream:1})) return false; // no more Sandstorm overwriting the Heavy Rain!
-		},
-		onEnd: function (pokemon) {
-			if (this.weatherData.source !== pokemon) return;
-			for (let i = 0; i < this.sides.length; i++) {
-				for (let j = 0; j < this.sides[i].active.length; j++) {
-					let target = this.sides[i].active[j];
-					if (target === pokemon) continue;
-					if (target && target.hp && (target.ability === 'primordialsea' || target.ability === 'seaandsky') && (!target.ignore || target.ignore['Ability'] !== true)) {
-						this.weatherData.source = target;
-						return;
-					}
-				}
-			}
-			this.clearWeather();
+			this.setWeather('raindance');
 		},
 		onModifySpe: function (spe, pokemon) {
 			if (this.isWeather(['raindance', 'primordialsea'])) {
 				return this.chainModify(2);
 			}
 		},
-		id: 'seaandsky',
-		name: 'Sea and Sky',
 		rating: 5,
-		num: 199,
 	},
 	'littleengine': { // Poomph, the little engine who couldn't. Little moody.
+		num: 2009,
+		id: "littleengine",
+		name: "Little Engine",
 		desc: "This Pokemon has a random stat raised by 1 stage at the end of each turn.",
 		shortDesc: "Raises a random stat by 1 at the end of each turn.",
 		onResidualOrder: 26,
@@ -218,12 +224,13 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 			this.boost(boost);
 		},
-		id: "littleengine",
-		name: "Little Engine",
 		rating: 4.5,
-		num: 200,
 	},
 	'furriercoat': { // WhatevsFur, better fur coat, no frz.
+		num: 2010,
+		id: "furriercoat",
+		name: "Furrier Coat",
+		desc: "This Pokemon's Defense and Sp. Defense are doubled. This Pokemon cannot be frozen.",
 		shortDesc: "This Pokemon's Defense and Sp. Defense are doubled. This Pokemon cannot be frozen.",
 		onModifyDefPriority: 6,
 		onModifyDef: function (def) {
@@ -236,27 +243,22 @@ exports.BattleAbilities = { // define custom abilities here.
 		onImmunity: function (type, pokemon) {
 			if (type === 'frz') return false;
 		},
-		id: "furriercoat",
-		name: "Furrier Coat",
 		rating: 3.5,
-		num: 201,
 	},
 	'nofun': {
-		shortDesc: "Abilities are fun. No more ability for you.",
+		num: 2011,
 		id: "nofun",
 		name: "No Fun",
+		desc: "Abilities are fun. No more ability for you.",
+		shortDesc: "Abilities are fun. No more ability for you.",
 		rating: 0,
-		num: 202,
 	},
 	'nofunallowed': {
-		shortDesc: "Makes opponent's ability No Fun. Causes all custom moves to fail.",
-		onFoeSwitchIn: function (pokemon) {
-			let oldAbility = pokemon.setAbility('nofun', pokemon, 'nofun', true);
-			if (oldAbility) {
-				this.add('-endability', pokemon, oldAbility, '[from] ability: No Fun Allowed');
-				this.add('-ability', pokemon, 'No Fun', '[from] ability: No Fun Allowed');
-			}
-		},
+		num: 2012,
+		id: "nofunallowed",
+		name: "No Fun Allowed",
+		desc: "On switch-in, makes opponent's ability No Fun. Causes all custom moves to fail.",
+		shortDesc: "On switch-in, makes opponent's ability No Fun. Causes all custom moves to fail.",
 		onStart: function (pokemon) {
 			let foeactive = pokemon.side.foe.active;
 			for (let i = 0; i < foeactive.length; i++) {
@@ -269,18 +271,19 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 		},
 		onAnyTryMove: function (target, source, effect) {
-			if (effect.num > 621) {
+			if (effect.num >= 2000) {
 				this.attrLastMove('[still]');
-				this.add("raw|No Fun Mantis's No Fun Allowed suppressed the signature move!");
+				this.add('-ability', source, 'No Fun Allowed');
+				this.add('message', "No Fun Mantis's No Fun Allowed suppressed the signature move!");
 				return false;
 			}
 		},
-		id: "nofunallowed",
-		name: "No Fun Allowed",
 		rating: 3.5,
-		num: 203,
 	},
 	"dictator": {
+		num: 2013,
+		id: "dictator",
+		name: "Dictator",
 		desc: "On switch-in, this Pokemon lowers the Attack, Special Attack and Speed of adjacent opposing Pokemon by 1 stage. Pokemon behind a substitute are immune.",
 		shortDesc: "On switch-in, this Pokemon lowers the Attack, Special Attack and Speed of adjacent opponents by 1 stage.",
 		onStart: function (pokemon) {
@@ -289,7 +292,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			for (let i = 0; i < foeactive.length; i++) {
 				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
 				if (!activated) {
-					this.add('-ability', pokemon, 'Dictator');
+					this.add('-ability', pokemon, 'Dictator', 'boost');
 					activated = true;
 				}
 				if (foeactive[i].volatiles['substitute']) {
@@ -299,16 +302,14 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 			}
 		},
-		id: "dictator",
-		name: "Dictator",
 		rating: 4,
-		num: 204,
 	},
 	"messiah": {
-		desc: "This Pokemon blocks certain status moves and instead uses the move against the original user. Increases Sp.Attack by 2 when triggered",
-		shortDesc: "This Pokemon blocks certain status moves and bounces them back to the user. Also gets a SpA boost when triggered",
+		num: 2014,
 		id: "messiah",
 		name: "Messiah",
+		desc: "This Pokemon blocks certain status moves and instead uses the move against the original user. This Pokemon's Special Attack is raised by 2 stages if triggered.",
+		shortDesc: "This Pokemon blocks certain status moves and bounces them back to the user. This Pokemon's Sp. Atk is raised by 2 afterward.",
 		onTryHitPriority: 1,
 		onTryHit: function (target, source, move) {
 			if (target === source || move.hasBounced || !move.flags['reflectable']) {
@@ -334,40 +335,47 @@ exports.BattleAbilities = { // define custom abilities here.
 			duration: 1,
 		},
 		rating: 4.5,
-		num: 205,
 	},
 	'technicality': {
-		num: 206,
+		num: 2015,
 		rating: 2,
 		id: 'technicality',
 		name: 'Technicality',
+		desc: "[PLACEHOLDER DESCRIPTION! FIX YO SHIT, TIESOUL!]",
+		shortDesc: "10% chance a move used by any opposing Pokemon will fail.",
 		onFoeTryMove: function (target, source, effect) {
 			if (this.random(10) === 0) {
 				this.attrLastMove('[still]');
-				this.add("c|DictatorMantis|This move doesn't work because I say so!");
+				this.sayQuote(target, "Ability-"+effect.id, {
+					target: target, 
+					default: ["This move doesn't work because I say so!", "You are not allowed to use that move!", "Unauthorized use of that move!"]
+				});
+				this.add('-ability', source, 'Technicality');
 				return false;
 			}
 		},
 	},
 	'megaplunder': {
-		num: 207,
-		rating: 0,
+		num: 2016,
 		id: 'megaplunder',
 		name: 'Mega Plunder',
+		desc: "Just a placeholder TriHard",
+		shortDesc: "Does nothing.",
+		rating: 0,
 	},
 	'pikapower': {
-		num: 208,
-		rating: 2,
-		desc: "This Pok&#xe9;mon has a 10% chance of exploding if you target it.",
-		shortdesc: "May explode when hit.",
+		num: 2017,
 		id: "pikapower",
 		name: "Pika Power",
+		desc: "This Pokemon has a 10% chance of exploding if you target it.",
+		shortdesc: "May explode when hit.",
+		rating: 2,
 		onTryHit: function (target, source, move) {
 			if (target === source || move.hasBounced) {
 				return;
 			}
 			if (this.random(10) === 1) {
-				this.add("c|PikalaxALT|KAPOW");
+				// this.add("c|" + target.name + "|KAPOW"); //Quote moved to the Move explosion
 				let newMove = this.getMoveCopy("explosion");
 				this.useMove(newMove, target, source);
 				return null;
@@ -375,6 +383,9 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	'banevade': {
+		num: 2018,
+		id: "banevade",
+		name: "Ban Evade",
 		desc: "This Pokemon's evasion is evaluated by end of each turn. Higher evasion at lower HP. OHKO moves will fail.",
 		shortDesc: "Higher evasion at lower HP. Immune to OHKO.",
 		onTryHit: function (pokemon, target, move) {
@@ -395,18 +406,19 @@ exports.BattleAbilities = { // define custom abilities here.
 			} else if (pokemon.hp <= pokemon.maxhp / 32 && pokemon.boosts.evasion < 6) {
 				this.boost({evasion: 6 - pokemon.boosts.evasion}, pokemon);
 			}
+			//TODO report ability!
 		},
-		id: "banevade",
-		name: "Ban Evade",
 		rating: 3,
-		num: 208,
 	},
 	'incinerate': {
+		num: 2019,
+		id: "incinerate",
+		name: "Incinerate",
 		desc: "This Pokemon's Normal type moves become Fire type and have their power multiplied by 1.3. This effect comes after other effects that change a move's type, but before Ion Deluge and Electrify's effects.",
 		shortDesc: "This Pokemon's Normal type moves become Fire type and have 1.3x power.",
 		onModifyMovePriority: -1,
 		onModifyMove: function (move, pokemon) {
-			if (move.id !== 'struggle' && move.type === 'Normal') { // don't mess with Struggle, only change normal moves.
+			if (move.type === 'Normal' && move.id !== 'naturalgift') { // Struggle is ??? type anyway
 				move.type = 'Fire';
 				if (move.category !== 'Status') pokemon.addVolatile('incinerate');
 			}
@@ -415,15 +427,16 @@ exports.BattleAbilities = { // define custom abilities here.
 			duration: 1,
 			onBasePowerPriority: 8,
 			onBasePower: function (basePower, pokemon, target, move) {
-				return this.chainModify([0x14CD, 0x1000]); // not sure how this one works but this was in the Aerilate code in Pokemon Showdown.
+				return this.chainModify([0x14CD, 0x1000]); // multiplies BP by 5325/4096 (~1.3000488), like in the games
 			},
 		},
-		id: "incinerate",
-		name: "Incinerate",
 		rating: 3.5,
-		num: 209,
 	},
-	'physicalakazam': { // Makes Alakazam into a physical tank
+	'physicalakazam': { // Makes Alakazam into a physical tank (not really)
+		num: 2020,
+		id: "physicalakazam",
+		name: "Physicalakazam",
+		desc: "This Pokemon's Attack is doubled and its Defense is increased 1.5x.",
 		shortDesc: "This Pokemon's Attack is doubled and its Defense is increased 1.5x.",
 		onModifyDefPriority: 6,
 		onModifyDef: function (def) {
@@ -433,12 +446,12 @@ exports.BattleAbilities = { // define custom abilities here.
 		onModifyAtk: function (atk) {
 			return this.chainModify(2);
 		},
-		id: "physicalakazam",
-		name: "Physicalakazam",
 		rating: 3.5,
-		num: 210,
 	},
 	"defiantplus": {
+		num: 2021,
+		id: "defiantplus",
+		name: "Defiant Plus",
 		desc: "This Pokemon's Attack and Speed is raised by 2 stages for each of its stat stages that is lowered by an opposing Pokemon. If this Pokemon has a major status condition, its Speed is multiplied by 1.5; the Speed drop from paralysis is ignored.",
 		shortDesc: "This Pokemon's Attack and Speed is raised by 2 for each of its stats that is lowered by a foe. If this Pokemon is statused, its Speed is 1.5x; ignores Speed drop from paralysis.",
 		onAfterEachBoost: function (boost, target, source) {
@@ -460,12 +473,12 @@ exports.BattleAbilities = { // define custom abilities here.
 				return this.chainModify(1.5);
 			}
 		},
-		id: "defiantplus",
-		name: "Defiant Plus",
 		rating: 2.5,
-		num: 211,
 	},
 	'silverscale': { // Abyll's Milotic's ability: Upgraded marvel scale
+		num: 2022,
+		id: "silverscale",
+		name: "Silver Scale",
 		desc: "If this Pokemon has a major status condition, its Sp Defense is multiplied by 1.5, and Speed by 1.25.",
 		shortDesc: "If this Pokemon is statused, its Sp Defense is 1.5x and Speed is 1.25x.",
 		onModifySpDPriority: 6,
@@ -480,33 +493,31 @@ exports.BattleAbilities = { // define custom abilities here.
 				return this.chainModify(1.25);
 			}
 		},
-		id: "silverscale",
-		name: "Silver Scale",
 		rating: 2.5,
-		num: 212,
 	},
 	'gottagofast': { // Pokson's speedboost
+		num: 2023,
 		id: 'gottagofast',
 		name: 'Gotta Go Fast',
-		rating: 2.5,
-		num: 213,
 		desc: "Chance of boosting speed when using signature move",
-		shortDesc: "Chance of boost when using special move",
+		shortDesc: "If this Pokemon uses Boost or Spindash, there is a 30% chance its Speed is raised 12 stages.",
+		rating: 2.5,
 		onSourceHit: function (target, source, move) {
 			if (source && move && (move.id === "boost" || move.id === "spindash")) {
 				if (this.random(10) < 3) {
-					this.boost({spe: 12}, source);
+					source.setBoost({spe: 12});
+					this.add('-setboost', source, 'spe', 12, '[from] ability: Gotta Go Fast');
 				}
 			}
 		},
 	},
 	'drawingrequest': {
+		num: 2024,
 		id: 'drawingrequest',
 		name: 'Drawing Request',
-		rating: 3,
-		num: 214,
 		desc: "At the end of each turn, replaces this Pokemon's first move with a random move from the pool of all Special attacks >= 60 BP and all status moves, minus the ones that boost the user's Attack stat, and the ones this Pokemon already has.",
-		shortDesc: 'TL;DR',
+		shortDesc: 'TL;DR', // DansGame
+		rating: 3,
 		onResidualOrder: 26,
 		onResidualSubOrder: 1,
 		onResidual: function (pokemon) {
@@ -542,9 +553,13 @@ exports.BattleAbilities = { // define custom abilities here.
 			};
 			pokemon.moves[0] = toId(move.name);
 			this.add('message', pokemon.name + ' acquired a new move using its Drawing Request!');
+			//TODO report ability!
 		},
 	},
-	"mindgames": {
+	"mindgames": { // Zorua Trainer's ability
+		num: 2025,
+		id: "mindgames",
+		name: "Mind Games",
 		desc: "When this Pokemon switches in, it appears as the last unfainted Pokemon in its party until it takes direct damage from another Pokemon's attack. This Pokemon's actual level and HP are displayed instead of those of the mimicked Pokemon.",
 		shortDesc: "This Pokemon appears as the last Pokemon in the party until it takes direct damage.",
 		onBeforeSwitchIn: function (pokemon) {
@@ -553,18 +568,15 @@ exports.BattleAbilities = { // define custom abilities here.
 			pokemon.illusion = foe.pokemon[this.random(foe.pokemon.length)];
 		},
 		// illusion clearing is hardcoded in the damage function
-		id: "mindgames",
-		name: "Mind Games",
 		rating: 4.5,
-		num: 149,
 	},
 	'jackyofalltrades': {
-		desc: '',
-		shortDesc: '',
+		num: 2026,
 		id: 'jackyofalltrades',
 		name: 'Jack(y) of All Trades',
+		desc: "This Pokemon's moves of 80 power or less have their power multiplied by 1.5. Does affect Struggle.",
+		shortDesc: "This Pokemon's moves of 80 power or less have 1.5x power. Includes Struggle.",
 		rating: 4,
-		num: 150,
 		onBasePowerPriority: 8,
 		onBasePower: function (basePower, attacker, defender, move) {
 			if (basePower <= 80) {
@@ -574,30 +586,73 @@ exports.BattleAbilities = { // define custom abilities here.
 		},
 	},
 	'mirrorguard': {
+		num: 2027,
+		id: 'mirrorguard',
+		name: 'Mirror Guard',
 		desc: 'Pokemon bounces residual damage. Curse and Substitute on use, Belly Drum, Pain Split, Struggle recoil, and confusion damage are considered direct damage.',
 		shortDesc: 'This Pokemon bounces residual damage.',
 		onDamage: function (damage, target, source, effect) {
-			console.log(arguments);
+			console.log("Mirror Guard Arguments:", arguments);
 			if (effect.effectType === 'Move' || effect.wasMirrored) {
 				return;
 			}
 			let newEffect = Object.create(effect);
 			newEffect.wasMirrored = true;
+			this.effectData.sourceEffect = effect; //Need to find a way to get to the parent effectData.sourceDffect
 			let foes = target.side.foe.active;
 			for (let i = 0; i < foes.length; i++) {
 				let foe = foes[i];
-				this.damage(damage, foe, source, newEffect);
+				this.damage(damage, foe, source, newEffect); //this.damage(damage, foe, target, newEffect);
 			}
-			return false;
+			return false; //TODO git blame this quote \/
 		},
-		id: 'mirrorguard',
-		name: 'Mirror Guard',
 		// Would be totally broken on something holding Toxic Orb.
 		// Good thing I haven't done that, right?
 		rating: 5,
-		num: 151,
 	},
+	/* 
+CRASH: TypeError: Cannot read property 'fullname' of undefined
+    at Battle.damage (/home/showdown/server/battle-engine.js:3609:90)
+    at Battle.exports.BattleAbilities.mirrorguard.onDamage (/home/showdown/server/mods/stpplb/abilities.js:611
+:10)
+    at Battle.runEvent (/home/showdown/server/battle-engine.js:2711:38)
+    at Battle.damage (/home/showdown/server/battle-engine.js:3593:18)
+    at Battle.exports.BattleStatuses.partiallytrapped.onResidual (/home/showdown/server/data/statuses.js:235:1
+0)
+    at Battle.singleEvent (/home/showdown/server/battle-engine.js:2497:39)
+    at Battle.residualEvent (/home/showdown/server/battle-engine.js:2446:9)
+    at Battle.runDecision (/home/showdown/server/battle-engine.js:4460:9)
+    at Battle.go (/home/showdown/server/battle-engine.js:4554:9)
+    at Battle.commitDecisions (/home/showdown/server/battle-engine.js:4886:8)
+
+|move|p2a: Azelf|Infestation|p1a: xfix
+|debug|randBW(100) = 2
+|debug|randBW(16) = 13
+|debug|randBW(16) = 3
+|-damage|p1a: xfix|315/334
+|debug|randBW(5, 7) = 5
+|-activate|p1a: xfix|move: Infestation|[of] p2a: Azelf
+|move|p1a: xfix|Roost|p1a: xfix
+|-heal|p1a: xfix|334/334
+|
+|html|<div class="broadcast-red"><b>The battle crashed</b><br />You can keep playing but it might crash again.
+</div>
+
+|move|p2a: Azelf|Infestation|p1a: xfix|[from]Mirror Guard
+|debug|randBW(100) = 22
+|debug|randBW(16) = 12
+|debug|randBW(16) = 1
+|-damage|p1a: xfix|315/334 tox
+|move|p1a: xfix|Roost|p1a: xfix|[from]Mirror Guard
+|-heal|p1a: xfix|334/334 tox
+|
+|-damage|p2a: Azelf|230/291|[from] psn
+|debug|damage event failed
+	*/
 	'superprotean': {
+		num: 2028,
+		id: 'superprotean',
+		name: 'Super Protean',
 		desc: 'Adds the type of every move used to the pokemon.',
 		shortDesc: 'Gets a shitload of types.',
 		onPrepareHit: function (source, target, move) {
@@ -609,22 +664,22 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 				tempTypes.push(type);
 				source.types = tempTypes;
-				this.add('-start', source, 'typechange', source.types.join('/'));
+				this.add('-start', source, 'typechange', source.types.join('/')); //TODO report ability! (but protean doesn't do that...)
 			}
 		},
-		id: 'superprotean',
-		name: 'Super Protean',
 		rating: 4,
-		num: 152,
 	},
 	'invocation': {
+		num: 2029,
+		name: 'Invocation',
+		id: 'invocation',
 		desc: 'Randomly transforms into a fossil god on switch-in.',
 		shortDesc: 'Transforms into a fossil.',
 		onStart: function (pokemon) {
 			let fossils = ['Omastar', 'Kabutops', 'Aerodactyl', 'Cradily', 'Armaldo', 'Bastiodon', 'Rampardos', 'Carracosta', 'Archeops', 'Aurorus', 'Tyrantrum'];
 			let fossil = fossils[this.random(fossils.length)];
 			pokemon.formeChange(fossil);
-			this.add('-formechange', pokemon, fossil, '[msg]');
+			this.add('-formechange', pokemon, fossil, '[msg]', '[from] ability: Invocation');
 			let move = 'ancientpower';
 			switch (pokemon.template.speciesid) {
 			case 'omastar':
@@ -675,9 +730,305 @@ exports.BattleAbilities = { // define custom abilities here.
 			};
 			pokemon.moves[index] = toId(move.name);
 		},
-		name: 'Invocation',
-		id: 'invocation',
 		rating: 1,
-		num: 153,
+	},
+	'heraldofdeath': {
+		num: 2030,
+		id: 'heraldofdeath',
+		name: 'Herald of Death',
+		desc: "On switch-in, each adjacent opposing active Pokemon receives a perish count of 4 if it doesn't already have a perish count. At the end of each turn including the turn used, the perish count of all active Pokemon lowers by 1 and Pokemon faint if the number reaches 0. The perish count is removed from Pokemon that switch out. If a Pokemon uses Baton Pass while it has a perish count, the replacement will gain the perish count and continue to count down.",
+		shortDesc: 'On switch-in, all adjacent opponents will faint in 3 turns.',
+		onStart: function (pokemon) {
+			let foeactive = pokemon.side.foe.active;
+			let result = false;
+			for (let i = 0; i < foeactive.length; i++) {
+				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
+				if (!foeactive[i].volatiles['perishsong']) {
+					foeactive[i].addVolatile('perishsong');
+					this.add('-start', foeactive[i], 'perish3', '[silent]');
+					result = true;
+				}
+			}
+			if (result) this.add('message', 'The Herald of Death has arrived. All opposing Pokemon will perish in 3 turns!'); //TODO report ability!
+		},
+		rating: 3.5,
+	},
+	"beatmisty": {
+		num: 2031,
+		id: "beatmisty",
+		name: "Beat Misty",
+		desc: "This Pokemon is immune to Water-type moves and restores 1/4 of its maximum HP, rounded down, when hit by a Water-type move. This Pokemon has a 10% chance to survive an attack that would KO it with 1 HP.",
+		shortDesc: "This Pokemon heals 1/4 of its max HP when hit by Water moves; Water immunity. This Pokemon has a 10% chance to survive an attack that would KO it with 1 HP.",
+		onTryHit: function (target, source, move) {
+			if (target !== source && move.type === 'Water') {
+				if (!this.heal(target.maxhp / 4)) {
+					this.add('-immune', target, '[msg]', '[from] ability: Beat Misty');
+				}
+				return null;
+			}
+		},
+		onDamage: function (damage, target, source, effect) {
+			if (this.random(10) === 7 && damage >= target.hp && effect && effect.effectType === 'Move') {
+				this.add("-activate", target, "ability: Beat Misty");
+				return target.hp - 1;
+			}
+		},
+		rating: 3.5,
+	},
+	"summongoats": {
+		num: 2032,
+		id: "summongoats",
+		name: "Summon Goats",
+		desc: "Summons additional goats to attack with a fraction of power the higher the current HP is. X is equal to (user's current HP * 48 / user's maximum HP), rounded down; the number of additional hits is 0 if X is 0 to 12, 1 if X is 13 to 24, 2 if X is 25 to 36, 3 if X is 37 to 47, and 4 if X is 48. The second hit has its damage halved; the third hit has its damage thirded, etc. Does not affect multi-hit moves or moves that have multiple targets. tl;dr: Parental Bond with more possible hits.", // Sticking to game mechanics TriHard
+		shortDesc: "This Pokemon's damaging moves hit multiple times depending on its current HP. Damage decreases from the second hit onwards.",
+		onPrepareHitPriority: 10, // higher than Goat of Arms item
+		onPrepareHit: function (source, target, move) {
+			if (move.id in {iceball: 1, rollout: 1}) return;
+			if (move.category !== 'Status' && !move.selfdestruct && !move.multihit && !move.flags['charge'] && !move.spreadHit) {
+				let num = Math.floor(source.hp * 48 / source.maxhp);
+				if (num < 12) num = 0;
+				else if (num < 24) num = 1;
+				else if (num < 36) num = 2;
+				else if (num < 48) num = 3;
+				else num = 4;
+				move.multihit = num + 1;
+				source.addVolatile('summongoats');
+			}
+		},
+		effect: {
+			duration: 1,
+			onBasePowerPriority: 8,
+			onBasePower: function (basePower) {
+				if (this.effectData.hit) {
+					this.effectData.hit++;
+					return this.chainModify(1.0 / this.effectData.hit);
+				} else {
+					this.effectData.hit = 1;
+				}
+			},
+			onSourceModifySecondaries: function (secondaries, target, source, move) {
+				if (move.id === 'secretpower' && this.effectData.hit < 2) {
+					// hack to prevent accidentally suppressing King's Rock/Razor Fang
+					return secondaries.filter(effect => effect.volatileStatus === 'flinch');
+				}
+			},
+		},
+		rating: 5,
+	},
+	"nolovelost": {
+		num: 2033,
+		id: "nolovelost",
+		name: "No Love Lost",
+		desc: "This Pokemon is immune to the effects of Attract. If this Pokemon is hit by Attract, the user is instead attracted to this Pokemon, and this Pokemon gains +2 SpA and +2 SpD.",
+		shortDesc: "Cannot be Attracted, but gains +2 SpA, +2 SpD, and an attracted foe if tried.",
+		//TODO Implement
+		rating: 1,
+	},
+	"speedrunner": {
+		num: 2034,
+		id: "speedrunner",
+		name: "SpeedRunner",
+		desc: "On switch-in, this Pokemon raises the Speed of itself by 1 stage, and lowers the Speed of adjacent opposing Pokemon by 1 stage. Opposing Pokemon behind a substitute are immune.",
+		shortDesc: "On switch-in, this Pokemon raises the Speed of itself by 1 stage, and lowers the Speed of adjacent opponents by 1 stage.",
+		onStart: function (pokemon) {
+			this.add('-ability', pokemon, 'SpeedRunner', 'boost');
+			this.boost({spe: 1}, pokemon, pokemon);
+			let foeactive = pokemon.side.foe.active;
+			for (let i = 0; i < foeactive.length; i++) {
+				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
+				if (foeactive[i].volatiles['substitute']) {
+					this.add('-immune', foeactive[i], '[msg]');
+				} else {
+					this.boost({spe: -1}, foeactive[i], pokemon);
+				}
+			}
+		},
+		onResidual: function (pokemon) {
+			if (pokemon.activeTurns === 2) {
+				this.add('-ability', pokemon, 'SpeedRunner', 'boost');
+				this.add('message', pokemon.name + ' cannot find a proctor anymore!');
+				this.boost({spe: -1}, pokemon, pokemon);
+			}
+		},
+	},
+	"slickice": {
+		num: 2035,
+		id: "slickice",
+		name: "Slick Ice",
+		desc: "This Pokemon's Ice-type moves have their priority increased by 1. Upon using an Ice type move the Dragon type is added to this Pokemon, unless it is already a Dragon type. If Forest's Curse or Trick-or-Treat adds a type to this Pokemon, it replaces the type added by this ability and vice versa.",
+		shortDesc: "This Pokemon's Ice-type moves have their priority increased by 1. Upon using an Ice type move the Dragon type is added to this Pokemon.",
+		onModifyPriority: function(priority, pokemon, target, move) {
+			if (move && move.type === "Ice") return priority + 1;
+		},
+		onAfterMoveSecondarySelf: function (source, target, move) {
+			if (move.type === "Ice" && !source.hasType('Dragon')) {
+				if (source.addType('Dragon')) {
+					this.add('-start', source, 'typeadd', 'Dragon', '[from] ability: Slick Ice');
+				}
+			}
+		},
+	},
+	"cheatcode": {
+		num: 2036,
+		id: "cheatcode",
+		name: "Cheat Code",
+		desc: "Upon switching in, and at the end of every turn, this pokemon gains two new signature moves, appended onto its move pool. One of the moves is from the opponent's set of signature moves, and the other is a random fossil god move (resolved in random order). Upon using an extra move, the move vanishes from the move set. This ability cannot add a move if there are already four extra moves. Moves are kept through switching.",
+		shortDesc: "Gains two signiture moves at the end of every turn.",
+		onResidualOrder: 28,
+		onResidual: function(pokemon) { //On end of turn
+			let self = this;
+			let methods = [];
+			this.debug("CheatCode activating...");
+			switch (this.random(2)) {
+				case 0: methods = [getOpponentMove, getGodMove]; break;
+				case 1: methods = [getGodMove, getOpponentMove]; break;
+			}
+			
+			let addedMoves = [];
+			while (methods.length > 0) {
+				if (pokemon.moves.length >= 8) break; //If there's more than 4 extra moves, don't add more
+				
+				let moveid = methods.pop().call(this);
+				this.debug("CheatCode: adding move "+moveid);
+				if (moveid === undefined) continue; //Can't add a move
+				addedMoves.push(moveid);
+				let move = this.getMove(moveid);
+				let sketchedMove = {
+					move: move.name,
+					id: move.id,
+					pp: move.pp,
+					maxpp: move.pp,
+					target: move.target,
+					disabled: false,
+					used: false,
+				};
+				pokemon.moveset.push(sketchedMove);
+				pokemon.baseMoveset.push(sketchedMove);
+				pokemon.moves.push(toId(move.name));
+			}
+			if (addedMoves.length == 0) {
+				this.debug("CheatCode failed to add any moves.");
+				return;
+			}
+			this.add('-ability', pokemon, 'Cheat Code');
+			if (pokemon.name === 'tustin2121') {
+				// If this is owned by tustin2121, act like he's using /evalbattle
+				// evalbattlePrint.call(this);
+			}
+			this.add(`raw|>>> this.${pokemon.toString().substr(0,2)}.active[${pokemon.side.active.indexOf(pokemon)}].moves.push(${addedMoves.toString()})`);
+			this.add(`raw|<<< ${pokemon.moves.length}`);
+			this.sayQuote(pokemon, "Ability-cheatcode");
+			
+			this.debug("CheatCode complete.");
+			return;
+			
+			function getOpponentMove() {
+				let moves = [];
+				let targets = pokemon.side.foe.active;
+				for (let i = 0; i < targets.length; i++) {
+					if (!targets[i] || targets[i].fainted) continue;
+					let sigmoves = targets[i].set.signatureMoves;
+					if (!sigmoves) continue;
+					for (let j = 0; j < sigmoves.length; j++) {
+						// Don't include moves we already have
+						if (pokemon.moves.indexOf(sigmoves[j]) > -1) continue;
+						moves.push(sigmoves[j]);
+					}
+				}
+				return moves[this.random(moves.length)];
+			}
+			
+			function getGodMove() {
+				let moves = [];
+				let godmoves = [
+					'abstartselect',
+					'wait4baba',
+					'balancedstrike',
+					'texttospeech',
+					'holyducttapeofclaw',
+					'warecho',
+					'skullsmash',
+					'danceriot',
+					'bluescreenofdeath',
+					'portaltospaaaaaaace',
+					'doubleascent',
+				];
+				for (let j = 0; j < godmoves.length; j++) {
+					// Don't include moves we already have
+					if (pokemon.moves.indexOf(godmoves[j]) > -1) continue;
+					moves.push(godmoves[j]);
+				}
+				return moves[this.random(moves.length)];
+			}
+			
+			function evalbattlePrint() {
+				let enemy = pokemon.side.foe.active;
+				let enemyid = Math.floor(Math.random()*enemy.length); //choose random pokemon
+				enemy = enemy[enemyid]; 
+				switch(Math.floor(Math.random()*10)) {
+					case 0:
+						this.add(`raw|>>> this.${enemy.toString().substr(0,2)}.active[${enemyid}].hp`);
+						this.add(`raw|<<< ${enemy.hp}`);
+						break;
+					case 1:
+						this.add(`raw|>>> this.${enemy.toString().substr(0,2)}.active[${enemyid}].moves`);
+						this.add(`raw|<<< ${enemy.moves}`);
+						break;
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+						this.add(`raw|>>> this.${enemy.toString().substr(0,2)}.active[${enemyid}].ability`);
+						this.add(`raw|<<< ${enemy.ability}`);
+						this.add('-ability', enemy, this.getAbility(enemy.ability), '[from] evalbattle', '[silent]');
+						break;
+				}
+				
+			}
+		},
+		onAfterMoveSecondarySelf: function (source, target, move) {
+			// Used an added move
+			let index = source.moves.indexOf(move.id);
+			if (index >= 4) {
+				this.debug("Removing move.id "+move.id+" from index "+index);
+				source.moves.splice(index, 1);
+				source.moveset.splice(index, 1);
+				source.baseMoveset.splice(index, 1);
+			}
+		},
+		//TODO on end (no funed) remove all extra moves
+	},
+	"mediator": {
+		num: 2037,
+		id: "mediator",
+		name: "Mediator",
+		desc: "There is a 50% chance of curing this Pokemon and its allies' major status conditions, and a 10% chance of curing its opponents' major status conditions at the end of each turn. Each Pokemon on the field is checked independently.",
+		shortDesc: "50% chance of curing this Pokemon and its allies' status, and 10% chance of curing its opponents' status at the end of each turn.",
+		onResidualOrder: 18,
+		onResidual: function(pokemon) {
+			let activated = false;
+			pokemon.side.active.forEach(m => {
+				if (m.hp && m.status && this.random(2) === 0) {
+					if (!activated) { 
+						this.add('-activate', pokemon, 'ability: Mediator');
+						activated = true;
+					}
+					m.cureStatus();
+				}
+			});
+			pokemon.side.foe.active.forEach(m => {
+				if (m.hp && m.status && this.random(10) === 0) {
+					if (!activated) { 
+						this.add('-activate', pokemon, 'ability: Mediator');
+						activated = true;
+					}
+					m.cureStatus();
+				}
+			});
+		},
 	},
 };

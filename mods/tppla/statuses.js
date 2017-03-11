@@ -1,6 +1,18 @@
 "use strict";
 
 exports.BattleStatuses = {
+	confusion: {
+		inherit: true,
+		onStart: function (target, source, sourceEffect) {
+			if (target.volatiles['sconfusion']) return false;
+			if (sourceEffect && sourceEffect.id === 'lockedmove') {
+				this.add('-start', target, 'confusion', '[fatigue]');
+			} else {
+				this.add('-start', target, 'confusion');
+			}
+			this.effectData.time = this.random(2, 6);
+		},
+	},
 	sconfusion: {
 		// sohippy's short switch-in confusion. 70% chance to hit self. doesn't stack with original confusion
 		onStart: function (target, source, sourceEffect) {

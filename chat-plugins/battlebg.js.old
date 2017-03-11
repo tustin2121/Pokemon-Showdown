@@ -1,0 +1,105 @@
+/**
+ * Battle background commands
+ * Pokemon Showdown - https://pokemonshowdown.com/
+ *
+ * These are commands which control some background things in battles, like
+ * music selection, background image, 
+ *
+ * For the API, see chat-plugins/COMMANDS.md
+ *
+ * @license MIT license
+ */
+
+'use strict';
+
+var fs = require("fs");
+var path = require("path");
+
+const musicFile = "../../assets/play.pokemonshowdown.com/audio/bgm-index.js";
+if (!global.__musicFileWatch) {
+    require(musicFile);
+    global.__musicFileWatch = fs.watchFile(path.resolve(__dirname, musicFile), (curr, prev) => {
+    	if (curr.mtime <= prev.mtime) return;
+    	try {
+    		delete require.cache[require.resolve(musicFile)];
+    		require(musicFile);
+    		console.log('Reloaded bgm-index.js');
+    	} catch (e) {
+    		console.log('Error reloading bgm-index.js: ' + e.stack);
+    	}
+    });
+}
+
+exports.commands = {
+    music: function(target, room, user, connection, cmd, message) {
+        if (this.cmdToken === '!') return this.errorReply("You cannot broadcast this command.");
+        // this.sendReply("Room: "+room+" : battle: "+room.battle);
+        if (!room.battle) return this.errorReply("You cannot use this command in a non-battle room at this time.");
+        try {
+            var canAccess = false;
+            if (room.battle.p1 && room.battle.p1.name == user.name) canAccess = true;
+            if (room.battle.p2 && room.battle.p2.name == user.name) canAccess = true;
+            if (user.can("root")) canAccess = true; //admins can access this command
+            
+            if (!canAccess) return this.errorReply("You must be a battle participant to change the music.");
+        } catch (e) { this.errorReply("Error... "+e); }
+        try {
+            var music = require(musicFile);
+            if (!target) {
+                var ids = Object.keys(music.meta);
+                return this.sendReply("The following music ids are available: "+ids.join(", "));
+            }
+            target = target.split(" ");
+            if (target.length == 1) { //single id given: /music <id>
+                if (target[0] == "cat") {
+                    return this.sendReply(`Valid categories are: ${Object.keys(music.cats).join(", ")}`);
+                }
+                if (!music.isValid(target[0])) {
+                    return this.errorReply(`There is no such song '${Tools.escapeHTML(target[0])}'`);
+                }
+                if (!music.isValidBattle(target[0])) {
+                    return this.errorReply(`Cannot use the song '${Tools.escapeHTML(target[0])}' as battle music.`);
+                }
+                //TODO STUFF!
+                this.add(`${Tools.escapeHTML(user)} has set music for this battle.`);
+                return this.sendReply(`The song '${Tools.escapeHTML(target[0])}' is now set as battle music for this battle.`);
+            }
+            
+            // target length is 2 or more
+            switch (target[0]) {
+                case 'cat': // category search
+                    if (!music.isCategory(target[1])) {
+                        return this.errorReply(`There is no such category '${Tools.escapeHTML(target[1])}'. Valid categories are: ${Object.keys(music.cats).join(", ")}`);
+                    }
+                    //TODO STUFF!
+                    this.add(`${Tools.escapeHTML(user)} has set the type of music for this battle.`);
+                    return this.sendReply(`The category of random songs for this battle has been set to '${Tools.escapeHTML(target[1])}'`);
+                    
+                case "win":
+                case "victory":
+                    if (!music.isValid(target[0])) {
+                        return this.errorReply(`There is no such song '${Tools.escapeHTML(target[0])}'`);
+                    }
+                    if (!music.isValidVictory(target[0])) {
+                        return this.errorReply(`Cannot use the song '${Tools.escapeHTML(target[0])}' as victory music.`);
+                    }
+                    //TODO STUFF!
+                    //this.add(`${Tools.escapeHTML(user)} has set music for this battle.`);
+                    return this.sendReply(`The victory music has been set to '${Tools.escapeHTML(target[1])}'`);
+                    
+                default:
+                    return this.errorReply("Unknown subcommand.");
+            }
+            
+            // this.sendReply("Battle logData:"+room.battle.logData);
+            // this.sendReply(", active: "+room.battle.active);
+            // this.sendReply(", hasStarted: "+room.battle.started);
+            // this.sendReply(", hasEnded: "+room.battle.ended);
+            // this.sendReply(", process: "+room.battle.process);
+        } catch (e) { this.errorReply("Error... "+e); }
+    },
+    musichelp : [
+        "/music <id> - Set the music for the current battle. Can only be set during Team Preview.",
+        "/music cat <id> - Sets the category of music to play for the current battle. Can only be set during Team Preview.",
+    ],
+};

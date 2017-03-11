@@ -23,6 +23,62 @@ exports.BattleMovedex = {
 			this.boost({atk: 12});
 		},
 	},
+	bide: {
+		inherit: true,
+		effect: {
+			duration: 3,
+			durationCallback: function (target, source, effect) {
+				return this.random(3, 5);
+			},
+			onLockMove: 'bide',
+			onStart: function (pokemon) {
+				this.effectData.totalDamage = 0;
+				this.add('-start', pokemon, 'move: Bide');
+			},
+			onDamagePriority: -101,
+			onDamage: function (damage, target, source, move) {
+				if (!move || move.effectType !== 'Move' || !source) return;
+				this.effectData.totalDamage += damage;
+				this.effectData.lastDamageSource = source;
+			},
+			onBeforeMove: function (pokemon, target, move) {
+				if (this.effectData.duration === 1) {
+					this.add('-end', pokemon, 'move: Bide');
+					if (!this.effectData.totalDamage) {
+						this.add('-fail', pokemon);
+						return false;
+					}
+					target = this.effectData.lastDamageSource;
+					if (!target) {
+						this.add('-fail', pokemon);
+						return false;
+					}
+					if (!target.isActive) target = this.resolveTarget(pokemon, this.getMove('pound'));
+					if (!this.isAdjacent(pokemon, target)) {
+						this.add('-miss', pokemon, target);
+						return false;
+					}
+					let moveData = {
+						id: 'bide',
+						name: "Bide",
+						accuracy: 100,
+						damage: this.effectData.totalDamage * 2,
+						category: "Physical",
+						priority: 0,
+						flags: {contact: 1, protect: 1},
+						effectType: 'Move',
+						type: 'Normal',
+					};
+					this.tryMoveHit(target, pokemon, moveData);
+					return false;
+				}
+				this.add('-activate', pokemon, 'move: Bide');
+			},
+			onEnd: function (pokemon) {
+				this.add('-end', pokemon, 'move: Bide', '[silent]');
+			},
+		},
+	},
 	counter: {
 		inherit: true,
 		damageCallback: function (pokemon, target) {
@@ -55,8 +111,16 @@ exports.BattleMovedex = {
 			},
 		},
 	},
+	detect: {
+		inherit: true,
+		desc: "The user is protected from attacks made by the opponent during this turn. This move has an X/255 chance of being successful, where X starts at 255 and halves, rounded down, each time this move is successfully used. X resets to 255 if this move fails or if the user's last move used is not Detect, Endure, or Protect. Fails if the user moves last this turn.",
+		priority: 2,
+	},
 	dig: {
 		inherit: true,
+		onPrepareHit: function (target, source) {
+			return source.status !== 'slp';
+		},
 		effect: {
 			duration: 2,
 			onImmunity: function (type, pokemon) {
@@ -65,6 +129,10 @@ exports.BattleMovedex = {
 			onAccuracy: function (accuracy, target, source, move) {
 				if (move.id === 'earthquake' || move.id === 'magnitude' || move.id === 'fissure') {
 					return;
+				}
+				if (move.id in {attract:1, curse:1, foresight:1, meanlook:1, mimic:1, nightmare:1, spiderweb:1, transform:1}) {
+					// Oversight in the interaction between these moves and the Lock-On effect
+					return 0;
 				}
 				if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return;
 				return 0;
@@ -128,6 +196,11 @@ exports.BattleMovedex = {
 			},
 		},
 	},
+	endure: {
+		inherit: true,
+		desc: "The user will survive attacks made by the opponent during this turn with at least 1 HP. This move has an X/255 chance of being successful, where X starts at 255 and halves, rounded down, each time this move is successfully used. X resets to 255 if this move fails or if the user's last move used is not Detect, Endure, or Protect. Fails if the user moves last this turn.",
+		priority: 2,
+	},
 	explosion: {
 		inherit: true,
 		basePower: 250,
@@ -140,11 +213,22 @@ exports.BattleMovedex = {
 	},
 	fly: {
 		inherit: true,
+		onPrepareHit: function (target, source) {
+			return source.status !== 'slp';
+		},
 		effect: {
 			duration: 2,
 			onAccuracy: function (accuracy, target, source, move) {
 				if (move.id === 'gust' || move.id === 'twister' || move.id === 'thunder' || move.id === 'whirlwind') {
 					return;
+				}
+				if (move.id === 'earthquake' || move.id === 'magnitude' || move.id === 'fissure') {
+					// These moves miss even during the Lock-On effect
+					return 0;
+				}
+				if (move.id in {attract:1, curse:1, foresight:1, meanlook:1, mimic:1, nightmare:1, spiderweb:1, transform:1}) {
+					// Oversight in the interaction between these moves and the Lock-On effect
+					return 0;
 				}
 				if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return;
 				return 0;
@@ -165,6 +249,13 @@ exports.BattleMovedex = {
 			onModifyCritRatio: function (critRatio) {
 				return critRatio + 1;
 			},
+		},
+	},
+	healbell: {
+		inherit: true,
+		onHit: function (target, source) {
+			this.add('-cureteam', source, '[from] move: Heal Bell');
+			source.side.pokemon.forEach(pokemon => pokemon.clearStatus());
 		},
 	},
 	highjumpkick: {
@@ -374,6 +465,11 @@ exports.BattleMovedex = {
 		inherit: true,
 		ignoreImmunity: false,
 	},
+	protect: {
+		inherit: true,
+		desc: "The user is protected from attacks made by the opponent during this turn. This move has an X/255 chance of being successful, where X starts at 255 and halves, rounded down, each time this move is successfully used. X resets to 255 if this move fails or if the user's last move used is not Detect, Endure, or Protect. Fails if the user moves last this turn.",
+		priority: 2,
+	},
 	psywave: {
 		inherit: true,
 		damageCallback: function (pokemon) {
@@ -394,6 +490,9 @@ exports.BattleMovedex = {
 		inherit: true,
 		accuracy: 75,
 		critRatio: 3,
+		onPrepareHit: function (target, source) {
+			return source.status !== 'slp';
+		},
 	},
 	reflect: {
 		inherit: true,
@@ -449,9 +548,18 @@ exports.BattleMovedex = {
 			this.add('-nothing');
 		},
 	},
+	skullbash: {
+		inherit: true,
+		onPrepareHit: function (target, source) {
+			return source.status !== 'slp';
+		},
+	},
 	skyattack: {
 		inherit: true,
 		critRatio: 1,
+		onPrepareHit: function (target, source) {
+			return source.status !== 'slp';
+		},
 		secondary: {},
 	},
 	slash: {
@@ -465,10 +573,9 @@ exports.BattleMovedex = {
 			for (let i = 0; i < pokemon.moveset.length; i++) {
 				let move = pokemon.moveset[i].id;
 				let NoSleepTalk = {
-					bide:1, dig:1, fly:1, metronome:1, mirrormove:1,
-					skullbash:1, skyattack:1, sleeptalk:1, solarbeam:1, razorwind:1,
+					bide:1, sleeptalk:1,
 				};
-				if (move && !NoSleepTalk[move]) {
+				if (move && !NoSleepTalk[move] && !this.getMove(move).flags['charge']) {
 					moves.push(move);
 				}
 			}
@@ -481,6 +588,9 @@ exports.BattleMovedex = {
 	},
 	solarbeam: {
 		inherit: true,
+		onPrepareHit: function (target, source) {
+			return source.status !== 'slp';
+		},
 		// Rain weakening done directly in the damage formula
 		onBasePower: function () {},
 	},
@@ -620,6 +730,11 @@ exports.BattleMovedex = {
 				}
 			},
 		},
+	},
+	triplekick: {
+		inherit: true,
+		multiaccuracy: false,
+		multihit: [1, 3],
 	},
 	whirlwind: {
 		inherit: true,
