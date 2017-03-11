@@ -2,6 +2,7 @@
 
 const assert = require('./../../assert');
 const common = require('./../../common');
+const BattleEngine = require('./../../../battle-engine');
 
 let battle;
 
@@ -64,9 +65,9 @@ describe('Roost', function () {
 		]);
 
 		let hitCount = 0;
-		battle.p2.active[0].damage = function () {
+		battle.p2.active[0].damage = function (...args) {
 			hitCount++;
-			return BattleEngine.BattlePokemon.prototype.damage.apply(this, arguments);
+			return BattleEngine.BattlePokemon.prototype.damage.apply(this, args);
 		};
 
 		battle.commitDecisions();

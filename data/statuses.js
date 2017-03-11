@@ -15,7 +15,7 @@ exports.BattleStatuses = {
 		// Damage reduction is handled directly in the battle-engine.js damage function
 		onResidualOrder: 9,
 		onResidual: function (pokemon) {
-			this.damage(pokemon.maxhp / 8);
+			this.damage(pokemon.maxhp / 16);
 		},
 	},
 	par: {
@@ -29,7 +29,7 @@ exports.BattleStatuses = {
 		},
 		onModifySpe: function (spe, pokemon) {
 			if (!pokemon.hasAbility('quickfeet')) {
-				return this.chainModify(0.25);
+				return this.chainModify(0.5);
 			}
 		},
 		onBeforeMovePriority: 1,
@@ -150,8 +150,6 @@ exports.BattleStatuses = {
 	confusion: {
 		// this is a volatile status
 		onStart: function (target, source, sourceEffect) {
-			let result = this.runEvent('TryConfusion', target, source, sourceEffect);
-			if (!result) return result;
 			if (sourceEffect && sourceEffect.id === 'lockedmove') {
 				this.add('-start', target, 'confusion', '[fatigue]');
 			} else {
@@ -170,7 +168,7 @@ exports.BattleStatuses = {
 				return;
 			}
 			this.add('-activate', pokemon, 'confusion');
-			if (this.random(2) === 0) {
+			if (this.random(3) > 0) {
 				return;
 			}
 			this.damage(this.getDamage(pokemon, pokemon, 40), pokemon, pokemon, {
@@ -278,6 +276,9 @@ exports.BattleStatuses = {
 		onLockMoveTarget: function () {
 			return this.effectData.targetLoc;
 		},
+		onMoveAborted: function (pokemon) {
+			pokemon.removeVolatile('twoturnmove');
+		},
 	},
 	choicelock: {
 		onStart: function (pokemon) {
@@ -358,6 +359,22 @@ exports.BattleStatuses = {
 			}
 			if (finished) {
 				side.removeSideCondition('futuremove');
+			}
+		},
+	},
+	healreplacement: {
+		// this is a side condition
+		onStart: function (side, source, sourceEffect) {
+			this.effectData.position = source.position;
+			this.effectData.sourceEffect = sourceEffect;
+			this.add('-activate', source, 'healreplacement');
+		},
+		onSwitchInPriority: 1,
+		onSwitchIn: function (target) {
+			if (!target.fainted && target.position === this.effectData.position) {
+				target.heal(target.maxhp);
+				this.add('-heal', target, target.getHealth, '[from] move: ' + this.effectData.sourceEffect, '[zeffect]');
+				target.side.removeSideCondition('healreplacement');
 			}
 		},
 	},
@@ -628,13 +645,13 @@ exports.BattleStatuses = {
 		},
 	},
 
+	// Arceus and Silvally's actual typing is implemented here.
+	// Their true typing for all their formes is Normal, and it's only
+	// Multitype and RKS System, respectively, that changes their type,
+	// but their formes are specified to be their corresponding type
+	// in the Pokedex, so that needs to be overridden.
+	// This is mainly relevant for Hackmons and Balanced Hackmons.
 	arceus: {
-		// Arceus's actual typing is implemented here
-		// Arceus's true typing for all its formes is Normal, and it's only
-		// Multitype that changes its type, but its formes are specified to
-		// be their corresponding type in the Pokedex, so that needs to be
-		// overridden. This is mainly relevant for Hackmons and Balanced
-		// Hackmons.
 		onSwitchInPriority: 101,
 		onSwitchIn: function (pokemon) {
 			let type = 'Normal';
@@ -647,4 +664,22 @@ exports.BattleStatuses = {
 			pokemon.setType(type, true);
 		},
 	},
+	silvally: {
+		onSwitchInPriority: 101,
+		onSwitchIn: function (pokemon) {
+			let type = 'Normal';
+			if (pokemon.ability === 'rkssystem') {
+				type = pokemon.getItem().onMemory;
+				if (!type || type === true) {
+					type = 'Normal';
+				}
+			}
+			pokemon.setType(type, true);
+		},
+	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/statuses.js");
+	Object.assign(exports.BattleStatuses, tpp.BattleStatuses);
+} catch (e) { console.error("Could not load TPP BattleStatuses!", e); }

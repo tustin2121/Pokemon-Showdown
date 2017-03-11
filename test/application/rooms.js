@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-let userUtils = require('./../../dev-tools/users-utils.js');
+let userUtils = require('./../../dev-tools/users-utils');
 let User = userUtils.User;
 
 describe('Rooms features', function () {
@@ -17,12 +17,8 @@ describe('Rooms features', function () {
 			});
 		});
 		describe('Rooms.rooms', function () {
-			it('should have null prototype', function () {
-				assert.strictEqual(Object.getPrototypeOf(Rooms.rooms), null);
-			});
-
-			it('should not have a native `constructor`', function () {
-				assert.ok(Rooms.rooms.constructor === undefined || Rooms.rooms.constructor instanceof Rooms.Room);
+			it('should be a Map', function () {
+				assert.ok(Rooms.rooms instanceof Map);
 			});
 		});
 	});
@@ -32,7 +28,12 @@ describe('Rooms features', function () {
 
 		let room;
 		afterEach(function () {
-			if (room) room.expire();
+			Users.users.forEach(user => {
+				room.onLeave(user);
+				user.disconnectAll();
+				user.destroy();
+			});
+			if (room) room.destroy();
 		});
 
 		it('should allow two users to join the battle', function () {
@@ -68,6 +69,7 @@ describe('Rooms features', function () {
 			const roomStaff = new User();
 			roomStaff.forceRename("Room auth", true);
 			const administrator = new User();
+			administrator.forceRename("Admin", true);
 			administrator.group = '~';
 			const options = {
 				rated: false,
@@ -80,16 +82,13 @@ describe('Rooms features', function () {
 				},
 			};
 			room = Rooms.global.startBattle(p1, p2, 'customgame', packedTeam, packedTeam, options);
+			roomStaff.joinRoom(room);
+			administrator.joinRoom(room);
 			assert.strictEqual(room.getAuth(roomStaff), '%', 'before promotion attempt');
-			CommandParser.parse("/roomvoice Room auth", room, p1, p1.connections[0]);
+			Chat.parse("/roomvoice Room auth", room, p1, p1.connections[0]);
 			assert.strictEqual(room.getAuth(roomStaff), '%', 'after promotion attempt');
-			CommandParser.parse("/roomvoice Room auth", room, administrator, administrator.connections[0]);
+			Chat.parse("/roomvoice Room auth", room, administrator, administrator.connections[0]);
 			assert.strictEqual(room.getAuth(roomStaff), '+', 'after being promoted by an administrator');
-
-			for (const user of [roomStaff, administrator]) {
-				user.disconnectAll();
-				user.destroy();
-			}
 		});
 	});
 });

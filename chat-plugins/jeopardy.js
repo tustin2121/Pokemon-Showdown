@@ -129,9 +129,7 @@ let Jeopardy = (() => {
 		this.room.add("A new Jeopardy match has been created by " + host.name);
 	}
 
-	Jeopardy.prototype.checkPermission = function (user, output) {
-		let checks = Array.prototype.slice.call(arguments, 2);
-
+	Jeopardy.prototype.checkPermission = function (user, output, ...checks) {
 		let currentCheck = '';
 		while ((currentCheck = checks.pop())) {
 			switch (currentCheck) {
@@ -453,7 +451,7 @@ function renderGrid(questions, mode) {
 
 	buffer += '<tr>';
 	for (let c = 0; c < questions.categoryCount; ++c) {
-		buffer += '<th>' + (Tools.escapeHTML(questions.getCategory(c)) || '&nbsp;') + '</th>';
+		buffer += '<th>' + (Chat.escapeHTML(questions.getCategory(c)) || '&nbsp;') + '</th>';
 	}
 	buffer += '</tr>';
 
@@ -495,14 +493,14 @@ let commands = {
 			"edit - Edits the grid. Run this command by itself for more detailed help<br />" +
 			"export [category number], [start], [end] - Exports data from the grid. start and end are optional<br />" +
 			"import [category number], [start], [end], [data] - Imports data into the grid. start and end are optional<br />" +
-			"create [categories], [questions per category] - Creates a jeopardy match. Parameters are optional, and default to maximum values. Requires: % @ # & ~<br />" +
-			"start - Starts the match. Requires: % @ # & ~<br />" +
-			"end - Forcibly ends the match. Requires: % @ # & ~<br />" +
+			"create [categories], [questions per category] - Creates a jeopardy match. Parameters are optional, and default to maximum values. Requires: % @ * # & ~<br />" +
+			"start - Starts the match. Requires: % @ * # & ~<br />" +
+			"end - Forcibly ends the match. Requires: % @ * # & ~<br />" +
 			"adduser [user] - Add a user to the match<br />" +
 			"removeuser [user] - Remove a user from the match<br />" +
 			"select [category number], [question number] - Select a question<br />" +
 			"a/answer [answer] - Attempt to answer the question<br />" +
-			"incorrect/correct - Marks the current answer as correct or not. Requires: % @ # & ~<br />" +
+			"incorrect/correct - Marks the current answer as correct or not. Requires: % @ * # & ~<br />" +
 			"skip - Skips the current question<br />" +
 			"wager [amount] - Wager some amount of points. 'all' is also accepted"
 		);
@@ -525,9 +523,9 @@ let commands = {
 
 		if (toId(target) === 'final') {
 			this.sendReplyBox(
-				"<strong>Final Category:</strong> " + Tools.escapeHTML(questions.getCategory('final') || "") + '<br />' +
-				"<strong>Final Question:</strong> " + Tools.escapeHTML(questions.getQuestion('final', 0).value || "") + '<br />' +
-				"<strong>Final Answer:</strong> " + Tools.escapeHTML(questions.getQuestion('final', 0).answer || "")
+				"<strong>Final Category:</strong> " + Chat.escapeHTML(questions.getCategory('final') || "") + '<br />' +
+				"<strong>Final Question:</strong> " + Chat.escapeHTML(questions.getQuestion('final', 0).value || "") + '<br />' +
+				"<strong>Final Answer:</strong> " + Chat.escapeHTML(questions.getQuestion('final', 0).answer || "")
 			);
 		} else {
 			this.sendReplyBox(renderGrid(questions, target));
