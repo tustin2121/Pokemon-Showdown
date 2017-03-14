@@ -57,6 +57,14 @@ exports.BattleFormatsData = {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
+	chibisatori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	satori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
 	defensemomiji: {
 		isNonstandard: true,
 		tier: "Touhou",
@@ -74,6 +82,14 @@ exports.BattleFormatsData = {
 		tier: "Touhou",
 	},
 	technicalsanae: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	technicalsatori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	defensesatori: {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
