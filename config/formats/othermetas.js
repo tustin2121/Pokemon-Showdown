@@ -445,4 +445,12 @@ exports.Formats = [
 			}
 		},
 	}
+	{
+		name: "[Gen 7] Ubers+",
+
+		mod: 'gen7',
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Allow Fake'],
+		__subsort: formats => formats[toId("[Gen 7] Ubers")].__subsort+0.1,
+	},
 ];
