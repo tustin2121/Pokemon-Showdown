@@ -330,7 +330,7 @@ exports.Formats = [
 	
 	{
 		name: "[Gen 7] Totem Battle",
-		section: "SM Singles (beta)",
+		section: "SM Singles",
 		desc: ["Player 1 is a Totem Pokemon."],
 		gameType: 'totem',
 		mod: 'totembattle',
