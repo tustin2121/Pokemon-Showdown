@@ -446,7 +446,7 @@ exports.Formats = [
 		},
 	},
 	{
-		name: "[Gen 7] Ubers+",
+		name: "[Gen 7] Ubers Plus",
 
 		mod: 'gen7',
 		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
