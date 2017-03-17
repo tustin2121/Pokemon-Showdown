@@ -1383,4 +1383,136 @@ exports.BattleMovedex = {
 		zMovePower: 195,
 		contestType: "Cool",
 	},
+	"tmirrorshot": {
+		num: 20035,
+		accuracy: 90,
+		basePower: 65,
+		category: "Special",
+		desc: "Has a 30% chance to lower the target's accuracy by 1 stage.",
+		shortDesc: "30% chance to lower the target's accuracy by 1.",
+		id: "tmirrorshot",
+		name: "T-Mirror Shot",
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Mirror Shot');
+		},
+		secondary: {
+			chance: 30,
+			boosts: {
+				accuracy: -1,
+			},
+		},
+		target: "normal",
+		type: "Bug",
+		zMovePower: 120,
+		contestType: "Beautiful",
+	},
+	"tsignalbeam": {
+		num: 20036,
+		accuracy: 100,
+		basePower: 90,
+		category: "Special",
+		desc: "Has a 10% chance to confuse the target.",
+		shortDesc: "10% chance to confuse the target.",
+		id: "tsignalbeam",
+		isViable: true,
+		name: "T-Signal Beam",
+		pp: 15,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Signal Beam');
+		},
+		secondary: {
+			chance: 10,
+			volatileStatus: 'confusion',
+		},
+		target: "normal",
+		type: "Bug",
+		zMovePower: 175,
+		contestType: "Beautiful",
+	},
+	"jamming": {
+		num: 20037,
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Prevents the target from switching out. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Parting Shot, U-turn, or Volt Switch. If the target leaves the field using Baton Pass, the replacement will remain trapped. The effect ends if the user leaves the field.",
+		shortDesc: "The target cannot switch out.",
+		id: "jamming",
+		name: "Jamming",
+		pp: 5,
+		priority: 0,
+		flags: {reflectable: 1, mirror: 1, sound: 1, authentic: 1},
+		onPrepareHit: function (target, source, move) { // epic animation that isn't really being played because no one uses this move
+			this.attrLastMove('[still]');
+			this.add('-animcustom', source, target, "boomburst", "thunderwave", "discharge", "chatter", "uproar");
+		},
+		onHit: function (target, source, move) {
+			if (!target.addVolatile('trapped', source, move, 'trapper')) {
+				this.add('-fail', target);
+			}
+		},
+		secondary: false,
+		target: "normal",
+		type: "Bug",
+		zMoveBoost: {spd: 1},
+		contestType: "Cute",
+	},
+	"tmistball": {
+		num: 20038,
+		accuracy: 80,
+		basePower: 120,
+		category: "Special",
+		desc: "Has a 30% chance to lower the target's accuracy by 1 stage.",
+		shortDesc: "30% chance to lower the target's accuracy by 1.",
+		id: "tmistball",
+		isViable: true,
+		name: "T-Mist Ball",
+		pp: 5,
+		priority: 0,
+		flags: {bullet: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Mist Ball');
+		},
+		secondary: {
+			chance: 30,
+			boosts: {
+				acc: -1,
+			},
+		},
+		target: "normal",
+		type: "Bug",
+		zMovePower: 190,
+		contestType: "Clever",
+	},
+	"tlusterpurge": {
+		num: 20039,
+		accuracy: 80,
+		basePower: 120,
+		category: "Special",
+		desc: "Has a 20% chance to lower the target's Special Defense by 1 stage.",
+		shortDesc: "20% chance to lower the target's Sp. Def by 1.",
+		id: "tlusterpurge",
+		isViable: true,
+		name: "T-Luster Purge",
+		pp: 5,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Luster Purge');
+		},
+		secondary: {
+			chance: 20,
+			boosts: {
+				spd: -1,
+			},
+		},
+		target: "normal",
+		type: "Psychic",
+		zMovePower: 190,
+		contestType: "Clever",
+	},
 };
