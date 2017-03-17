@@ -444,7 +444,7 @@ exports.Formats = [
 				this.switchIn(this.p1.pokemon[1], 1);
 			}
 		},
-	}
+	},
 	{
 		name: "[Gen 7] Ubers+",
 

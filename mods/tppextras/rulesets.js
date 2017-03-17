@@ -298,7 +298,7 @@ exports.BattleFormats = {
 
 			return problems;
 		},
-	}
+	},
 	
 	//Groundsource Mod: I'm quite sure this desnt't work yet
 	groundsourcemod: {
