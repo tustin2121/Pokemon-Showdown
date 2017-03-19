@@ -291,14 +291,14 @@ exports.Formats = [
 		onModifyMovePriority: -100,
 	},
 	{
-		name: "Reverse Type Matchup",
+		name: "[Gen 7] Reverse Type Matchup",
 		desc: [
 			"The Attackers and Defenders on the type chart are reversed.",
 		],
 		section: "Kappa Cup Season 3",
 
 		mod: 'reverse',
-		ruleset: ['Ubers'],
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
 	},
 	{
 		name: "Linked",
