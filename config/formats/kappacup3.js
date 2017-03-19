@@ -299,6 +299,7 @@ exports.Formats = [
 
 		mod: 'reverse',
 		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Allow Fake'],
 	},
 	{
 		name: "Linked",
