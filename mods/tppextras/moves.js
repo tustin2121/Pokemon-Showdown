@@ -715,7 +715,7 @@ exports.BattleMovedex = {
 		secondary: {
 			chance: 30,
 			boosts: {
-				acc: -1,
+				accuracy: -1,
 			},
 		},
 		target: "normal",
@@ -1480,7 +1480,7 @@ exports.BattleMovedex = {
 		secondary: {
 			chance: 30,
 			boosts: {
-				acc: -1,
+				accuracy: -1,
 			},
 		},
 		target: "normal",
