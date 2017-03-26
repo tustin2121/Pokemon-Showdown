@@ -379,7 +379,7 @@ exports.BattleMovedex = {
 		onMoveFail: function (target, source, move) {
 			this.faint(source);
 		},
-		selfdestruct: true,
+		selfdestruct: "always",
 		secondary: false,
 		target: "normal",
 		type: "Type 53",
