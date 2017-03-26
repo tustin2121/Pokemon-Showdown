@@ -208,7 +208,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Lunar Dance');
 		},
-		selfdestruct: true,
+		selfdestruct: "ifHit",
 		sideCondition: 'disappointment',
 		effect: {
 			duration: 2,
