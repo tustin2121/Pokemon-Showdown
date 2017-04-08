@@ -28,3 +28,7 @@ TODO List
 	* [<Pokemon>'s Speedrunner!] is shown twice when a Pokemon with the ability is switched in.
 	* Spoopify doesn't remove added types (this is correct), but the client doesn't show the added types after the types are changed.
 	For example, Coryn216 becomes Water/Ice+Dragon after Slick Ice, and Spoopify changes it to Ghost/Ice+Dragon. The client only shows that it's Ghost/Ice type.
+	* Drama Reduction doesn't apply recoil damage when one or more status is cured.
+	* Message that appears when Technicality is triggered is said by the wrong Pokemon.
+	* Witch's Curse sometimes doesn't apply residual damage (probably when used consecutively).
+	* Dictator makes the opponent's ability Dictator as well *as shown by the client only*.
