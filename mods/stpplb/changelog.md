@@ -1,3 +1,16 @@
+####v2.10
+
+^<20170408>
+
+* **New Pokemon: Redwings1340! He can heal status and HP at the same time!**
+* **A Pokemon with Speedrunner now has its Speed lowered by 1 stage at the end of the second full turn it has been on the field.**
+* **No Fun Allowed now only changes opposing Pokemon's ability to No Fun on switch-in.**
+* *Bug Fix: Mirror Guard interaction with partial trapping. Now it doesn't crash the battle at least!*
+* *Bug Fix: Gotta Go Fast now raises the correct stat.*
+* *MasterLeoZangetsu's moveset overhauled. Now it doesn't have any boosting move.*
+* Iwamiger gets quotes from something completely unrelated.
+* Some animation fix.
+
 ####v2.09a
 
 ^<20161112>

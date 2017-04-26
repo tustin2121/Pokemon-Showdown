@@ -330,7 +330,7 @@ exports.Formats = [
 	
 	{
 		name: "[Gen 7] Totem Battle",
-		section: "SM Singles (beta)",
+		section: "SM Singles",
 		desc: ["Player 1 is a Totem Pokemon."],
 		gameType: 'totem',
 		mod: 'totembattle',
@@ -444,5 +444,13 @@ exports.Formats = [
 				this.switchIn(this.p1.pokemon[1], 1);
 			}
 		},
-	}
+	},
+	{
+		name: "[Gen 7] Ubers Plus",
+
+		mod: 'gen7',
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Allow Fake'],
+		__subsort: formats => formats[toId("[Gen 7] Ubers")].__subsort+0.1,
+	},
 ];
