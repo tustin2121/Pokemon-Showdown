@@ -271,6 +271,7 @@ class DiscordBot extends Bot {
 			.replace(/<span class="message-effect-immune">/g, "*")
 			.replace(/<span class="message-learn-canlearn">/g, "*")
 			.replace(/<span class="message-learn-cannotlearn">/g, "*")
+			.replace(/<span style="color:#\d{6};?">/g, "*")
 			.replace(/<font color="?#[0-9a-f]{3,6}"?>/g, "**")
 			.replace(/<\/font>/g, "**")
 			.replace(/&nbsp;|&ThickSpace;| +/g, " ")

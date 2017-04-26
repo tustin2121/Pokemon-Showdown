@@ -27,6 +27,7 @@ exports.BattleTypeChart = {
 	"Dark": {
 		inherit: true,
 		damageTaken: {
+			prankster: 3,
 			"Bug": 0,
 			"Dark": 2,
 			"Dragon": 0,

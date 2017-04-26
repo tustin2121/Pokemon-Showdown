@@ -216,7 +216,13 @@ class Bot {
 				let splitter = msg.indexOf(' ');
 				let type = msg.slice(0, splitter);
 				let what = msg.slice(splitter + 1);
-				finalParts.push(...this.formatRaw(dataParsers[type](what)));
+				finalParts.push(...this.formatData(type, what));
+				return;
+			}
+			signal = '|html|<div class="infobox">';
+			if (part.startsWith(signal)) {
+				let boxContents = part.slice(signal.length, -('</div>'.length));
+				finalParts.push(...this.formatRaw(boxContents));
 				return;
 			}
 			signal = '|html|<div class="message-error">';
@@ -227,6 +233,10 @@ class Bot {
 		});
 		if (!this.verifyParts(finalParts)) return "Response too long.";
 		return finalParts.join("\n");
+	}
+	
+	formatData(type, what) {
+		return this.formatRaw(dataParsers[type](what));
 	}
 	
 	formatRaw(rawMsg) {

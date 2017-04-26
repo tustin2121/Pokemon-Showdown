@@ -379,7 +379,7 @@ exports.BattleMovedex = {
 		onMoveFail: function (target, source, move) {
 			this.faint(source);
 		},
-		selfdestruct: true,
+		selfdestruct: "always",
 		secondary: false,
 		target: "normal",
 		type: "Type 53",
@@ -673,7 +673,7 @@ exports.BattleMovedex = {
 	"tsilverwind": {
 		num: 20009,
 		accuracy: 80,
-		basePower: 120,
+		basePower: 110,
 		category: "Special",
 		desc: "Has a 30% chance to lower the target's Speed by 1 stage.",
 		shortDesc: "30% chance to lower the target's Speed by 1.",
@@ -715,7 +715,7 @@ exports.BattleMovedex = {
 		secondary: {
 			chance: 30,
 			boosts: {
-				acc: -1,
+				accuracy: -1,
 			},
 		},
 		target: "normal",
@@ -1312,7 +1312,7 @@ exports.BattleMovedex = {
 	"tancientpower": {
 		num: 20032,
 		accuracy: 80,
-		basePower: 120,
+		basePower: 110,
 		category: "Special",
 		desc: "Has a 20% chance to raise the user's Defense by 1 stage.",
 		shortDesc: "20% chance to raise the user's Defense by 1.",
@@ -1464,11 +1464,12 @@ exports.BattleMovedex = {
 	"tmistball": {
 		num: 20038,
 		accuracy: 80,
-		basePower: 120,
+		basePower: 110,
 		category: "Special",
 		desc: "Has a 30% chance to lower the target's accuracy by 1 stage.",
 		shortDesc: "30% chance to lower the target's accuracy by 1.",
 		id: "tmistball",
+		isViable: true,
 		name: "T-Mist Ball",
 		pp: 5,
 		priority: 0,
@@ -1479,7 +1480,7 @@ exports.BattleMovedex = {
 		secondary: {
 			chance: 30,
 			boosts: {
-				acc: -1,
+				accuracy: -1,
 			},
 		},
 		target: "normal",
@@ -1490,11 +1491,12 @@ exports.BattleMovedex = {
 	"tlusterpurge": {
 		num: 20039,
 		accuracy: 80,
-		basePower: 120,
+		basePower: 110,
 		category: "Special",
 		desc: "Has a 20% chance to lower the target's Special Defense by 1 stage.",
 		shortDesc: "20% chance to lower the target's Sp. Def by 1.",
 		id: "tlusterpurge",
+		isViable: true,
 		name: "T-Luster Purge",
 		pp: 5,
 		priority: 0,
