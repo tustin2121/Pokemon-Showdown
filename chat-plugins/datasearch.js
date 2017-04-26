@@ -88,8 +88,6 @@ exports.commands = {
 	dexsearch: function (target, room, user, connection, cmd, message) {
 		if (!this.canBroadcast()) return;
 		if (!target) return this.parse('/help dexsearch');
-		if (global.AntiCheat) AntiCheat.emit('dexsearch', target, room, user);
-		if (this.broadcastMessage && room.noDexsearchBroadcast) return this.errorReply('Cannot broadcast dexsearch in this room.');
 
 		return runSearch({
 			target: target,
@@ -113,7 +111,7 @@ exports.commands = {
 		"/dexsearch [parameter], [parameter], [parameter], ... - Searches for Pok\u00e9mon that fulfill the selected criteria",
 		"Search categories are: type, tier, color, moves, ability, gen, resists, recovery, priority, stat, egg group.",
 		"Valid colors are: green, red, blue, white, brown, yellow, purple, pink, gray and black.",
-		"Valid tiers are: Uber/OU/BL/UU/BL2/RU/BL3/NU/BL4/PU/FU/NFE/LC/CAP.",
+		"Valid tiers are: Uber/OU/BL/UU/BL2/RU/BL3/NU/BL4/PU/NFE/LC/CAP.",
 		"Types must be followed by ' type', e.g., 'dragon type'.",
 		"'resists' followed by a type will show Pok\u00e9mon that resist that typing, e.g., 'resists normal'.",
 		"Inequality ranges use the characters '>=' for '≥' and '<=' for '≤', e.g., 'hp <= 95' searches all Pok\u00e9mon with HP less than or equal to 95.",
@@ -194,7 +192,7 @@ exports.commands = {
 	},
 	movesearchhelp: [
 		"/movesearch [parameter], [parameter], [parameter], ... - Searches for moves that fulfill the selected criteria.",
-		"Search categories are: type, category, contest condition, flag, status inflicted, type boosted, and numeric range for base power, pp, and accuracy.",
+		"Search categories are: type, category, gen, contest condition, flag, status inflicted, type boosted, and numeric range for base power, pp, and accuracy.",
 		"Types must be followed by ' type', e.g., 'dragon type'.",
 		"Stat boosts must be preceded with 'boosts ', e.g., 'boosts attack' searches for moves that boost the attack stat.",
 		"Inequality ranges use the characters '>' and '<' though they behave as '≥' and '≤', e.g., 'bp > 100' searches for all moves equal to and greater than 100 base power.",
@@ -296,10 +294,10 @@ if (process.send && module === process.mainModule) {
 
 function runDexsearch(target, cmd, canAll, message) {
 	let searches = [];
-	let allTiers = {'uber':'Uber', 'ou':'OU', 'bl':"BL", 'uu':'UU', 'bl2':"BL2", 'ru':'RU', 'bl3':"BL3", 'nu':'NU', 'bl4':"BL4", 'pu':'PU', 'fu':'FU', 'nfe':'NFE', 'lc uber':"LC Uber", 'lc':'LC', 'cap':"CAP"};
+	let allTiers = {'uber':'Uber', 'ou':'OU', 'bl':"BL", 'uu':'UU', 'bl2':"BL2", 'ru':'RU', 'bl3':"BL3", 'nu':'NU', 'bl4':"BL4", 'pu':'PU', 'nfe':'NFE', 'lc uber':"LC Uber", 'lc':'LC', 'cap':"CAP"};
 	let allColours = {'green':1, 'red':1, 'blue':1, 'white':1, 'brown':1, 'yellow':1, 'purple':1, 'pink':1, 'gray':1, 'black':1};
 	let allEggGroups = {'amorphous':'Amorphous', 'bug':'Bug', 'ditto':'Ditto', 'dragon':'Dragon', 'fairy':'Fairy', 'field':'Field', 'flying':'Flying', 'grass':'Grass', 'humanlike':'Human-Like', 'mineral':'Mineral', 'monster':'Monster', 'undiscovered':'Undiscovered', 'water1':'Water 1', 'water2':'Water 2', 'water3':'Water 3'};
-	let allStats = {'hp':1, 'atk':1, 'def':1, 'spa':1, 'spd':1, 'spe':1, 'bst':1};
+	let allStats = {'hp':1, 'atk':1, 'def':1, 'spa':1, 'spd':1, 'spe':1, 'bst':1, 'weight':1};
 	let showAll = false;
 	let megaSearch = null;
 	let capSearch = null;
@@ -539,6 +537,7 @@ function runDexsearch(target, cmd, canAll, message) {
 				case 'specialdefense': stat = 'spd'; break;
 				case 'spdef': stat = 'spd'; break;
 				case 'speed': stat = 'spe'; break;
+				case 'wt': stat = 'weight'; break;
 				}
 				if (!(stat in allStats)) return {reply: "'" + escapeHTML(target) + "' did not contain a valid stat."};
 				if (!orGroup.stats[stat]) orGroup.stats[stat] = {};
@@ -629,6 +628,8 @@ function runDexsearch(target, cmd, canAll, message) {
 					for (let monStats in dex[mon].baseStats) {
 						monStat += dex[mon].baseStats[monStats];
 					}
+				} else if (stat === 'weight') {
+					monStat = dex[mon].weightkg;
 				} else {
 					monStat = dex[mon].baseStats[stat];
 				}
