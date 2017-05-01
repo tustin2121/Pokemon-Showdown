@@ -1,7 +1,7 @@
 /**
 * Wi-Fi chat-plugin. Only works in a room with id 'wifi'
-* Handles giveaways in the formats: question, lottery
-* Credits: Codelegend, SilverTactic, DanielCranham, bumbadadabum
+* Handles giveaways in the formats: question, lottery, gts
+* Written by bumbadadabum, based on the original plugin as written by Codelegend, SilverTactic, DanielCranham
 **/
 
 'use strict';
@@ -536,7 +536,7 @@ class GtsGiveaway {
 		return `<p style="text-align:center;font-size:14pt;font-weight:bold;margin-bottom:2px;">There is a GTS giveaway going on!</p>` +
 			`<p style="text-align:center;font-size:10pt;margin-top:0px;">Hosted by: ${Chat.escapeHTML(this.giver.name)} | Left: <b>${this.left}</b></p>` +
 			`<table style="margin-left:auto;margin-right:auto;"><tr>` +
-			(sentModifier ? `<td style="text-align:center;width:10%><b>Last winners:</b><br/>${this.sent.join('<br/>')}</td>` : '') +
+			(sentModifier ? `<td style="text-align:center;width:10%"><b>Last winners:</b><br/>${this.sent.join('<br/>')}</td>` : '') +
 			`<td style="text-align:center;width:15%">${this.sprite}</td><td style="text-align:center;width:${40 - sentModifier}%">${Giveaway.parseText(this.summary)}</td>` +
 			`<td style="text-align:center;width:${35 - sentModifier}%">To participate, deposit <strong>${this.deposit}</strong> into the GTS and look for <strong>${Chat.escapeHTML(this.lookfor)}</strong></td></tr></table>`;
 	}
@@ -567,7 +567,7 @@ class GtsGiveaway {
 			this.clearTimer();
 			this.changeUhtml(`<p style="text-align:center;font-size:13pt;font-weight:bold;">The GTS giveaway has finished.</p>`);
 			this.room.modlog(`${this.giver.name} has finished their GTS giveaway for "${this.summary}"`);
-			this.send(`<p style="text-align:center;font-size:13pt;font-weight:bold;">The GTS giveaway for a "${this.summary}" has finished.</p>`);
+			this.send(`<p style="text-align:center;font-size:11pt">The GTS giveaway for a "<strong>${Chat.escapeHTML(this.summary)}</strong>" has finished.</p>`);
 		}
 		delete this.room.gtsga;
 	}
