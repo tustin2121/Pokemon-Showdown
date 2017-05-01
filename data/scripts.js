@@ -819,6 +819,7 @@ exports.BattleScripts = {
 		let atLeastOne = false;
 		let zMoves = [];
 		for (let i = 0; i < pokemon.moves.length; i++) {
+			if (pokemon.moveset[i].pp <= 0) continue;
 			let move = this.getMove(pokemon.moves[i]);
 			let zMoveName = this.getZMove(move, pokemon, true) || '';
 			if (zMoveName) {
@@ -2069,6 +2070,9 @@ exports.BattleScripts = {
 			if (abilities.includes('Guts') && ability !== 'Quick Feet' && (hasMove['facade'] || hasMove['protect'] || (hasMove['rest'] && hasMove['sleeptalk']))) {
 				ability = 'Guts';
 			}
+			if (abilities.includes('Liquid Voice') && hasMove['hypervoice']) {
+				ability = 'Liquid Voice';
+			}
 			if (abilities.includes('Marvel Scale') && hasMove['rest'] && hasMove['sleeptalk']) {
 				ability = 'Marvel Scale';
 			}
@@ -2328,7 +2332,7 @@ exports.BattleScripts = {
 				evs.hp -= 4;
 				hp = Math.floor(Math.floor(2 * template.baseStats.hp + ivs.hp + Math.floor(evs.hp / 4) + 100) * level / 100 + 10);
 			}
-		} else if (hasMove['bellydrum'] && item === 'Sitrus Berry') {
+		} else if (hasMove['bellydrum'] && (item === 'Sitrus Berry' || ability === 'Gluttony')) {
 			// Belly Drum should activate Sitrus Berry
 			if (hp % 2 > 0) evs.hp -= 4;
 		} else if (hasMove['substitute'] && hasMove['reversal']) {
@@ -3106,6 +3110,9 @@ exports.BattleScripts = {
 			}
 			if (abilities.includes('Intimidate') || template.id === 'mawilemega') {
 				ability = 'Intimidate';
+			}
+			if (abilities.includes('Liquid Voice') && hasMove['hypervoice']) {
+				ability = 'Liquid Voice';
 			}
 			if (abilities.includes('Swift Swim') && hasMove['raindance']) {
 				ability = 'Swift Swim';
