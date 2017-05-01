@@ -177,11 +177,10 @@ class Validator {
 			set.level = maxLevel;
 		}
 
-		/* let nameTemplate = tools.getTemplate(set.name);
+		let nameTemplate = tools.getTemplate(set.name);
 		if (nameTemplate.exists && nameTemplate.name.toLowerCase() === set.name.toLowerCase()) {
 			set.name = null;
-		} */
-		// above needs to be removed for Cross Evolution.
+		}
 		set.name = set.name || set.baseSpecies;
 		let name = set.species;
 		if (set.species !== set.name && set.baseSpecies !== set.name) name = `${set.name} (${set.species})`;
@@ -207,6 +206,7 @@ class Validator {
 			template = tools.getTemplate(set.species);
 			if (ability.id === 'battlebond' && template.id === 'greninja') {
 				template = tools.getTemplate('greninjaash');
+				set.gender = 'M';
 			}
 		}
 		if (!template.exists) {
@@ -277,7 +277,7 @@ class Validator {
 			// Don't check abilities for metagames with All Abilities
 			if (tools.gen <= 2) {
 				set.ability = 'None';
-			} else if (!banlistTable['ignoreillegalabilities']) {
+			} else if (!banlistTable['Rule:ignoreillegalabilities']) {
 				if (!ability.name) {
 					problems.push(`${name} needs to have an ability.`);
 				} else if (!Object.values(template.abilities).includes(ability.name)) {
@@ -341,7 +341,8 @@ class Validator {
 					let problem = this.checkLearnset(move, template, lsetData);
 					if (problem) {
 						// Sketchmons hack
-						if (banlistTable['allowonesketch'] && format.noSketch.indexOf(move.name) < 0 && !set.sketchmonsMove && !move.noSketch && !move.isZ) {
+						const noSketch = format.noSketch || tools.getFormat('gen7sketchmons').noSketch;
+						if (banlistTable['Rule:allowonesketch'] && noSketch.indexOf(move.name) < 0 && !set.sketchmonsMove && !move.noSketch && !move.isZ) {
 							set.sketchmonsMove = move.id;
 							continue;
 						}
@@ -395,6 +396,13 @@ class Validator {
 				const expectedHpDV = (atkDV % 2) * 8 + (defDV % 2) * 4 + (speDV % 2) * 2 + (spcDV % 2);
 				if (expectedHpDV !== hpDV) {
 					problems.push(`${name} has an HP DV of ${hpDV}, but its Atk, Def, Spe, and Spc DVs give it an HP DV of ${expectedHpDV}.`);
+				}
+				if (set.ivs.spa !== set.ivs.spd) {
+					if (tools.gen === 2) {
+						problems.push(`${name} has different SpA and SpD DVs, which is not possible in Gen 2.`);
+					} else {
+						set.ivs.spd = set.ivs.spa;
+					}
 				}
 				if (tools.gen > 1 && !template.gender) {
 					// Gen 2 gender is calculated from the Atk DV.
@@ -834,10 +842,6 @@ class Validator {
 		let format = (lsetData.format || (lsetData.format = {}));
 		let alreadyChecked = {};
 		let level = set.level || 100;
-		let alphabetCupLetter = null;
-		if (format.banlistTable && format.banlistTable['ignorealphabetmoves']) {
-			alphabetCupLetter = template.speciesid.charAt(0);
-		}
 
 		let incompatibleAbility = false;
 		let isHidden = false;
@@ -893,7 +897,6 @@ class Validator {
 		do {
 			alreadyChecked[template.speciesid] = true;
 			if (tools.gen === 2 && template.gen === 1) tradebackEligible = true;
-
 			if (!template.learnset) {
 				if (template.baseSpecies !== template.species) {
 					// forme without its own learnset
