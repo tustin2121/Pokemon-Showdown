@@ -56,6 +56,12 @@ class DiscordBot extends Bot {
 		this.client.on('messageUpdate', (oldMsg, newMsg)=>{
 			
 		});
+		this.client.on('disconnect', (evt)=>{
+			console.log(`Discord bot has disconnected with code ${evt.code}: ${evt.reason}. Reconnecting...`);
+			// if (evt.code !== 1000) {
+			// 	this.client.login(opts.token);
+			// }
+		});
 		this.client.login(opts.token);
 	}
 	

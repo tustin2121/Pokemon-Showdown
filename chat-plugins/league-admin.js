@@ -142,7 +142,7 @@ function LeagueSetupSend(msg) {
 			}
 			case 'hallOfFame': {
 				if (typeof msg.user === 'string') msg.user = Users.get(msg.user);
-				let hof = LeagueSetup.hallOfFame[msg.type || 'singles'];
+				let hof = LeagueSetup.hallOfFame[msg.format || 'singles'];
 				let chall = LeagueSetup.challengers[msg.user.userid];
 				let entry = {
 					num: hof.length+1,
@@ -190,7 +190,7 @@ function LeagueSetupSend(msg) {
 					type:"new",
 					event:"hallOfFame",
 					user:user,
-					type: msg.otherInfo[0],
+					format: msg.otherInfo[0],
 					team: msg.otherInfo[1],
 				});
 				
@@ -206,7 +206,7 @@ function LeagueSetupSend(msg) {
 				if (num==='11st'||num==='12nd'||num==='13rd') num=num.slice(0,2)+"th";
 				setTimeout(()=>msg.room.add(`|html|<div class="broadcast-blue"><b>The challenger ${user.name} has won against ${elite.name}! Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`), 4000);
 				Rooms.global.add(`|html|<div class="broadcast-blue"><b>Congratuations to our new ${num} TPPLeague Champion, ${user.name}!</b></div>`);
-				BotManager.announceNotify(`Congratuations to our new ${num} TPPLeague Champion, ${user.name}!`);
+				BotManager.announce(`Congratuations to our new ${num} TPPLeague Champion, ${user.name}!`);
 			} return;
 		}
 	} return;
@@ -218,7 +218,7 @@ function LeagueSetupSend(msg) {
 				Users.users.forEach(curUser => curUser.send('|champnotify|notify') );
 				return;
 			case 'begin':
-				BotManager.announceNotify(`TPPLeague Champion Battle has begun! https://tppleague.me/${msg.battleid}`);
+				BotManager.announce(`TPPLeague Champion Battle has begun! https://tppleague.me/${msg.battleid}`);
 				return;
 			case 'ongoing': //sent about every 10 rounds
 				BotManager.announce(`TPPLeague Champion Battle is in progress! https://tppleague.me/${msg.battleid}`);
