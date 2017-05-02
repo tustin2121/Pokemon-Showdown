@@ -305,7 +305,6 @@ exports.BattleItems = {
 	"audinite": {
 		id: "audinite",
 		name: "Audinite",
-		isUnreleased: true,
 		spritenum: 617,
 		megaStone: "Audino-Mega",
 		megaEvolves: "Audino",
@@ -3235,7 +3234,6 @@ exports.BattleItems = {
 	"medichamite": {
 		id: "medichamite",
 		name: "Medichamite",
-		isUnreleased: true,
 		spritenum: 599,
 		megaStone: "Medicham-Mega",
 		megaEvolves: "Medicham",
@@ -3845,7 +3843,6 @@ exports.BattleItems = {
 	"pidgeotite": {
 		id: "pidgeotite",
 		name: "Pidgeotite",
-		isUnreleased: true,
 		spritenum: 622,
 		megaStone: "Pidgeot-Mega",
 		megaEvolves: "Pidgeot",
@@ -3872,7 +3869,6 @@ exports.BattleItems = {
 	"pikashuniumz": {
 		id: "pikashuniumz",
 		name: "Pikashunium Z",
-		isUnreleased: true,
 		spritenum: 659,
 		onTakeItem: false,
 		zMove: "10,000,000 Volt Thunderbolt",
@@ -5182,7 +5178,6 @@ exports.BattleItems = {
 	"steelixite": {
 		id: "steelixite",
 		name: "Steelixite",
-		isUnreleased: true,
 		spritenum: 621,
 		megaStone: "Steelix-Mega",
 		megaEvolves: "Steelix",
@@ -6135,8 +6130,3 @@ exports.BattleItems = {
 		desc: "If holder is a Crucibelle, this item allows it to Mega Evolve in battle.",
 	},
 };
-
-try {
-	let tpp = require("../mods/tppextras/items.js");
-	Object.assign(exports.BattleItems, tpp.BattleItems);
-} catch (e) { console.error("Could not load TPP BattleItems!", e); }
