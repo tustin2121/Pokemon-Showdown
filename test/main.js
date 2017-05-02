@@ -69,10 +69,6 @@ before('initialization', function (done) {
 	config.logchallenges = false;
 	config.logchat = false;
 
-	// Disable IRC support
-	config.ircconfig = null;
-
-	// Sandbox file system: it's possible for a production server to be running in the same directory.
 	// Don't create a REPL
 	require('./../repl').start = noop;
 

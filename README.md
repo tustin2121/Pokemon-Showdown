@@ -7,7 +7,9 @@ Navigation: [Website][1] | **Server repository** | [Client repository][2] | [Dex
   [2]: https://github.com/Zarel/Pokemon-Showdown-Client
   [3]: https://github.com/Zarel/Pokemon-Showdown-Dex
 
-[![Build Status](https://travis-ci.org/abyll/Pokemon-Showdown.svg?branch=tpp-micro)](https://travis-ci.org/abyll/Pokemon-Showdown)
+[![Build Status](https://travis-ci.org/Zarel/Pokemon-Showdown.svg)](https://travis-ci.org/Zarel/Pokemon-Showdown)
+[![Dependency Status](https://david-dm.org/zarel/Pokemon-Showdown.svg)](https://david-dm.org/zarel/Pokemon-Showdown)
+[![devDependency Status](https://david-dm.org/zarel/Pokemon-Showdown/dev-status.svg)](https://david-dm.org/zarel/Pokemon-Showdown#info=devDependencies)
 
 Introduction
 ------------------------------------------------------------------------
@@ -120,13 +122,17 @@ You can also visit the [Pokémon Showdown forums][8] for discussion and help.
 
   [8]: http://www.smogon.com/forums/forums/pok%C3%A9mon-showdown.209/
 
+If you'd like to contribute to programming and don't know where to start, feel free to check out [Ideas for New Developers][9].
+
+  [9]: https://github.com/Zarel/Pokemon-Showdown/issues/2444
+
 
 License
 ------------------------------------------------------------------------
 
-Pokémon Showdown's server is distributed under the terms of the [MIT License][9].
+Pokémon Showdown's server is distributed under the terms of the [MIT License][10].
 
-  [9]: https://github.com/Zarel/Pokemon-Showdown/blob/master/LICENSE
+  [10]: https://github.com/Zarel/Pokemon-Showdown/blob/master/LICENSE
 
 
 Credits
