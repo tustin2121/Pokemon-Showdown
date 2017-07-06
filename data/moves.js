@@ -19032,3 +19032,8 @@ exports.BattleMovedex = {
 		contestType: "Cute",
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/moves.js");
+	Object.assign(exports.BattleMovedex, tpp.BattleMovedex);
+} catch (e) { console.error("Could not load TPP BattleMovedex!", e); }

@@ -1,5 +1,6 @@
 "use strict";
 const clone = require("clone");
+const PRNG = require('../../prng');
 
 let leaguemon = { 
 	// This is where all movesets are defined. Add new mons here.
@@ -822,12 +823,13 @@ exports.BattleScripts = {
 			}
 			return team; //CHANGES END HERE
 		} else {
-			// // Reinitialize the RNG seed to create random teams.
-			this.seed = this.generateSeed();
-			this.startingSeed = this.startingSeed.concat(this.seed);
+			// Teams are generated each one with a shiny new PRNG to prevent
+			// information leaks that would empower brute-force attacks.
+			const originalPrng = this.prng;
+			this.prng = new PRNG();
+			this.prngSeed.push(...this.prng.startingSeed);
 			team = this[teamGenerator || 'randomTeam'](side);
-			// Restore the default seed
-			this.seed = this.startingSeed.slice(0, 4);
+			this.prng = originalPrng;
 			return team;
 		}
 	},

@@ -736,3 +736,8 @@ exports.BattleFormats = {
 		// Implemented in the 'pokemon' ruleset
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/rulesets.js");
+	Object.assign(exports.BattleFormats, tpp.BattleFormats);
+} catch (e) { console.error("Could not load TPP BattleFormats!", e); }

@@ -6130,3 +6130,8 @@ exports.BattleItems = {
 		desc: "If holder is a Crucibelle, this item allows it to Mega Evolve in battle.",
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/items.js");
+	Object.assign(exports.BattleItems, tpp.BattleItems);
+} catch (e) { console.error("Could not load TPP BattleItems!", e); }

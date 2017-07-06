@@ -3341,19 +3341,24 @@ class Battle extends Tools.BattleDex {
 		this.started = true;
 		this.p2.foe = this.p1;
 		this.p1.foe = this.p2;
-
+		
+		let format = this.getFormat();
+		if (format.onPreSetup) {
+			if (format.onPreSetup.call(this, format) === false) return;
+			format = this.getFormat();
+		}
+		
 		this.add('gametype', this.gameType);
 		this.add('gen', this.gen);
-
-		let format = this.getFormat();
+		
 		Tools.mod(format.mod).getBanlistTable(format); // fill in format ruleset
-
+		
 		this.add('tier', format.name);
 		if (this.rated) {
 			this.add('rated');
 		}
 		this.add('seed', Battle.logReplay.bind(this, this.prngSeed.join(',')));
-
+		
 		if (format.onBegin) {
 			format.onBegin.call(this);
 		}
@@ -4608,6 +4613,10 @@ class Battle extends Tools.BattleDex {
 
 		case 'undo':
 			this.undoChoice(data[2], data[3]);
+			break;
+		
+		case 'stadium':
+			this.runEvent('StadiumRequest', null, null, null, data.slice(3));
 			break;
 
 		case 'eval': {

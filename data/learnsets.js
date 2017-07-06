@@ -60214,3 +60214,8 @@ exports.BattleLearnsets = {
 		workup: ["7M"],
 	}},
 };
+
+try {
+	let tpp = require("../mods/tppextras/learnsets.js");
+	Object.assign(exports.BattleLearnsets, tpp.BattleLearnsets);
+} catch (e) { console.error("Could not load TPP BattleLearnsets!", e); }

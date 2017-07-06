@@ -3569,3 +3569,8 @@ exports.BattleScripts = {
 		return pokemon;
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/scripts.js");
+	Object.assign(exports.BattleScripts, tpp.BattleScripts);
+} catch (e) { console.error("Could not load TPP BattleScripts!", e); }

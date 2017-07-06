@@ -12,6 +12,7 @@ exports.BattleScripts = {
 		switch (data[1]) {
 		case 'join': {
 			let team = '';
+			//////// 
 			try {
 				if (more) team = Tools.fastUnpackTeam(more);
 				
@@ -47,18 +48,6 @@ exports.BattleScripts = {
 			this.join(data[2], data[3], data[4], team);
 			break;
 		}
-
-		case 'rename':
-			this.rename(data[2], data[3], data[4]);
-			break;
-
-		case 'leave':
-			this.leave(data[2]);
-			break;
-
-		case 'chat':
-			this.add('chat', data[2], more);
-			break;
 
 		case 'win':
 		case 'tie':

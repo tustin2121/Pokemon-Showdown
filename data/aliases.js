@@ -694,3 +694,8 @@ exports.BattleAliases = {
 	// there's no need to type out the other Japanese names
 	// I'll autogenerate them at some point
 };
+
+try {
+	let tpp = require("../mods/tppextras/aliases.js");
+	Object.assign(exports.BattleAliases, tpp.BattleAliases);
+} catch (e) { console.error("Could not load TPP BattleAliases!", e); }

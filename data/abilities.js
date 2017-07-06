@@ -4141,3 +4141,8 @@ exports.BattleAbilities = {
 		num: -4,
 	},
 };
+
+try {
+	let tpp = require("../mods/tppextras/abilities.js");
+	Object.assign(exports.BattleAbilities, tpp.BattleAbilities);
+} catch (e) { console.error("Could not load TPP BattleAbilities!", e); }
