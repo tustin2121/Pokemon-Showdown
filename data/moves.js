@@ -7,11 +7,13 @@ bite: Power is multiplied by 1.5 when used by a Pokemon with the Ability Strong 
 bullet: Has no effect on Pokemon with the Ability Bulletproof.
 charge: The user is unable to make a move between turns.
 contact: Makes contact.
+dance: When used by a Pokemon, other Pokemon with the Ability Dancer can attempt to execute the same move.
 defrost: Thaws the user if executed successfully while the user is frozen.
 distance: Can target a Pokemon positioned anywhere in a Triple Battle.
 gravity: Prevented from being executed or selected during Gravity's effect.
 heal: Prevented from being executed or selected during Heal Block's effect.
 mirror: Can be copied by Mirror Move.
+mystery: Unknown effect.
 nonsky: Prevented from being executed or selected in a Sky Battle.
 powder: Has no effect on Grass-type Pokemon, Pokemon with the Ability Overcoat, and Pokemon holding Safety Goggles.
 protect: Blocked by Detect, Protect, Spiky Shield, and if not a Status move, King's Shield.
@@ -1194,7 +1196,7 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		flags: {protect: 1},
-		// Move disabling implemented in Battle#nextTurn in battle-engine.js
+		// Move disabling implemented in Battle#nextTurn in sim/battle.js
 		secondary: false,
 		target: "normal",
 		type: "Poison",
@@ -4338,7 +4340,7 @@ exports.BattleMovedex = {
 			onStart: function (pokemon) {
 				this.add('-start', pokemon, 'Embargo');
 			},
-			// Item suppression implemented in BattlePokemon.ignoringItem() within battle-engine.js
+			// Item suppression implemented in Pokemon.ignoringItem() within sim/pokemon.js
 			onResidualOrder: 18,
 			onEnd: function (pokemon) {
 				this.add('-end', pokemon, 'Embargo');
@@ -6171,7 +6173,7 @@ exports.BattleMovedex = {
 			}
 		},
 		effect: {
-			// Ability suppression implemented in BattlePokemon.ignoringAbility() within battle-engine.js
+			// Ability suppression implemented in Pokemon.ignoringAbility() within sim/pokemon.js
 			onStart: function (pokemon) {
 				this.add('-endability', pokemon);
 				this.singleEvent('End', this.getAbility(pokemon.ability), pokemon.abilityData, pokemon, pokemon, 'gastroacid');
@@ -7497,6 +7499,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerbug": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7513,6 +7516,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerdark": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7529,6 +7533,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerdragon": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7545,6 +7550,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerelectric": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7562,6 +7568,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerfighting": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7579,6 +7586,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerfire": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7596,6 +7604,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerflying": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7612,6 +7621,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerghost": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7628,6 +7638,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowergrass": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7645,6 +7656,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerground": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7661,6 +7673,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerice": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7678,6 +7691,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerpoison": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7694,6 +7708,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerpsychic": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7710,6 +7725,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerrock": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7726,6 +7742,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowersteel": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -7742,6 +7759,7 @@ exports.BattleMovedex = {
 		contestType: "Clever",
 	},
 	"hiddenpowerwater": {
+		num: 237,
 		accuracy: 100,
 		basePower: 60,
 		category: "Special",
@@ -9609,17 +9627,16 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			duration: 5,
-			/*durationCallback: function (source, effect) {
-				// Persistent isn't updated for BW moves
-				if (source && source.hasAbility('Persistent')) {
+			durationCallback: function (source, effect) {
+				if (source && source.hasAbility('persistent')) {
 					return 7;
 				}
 				return 5;
-			},*/
+			},
 			onStart: function (target, source) {
 				this.add('-fieldstart', 'move: Magic Room', '[of] ' + source);
 			},
-			// Item suppression implemented in BattlePokemon.ignoringItem() within battle-engine.js
+			// Item suppression implemented in Pokemon.ignoringItem() within sim/pokemon.js
 			onResidualOrder: 25,
 			onEnd: function () {
 				this.add('-fieldend', 'move: Magic Room', '[of] ' + this.effectData.source);
@@ -10240,7 +10257,7 @@ exports.BattleMovedex = {
 			if (source.transformed || !target.lastMove || disallowedMoves[target.lastMove] || source.moves.indexOf(target.lastMove) >= 0) return false;
 			let moveslot = source.moves.indexOf('mimic');
 			if (moveslot < 0) return false;
-			let move = Tools.getMove(target.lastMove);
+			let move = Dex.getMove(target.lastMove);
 			source.moveset[moveslot] = {
 				move: move.name,
 				id: move.id,
@@ -12123,7 +12140,7 @@ exports.BattleMovedex = {
 		basePower: 120,
 		category: "Physical",
 		desc: "No additional effect.",
-		shortDesc: "No additional effect. Hits adjacent Pokemon.",
+		shortDesc: "No additional effect. Hits adjacent foes.",
 		id: "precipiceblades",
 		isViable: true,
 		name: "Precipice Blades",
@@ -14347,7 +14364,7 @@ exports.BattleMovedex = {
 		accuracy: 30,
 		basePower: 0,
 		category: "Special",
-		desc: "Deals damage to the target equal to the target's maximum HP. Ignores accuracy and evasiveness modifiers. This attack's accuracy is equal to (user's level - target's level + 30)%, and fails if the target is at a higher level. Pokemon with Ice typing or with the Ability Sturdy are immune.",
+		desc: "Deals damage to the target equal to the target's maximum HP. Ignores accuracy and evasiveness modifiers. This attack's accuracy is equal to (user's level - target's level + X)%, where X is 30 if the user is an Ice type and 20 otherwise, and fails if the target is at a higher level. Ice-type Pokemon and Pokemon with the Ability Sturdy are immune.",
 		shortDesc: "OHKOs non-Ice targets. Fails if user's lower level.",
 		id: "sheercold",
 		name: "Sheer Cold",
@@ -14630,7 +14647,7 @@ exports.BattleMovedex = {
 			if (source.transformed || !target.lastMove || disallowedMoves[target.lastMove] || source.moves.indexOf(target.lastMove) >= 0) return false;
 			let moveslot = source.moves.indexOf('sketch');
 			if (moveslot < 0) return false;
-			let move = Tools.getMove(target.lastMove);
+			let move = Dex.getMove(target.lastMove);
 			let sketchedMove = {
 				move: move.name,
 				id: move.id,
@@ -15306,7 +15323,6 @@ exports.BattleMovedex = {
 		desc: "The target's raised stat stages are stolen from it and applied to the user before dealing damage.",
 		shortDesc: "Steals target's boosts before dealing damage.",
 		id: "spectralthief",
-		isUnreleased: true,
 		isViable: true,
 		name: "Spectral Thief",
 		pp: 10,
@@ -17754,7 +17770,7 @@ exports.BattleMovedex = {
 			onStart: function (target, source) {
 				this.add('-fieldstart', 'move: Trick Room', '[of] ' + source);
 			},
-			// Speed modification is changed in BattlePokemon.getDecisionSpeed() in battle-engine.js
+			// Speed modification is changed in Pokemon.getDecisionSpeed() in sim/pokemon.js
 			onResidualOrder: 23,
 			onEnd: function () {
 				this.add('-fieldend', 'move: Trick Room');
@@ -18692,10 +18708,16 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			duration: 5,
-			onStart: function (side, source) {
-				this.add('-fieldstart', 'move: WonderRoom', '[of] ' + source);
+			durationCallback: function (source, effect) {
+				if (source && source.hasAbility('persistent')) {
+					return 7;
+				}
+				return 5;
 			},
-			// Swapping defenses implemented in battle-engine.js:BattlePokemon#calculateStat and BattlePokemon#getStat
+			onStart: function (side, source) {
+				this.add('-fieldstart', 'move: Wonder Room', '[of] ' + source);
+			},
+			// Swapping defenses implemented in sim/pokemon.js:Pokemon#calculateStat and Pokemon#getStat
 			onResidualOrder: 24,
 			onEnd: function () {
 				this.add('-fieldend', 'move: Wonder Room');
@@ -19027,8 +19049,10 @@ exports.BattleMovedex = {
 				spa: -1,
 			},
 		},
+		stealsBoosts: true,
 		target: "normal",
 		type: "Water",
+		zMovePower: 190,
 		contestType: "Cute",
 	},
 };
