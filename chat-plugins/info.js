@@ -90,7 +90,7 @@ exports.commands = {
 				if (targetAlt.group === '~' && user.group !== '~') continue;
 
 				buf += Chat.html`<br />Alt: <span class="username">${targetAlt.name}</span>`;
-				if (!targetAlt.connected) buf += ` <em style=\"color:gray\">(offline)</em>`;
+				if (!targetAlt.connected) buf += ` <em style="color:gray">(offline)</em>`;
 				prevNames = Object.keys(targetAlt.prevNames).join(", ");
 				if (prevNames) buf += `<br />Previous names: ${prevNames}`;
 			}
@@ -128,7 +128,16 @@ exports.commands = {
 		}
 		if ((user.can('ip', targetUser) || user === targetUser)) {
 			let ips = Object.keys(targetUser.ips);
-			ips = ips.map(ip => ip + (Punishments.sharedIps.has(ip) ? ' (shared)' : ''));
+			ips = ips.map(ip => {
+				if (Punishments.sharedIps.has(ip)) {
+					let sharedStr = 'shared';
+					if (Punishments.sharedIps.get(ip)) {
+						sharedStr += `: ${Punishments.sharedIps.get(ip)}`;
+					}
+					return ip + ` (${sharedStr})`;
+				}
+				return ip;
+			});
 			buf += `<br /> IP${Chat.plural(ips)}: ${ips.join(", ")}`;
 			if (user.group !== ' ' && targetUser.latestHost) {
 				buf += Chat.html`<br />Host: ${targetUser.latestHost}`;
@@ -313,10 +322,10 @@ exports.commands = {
 		}
 		let challenges = [];
 		if (user1.challengeTo && user1.challengeTo.to === user2.userid) {
-			challenges.push(Chat.html`${user1.name} is challenging ${user2.name} in ${Tools.getFormat(user1.challengeTo.format).name}.`);
+			challenges.push(Chat.html`${user1.name} is challenging ${user2.name} in ${Dex.getFormat(user1.challengeTo.format).name}.`);
 		}
 		if (user2.challengeTo && user2.challengeTo.to === user1.userid) {
-			challenges.push(Chat.html`${user2.name} is challenging ${user1.name} in ${Tools.getFormat(user2.challengeTo.format).name}.`);
+			challenges.push(Chat.html`${user2.name} is challenging ${user1.name} in ${Dex.getFormat(user2.challengeTo.format).name}.`);
 		}
 		if (!challenges.length) {
 			return this.sendReplyBox(Chat.html`${user1.name} and ${user2.name} are not challenging each other.`);
@@ -336,7 +345,7 @@ exports.commands = {
 	},
 
 	/*********************************************************
-	 * Data Search Tools
+	 * Data Search Dex
 	 *********************************************************/
 
 	'!data': true,
@@ -348,12 +357,15 @@ exports.commands = {
 		if (!this.runBroadcast()) return;
 
 		let buffer = '';
+		let sep = target.split(',');
+		if (sep.length !== 2) sep = [target];
+		target = sep[0].trim();
 		let targetId = toId(target);
 		if (!targetId) return this.parse('/help data');
 		let targetNum = parseInt(targetId);
-		if (!isNaN(targetNum)) {
-			for (let p in Tools.data.Pokedex) {
-				let pokemon = Tools.getTemplate(p);
+		if (!isNaN(targetNum) && '' + targetNum === target) {
+			for (let p in Dex.data.Pokedex) {
+				let pokemon = Dex.getTemplate(p);
 				if (pokemon.num === targetNum) {
 					target = pokemon.species;
 					targetId = pokemon.id;
@@ -361,15 +373,22 @@ exports.commands = {
 				}
 			}
 		}
-		let newTargets = Tools.dataSearch(target);
+		let mod = Dex;
+		if (sep[1] && toId(sep[1]) in Dex.dexes) {
+			mod = Dex.mod(toId(sep[1]));
+		} else if (sep[1] && Dex.getFormat(sep[1]).mod) {
+			mod = Dex.mod(Dex.getFormat(sep[1]).mod);
+		}
+		let newTargets = mod.dataSearch(target);
 		let showDetails = (cmd === 'dt' || cmd === 'details');
 		if (newTargets && newTargets.length) {
 			for (let i = 0; i < newTargets.length; ++i) {
-				if (!newTargets[i].exactMatch && !i) {
-					buffer = "No Pok\u00e9mon, item, move, ability or nature named '" + target + "' was found. Showing the data of '" + newTargets[0].name + "' instead.\n";
+				if (newTargets[i].isInexact && !i) {
+					buffer = `No Pok\u00e9mon, item, move, ability or nature named '${target}' was found${Dex.gen > mod.gen ? ` in Gen ${mod.gen}` : ""}. Showing the data of '${newTargets[0].name}' instead.\n`;
 				}
-				if (newTargets[i].searchType === 'nature') {
-					let nature = Tools.getNature(newTargets[i].name);
+				switch (newTargets[i].searchType) {
+				case 'nature':
+					let nature = Dex.getNature(newTargets[i].name);
 					buffer += "" + nature.name + " nature: ";
 					if (nature.plus) {
 						let statNames = {'atk': "Attack", 'def': "Defense", 'spa': "Special Attack", 'spd': "Special Defense", 'spe': "Speed"};
@@ -378,20 +397,34 @@ exports.commands = {
 						buffer += "No effect.";
 					}
 					return this.sendReply(buffer);
-				} else {
-					buffer += '|c|~|/data-' + newTargets[i].searchType + ' ' + newTargets[i].name + '\n';
+				case 'pokemon':
+					let template = mod.getTemplate(newTargets[i].name);
+					buffer += `|raw|${Chat.getDataPokemonHTML(template, mod.gen)}\n`;
+					break;
+				case 'item':
+					let item = mod.getItem(newTargets[i].name);
+					buffer += `|raw|${Chat.getDataItemHTML(item)}\n`;
+					break;
+				case 'move':
+					let move = mod.getMove(newTargets[i].name);
+					buffer += `|raw|${Chat.getDataMoveHTML(move)}\n`;
+					break;
+				case 'ability':
+					let ability = mod.getAbility(newTargets[i].name);
+					buffer += `|raw|${Chat.getDataAbilityHTML(ability)}\n`;
+					break;
+				default:
+					throw new Error(`Unrecognized searchType`);
 				}
 			}
 		} else {
-			return this.errorReply("No Pok\u00e9mon, item, move, ability or nature named '" + target + "' was found. (Check your spelling?)");
+			return this.errorReply(`No Pok\u00e9mon, item, move, ability or nature named '${target}' was found${Dex.gen > mod.gen ? ` in Gen ${mod.gen}` : ""}. (Check your spelling?)`);
 		}
 
 		if (showDetails) {
 			let details;
-			let isSnatch = false;
-			let isMirrorMove = false;
 			if (newTargets[0].searchType === 'pokemon') {
-				let pokemon = Tools.getTemplate(newTargets[0].name);
+				let pokemon = mod.getTemplate(newTargets[0].name);
 				let weighthit = 20;
 				if (pokemon.weightkg >= 200) {
 					weighthit = 120;
@@ -406,25 +439,29 @@ exports.commands = {
 				}
 				details = {
 					"Dex#": pokemon.num,
-					"Gen": pokemon.gen,
+					"Gen": pokemon.gen || 'CAP',
 					"Height": pokemon.heightm + " m",
 					"Weight": pokemon.weightkg + " kg <em>(" + weighthit + " BP)</em>",
-					"Dex Colour": pokemon.color,
 				};
-				if (pokemon.eggGroups) details["Egg Group(s)"] = pokemon.eggGroups.join(", ");
-				if (!pokemon.evos.length) {
+				if (pokemon.color && mod.gen >= 5) details["Dex Colour"] = pokemon.color;
+				if (pokemon.eggGroups && mod.gen >= 2) details["Egg Group(s)"] = pokemon.eggGroups.join(", ");
+				let evos = [];
+				pokemon.evos.forEach(evo => {
+					evo = mod.getTemplate(evo);
+					if (evo.gen <= mod.gen) {
+						evos.push(evo.name + " (" + evo.evoLevel + ")");
+					}
+				});
+				if (!evos.length) {
 					details['<font color="#686868">Does Not Evolve</font>'] = "";
 				} else {
-					details["Evolution"] = pokemon.evos.map(evo => {
-						evo = Tools.getTemplate(evo);
-						return evo.name + " (" + evo.evoLevel + ")";
-					}).join(", ");
+					details["Evolution"] = evos.join(", ");
 				}
 			} else if (newTargets[0].searchType === 'move') {
-				let move = Tools.getMove(newTargets[0].name);
+				let move = mod.getMove(newTargets[0].name);
 				details = {
 					"Priority": move.priority,
-					"Gen": move.gen,
+					"Gen": move.gen || 'CAP',
 				};
 
 				if (move.secondary || move.secondaries) details["&#10003; Secondary effect"] = "";
@@ -439,38 +476,37 @@ exports.commands = {
 				if (move.flags['punch']) details["&#10003; Punch"] = "";
 				if (move.flags['powder']) details["&#10003; Powder"] = "";
 				if (move.flags['reflectable']) details["&#10003; Bounceable"] = "";
-				if (move.flags['gravity']) details["&#10007; Suppressed by Gravity"] = "";
+				if (move.flags['gravity'] && mod.gen >= 4) details["&#10007; Suppressed by Gravity"] = "";
 
-				if (move.id === 'snatch') isSnatch = true;
-				if (move.id === 'mirrormove') isMirrorMove = true;
-
-				if (move.zMovePower) {
-					details["Z-Power"] = move.zMovePower;
-				} else if (move.zMoveEffect) {
-					details["Z-Effect"] = {
-						'clearnegativeboost': "Restores negative stat stages to 0",
-						'crit2': "Crit ratio +2",
-						'heal': "Restores HP 100%",
-						'curse': "Restores HP 100% if user is Ghost type, otherwise Attack +1",
-						'redirect': "Redirects opposing attacks to user",
-						'healreplacement': "Restores replacement's HP 100%",
-					}[move.zMoveEffect];
-				} else if (move.zMoveBoost) {
-					details["Z-Effect"] = "";
-					let boost = move.zMoveBoost;
-					let stats = {atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed', accuracy: 'Accuracy', evasion: 'Evasiveness'};
-					for (let i in boost) {
-						details["Z-Effect"] += " " + stats[i] + " +" + boost[i];
+				if (mod.gen >= 7) {
+					if (move.zMovePower) {
+						details["Z-Power"] = move.zMovePower;
+					} else if (move.zMoveEffect) {
+						details["Z-Effect"] = {
+							'clearnegativeboost': "Restores negative stat stages to 0",
+							'crit2': "Crit ratio +2",
+							'heal': "Restores HP 100%",
+							'curse': "Restores HP 100% if user is Ghost type, otherwise Attack +1",
+							'redirect': "Redirects opposing attacks to user",
+							'healreplacement': "Restores replacement's HP 100%",
+						}[move.zMoveEffect];
+					} else if (move.zMoveBoost) {
+						details["Z-Effect"] = "";
+						let boost = move.zMoveBoost;
+						let stats = {atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed', accuracy: 'Accuracy', evasion: 'Evasiveness'};
+						for (let i in boost) {
+							details["Z-Effect"] += " " + stats[i] + " +" + boost[i];
+						}
+					} else if (move.isZ) {
+						details["&#10003; Z-Move"] = "";
+						details["Z-Crystal"] = mod.getItem(move.isZ).name;
+						if (move.basePower !== 1) {
+							details["User"] = mod.getItem(move.isZ).zMoveUser.join(", ");
+							details["Required Move"] = mod.getItem(move.isZ).zMoveFrom;
+						}
+					} else {
+						details["Z-Effect"] = "None";
 					}
-				} else if (move.isZ) {
-					details["&#10003; Z-Move"] = "";
-					details["Z-Crystal"] = Tools.getItem(move.isZ).name;
-					if (move.basePower !== 1) {
-						details["User"] = Tools.getItem(move.isZ).zMoveUser.join(", ");
-						details["Required Move"] = Tools.getItem(move.isZ).zMoveFrom;
-					}
-				} else {
-					details["Z-Effect"] = "None";
 				}
 
 				details["Target"] = {
@@ -487,23 +523,32 @@ exports.commands = {
 					'any': "Any Pok\u00e9mon",
 					'all': "All Pok\u00e9mon",
 				}[move.target] || "Unknown";
+
+				if (move.id === 'snatch' && mod.gen >= 3) {
+					details['<a href="https://pokemonshowdown.com/dex/moves/snatch">Snatchable Moves</a>'] = '';
+				}
+				if (move.id === 'mirrormove') {
+					details['<a href="https://pokemonshowdown.com/dex/moves/mirrormove">Mirrorable Moves</a>'] = '';
+				}
 			} else if (newTargets[0].searchType === 'item') {
-				let item = Tools.getItem(newTargets[0].name);
+				let item = mod.getItem(newTargets[0].name);
 				details = {
 					"Gen": item.gen,
 				};
 
-				if (item.fling) {
-					details["Fling Base Power"] = item.fling.basePower;
-					if (item.fling.status) details["Fling Effect"] = item.fling.status;
-					if (item.fling.volatileStatus) details["Fling Effect"] = item.fling.volatileStatus;
-					if (item.isBerry) details["Fling Effect"] = "Activates the Berry's effect on the target.";
-					if (item.id === 'whiteherb') details["Fling Effect"] = "Restores the target's negative stat stages to 0.";
-					if (item.id === 'mentalherb') details["Fling Effect"] = "Removes the effects of Attract, Disable, Encore, Heal Block, Taunt, and Torment from the target.";
-				} else {
-					details["Fling"] = "This item cannot be used with Fling.";
+				if (mod.gen >= 4) {
+					if (item.fling) {
+						details["Fling Base Power"] = item.fling.basePower;
+						if (item.fling.status) details["Fling Effect"] = item.fling.status;
+						if (item.fling.volatileStatus) details["Fling Effect"] = item.fling.volatileStatus;
+						if (item.isBerry) details["Fling Effect"] = "Activates the Berry's effect on the target.";
+						if (item.id === 'whiteherb') details["Fling Effect"] = "Restores the target's negative stat stages to 0.";
+						if (item.id === 'mentalherb') details["Fling Effect"] = "Removes the effects of Attract, Disable, Encore, Heal Block, Taunt, and Torment from the target.";
+					} else {
+						details["Fling"] = "This item cannot be used with Fling.";
+					}
 				}
-				if (item.naturalGift) {
+				if (item.naturalGift && mod.gen >= 3) {
 					details["Natural Gift Type"] = item.naturalGift.type;
 					details["Natural Gift Base Power"] = item.naturalGift.basePower;
 				}
@@ -515,13 +560,11 @@ exports.commands = {
 				if (details[detail] === '') return detail;
 				return '<font color="#686868">' + detail + ':</font> ' + details[detail];
 			}).join("&nbsp;|&ThickSpace;") + '</font>';
-
-			if (isSnatch) buffer += '&nbsp;|&ThickSpace;<a href="https://pokemonshowdown.com/dex/moves/snatch"><font size="1">Snatchable Moves</font></a>';
-			if (isMirrorMove) buffer += '&nbsp;|&ThickSpace;<a href="https://pokemonshowdown.com/dex/moves/mirrormove"><font size="1">Mirrorable Moves</font></a>';
 		}
 		this.sendReply(buffer);
 	},
 	datahelp: ["/data [pokemon/item/move/ability] - Get details on this pokemon/item/move/ability/nature.",
+		"/data [pokemon/item/move/ability], Gen [generation number/format name] - Get details on this pokemon/item/move/ability/nature for that generation/format.",
 		"!data [pokemon/item/move/ability] - Show everyone these details. Requires: + % @ * # & ~"],
 
 	'!details': true,
@@ -530,1096 +573,10 @@ exports.commands = {
 		if (!target) return this.parse('/help details');
 		this.run('data');
 	},
-	detailshelp: ["/details [pokemon] - Get additional details on this pokemon/item/move/ability/nature.",
-		"!details [pokemon] - Show everyone these details. Requires: + % @ * # & ~"],
-	ds: 'dexsearch',
-	dsearch: 'dexsearch',
-	dexsearch: function (target, room, user, connection, cmd, message) {
-		if (!this.canBroadcast()) return;
+	detailshelp: ["/details [pokemon/item/move/ability] - Get additional details on this pokemon/item/move/ability/nature.",
+		"/details [pokemon/item/move/ability], Gen [generation number/format name] - Get details on this pokemon/item/move/ability/nature for that generation/format.",
+		"!details [pokemon/item/move/ability] - Show everyone these details. Requires: + % @ * # & ~"],
 
-		if (!target) return this.parse('/help dexsearch');
-		let searches = [];
-		let allTiers = {'uber':1, 'ou':1, 'bl':1, 'uu':1, 'bl2':1, 'ru':1, 'bl3':1, 'nu':1, 'bl4':1, 'pu':1, 'nfe':1, 'lc uber':1, 'lc':1, 'cap':1};
-		let allColours = {'green':1, 'red':1, 'blue':1, 'white':1, 'brown':1, 'yellow':1, 'purple':1, 'pink':1, 'gray':1, 'black':1};
-		let allStats = {'hp':1, 'atk':1, 'def':1, 'spa':1, 'spd':1, 'spe':1, 'bst':1};
-		let showAll = false;
-		let megaSearch = null;
-		let tppSearch = null;
-		let capSearch = null;
-		let randomOutput = 0;
-
-		let validParameter = (cat, param, isNotSearch) => {
-			for (let h = 0; h < searches.length; h++) {
-				let group = searches[h];
-				if (group[cat] === undefined) continue;
-				if (group[cat][param] === undefined) continue;
-				if (group[cat][param] === isNotSearch) {
-					this.sendReplyBox("A search cannot both include and exclude '" + param + "'.");
-				} else {
-					this.sendReplyBox("The search included '" + (isNotSearch ? "!" : "") + param + "' more than once.");
-				}
-				return false;
-			}
-			return true;
-		};
-
-		let andGroups = target.split(',');
-		for (let i = 0; i < andGroups.length; i++) {
-			let orGroup = {abilities: {}, tiers: {}, colors: {}, gens: {}, moves: {}, types: {}, stats: {}, skip: false};
-			let parameters = andGroups[i].split("|");
-			if (parameters.length > 3) return this.sendReply("No more than 3 alternatives for each parameter may be used.");
-			for (let j = 0; j < parameters.length; j++) {
-				let isNotSearch = false;
-				target = parameters[j].trim().toLowerCase();
-				if (target.charAt(0) === '!') {
-					isNotSearch = true;
-					target = target.substr(1);
-				}
-
-				let targetAbility = Tools.getAbility(target);
-				if (targetAbility.exists) {
-					if (!validParameter("abilities", targetAbility, isNotSearch)) return;
-					orGroup.abilities[targetAbility] = !isNotSearch;
-					continue;
-				}
-
-				if (target in allTiers) {
-					if (target === "cap") {
-						if (parameters.length > 1) return this.sendReplyBox("The parameter 'cap' cannot have alternative parameters");
-						capSearch = !isNotSearch;
-					}
-					if (!validParameter("tiers", target, isNotSearch)) return;
-					orGroup.tiers[target] = !isNotSearch;
-					continue;
-				}
-
-				if (target in allColours) {
-					target = target.capitalize();
-					if (!validParameter("colors", target, isNotSearch)) return;
-					orGroup.colors[target] = !isNotSearch;
-					continue;
-				}
-
-				if (target.substr(0, 3) === 'gen' && Number.isInteger(parseFloat(target.substr(3)))) target = target.substr(3).trim();
-				let targetInt = parseInt(target);
-				if (0 < targetInt && targetInt < 7) {
-					if (!validParameter("gens", target, isNotSearch)) return;
-					orGroup.gens[target] = !isNotSearch;
-					continue;
-				}
-
-				if (target === 'all') {
-					if (this.broadcasting && !room.isPersonal) return this.sendReplyBox("A search with the parameter 'all' cannot be broadcast.");
-					if (parameters.length > 1) return this.sendReplyBox("The parameter 'all' cannot have alternative parameters");
-					showAll = true;
-					orGroup.skip = true;
-					break;
-				}
-
-				if (target.substr(0, 6) === 'random' && cmd === 'randpoke') {
-					//validation for this is in the /randpoke command
-					randomOutput = parseInt(target.substr(6));
-					orGroup.skip = true;
-					continue;
-				}
-
-				if (target === 'megas' || target === 'mega') {
-					if (parameters.length > 1) return this.sendReplyBox("The parameter 'mega' cannot have alternative parameters");
-					megaSearch = !isNotSearch;
-					orGroup.skip = true;
-					break;
-				}
-
-				if (target === 'recovery') {
-					if (parameters.length > 1) return this.sendReplyBox("The parameter 'recovery' cannot have alternative parameters");
-					let recoveryMoves = ["recover", "roost", "moonlight", "morningsun", "synthesis", "milkdrink", "slackoff", "softboiled", "wish", "healorder"];
-					for (let k = 0; k < recoveryMoves.length; k++) {
-						if (!validParameter("moves", recoveryMoves[k], isNotSearch)) return;
-						if (isNotSearch) {
-							let bufferObj = {moves: {}};
-							bufferObj.moves[recoveryMoves[k]] = false;
-							searches.push(bufferObj);
-						} else {
-							orGroup.moves[recoveryMoves[k]] = true;
-						}
-					}
-					if (isNotSearch) orGroup.skip = true;
-					break;
-				}
-
-				if (target === 'tpp') {
-					if (parameters.length > 1) return this.sendReplyBox("The parameter 'tpp' cannot have alternative parameters");
-					tppSearch = !isNotSearch;
-					orGroup.skip = true;
-					continue;
-				}
-
-				if (target === 'priority') {
-					if (parameters.length > 1) return this.sendReplyBox("The parameter 'priority' cannot have alternative parameters");
-					for (let move in Tools.data.Movedex) {
-						let moveData = Tools.getMove(move);
-						if (moveData.category === "Status" || moveData.id === "bide") continue;
-						if (moveData.priority > 0) {
-							if (!validParameter("moves", move, isNotSearch)) return;
-							if (isNotSearch) {
-								let bufferObj = {moves: {}};
-								bufferObj.moves[move] = false;
-								searches.push(bufferObj);
-							} else {
-								orGroup.moves[move] = true;
-							}
-						}
-					}
-					if (isNotSearch) orGroup.skip = true;
-					break;
-				}
-
-				let targetMove = Tools.getMove(target);
-				if (targetMove.exists) {
-					if (!validParameter("moves", targetMove.id, isNotSearch)) return;
-					orGroup.moves[targetMove.id] = !isNotSearch;
-					continue;
-				}
-
-				let typeIndex = target.indexOf(' type');
-				if (typeIndex >= 0) {
-					target = target.charAt(0).toUpperCase() + target.substring(1, typeIndex);
-					if (target in Tools.data.TypeChart) {
-						if (!validParameter("types", target, isNotSearch)) return;
-						orGroup.types[target] = !isNotSearch;
-						continue;
-					}
-				}
-
-				let inequality = target.search(/>|<|=/);
-				if (inequality >= 0) {
-					if (isNotSearch) return this.sendReplyBox("You cannot use the negation symbol '!' in stat ranges.");
-					if (target.charAt(inequality + 1) === '=') {
-						inequality = target.substr(inequality, 2);
-					} else {
-						inequality = target.charAt(inequality);
-					}
-					let inequalityOffset = (inequality.charAt(1) === '=' ? 0 : -1);
-					let targetParts = target.replace(/\s/g, '').split(inequality);
-					let num, stat, direction;
-					if (!isNaN(targetParts[0])) {
-						// e.g. 100 < spe
-						num = parseFloat(targetParts[0]);
-						stat = targetParts[1];
-						switch (inequality.charAt(0)) {
-						case '>': direction = 'less'; num += inequalityOffset; break;
-						case '<': direction = 'greater'; num -= inequalityOffset; break;
-						case '=': direction = 'equal'; break;
-						}
-					} else if (!isNaN(targetParts[1])) {
-						// e.g. spe > 100
-						num = parseFloat(targetParts[1]);
-						stat = targetParts[0];
-						switch (inequality.charAt(0)) {
-						case '<': direction = 'less'; num += inequalityOffset; break;
-						case '>': direction = 'greater'; num -= inequalityOffset; break;
-						case '=': direction = 'equal'; break;
-						}
-					} else {
-						return this.sendReplyBox("No value given to compare with '" + Tools.escapeHTML(target) + "'.");
-					}
-					switch (toId(stat)) {
-					case 'attack': stat = 'atk'; break;
-					case 'defense': stat = 'def'; break;
-					case 'specialattack': stat = 'spa'; break;
-					case 'spatk': stat = 'spa'; break;
-					case 'specialdefense': stat = 'spd'; break;
-					case 'spdef': stat = 'spd'; break;
-					case 'speed': stat = 'spe'; break;
-					}
-					if (!(stat in allStats)) return this.sendReplyBox("'" + Tools.escapeHTML(target) + "' did not contain a valid stat.");
-					if (!orGroup.stats[stat]) orGroup.stats[stat] = {};
-					if (orGroup.stats[stat][direction]) return this.sendReplyBox("Invalid stat range for " + stat + ".");
-					orGroup.stats[stat][direction] = num;
-					continue;
-				}
-				return this.sendReplyBox("'" + Tools.escapeHTML(target) + "' could not be found in any of the search categories.");
-			}
-			searches.push(orGroup);
-		}
-
-		if (showAll && searches.length === 0 && megaSearch === null && tppSearch === null) return this.sendReplyBox("No search parameters other than 'all' were found. Try '/help dexsearch' for more information on this command.");
-
-		let dex = {};
-		let tpp = require('../data/tpp').BattleTPP;
-		for (let pokemon in Tools.data.Pokedex) {
-			let template = Tools.getTemplate(pokemon);
-			let megaSearchResult = (megaSearch === null || (megaSearch === true && template.isMega) || (megaSearch === false && !template.isMega));
-			let tppSearchResult = (tppSearch === null || (tppSearch === true && tpp[template.id]) || (tppSearch === false && !tpp[template.id]));
-			if (template.tier !== 'Unreleased' && template.tier !== 'Illegal' && (template.tier !== 'CAP' || capSearch) && megaSearchResult && tppSearchResult) {
-				dex[pokemon] = template;
-			}
-		}
-		dex = JSON.parse(JSON.stringify(dex)); // Don't modify the original template (when compiling learnsets)
-
-		let learnSetsCompiled = false;
-		//ensure searches with the least alternatives are run first
-		searches.sort((a, b) => {
-			let aCount = 0, bCount = 0;
-			for (let cat in a) {
-				if (typeof a[cat] === "object") aCount += Object.size(a[cat]);
-			}
-			for (let cat in b) {
-				if (typeof b[cat] === "object") bCount += Object.size(b[cat]);
-			}
-			return aCount - bCount;
-		});
-
-		for (let group = 0; group < searches.length; group++) {
-			let alts = searches[group];
-			if (alts.skip) continue;
-			for (let mon in dex) {
-				let matched = false;
-				if (Object.size(alts.gens) > 0) {
-					if (alts.gens[dex[mon].gen] || (Object.count(alts.gens, false) > 0 &&
-						alts.gens[dex[mon].gen] !== false)) continue;
-				}
-
-				if (Object.size(alts.colors) > 0) {
-					if (alts.colors[dex[mon].color] || (Object.count(alts.colors, false) > 0 &&
-						alts.colors[dex[mon].color] !== false)) continue;
-				}
-
-				if (Object.size(alts.tiers) > 0) {
-					if (alts.tiers[dex[mon].tier.toLowerCase()] || (Object.count(alts.tiers, false) > 0 &&
-						alts.tiers[dex[mon].tier.toLowerCase()] !== false)) continue;
-				}
-
-				for (let type in alts.types) {
-					if (dex[mon].types.indexOf(type) >= 0 === alts.types[type]) {
-						matched = true;
-						break;
-					}
-				}
-				if (matched) continue;
-
-				for (let ability in alts.abilities) {
-					if (alts.abilities[ability] === (Object.count(dex[mon].abilities, ability) > 0)) {
-						matched = true;
-						break;
-					}
-				}
-				if (matched) continue;
-
-				for (let stat in alts.stats) {
-					let monStat = 0;
-					if (stat === 'bst') {
-						for (let monStats in dex[mon].baseStats) {
-							monStat += dex[mon].baseStats[monStats];
-						}
-					} else {
-						monStat = dex[mon].baseStats[stat];
-					}
-					if (typeof alts.stats[stat].less === 'number') {
-						if (monStat <= alts.stats[stat].less) {
-							matched = true;
-							break;
-						}
-					}
-					if (typeof alts.stats[stat].greater === 'number') {
-						if (monStat >= alts.stats[stat].greater) {
-							matched = true;
-							break;
-						}
-					}
-					if (typeof alts.stats[stat].equal === 'number') {
-						if (monStat === alts.stats[stat].equal) {
-							matched = true;
-							break;
-						}
-					}
-				}
-				if (matched) continue;
-
-				if (!learnSetsCompiled) {
-					for (let mon2 in dex) {
-						let template = dex[mon2];
-						if (!template.learnset) template = Tools.getTemplate(template.baseSpecies);
-						if (!template.learnset) continue;
-						let fullLearnset = template.learnset;
-						while (template.prevo) {
-							template = Tools.getTemplate(template.prevo);
-							for (let move in template.learnset) {
-								if (!fullLearnset[move]) fullLearnset[move] = template.learnset[move];
-							}
-						}
-						dex[mon2].learnset = fullLearnset;
-					}
-					learnSetsCompiled = true;
-				}
-
-				for (let move in alts.moves) {
-					let canLearn = (dex[mon].learnset.sketch && ['chatter', 'struggle', 'magikarpsrevenge'].indexOf(move) < 0) || dex[mon].learnset[move];
-					if ((canLearn && alts.moves[move]) || (alts.moves[move] === false && !canLearn)) {
-						matched = true;
-						break;
-					}
-				}
-				if (matched) continue;
-
-				delete dex[mon];
-			}
-		}
-
-		let results = [];
-		for (let mon in dex) {
-			if (dex[mon].baseSpecies && results.indexOf(dex[mon].baseSpecies) >= 0) continue;
-			results.push(dex[mon].species);
-		}
-
-		let moveGroups = searches
-			.filter(alts => {
-				return Object.any(alts.moves, (move, isSearch) => {
-					return isSearch;
-				});
-			})
-			.map(alts => Object.keys(alts.moves));
-		if (moveGroups.length >= 2) {
-			results = results.filter(mon => {
-				let lsetData = {fastCheck: true, set: {}};
-				for (let group = 0; group < moveGroups.length; group++) {
-					for (let i = 0; i < moveGroups[group].length; i++) {
-						let problem = TeamValidator.checkLearnsetSync('anythinggoes', moveGroups[group][i], mon, lsetData);
-						if (!problem) break;
-						if (i === moveGroups[group].length - 1) return false;
-					}
-				}
-				return true;
-			});
-		}
-
-		if (randomOutput && randomOutput < results.length) {
-			results = results.randomize().slice(0, randomOutput);
-		}
-
-		let resultsStr = this.broadcasting ? "" : ("<font color=#999999>" + Tools.escapeHTML(message) + ":</font><br>");
-		if (results.length > 1) {
-			if (showAll || results.length <= RESULTS_MAX_LENGTH + 5) {
-				results.sort();
-				resultsStr += results.join(", ");
-			} else {
-				resultsStr += results.slice(0, RESULTS_MAX_LENGTH).join(", ") + ", and " + (results.length - RESULTS_MAX_LENGTH) + " more. <font color=#999999>Redo the search with 'all' as a search parameter to show all results.</font>";
-			}
-		} else if (results.length === 1) {
-			return CommandParser.commands.data.call(this, results[0], room, user, connection, 'dt');
-		} else {
-			resultsStr += "No Pok&eacute;mon found.";
-		}
-		return this.sendReplyBox(resultsStr);
-	},
-	dexsearchhelp: ["/dexsearch [parameter], [parameter], [parameter], ... - Searches for Pok\u00e9mon that fulfill the selected criteria",
-		"Search categories are: type, tier, color, moves, ability, gen, recovery, priority, tpp, stat.",
-		"Valid colors are: green, red, blue, white, brown, yellow, purple, pink, gray and black.",
-		"Valid tiers are: Uber/OU/BL/UU/BL2/RU/BL3/NU/BL4/PU/NFE/LC/CAP.",
-		"Types must be followed by ' type', e.g., 'dragon type'.",
-		"Inequality ranges use the characters '>=' for '≥' and '<=' for '≤', e.g., 'hp <= 95' searches all Pok\u00e9mon with HP less than or equal to 95.",
-		"Parameters can be excluded through the use of '!', e.g., '!water type' excludes all water types.",
-		"The parameter 'mega' can be added to search for Mega Evolutions only, and the parameter 'NFE' can be added to search not-fully evolved Pok\u00e9mon only.",
-		"Parameters separated with '|' will be searched as alternatives for each other, e.g., 'trick | switcheroo' searches for all Pok\u00e9mon that learn either Trick or Switcheroo.",
-		"The order of the parameters does not matter."],
-
-	rollpokemon: 'randompokemon',
-	randpoke: 'randompokemon',
-	randompokemon: function (target, room, user, connection, cmd, message) {
-		let targets = target.split(",");
-		let targetsBuffer = [];
-		let qty;
-		for (let i = 0; i < targets.length; i++) {
-			if (!targets[i]) continue;
-			let num = Number(targets[i]);
-			if (Number.isInteger(num)) {
-				if (qty) return this.errorReply("Only specify the number of Pok\u00e9mon once.");
-				qty = num;
-				if (qty < 1 || 15 < qty) return this.errorReply("Number of random Pok\u00e9mon must be between 1 and 15.");
-				targetsBuffer.push("random" + qty);
-			} else {
-				targetsBuffer.push(targets[i]);
-			}
-		}
-		if (!qty) targetsBuffer.push("random1");
-
-		CommandParser.commands.dexsearch.call(this, targetsBuffer.join(","), room, user, connection, "randpoke", message);
-	},
-	randompokemonhelp: ["/randompokemon - Generates random Pok\u00e9mon based on given search conditions.",
-		"/randompokemon uses the same parameters as /dexsearch (see '/help ds').",
-		"Adding a number as a parameter returns that many random Pok\u00e9mon, e.g., '/randpoke 6' returns 6 random Pok\u00e9mon."],
-
-	ms: 'movesearch',
-	msearch: 'movesearch',
-	movesearch: function (target, room, user, connection, cmd, message) {
-		if (!this.canBroadcast()) return;
-
-		if (!target) return this.parse('/help movesearch');
-		let targets = target.split(',');
-		let searches = {};
-		let allCategories = {'physical':1, 'special':1, 'status':1};
-		let allProperties = {'basePower':1, 'accuracy':1, 'priority':1, 'pp':1};
-		let allFlags = {'authentic':1, 'bite':1, 'bullet':1, 'contact':1, 'defrost':1, 'powder':1, 'pulse':1, 'punch':1, 'secondary':1, 'snatch':1, 'sound':1};
-		let allStatus = {'psn':1, 'tox':1, 'brn':1, 'par':1, 'frz':1, 'slp':1};
-		let allVolatileStatus = {'flinch':1, 'confusion':1, 'partiallytrapped':1};
-		let allBoosts = {'hp':1, 'atk':1, 'def':1, 'spa':1, 'spd':1, 'spe':1, 'accuracy':1, 'evasion':1};
-		let showAll = false;
-		let lsetData = {};
-		let targetMon = '';
-
-		for (let i = 0; i < targets.length; i++) {
-			let isNotSearch = false;
-			target = targets[i].toLowerCase().trim();
-			if (target.charAt(0) === '!') {
-				isNotSearch = true;
-				target = target.substr(1);
-			}
-
-			let typeIndex = target.indexOf(' type');
-			if (typeIndex >= 0) {
-				target = target.charAt(0).toUpperCase() + target.substring(1, typeIndex);
-				if (!(target in Tools.data.TypeChart)) return this.sendReplyBox("Type '" + Tools.escapeHTML(target) + "' not found.");
-				if (!searches['type']) searches['type'] = {};
-				if ((searches['type'][target] && isNotSearch) || (searches['type'][target] === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include a type.');
-				searches['type'][target] = !isNotSearch;
-				continue;
-			}
-
-			if (target in allCategories) {
-				target = target.charAt(0).toUpperCase() + target.substr(1);
-				if (!searches['category']) searches['category'] = {};
-				if ((searches['category'][target] && isNotSearch) || (searches['category'][target] === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include a category.');
-				searches['category'][target] = !isNotSearch;
-				continue;
-			}
-
-			if (target === 'bypassessubstitute') target = 'authentic';
-			if (target in allFlags) {
-				if (!searches['flags']) searches['flags'] = {};
-				if ((searches['flags'][target] && isNotSearch) || (searches['flags'][target] === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include \'' + target + '\'.');
-				searches['flags'][target] = !isNotSearch;
-				continue;
-			}
-
-			if (target === 'all') {
-				if (this.broadcasting && !room.isPersonal) return this.sendReplyBox("A search with the parameter 'all' cannot be broadcast.");
-				showAll = true;
-				continue;
-			}
-
-			if (target === 'recovery') {
-				if (!searches['recovery']) {
-					searches['recovery'] = !isNotSearch;
-				} else if ((searches['recovery'] && isNotSearch) || (searches['recovery'] === false && !isNotSearch)) {
-					return this.sendReplyBox('A search cannot both exclude and include recovery moves.');
-				}
-				continue;
-			}
-
-			let template = Tools.getTemplate(target);
-			if (template.exists) {
-				if (Object.size(lsetData) !== 0) return this.sendReplyBox("A search can only include one Pok\u00e9mon learnset.");
-				if (!template.learnset) template = Tools.getTemplate(template.baseSpecies);
-				lsetData = template.learnset;
-				targetMon = template.name;
-				while (template.prevo) {
-					template = Tools.getTemplate(template.prevo);
-					for (let move in template.learnset) {
-						if (!lsetData[move]) lsetData[move] = template.learnset[move];
-					}
-				}
-				continue;
-			}
-
-			let inequality = target.search(/>|<|=/);
-			if (inequality >= 0) {
-				if (isNotSearch) return this.sendReplyBox("You cannot use the negation symbol '!' in quality ranges.");
-				inequality = target.charAt(inequality);
-				let targetParts = target.replace(/\s/g, '').split(inequality);
-				let numSide, propSide, direction;
-				if (!isNaN(targetParts[0])) {
-					numSide = 0;
-					propSide = 1;
-					switch (inequality) {
-					case '>': direction = 'less'; break;
-					case '<': direction = 'greater'; break;
-					case '=': direction = 'equal'; break;
-					}
-				} else if (!isNaN(targetParts[1])) {
-					numSide = 1;
-					propSide = 0;
-					switch (inequality) {
-					case '<': direction = 'less'; break;
-					case '>': direction = 'greater'; break;
-					case '=': direction = 'equal'; break;
-					}
-				} else {
-					return this.sendReplyBox("No value given to compare with '" + Tools.escapeHTML(target) + "'.");
-				}
-				let prop = targetParts[propSide];
-				switch (toId(targetParts[propSide])) {
-				case 'basepower': prop = 'basePower'; break;
-				case 'bp': prop = 'basePower'; break;
-				case 'acc': prop = 'accuracy'; break;
-				}
-				if (!(prop in allProperties)) return this.sendReplyBox("'" + Tools.escapeHTML(target) + "' did not contain a valid property.");
-				if (!searches['property']) searches['property'] = {};
-				if (direction === 'equal') {
-					if (searches['property'][prop]) return this.sendReplyBox("Invalid property range for " + prop + ".");
-					searches['property'][prop] = {};
-					searches['property'][prop]['less'] = parseFloat(targetParts[numSide]);
-					searches['property'][prop]['greater'] = parseFloat(targetParts[numSide]);
-				} else {
-					if (!searches['property'][prop]) searches['property'][prop] = {};
-					if (searches['property'][prop][direction]) {
-						return this.sendReplyBox("Invalid property range for " + prop + ".");
-					} else {
-						searches['property'][prop][direction] = parseFloat(targetParts[numSide]);
-					}
-				}
-				continue;
-			}
-
-			if (target.substr(0, 8) === 'priority') {
-				let sign = '';
-				target = target.substr(8).trim();
-				if (target === "+") {
-					sign = 'greater';
-				} else if (target === "-") {
-					sign = 'less';
-				} else {
-					return this.sendReplyBox("Priority type '" + target + "' not recognized.");
-				}
-				if (!searches['property']) searches['property'] = {};
-				if (searches['property']['priority']) {
-					return this.sendReplyBox("Priority cannot be set with both shorthand and inequality range.");
-				} else {
-					searches['property']['priority'] = {};
-					searches['property']['priority'][sign] = (sign === 'less' ? -1 : 1);
-				}
-				continue;
-			}
-
-			if (target.substr(0, 7) === 'boosts ') {
-				switch (target.substr(7)) {
-				case 'attack': target = 'atk'; break;
-				case 'defense': target = 'def'; break;
-				case 'specialattack': target = 'spa'; break;
-				case 'spatk': target = 'spa'; break;
-				case 'specialdefense': target = 'spd'; break;
-				case 'spdef': target = 'spd'; break;
-				case 'speed': target = 'spe'; break;
-				case 'acc': target = 'accuracy'; break;
-				case 'evasiveness': target = 'evasion'; break;
-				default: target = target.substr(7);
-				}
-				if (!(target in allBoosts)) return this.sendReplyBox("'" + Tools.escapeHTML(target.substr(7)) + "' is not a recognized stat.");
-				if (!searches['boost']) searches['boost'] = {};
-				if ((searches['boost'][target] && isNotSearch) || (searches['boost'][target] === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include a stat boost.');
-				searches['boost'][target] = !isNotSearch;
-				continue;
-			}
-
-			let oldTarget = target;
-			if (target.charAt(target.length - 1) === 's') target = target.substr(0, target.length - 1);
-			switch (target) {
-			case 'toxic': target = 'tox'; break;
-			case 'poison': target = 'psn'; break;
-			case 'burn': target = 'brn'; break;
-			case 'paralyze': target = 'par'; break;
-			case 'freeze': target = 'frz'; break;
-			case 'sleep': target = 'slp'; break;
-			case 'confuse': target = 'confusion'; break;
-			case 'trap': target = 'partiallytrapped'; break;
-			case 'flinche': target = 'flinch'; break;
-			}
-
-			if (target in allStatus) {
-				if (!searches['status']) searches['status'] = {};
-				if ((searches['status'][target] && isNotSearch) || (searches['status'][target] === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include a status.');
-				searches['status'][target] = !isNotSearch;
-				continue;
-			}
-
-			if (target in allVolatileStatus) {
-				if (!searches['volatileStatus']) searches['volatileStatus'] = {};
-				if ((searches['volatileStatus'][target] && isNotSearch) || (searches['volatileStatus'][target] === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include a volitile status.');
-				searches['volatileStatus'][target] = !isNotSearch;
-				continue;
-			}
-
-			return this.sendReplyBox("'" + Tools.escapeHTML(oldTarget) + "' could not be found in any of the search categories.");
-		}
-
-		if (showAll && Object.size(searches) === 0 && !targetMon) return this.sendReplyBox("No search parameters other than 'all' were found. Try '/help movesearch' for more information on this command.");
-
-		let dex = {};
-		if (targetMon) {
-			for (let move in lsetData) {
-				dex[move] = Tools.getMove(move);
-			}
-		} else {
-			for (let move in Tools.data.Movedex) {
-				dex[move] = Tools.getMove(move);
-			}
-			delete dex.magikarpsrevenge;
-		}
-
-		for (let search in searches) {
-			switch (search) {
-			case 'type':
-			case 'category':
-				for (let move in dex) {
-					if (searches[search][String(dex[move][search])] === false ||
-						Object.count(searches[search], true) > 0 && !searches[search][String(dex[move][search])]) {
-						delete dex[move];
-					}
-				}
-				break;
-
-			case 'flags':
-				for (let flag in searches[search]) {
-					for (let move in dex) {
-						if (flag !== 'secondary') {
-							if ((!dex[move].flags[flag] && searches[search][flag]) || (dex[move].flags[flag] && !searches[search][flag])) delete dex[move];
-						} else {
-							if (searches[search][flag]) {
-								if (!dex[move].secondary && !dex[move].secondaries) delete dex[move];
-							} else {
-								if (dex[move].secondary && dex[move].secondaries) delete dex[move];
-							}
-						}
-					}
-				}
-				break;
-
-			case 'recovery':
-				for (let move in dex) {
-					let hasRecovery = (dex[move].drain || dex[move].flags.heal);
-					if ((!hasRecovery && searches[search]) || (hasRecovery && !searches[search])) delete dex[move];
-				}
-				break;
-
-			case 'property':
-				for (let prop in searches[search]) {
-					for (let move in dex) {
-						if (typeof searches[search][prop].less === "number") {
-							if (dex[move][prop] === true) {
-								delete dex[move];
-								continue;
-							}
-							if (dex[move][prop] > searches[search][prop].less) {
-								delete dex[move];
-								continue;
-							}
-						}
-						if (typeof searches[search][prop].greater === "number") {
-							if (dex[move][prop] === true) {
-								if (dex[move].category === "Status") delete dex[move];
-								continue;
-							}
-							if (dex[move][prop] < searches[search][prop].greater) {
-								delete dex[move];
-								continue;
-							}
-						}
-					}
-				}
-				break;
-
-			case 'boost':
-				for (let boost in searches[search]) {
-					for (let move in dex) {
-						if (dex[move].boosts) {
-							if ((dex[move].boosts[boost] > 0 && searches[search][boost]) ||
-								(dex[move].boosts[boost] < 1 && !searches[search][boost])) continue;
-						} else if (dex[move].secondary && dex[move].secondary.self && dex[move].secondary.self.boosts) {
-							if ((dex[move].secondary.self.boosts[boost] > 0 && searches[search][boost]) ||
-								(dex[move].secondary.self.boosts[boost] < 1 && !searches[search][boost])) continue;
-						}
-						delete dex[move];
-					}
-				}
-				break;
-
-			case 'status':
-			case 'volatileStatus':
-				for (let searchStatus in searches[search]) {
-					for (let move in dex) {
-						if (dex[move][search] !== searchStatus) {
-							if (!dex[move].secondaries) {
-								if (!dex[move].secondary) {
-									if (searches[search][searchStatus]) delete dex[move];
-								} else {
-									if ((dex[move].secondary[search] !== searchStatus && searches[search][searchStatus]) ||
-										(dex[move].secondary[search] === searchStatus && !searches[search][searchStatus])) delete dex[move];
-								}
-							} else {
-								let hasSecondary = false;
-								for (let i = 0; i < dex[move].secondaries.length; i++) {
-									if (dex[move].secondaries[i][search] === searchStatus) hasSecondary = true;
-								}
-								if ((!hasSecondary && searches[search][searchStatus]) || (hasSecondary && !searches[search][searchStatus])) delete dex[move];
-							}
-						} else {
-							if (!searches[search][searchStatus]) delete dex[move];
-						}
-					}
-				}
-				break;
-
-			default:
-				throw new Error("/movesearch search category '" + search + "' was unrecognised.");
-			}
-		}
-
-		let results = [];
-		for (let move in dex) {
-			results.push(dex[move].name);
-		}
-
-		let resultsStr = "";
-		if (targetMon) {
-			resultsStr += "<font color=#999999>Matching moves found in learnset for</font> " + targetMon + ":<br>";
-		} else {
-			resultsStr += this.broadcasting ? "" : ("<font color=#999999>" + Tools.escapeHTML(message) + ":</font><br>");
-		}
-		if (results.length > 0) {
-			if (showAll || results.length <= RESULTS_MAX_LENGTH + 5) {
-				results.sort();
-				resultsStr += results.join(", ");
-			} else {
-				resultsStr += results.slice(0, RESULTS_MAX_LENGTH).join(", ") + ", and " + (results.length - RESULTS_MAX_LENGTH) + " more. <font color=#999999>Redo the search with 'all' as a search parameter to show all results.</font>";
-			}
-		} else {
-			resultsStr += "No moves found.";
-		}
-		return this.sendReplyBox(resultsStr);
-	},
-	movesearchhelp: ["/movesearch [parameter], [parameter], [parameter], ... - Searches for moves that fulfill the selected criteria.",
-		"Search categories are: type, category, flag, status inflicted, type boosted, and numeric range for base power, pp, and accuracy.",
-		"Types must be followed by ' type', e.g., 'dragon type'.",
-		"Stat boosts must be preceded with 'boosts ', e.g., 'boosts attack' searches for moves that boost the attack stat.",
-		"Inequality ranges use the characters '>' and '<' though they behave as '≥' and '≤', e.g., 'bp > 100' searches for all moves equal to and greater than 100 base power.",
-		"Parameters can be excluded through the use of '!', e.g., !water type' excludes all water type moves.",
-		"Valid flags are: authentic (bypasses substitute), bite, bullet, contact, defrost, powder, pulse, punch, secondary, snatch, sound",
-		"If a Pok\u00e9mon is included as a parameter, moves will be searched from it's movepool.",
-		"The order of the parameters does not matter."],
-
-	isearch: 'itemsearch',
-	itemsearch: function (target, room, user, connection, cmd, message) {
-		if (!target) return this.parse('/help itemsearch');
-		if (!this.canBroadcast()) return;
-
-		let showAll = false;
-
-		target = target.trim();
-		if (target.substr(target.length - 5) === ', all' || target.substr(target.length - 4) === ',all') {
-			showAll = true;
-			target = target.substr(0, target.length - 5);
-		}
-
-		target = target.toLowerCase().replace('-', ' ').replace(/[^a-z0-9.\s\/]/g, '');
-		let rawSearch = target.split(' ');
-		let searchedWords = [];
-		let foundItems = [];
-
-		//refine searched words
-		for (let i = 0; i < rawSearch.length; i++) {
-			let newWord = rawSearch[i].trim();
-			if (isNaN(newWord)) newWord = newWord.replace('.', '');
-			switch (newWord) {
-			// words that don't really help identify item removed to speed up search
-			case 'a':
-			case 'an':
-			case 'is':
-			case 'it':
-			case 'its':
-			case 'the':
-			case 'that':
-			case 'which':
-			case 'user':
-			case 'holder':
-			case 'holders':
-				newWord = '';
-				break;
-			// replace variations of common words with standardized versions
-			case 'opponent': newWord = 'attacker'; break;
-			case 'flung': newWord = 'fling'; break;
-			case 'heal': case 'heals':
-			case 'recovers': newWord = 'restores'; break;
-			case 'boost':
-			case 'boosts': newWord = 'raises'; break;
-			case 'weakens': newWord = 'halves'; break;
-			case 'more': newWord = 'increases'; break;
-			case 'super':
-				if (rawSearch[i + 1] === 'effective') {
-					newWord = 'supereffective';
-				}
-				break;
-			case 'special': newWord = 'sp'; break;
-			case 'spa':
-				newWord = 'sp';
-				break;
-			case 'atk':
-			case 'attack':
-				if (rawSearch[i - 1] === 'sp') {
-					newWord = 'atk';
-				} else {
-					newWord = 'attack';
-				}
-				break;
-			case 'spd':
-				newWord = 'sp';
-				break;
-			case 'def':
-			case 'defense':
-				if (rawSearch[i - 1] === 'sp') {
-					newWord = 'def';
-				} else {
-					newWord = 'defense';
-				}
-				break;
-			case 'burns': newWord = 'burn'; break;
-			case 'poisons': newWord = 'poison'; break;
-			default:
-				if (/x[\d\.]+/.test(newWord)) {
-					newWord = newWord.substr(1) + 'x';
-				}
-			}
-			if (!newWord || searchedWords.indexOf(newWord) >= 0) continue;
-			searchedWords.push(newWord);
-		}
-
-		if (searchedWords.length === 0) return this.sendReplyBox("No distinguishing words were used. Try a more specific search.");
-		if (searchedWords.indexOf('fling') >= 0) {
-			let basePower = 0;
-			let effect;
-
-			for (let k = 0; k < searchedWords.length; k++) {
-				let wordEff = "";
-				switch (searchedWords[k]) {
-				case 'burn': case 'burns':
-				case 'brn': wordEff = 'brn'; break;
-				case 'paralyze': case 'paralyzes':
-				case 'par': wordEff = 'par'; break;
-				case 'poison': case 'poisons':
-				case 'psn': wordEff = 'psn'; break;
-				case 'toxic':
-				case 'tox': wordEff = 'tox'; break;
-				case 'flinches':
-				case 'flinch': wordEff = 'flinch'; break;
-				case 'badly': wordEff = 'tox'; break;
-				}
-				if (wordEff && effect) {
-					if (!(wordEff === 'psn' && effect === 'tox')) return this.sendReplyBox("Only specify fling effect once.");
-				} else if (wordEff) {
-					effect = wordEff;
-				} else {
-					if (searchedWords[k].substr(searchedWords[k].length - 2) === 'bp' && searchedWords[k].length > 2) searchedWords[k] = searchedWords[k].substr(0, searchedWords[k].length - 2);
-					if (Number.isInteger(Number(searchedWords[k]))) {
-						if (basePower) return this.sendReplyBox("Only specify a number for base power once.");
-						basePower = parseInt(searchedWords[k]);
-					}
-				}
-			}
-
-			for (let n in Tools.data.Items) {
-				let item = Tools.getItem(n);
-				if (!item.fling) continue;
-
-				if (basePower && effect) {
-					if (item.fling.basePower === basePower &&
-					(item.fling.status === effect || item.fling.volatileStatus === effect)) foundItems.push(item.name);
-				} else if (basePower) {
-					if (item.fling.basePower === basePower) foundItems.push(item.name);
-				} else {
-					if (item.fling.status === effect || item.fling.volatileStatus === effect) foundItems.push(item.name);
-				}
-			}
-			if (foundItems.length === 0) return this.sendReplyBox('No items inflict ' + basePower + 'bp damage when used with Fling.');
-		} else if (target.search(/natural ?gift/i) >= 0) {
-			let basePower = 0;
-			let type = "";
-
-			for (let k = 0; k < searchedWords.length; k++) {
-				searchedWords[k] = searchedWords[k].capitalize();
-				if (searchedWords[k] in Tools.data.TypeChart) {
-					if (type) return this.sendReplyBox("Only specify natural gift type once.");
-					type = searchedWords[k];
-				} else {
-					if (searchedWords[k].substr(searchedWords[k].length - 2) === 'bp' && searchedWords[k].length > 2) searchedWords[k] = searchedWords[k].substr(0, searchedWords[k].length - 2);
-					if (Number.isInteger(Number(searchedWords[k]))) {
-						if (basePower) return this.sendReplyBox("Only specify a number for base power once.");
-						basePower = parseInt(searchedWords[k]);
-					}
-				}
-			}
-
-			for (let n in Tools.data.Items) {
-				let item = Tools.getItem(n);
-				if (!item.isBerry) continue;
-
-				if (basePower && type) {
-					if (item.naturalGift.basePower === basePower && item.naturalGift.type === type) foundItems.push(item.name);
-				} else if (basePower) {
-					if (item.naturalGift.basePower === basePower) foundItems.push(item.name);
-				} else {
-					if (item.naturalGift.type === type) foundItems.push(item.name);
-				}
-			}
-			if (foundItems.length === 0) return this.sendReplyBox('No berries inflict ' + basePower + 'bp damage when used with Natural Gift.');
-		} else {
-			let bestMatched = 0;
-			for (let n in Tools.data.Items) {
-				let item = Tools.getItem(n);
-				let matched = 0;
-				// splits words in the description into a toId()-esk format except retaining / and . in numbers
-				let descWords = item.desc;
-				// add more general quantifier words to descriptions
-				if (/[1-9\.]+x/.test(descWords)) descWords += ' increases';
-				if (item.isBerry) descWords += ' berry';
-				descWords = descWords.replace(/super[\-\s]effective/g, 'supereffective');
-				descWords = descWords.toLowerCase().replace('-', ' ').replace(/[^a-z0-9\s\/]/g, '').replace(/(\D)\./, (p0, p1) => p1).split(' ');
-
-				for (let k = 0; k < searchedWords.length; k++) {
-					if (descWords.indexOf(searchedWords[k]) >= 0) matched++;
-				}
-
-				if (matched >= bestMatched && matched >= (searchedWords.length * 3 / 5)) foundItems.push(item.name);
-				if (matched > bestMatched) bestMatched = matched;
-			}
-
-			// iterate over found items again to make sure they all are the best match
-			for (let l = 0; l < foundItems.length; l++) {
-				let item = Tools.getItem(foundItems[l]);
-				let matched = 0;
-				let descWords = item.desc;
-				if (/[1-9\.]+x/.test(descWords)) descWords += ' increases';
-				if (item.isBerry) descWords += ' berry';
-				descWords = descWords.replace(/super[\-\s]effective/g, 'supereffective');
-				descWords = descWords.toLowerCase().replace('-', ' ').replace(/[^a-z0-9\s\/]/g, '').replace(/(\D)\./, (p0, p1) => p1).split(' ');
-
-				for (let k = 0; k < searchedWords.length; k++) {
-					if (descWords.indexOf(searchedWords[k]) >= 0) matched++;
-				}
-
-				if (matched !== bestMatched) {
-					foundItems.splice(l, 1);
-					l--;
-				}
-			}
-		}
-
-		let resultsStr = this.broadcasting ? "" : ("<font color=#999999>" + Tools.escapeHTML(message) + ":</font><br>");
-		if (foundItems.length > 0) {
-			if (showAll || foundItems.length <= RESULTS_MAX_LENGTH + 5) {
-				foundItems.sort();
-				resultsStr += foundItems.join(", ");
-			} else {
-				resultsStr += foundItems.slice(0, RESULTS_MAX_LENGTH).join(", ") + ", and " + (foundItems.length - RESULTS_MAX_LENGTH) + " more. <font color=#999999>Redo the search with ', all' at the end to show all results.</font>";
-			}
-		} else {
-			resultsStr += "No items found. Try a more general search";
-		}
-		return this.sendReplyBox(resultsStr);
-	},
-	itemsearchhelp: ["/itemsearch [move description] - finds items that match the given key words.",
-	"Command accepts natural language. (tip: fewer words tend to work better)",
-	"Searches with \"fling\" in them will find items with the specified Fling behavior.",
-	"Searches with \"natural gift\" in them will find items with the specified Natural Gift behavior."],
-
-	learnset: 'learn',
-	learnall: 'learn',
-	learn5: 'learn',
-	g6learn: 'learn',
-	rbylearn: 'learn',
-	gsclearn: 'learn',
-	advlearn: 'learn',
-	dpplearn: 'learn',
-	bw2learn: 'learn',
-	learn: function (target, room, user, connection, cmd) {
-		if (!target) return this.parse('/help learn');
-
-		if (!this.canBroadcast()) return;
-
-		let lsetData = {set:{}};
-		let targets = target.split(',');
-		let template = Tools.getTemplate(targets[0]);
-		let move = {};
-		let problem;
-		let gen = ({rby:1, gsc:2, adv:3, dpp:4, bw2:5}[cmd.substring(0, 3)] || 6);
-		let format = 'gen' + gen + 'ou';
-		let all = (cmd === 'learnall');
-		if (cmd === 'learn5') lsetData.set.level = 5;
-		if (cmd === 'g6learn') lsetData.format = {noPokebank: true};
-
-		if (!template.exists) {
-			return this.errorReply("Pok\u00e9mon '" + template.id + "' not found.");
-		}
-
-		if (targets.length < 2) {
-			return this.errorReply("You must specify at least one move.");
-		}
-
-		for (let i = 1, len = targets.length; i < len; i++) {
-			move = Tools.getMove(targets[i]);
-			if (!move.exists) {
-				return this.errorReply("Move '" + move.id + "' not found.");
-			}
-			problem = TeamValidator.checkLearnsetSync(format, move, template.species, lsetData);
-			if (problem) break;
-		}
-		let buffer = "";
-		if (format) buffer += "In Gen " + gen + ", ";
-		buffer += "" + template.name + (problem ? " <span class=\"message-learn-cannotlearn\">can't</span> learn " : " <span class=\"message-learn-canlearn\">can</span> learn ") + (targets.length > 2 ? "these moves" : move.name);
-		if (!problem) {
-			let sourceNames = {E:"egg", S:"event", D:"dream world", X:"egg, traded back", Y: "event, traded back"};
-			let sourcesBefore = lsetData.sourcesBefore;
-			if (lsetData.sources || sourcesBefore < gen) buffer += " only when obtained";
-			buffer += " from:<ul class=\"message-learn-list\">";
-			if (lsetData.sources) {
-				let sources = lsetData.sources.map(source => {
-					if (source.slice(0, 3) === '1ET') {
-						return '2X' + source.slice(3);
-					}
-					if (source.slice(0, 3) === '1ST') {
-						return '2Y' + source.slice(3);
-					}
-					return source;
-				}).sort();
-				let prevSourceType;
-				let prevSourceCount = 0;
-				for (let i = 0, len = sources.length; i < len; ++i) {
-					let source = sources[i];
-					if (source.substr(0, 2) === prevSourceType) {
-						if (prevSourceCount < 0) {
-							buffer += ": " + source.substr(2);
-						} else if (all || prevSourceCount < 3) {
-							buffer += ", " + source.substr(2);
-						} else if (prevSourceCount === 3) {
-							buffer += ", ...";
-						}
-						++prevSourceCount;
-						continue;
-					}
-					prevSourceType = source.substr(0, 2);
-					prevSourceCount = source.substr(2) ? 0 : -1;
-					buffer += "<li>gen " + source.charAt(0) + " " + sourceNames[source.charAt(1)];
-					if (prevSourceType === '5E' && template.maleOnlyHidden) buffer += " (cannot have hidden ability)";
-					if (source.substr(2)) buffer += ": " + source.substr(2);
-				}
-			}
-			if (sourcesBefore) {
-				buffer += "<li>" + (sourcesBefore < gen ? "gen " + sourcesBefore + " or earlier" : "anywhere") + " (all moves are level-up/tutor/TM/HM in gen " + Math.min(gen, sourcesBefore) + (sourcesBefore < gen ? " to " + gen : "") + ")";
-			}
-			buffer += "</ul>";
-		}
-		this.sendReplyBox(buffer);
-	},
-	learnhelp: ["/learn [pokemon], [move, move, ...] - Displays how a Pok\u00e9mon can learn the given moves, if it can at all.",
-		"!learn [pokemon], [move, move, ...] - Show everyone that information. Requires: + % @ # & ~"],
-	
 	'!weakness': true,
 	weaknesses: 'weakness',
 	weak: 'weakness',
@@ -1628,12 +585,12 @@ exports.commands = {
 		if (!target) return this.parse('/help weakness');
 		if (!this.runBroadcast()) return;
 		target = target.trim();
-		let targets = target.split(/ ?[,\/ ] ?/);
+		let targets = target.split(/ ?[,/ ] ?/);
 
-		let pokemon = Tools.getTemplate(target);
-		let type1 = Tools.getType(targets[0]);
-		let type2 = Tools.getType(targets[1]);
-		let type3 = Tools.getType(targets[2]);
+		let pokemon = Dex.getTemplate(target);
+		let type1 = Dex.getType(targets[0]);
+		let type2 = Dex.getType(targets[1]);
+		let type3 = Dex.getType(targets[2]);
 
 		if (pokemon.exists) {
 			target = pokemon.species;
@@ -1659,10 +616,10 @@ exports.commands = {
 		let weaknesses = [];
 		let resistances = [];
 		let immunities = [];
-		for (let type in Tools.data.TypeChart) {
-			let notImmune = Tools.getImmunity(type, pokemon);
+		for (let type in Dex.data.TypeChart) {
+			let notImmune = Dex.getImmunity(type, pokemon);
 			if (notImmune) {
-				let typeMod = Tools.getEffectiveness(type, pokemon);
+				let typeMod = Dex.getEffectiveness(type, pokemon);
 				switch (typeMod) {
 				case 1:
 					weaknesses.push(type);
@@ -1716,7 +673,7 @@ exports.commands = {
 		for (let i = 0; i < 2; ++i) {
 			let method;
 			for (method in searchMethods) {
-				foundData = Tools[method](targets[i]);
+				foundData = Dex[method](targets[i]);
 				if (foundData.exists) break;
 			}
 			if (!foundData.exists) return this.parse('/help effectiveness');
@@ -1744,12 +701,12 @@ exports.commands = {
 		if (!this.runBroadcast()) return;
 
 		let factor = 0;
-		if (Tools.getImmunity(source, defender) || source.ignoreImmunity && (source.ignoreImmunity === true || source.ignoreImmunity[source.type])) {
+		if (Dex.getImmunity(source, defender) || source.ignoreImmunity && (source.ignoreImmunity === true || source.ignoreImmunity[source.type])) {
 			let totalTypeMod = 0;
 			if (source.effectType !== 'Move' || source.category !== 'Status' && (source.basePower || source.basePowerCallback)) {
 				for (let i = 0; i < defender.types.length; i++) {
-					let baseMod = Tools.getEffectiveness(source, defender.types[i]);
-					let moveMod = source.onEffectiveness && source.onEffectiveness.call(Tools, baseMod, defender.types[i], source);
+					let baseMod = Dex.getEffectiveness(source, defender.types[i]);
+					let moveMod = source.onEffectiveness && source.onEffectiveness.call(Dex, baseMod, defender.types[i], source);
 					totalTypeMod += typeof moveMod === 'number' ? moveMod : baseMod;
 				}
 			}
@@ -1777,7 +734,7 @@ exports.commands = {
 		let bestCoverage = {};
 		let hasThousandArrows = false;
 
-		for (let type in Tools.data.TypeChart) {
+		for (let type in Dex.data.TypeChart) {
 			// This command uses -5 to designate immunity
 			bestCoverage[type] = -5;
 		}
@@ -1792,16 +749,16 @@ exports.commands = {
 			}
 
 			let eff;
-			if (move in Tools.data.TypeChart) {
+			if (move in Dex.data.TypeChart) {
 				sources.push(move);
 				for (let type in bestCoverage) {
-					if (!Tools.getImmunity(move, type) && !move.ignoreImmunity) continue;
-					eff = Tools.getEffectiveness(move, type);
+					if (!Dex.getImmunity(move, type) && !move.ignoreImmunity) continue;
+					eff = Dex.getEffectiveness(move, type);
 					if (eff > bestCoverage[type]) bestCoverage[type] = eff;
 				}
 				continue;
 			}
-			move = Tools.getMove(move);
+			move = Dex.getMove(move);
 			if (move.exists) {
 				if (!move.basePower && !move.basePowerCallback) continue;
 				if (move.id === 'thousandarrows') hasThousandArrows = true;
@@ -1810,9 +767,9 @@ exports.commands = {
 					if (move.id === "struggle") {
 						eff = 0;
 					} else {
-						if (!Tools.getImmunity(move.type, type) && !move.ignoreImmunity) continue;
-						let baseMod = Tools.getEffectiveness(move, type);
-						let moveMod = move.onEffectiveness && move.onEffectiveness.call(Tools, baseMod, type, move);
+						if (!Dex.getImmunity(move.type, type) && !move.ignoreImmunity) continue;
+						let baseMod = Dex.getEffectiveness(move, type);
+						let moveMod = move.onEffectiveness && move.onEffectiveness.call(Dex, baseMod, type, move);
 						eff = typeof moveMod === 'number' ? moveMod : baseMod;
 					}
 					if (eff > bestCoverage[type]) bestCoverage[type] = eff;
@@ -1870,16 +827,16 @@ exports.commands = {
 		} else {
 			let buffer = '<div class="scrollable"><table cellpadding="1" width="100%"><tr><th></th>';
 			let icon = {};
-			for (let type in Tools.data.TypeChart) {
-				icon[type] = '<img src="/sprites/types/' + type + '.png" width="32" height="14">';
+			for (let type in Dex.data.TypeChart) {
+				icon[type] = '<img src="https://play.pokemonshowdown.com/sprites/types/' + type + '.png" width="32" height="14">';
 				// row of icons at top
 				buffer += '<th>' + icon[type] + '</th>';
 			}
 			buffer += '</tr>';
-			for (let type1 in Tools.data.TypeChart) {
+			for (let type1 in Dex.data.TypeChart) {
 				// assembles the rest of the rows
 				buffer += '<tr><th>' + icon[type1] + '</th>';
-				for (let type2 in Tools.data.TypeChart) {
+				for (let type2 in Dex.data.TypeChart) {
 					let typing;
 					let cell = '<th ';
 					let bestEff = -5;
@@ -1893,12 +850,12 @@ exports.commands = {
 							let move = sources[i];
 
 							let curEff = 0;
-							if ((!Tools.getImmunity((move.type || move), type1) || !Tools.getImmunity((move.type || move), type2)) && !move.ignoreImmunity) continue;
-							let baseMod = Tools.getEffectiveness(move, type1);
-							let moveMod = move.onEffectiveness && move.onEffectiveness.call(Tools, baseMod, type1, move);
+							if ((!Dex.getImmunity((move.type || move), type1) || !Dex.getImmunity((move.type || move), type2)) && !move.ignoreImmunity) continue;
+							let baseMod = Dex.getEffectiveness(move, type1);
+							let moveMod = move.onEffectiveness && move.onEffectiveness.call(Dex, baseMod, type1, move);
 							curEff += typeof moveMod === 'number' ? moveMod : baseMod;
-							baseMod = Tools.getEffectiveness(move, type2);
-							moveMod = move.onEffectiveness && move.onEffectiveness.call(Tools, baseMod, type2, move);
+							baseMod = Dex.getEffectiveness(move, type2);
+							moveMod = move.onEffectiveness && move.onEffectiveness.call(Dex, baseMod, type2, move);
 							curEff += typeof moveMod === 'number' ? moveMod : baseMod;
 
 							if (curEff > bestEff) bestEff = curEff;
@@ -2099,7 +1056,7 @@ exports.commands = {
 			}
 
 			if (!pokemon) {
-				let testPoke = Tools.getTemplate(targets[i]);
+				let testPoke = Dex.getTemplate(targets[i]);
 				if (testPoke.baseStats) {
 					pokemon = testPoke.baseStats;
 					baseSet = true;
@@ -2162,7 +1119,6 @@ exports.commands = {
 		} else {
 			uptimeText = Chat.toDurationString(uptime * 1000);
 		}
-		if (user.userid === 'azum4roll') uptimeText = "Fuck off, Azum";
 		this.sendReplyBox("Uptime: <b>" + uptimeText + "</b>");
 	},
 
@@ -2322,6 +1278,8 @@ exports.commands = {
 
 	'!calc': true,
 	calculator: 'calc',
+	damagecalculator: 'calc',
+	damagecalc: 'calc',
 	calc: function (target, room, user) {
 		if (!this.runBroadcast()) return;
 		this.sendReplyBox(
@@ -2420,10 +1378,10 @@ exports.commands = {
 		if (targetId === 'all') targetId = '';
 
 		let formatList;
-		let format = Tools.getFormat(targetId);
+		let format = Dex.getFormat(targetId);
 		if (format.effectType === 'Format') formatList = [targetId];
 		if (!formatList) {
-			formatList = Object.keys(Tools.data.Formats).filter(formatid => Tools.data.Formats[formatid].effectType === 'Format');
+			formatList = Object.keys(Dex.formats);
 		}
 
 		// Filter formats and group by section
@@ -2431,7 +1389,7 @@ exports.commands = {
 		let sections = {};
 		let totalMatches = 0;
 		for (let i = 0; i < formatList.length; i++) {
-			let format = Tools.getFormat(formatList[i]);
+			let format = Dex.getFormat(formatList[i]);
 			let sectionId = toId(format.section);
 			let formatId = format.id;
 			if (!/^gen\d+/.test(targetId)) formatId = formatId.replace(/^gen\d+/, ''); // skip generation prefix if it wasn't provided
@@ -2448,7 +1406,7 @@ exports.commands = {
 
 		if (!totalMatches) return this.errorReply("No " + (target ? "matched " : "") + "formats found.");
 		if (totalMatches === 1) {
-			let format = Tools.getFormat(Object.values(sections)[0].formats[0]);
+			let format = Dex.getFormat(Object.values(sections)[0].formats[0]);
 			let formatType = (format.gameType || "singles");
 			formatType = formatType.charAt(0).toUpperCase() + formatType.slice(1).toLowerCase();
 			if (!format.desc) return this.sendReplyBox("No description found for this " + formatType + " " + format.section + " format.");
@@ -2467,7 +1425,7 @@ exports.commands = {
 			if (exactMatch && sectionId !== exactMatch) continue;
 			buf.push(Chat.html`<th style="border:1px solid gray" colspan="2">${sections[sectionId].name}</th>`);
 			for (let i = 0; i < sections[sectionId].formats.length; i++) {
-				let format = Tools.getFormat(sections[sectionId].formats[i]);
+				let format = Dex.getFormat(sections[sectionId].formats[i]);
 				let nameHTML = Chat.escapeHTML(format.name);
 				let descHTML = format.desc ? format.desc.join("<br />") : "&mdash;";
 				buf.push(`<tr><td style="border:1px solid gray">${nameHTML}</td><td style="border: 1px solid gray; margin-left:10px">${descHTML}</td></tr>`);
@@ -2549,10 +1507,10 @@ exports.commands = {
 		});
 
 		const ProcessManager = require('../process-manager');
-		ProcessManager.cache.forEach((processManager, execFile) => {
+		ProcessManager.cache.forEach((execFile, processManager) => {
 			let i = 0;
 			processManager.processes.forEach(process => {
-				buf += `<strong>${process.process.pid}</strong> - ${path.baseName(execFile)} ${i++}<br />`;
+				buf += `<strong>${process.process.pid}</strong> - ${path.basename(execFile)} ${i++}<br />`;
 			});
 		});
 
@@ -2570,15 +1528,21 @@ exports.commands = {
 			return;
 		}
 		if (!room) {
-			this.errorReply("This is not a room you can set the rules of.");
+			return this.errorReply("This is not a room you can set the rules of.");
 		}
 		if (!this.can('editroom', null, room)) return;
 		if (target.length > 100) {
 			return this.errorReply("Error: Room rules link is too long (must be under 100 characters). You can use a URL shortener to shorten the link.");
 		}
 
-		room.rulesLink = target.trim();
-		this.privateModCommand(`(${user.name} changed the room rules link to: ${target})`);
+		if (target === 'delete' || target === 'remove') {
+			if (!room.rulesLink) return this.errorReply("This room does not have rules set to remove.");
+			delete room.rulesLink;
+			this.privateModCommand(`(${user.name} has removed the room rules link.)`);
+		} else {
+			room.rulesLink = target.trim();
+			this.privateModCommand(`(${user.name} changed the room rules link to: ${target})`);
+		}
 
 		if (room.chatRoomData) {
 			room.chatRoomData.rulesLink = room.rulesLink;
@@ -2587,7 +1551,8 @@ exports.commands = {
 	},
 	ruleshelp: ["/rules - Show links to room rules and global rules.",
 		"!rules - Show everyone links to room rules and global rules. Requires: + % @ * # & ~",
-		"/rules [url] - Change the room rules URL. Requires: # & ~"],
+		"/rules [url] - Change the room rules URL. Requires: # & ~",
+		"/rules remove - Removes a room rules URL. Requires: # & ~"],
 
 	'!faq': true,
 	faq: function (target, room, user) {
@@ -2629,15 +1594,15 @@ exports.commands = {
 		if (!this.runBroadcast()) return;
 
 		let targets = target.split(',');
-		let pokemon = Tools.getTemplate(targets[0]);
-		let item = Tools.getItem(targets[0]);
-		let move = Tools.getMove(targets[0]);
-		let ability = Tools.getAbility(targets[0]);
-		let format = Tools.getFormat(targets[0]);
+		let pokemon = Dex.getTemplate(targets[0]);
+		let item = Dex.getItem(targets[0]);
+		let move = Dex.getMove(targets[0]);
+		let ability = Dex.getAbility(targets[0]);
+		let format = Dex.getFormat(targets[0]);
 		let atLeastOne = false;
 		let generation = (targets[1] || 'sm').trim().toLowerCase();
 		let genNumber = 7;
-		let extraFormat = Tools.getFormat(targets[2]);
+		let extraFormat = Dex.getFormat(targets[2]);
 
 		if (generation === 'sm' || generation === 'sumo' || generation === '7' || generation === 'seven') {
 			generation = 'sm';
@@ -2675,7 +1640,7 @@ exports.commands = {
 			}
 
 			if ((pokemon.battleOnly && pokemon.baseSpecies !== 'Greninja') || pokemon.baseSpecies === 'Keldeo' || pokemon.baseSpecies === 'Genesect') {
-				pokemon = Tools.getTemplate(pokemon.baseSpecies);
+				pokemon = Dex.getTemplate(pokemon.baseSpecies);
 			}
 
 			let formatName = extraFormat.name;
@@ -2693,6 +1658,8 @@ exports.commands = {
 				formatId = 'bh';
 			} else if (formatId === 'battlespotsingles') {
 				formatId = 'battle_spot_singles';
+			} else if (formatId === 'ubers') {
+				formatId = 'uber';
 			} else if (formatId.includes('vgc')) {
 				formatId = 'vgc' + formatId.slice(-2);
 				formatName = 'VGC20' + formatId.slice(-2);
@@ -2744,6 +1711,8 @@ exports.commands = {
 				formatId = 'bh';
 			} else if (formatId === 'battlespotsingles') {
 				formatId = 'battle_spot_singles';
+			} else if (formatId === 'ubers') {
+				formatId = 'uber';
 			} else if (formatId.includes('vgc')) {
 				formatId = 'vgc' + formatId.slice(-2);
 				formatName = 'VGC20' + formatId.slice(-2);
@@ -2767,13 +1736,15 @@ exports.commands = {
 	veekun: function (target, broadcast, user) {
 		if (!this.runBroadcast()) return;
 
+		if (!target) return this.parse('/help veekun');
+
 		let baseLink = 'http://veekun.com/dex/';
 
-		let pokemon = Tools.getTemplate(target);
-		let item = Tools.getItem(target);
-		let move = Tools.getMove(target);
-		let ability = Tools.getAbility(target);
-		let nature = Tools.getNature(target);
+		let pokemon = Dex.getTemplate(target);
+		let item = Dex.getItem(target);
+		let move = Dex.getMove(target);
+		let ability = Dex.getAbility(target);
+		let nature = Dex.getNature(target);
 		let atLeastOne = false;
 
 		// Pokemon
@@ -2861,7 +1832,7 @@ exports.commands = {
 	'!dice': true,
 	roll: 'dice',
 	dice: function (target, room, user) {
-		if (!target || target.match(/[^d\d\s\-\+HL]/i)) return this.parse('/help dice');
+		if (!target || target.match(/[^\d\sdHL+-]/i)) return this.parse('/help dice');
 		if (!this.runBroadcast()) return;
 
 		// ~30 is widely regarded as the sample size required for sum to be a Gaussian distribution.
@@ -2878,7 +1849,7 @@ exports.commands = {
 		let offset = 0;
 		let removeOutlier = 0;
 
-		let modifierData = target.match(/[\-\+]/);
+		let modifierData = target.match(/[+-]/);
 		if (modifierData) {
 			switch (target.slice(modifierData.index).trim().toLowerCase()) {
 			case '-l':
@@ -2949,13 +1920,6 @@ exports.commands = {
 		"/dice [number of dice]d[number of sides] - Simulates rolling a number of dice, e.g., /dice 2d4 simulates rolling two 4-sided dice.",
 		"/dice [number of dice]d[number of sides][+/-][offset] - Simulates rolling a number of dice and adding an offset to the sum, e.g., /dice 2d6+10: two standard dice are rolled; the result lies between 12 and 22.",
 		"/dice [number of dice]d[number of sides]-[H/L] - Simulates rolling a number of dice with removal of extreme values, e.g., /dice 3d8-L: rolls three 8-sided dice; the result ignores the lowest value."],
-	
-	rollpkmn: 'rollpokemon',
-	rollpokemon: function(target, room, user) {
-		let number = Math.floor(Math.random() * 721) + 1;
-		return this.parse("/dt "+number);
-	},
-	rollpokemonhelp: ["/rollpokemon - Randomly picks a pokemon from all possible pokemon, and displays its stats. The equivilant of '/roll 721', then '/dt <result>'."],
 
 	'!pickrandom': true,
 	pr: 'pickrandom',
@@ -2978,52 +1942,37 @@ exports.commands = {
 		}
 
 		let targets = target.split(',');
-		// if (targets.length !== 3) {
-		// 	// Width and height are required because most browsers insert the
-		// 	// <img> element before width and height are known, and when the
-		// 	// image is loaded, this changes the height of the chat area, which
-		// 	// messes up autoscrolling.
-		// 	return this.parse('/help showimage');
-		// }
-		// Fuck that. Fix it a better way elsewhere. --tustin2121 2016/08/17
+		if (targets.length !== 3) {
+			// Width and height are required because most browsers insert the
+			// <img> element before width and height are known, and when the
+			// image is loaded, this changes the height of the chat area, which
+			// messes up autoscrolling.
+			return this.parse('/help showimage');
+		}
 
 		let image = targets[0].trim();
 		if (!image) return this.errorReply('No image URL was provided!');
 		image = this.canEmbedURI(image);
 
 		if (!image) return false;
-		
-		let width = null;
-		let height = null;
-		
-		if (targets.length > 1)
-		{
-			width = targets[1].trim();
-			if (width > 1400) return this.errorReply("No.");
-			// if (!width) return this.errorReply('No width for the image was provided!');
-			if (!isNaN(width)) width += 'px';
-		}
-		if (targets.length > 2)
-		{
-			height = targets[2].trim();
-			if (height > 1400) return this.errorReply("No.");
-			// if (!height) return this.errorReply('No height for the image was provided!');
-			if (!isNaN(height)) height += 'px';
-		}
+
+		let width = targets[1].trim();
+		if (!width) return this.errorReply('No width for the image was provided!');
+		if (!isNaN(width)) width += 'px';
+
+		let height = targets[2].trim();
+		if (!height) return this.errorReply('No height for the image was provided!');
+		if (!isNaN(height)) height += 'px';
 
 		let unitRegex = /^\d+(?:p[xtc]|%|[ecm]m|ex|in)$/;
-		if (width && !unitRegex.test(width)) {
+		if (!unitRegex.test(width)) {
 			return this.errorReply('"' + width + '" is not a valid width value!');
 		}
-		if (height && !unitRegex.test(height)) {
+		if (!unitRegex.test(height)) {
 			return this.errorReply('"' + height + '" is not a valid height value!');
 		}
-		
-		let style = "";
-		if (width) style += `width: ${Tools.escapeHTML(width)};`;
-		if (height) style += `width: ${Tools.escapeHTML(height)};`;
-		
-		this.sendReply(`|raw|<img src="${Chat.escapeHTML(image)}" style="${style}" />`);
+
+		this.sendReply('|raw|<img src="' + Chat.escapeHTML(image) + '" ' + 'style="width: ' + Chat.escapeHTML(width) + '; height: ' + Chat.escapeHTML(height) + '" />');
 	},
 	showimagehelp: ["/showimage [url], [width], [height] - Show an image. " +
 		"Any CSS units may be used for the width or height (default: px)." +
@@ -3038,7 +1987,6 @@ exports.commands = {
 		if (this.broadcastMessage && !this.can('declare', null, room)) return false;
 
 		if (!this.runBroadcast('!htmlbox')) return;
-		if (this.broadcasting && !this.can('declare', null, room)) return;
 
 		this.sendReplyBox(target);
 	},
@@ -3059,29 +2007,8 @@ exports.commands = {
 		"/htmlbox [message] - Displays a message, parsing HTML code contained.",
 		"!htmlbox [message] - Shows everyone a message, parsing HTML code contained. Requires: ~ & #",
 	],
-	
-	news: function (target, room, user) {
-		if (this.cmdToken === '!') {
-			if (!this.can('declare', null, room)) return;
-			if (!this.runBroadcast("#NEWSNEWSNEWS TriHard")) return;
-		};
-		if (this.broadcasting) {
-			// Using this.send => don't want it in the history
-			// this.send(`|html|<div class="infobox">#NEWSNEWSNEWS <img src="/fx/emotes/TriHard.png" width=" alt="TriHard" title="TriHard" class="emote"></div>`);
-			this.send("|news|refreshall");
-		} else {
-			this.sendReply("|news|refresh");
-			this.sendReply("News has been refreshed.");
-		}
-		this.user.broadcasting = false;
-	},
-	newshelp: ["/news Updates the news sidebar. Broadcasting it will update it for everyone."],
 };
 
 process.nextTick(() => {
-	// This slow operation is done *after* we start listening for connections
-	// to the server. Anybody who connects while data is loading will
-	// have to wait a couple seconds before they are able to join the server, but
-	// at least they probably won't receive a connection error message.
-	Tools.includeData();
+	Dex.includeData();
 });
