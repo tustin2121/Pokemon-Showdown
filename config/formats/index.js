@@ -92,7 +92,13 @@ for (let i = 0; i < sublists.length; i++) {
 			format.__sectionSort = sectionList[section].sort;
 		}
 		if (!format.__subsort) format.__subsort = f;
-		if (typeof format.__subsort === 'function') format.__subsort = format.__subsort(formatList);
+		if (typeof format.__subsort === 'function') {
+			let subSortOf = (b)=>{ 
+				let a = formatList[toId(b)];
+				return (a)? a.__subsort : f;  
+			};
+			format.__subsort = format.__subsort(subSortOf);
+		}
 	}
 }
 

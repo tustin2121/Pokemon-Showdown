@@ -69,7 +69,7 @@ exports.Formats = [
 		ruleset: ['Balanced Hackmons'],
 		banlist: [],
 		
-		// __subsort: formats => formats[toId("Balanced Hackmons")].__subsort+0.1,
+		// __subsort: subSortOf => subSortOf("Balanced Hackmons")+0.1,
 	},
 	{
 		name: "[Gen 0] Return'd",
@@ -310,7 +310,7 @@ exports.Formats = [
 		ruleset: ['PU'],
 		banlist: ['PU', 'Chatter'],
 		
-		__subsort: formats => formats[toId("PU")].__subsort+0.1,
+		__subsort: subSortOf => subSortOf("PU")+0.1,
 	},
 	{
 		name: "LC Supreme",
@@ -320,7 +320,7 @@ exports.Formats = [
 			"&bullet; <a href=\"https://www.smogon.com/dex/xy/formats/lc/\">LC Banlist</a>",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3547566/\">LC Viability Ranking</a>",
 		],
-		__subsort: formats => formats[toId("LC")].__subsort+0.1,
+		__subsort: subSortOf => subSortOf("LC")+0.1,
 		
 		defaultLevel: 100,
 		maxLevel: 100,
@@ -451,6 +451,6 @@ exports.Formats = [
 		mod: 'gen7',
 		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
 		banlist: ['Allow Fake'],
-		__subsort: formats => formats[toId("[Gen 7] Ubers")].__subsort+0.1,
+		__subsort: subSortOf => subSortOf("[Gen 7] Ubers")+0.1,
 	},
 ];
