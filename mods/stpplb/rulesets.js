@@ -53,7 +53,7 @@ exports.BattleFormats = {
 			this.add('rule', 'BST Limit Rule: Cannot use a Pokemon with a BST higher than 600.');
 		},
 		onValidateSet: function (set){
-			let template = Tools.getTemplate(set.species);
+			let template = Dex.getTemplate(set.species);
 			let totalBST = 0;
 			for (let k in template.baseStats) {
 				totalBST += template.baseStats[k];
