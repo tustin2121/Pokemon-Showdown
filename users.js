@@ -422,7 +422,7 @@ class User {
 	popup(message) {
 		this.send(`|popup|` + message.replace(/\n/g, '||'));
 	}
-	getIdentity(roomid) {
+	getIdentity(roomid, inChar) {
 		if (this.locked || this.namelocked) {
 			const lockedSymbol = (Config.punishgroups && Config.punishgroups.locked ? Config.punishgroups.locked.symbol : '‽');
 			return lockedSymbol + this.name;
