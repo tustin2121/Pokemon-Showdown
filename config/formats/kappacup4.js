@@ -6,32 +6,18 @@ exports.Sections = {
 exports.Formats = [
 	// Week 1: Singles
 	{
-		name: "[Gen 7] Week 1: Singles", // OU
+		name: "[Gen 7] Week 1: Singles", // Uber
 		section: "Kappa Kup Season 4",
 		desc: [
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3592140/\">OU Metagame Discussion</a>",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587177/\">OU Banlist</a>",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3590726/\">OU Viability Ranking</a>",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3598705/\">OU Sample Teams</a>",
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587184/\">Ubers Metagame Discussion</a>",
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3591388/\">Ubers Viability Ranking</a>",
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3599816/\">Ubers Sample Teams</a>",
 		],
-		
+	 
 		mod: 'gen7',
-		ruleset: ['Pokemon', 'Standard', 'Team Preview'],
-		banlist: ['Uber', 'Power Construct', 'Shadow Tag', 'Baton Pass'],
+		ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Baton Pass'],
 	},
-	// {
-	// 	name: "[Gen 7] Week 1: Singles", // Uber
-	//	section: "Kappa Kup Season 4",
-	// 	desc: [
-	// 		"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587184/\">Ubers Metagame Discussion</a>",
-	// 		"&bullet; <a href=\"https://www.smogon.com/forums/threads/3591388/\">Ubers Viability Ranking</a>",
-	// 		"&bullet; <a href=\"https://www.smogon.com/forums/threads/3599816/\">Ubers Sample Teams</a>",
-	// 	],
-	//  
-	// 	mod: 'gen7',
-	// 	ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
-	// 	banlist: ['Baton Pass'],
-	// },
 	
 	
 	// Week 2: All Terrain
@@ -51,31 +37,14 @@ exports.Formats = [
 	
 	// Week 3: Doubles
 	{
-		name: "[Gen 7] Week 3: Doubles", // OU
+		name: "[Gen 7] Week 3: Doubles", // Ubersw
 		section: "Kappa Kup Season 4",
-		desc: [
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3586596/\">Doubles OU Metagame Discussion</a>",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3592903/\">Doubles OU Viability Ranking</a>",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3590987/\">Doubles OU Sample Teams</a>",
-		],
 		
 		mod: 'gen7',
 		gameType: 'doubles',
 		ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
-		banlist: ['Arceus', 'Dialga', 'Giratina', 'Giratina-Origin', 'Groudon', 'Ho-Oh', 'Jirachi', 'Kyogre', 'Kyurem-White',
-			'Lugia', 'Lunala', 'Magearna', 'Mewtwo', 'Palkia', 'Rayquaza', 'Reshiram', 'Solgaleo', 'Xerneas', 'Yveltal', 'Zekrom',
-			'Power Construct', 'Eevium Z', 'Kangaskhanite', 'Dark Void', 'Gravity ++ Grass Whistle', 'Gravity ++ Hypnosis', 'Gravity ++ Lovely Kiss', 'Gravity ++ Sing', 'Gravity ++ Sleep Powder',
-		],
+		banlist: ['Illegal', 'Unreleased', 'Dark Void'],
 	},
-	// {
-	// 	name: "[Gen 7] Week 3: Doubles", // Ubersw
-	// 	section: "Kappa Kup Season 4",
-		
-	// 	mod: 'gen7',
-	// 	gameType: 'doubles',
-	// 	ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
-	// 	banlist: ['Illegal', 'Unreleased', 'Dark Void'],
-	// },
 	
 	
 	// Week 4: Mix n' Mega
@@ -287,6 +256,20 @@ exports.Formats = [
 		// ruleset: ['[Gen 7] OU'],
 		// mod: 'lastwill',
 	},
+	// Backup if Pan-Z-Monium falls through
+	// { 
+	// 	name: "[Gen 7] Week 8: Sketchmons",
+	// 	desc: [
+	// 		"Pok&eacute;mon gain access to one Sketched move.",
+	// 		"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587743/\">Sketchmons</a>",
+	// 		"&bullet; <a href=\"https://www.smogon.com/tiers/om/analyses/sketchmons/\">Sketchmons Analyses</a>",
+	// 	],
+
+	// 	mod: 'gen7',
+	// 	ruleset: ['[Gen 7] OU', 'Allow One Sketch', 'Sketch Clause'],
+	// 	banlist: ['Dugtrio-Base'],
+	// 	noSketch: ['Belly Drum', 'Celebrate', 'Conversion', "Forest's Curse", 'Geomancy', 'Happy Hour', 'Hold Hands', 'Lovely Kiss', 'Purify', 'Shell Smash', 'Shift Gear', 'Sketch', 'Spore', 'Sticky Web', 'Trick-or-Treat'],
+	// },
 	
 	
 	// Week 9: Last Will
