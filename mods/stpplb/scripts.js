@@ -1,6 +1,6 @@
 "use strict";
 const clone = require("clone");
-const PRNG = require('../../prng');
+const PRNG = require('../../sim/prng');
 
 let leaguemon = { 
 	// This is where all movesets are defined. Add new mons here.

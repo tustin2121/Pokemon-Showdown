@@ -4,6 +4,7 @@
   "description": "The server for the Pokémon Showdown battle simulator",
   "version": "0.11.1",
   "dependencies": {
+    "clone": "^2.1.1",
     "discord.js": "^11.1.0",
     "generic-pool": "^3.1.7",
     "irc": "^0.4.1",
