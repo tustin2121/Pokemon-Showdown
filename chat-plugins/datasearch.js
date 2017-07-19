@@ -346,6 +346,7 @@ function runDexsearch(target, cmd, canAll, message) {
 	let allStats = {'hp':1, 'atk':1, 'def':1, 'spa':1, 'spd':1, 'spe':1, 'bst':1, 'weight':1, 'height':1};
 	let showAll = false;
 	let megaSearch = null;
+	let tppSearch = null;
 	let capSearch = null;
 	let randomOutput = 0;
 
@@ -470,7 +471,14 @@ function runDexsearch(target, cmd, canAll, message) {
 				if (isNotSearch) orGroup.skip = true;
 				break;
 			}
-
+			
+			if (target === 'tpp') {		
+				if (parameters.length > 1) return this.sendReplyBox("The parameter 'tpp' cannot have alternative parameters");
+				tppSearch = !isNotSearch;		
+				orGroup.skip = true;		
+				continue;		
+			}
+			
 			if (target === 'zrecovery') {
 				if (parameters.length > 1) return {reply: "The parameter 'zrecovery' cannot have alternative parameters"};
 				let recoveryMoves = ["aromatherapy", "bellydrum", "conversion2", "haze", "healbell", "mist", "psychup", "refresh", "spite", "stockpile", "teleport", "transform"];
@@ -595,13 +603,15 @@ function runDexsearch(target, cmd, canAll, message) {
 			searches.push(orGroup);
 		}
 	}
-	if (showAll && searches.length === 0 && megaSearch === null) return {reply: "No search parameters other than 'all' were found. Try '/help dexsearch' for more information on this command."};
+	if (showAll && searches.length === 0 && megaSearch === null && tppSearch === null) return {reply: "No search parameters other than 'all' were found. Try '/help dexsearch' for more information on this command."};
 
 	let dex = {};
+	let tpp = require('../data/tpp').BattleTPP;
 	for (let pokemon in Dex.data.Pokedex) {
 		let template = Dex.getTemplate(pokemon);
 		let megaSearchResult = (megaSearch === null || (megaSearch === true && template.isMega) || (megaSearch === false && !template.isMega));
-		if (template.tier !== 'Unreleased' && template.tier !== 'Illegal' && (template.tier !== 'CAP' || capSearch) && megaSearchResult) {
+		let tppSearchResult = (tppSearch === null || (tppSearch === true && tpp[template.id]) || (tppSearch === false && !tpp[template.id]));
+		if (template.tier !== 'Unreleased' && template.tier !== 'Illegal' && (template.tier !== 'CAP' || capSearch) && megaSearchResult && tppSearchResult) {
 			dex[pokemon] = template;
 		}
 	}

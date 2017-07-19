@@ -1320,7 +1320,10 @@ class ModdedDex {
 			if (!dataObject[key] || typeof dataObject[key] !== 'object') return new TypeError(`${filePath}, if it exists, must export an object whose '${key}' property is a non-null object`);
 			return dataObject[key];
 		} catch (e) {
-			if (e.code !== 'MODULE_NOT_FOUND') {
+			// if (e.code !== 'MODULE_NOT_FOUND') {
+			if (e.code === 'MODULE_NOT_FOUND' && e.message.startsWith(`Cannot find module '${basePath}`)) {
+				// ignore
+			} else {
 				throw e;
 			}
 		}

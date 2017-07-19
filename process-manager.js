@@ -16,6 +16,8 @@ const EventEmitter = require('events');
  */
 const processManagers = new Map();
 
+let inspectIncrement = 0;
+
 /**
  * @param {any} str
  * @return {string}
@@ -39,7 +41,7 @@ class ProcessWrapper extends EventEmitter {
 		/** @type {Map<number, any>} */
 		this.pendingTasks = new Map();
 		/** @type {any} */
-		this.process = require('child_process').fork(PM.execFile, [], {cwd: __dirname});
+		this.process = require('child_process').fork(PM.execFile, [], {cwd: __dirname, execArgv:[]});
 
 		// Allow events to bubble-up to the wrapper
 		this.process.on('message', /** @param {string} message */ message => this.emit('message', message));

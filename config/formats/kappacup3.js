@@ -115,15 +115,15 @@ exports.Formats = [
 		// Note: "validateSet" = replace set validation rules. "onValidateSet" = additional set rules.
 		// Also, "validateTeam" = completely replace all validation.
 		validateSet: function (set, teamHas) {
-			let crossTemplate = this.tools.getTemplate(set.name);
+			let crossTemplate = this.dex.getTemplate(set.name);
 			if (!crossTemplate.exists) return this.validateSet(set, teamHas);
-			let template = this.tools.getTemplate(set.species);
+			let template = this.dex.getTemplate(set.species);
 			if (!template.exists) return ["The Pokemon '" + set.species + "' does not exist."];
 			if (!template.evos.length) return ["" + template.species + " cannot cross evolve because it doesn't evolve."];
 			if (crossTemplate.species == 'Shedinja' || crossTemplate.species == 'Gyarados') return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it is a banned evolution."];
 			if (template.species == 'Scyther' || template.species == 'Sneasel' || template.species == 'Archen') return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it is banned from cross evolving."];
 			if (crossTemplate.battleOnly || !crossTemplate.prevo) return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it isn't an evolution."];
-			let crossPrevoTemplate = this.tools.getTemplate(crossTemplate.prevo);
+			let crossPrevoTemplate = this.dex.getTemplate(crossTemplate.prevo);
 			if (!crossPrevoTemplate.prevo !== !template.prevo) return ["" + template.species + " cannot cross into " + crossTemplate.species + " because they are not consecutive evolutionary stages."];
 
 			// Make sure no stat is too high/low to cross evolve to
@@ -139,7 +139,7 @@ exports.Formats = [
 
 			let mixedTemplate = Object.assign({}, template);
 			// Ability test
-			let ability = this.tools.getAbility(set.ability);
+			let ability = this.dex.getAbility(set.ability);
 			if (ability.name !== 'Huge Power' && ability.name !== 'Pure Power' && ability.name !== 'Shadow Tag') mixedTemplate.abilities = crossTemplate.abilities;
 
 			mixedTemplate.learnset = Object.assign({}, template.learnset);
