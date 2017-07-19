@@ -2674,6 +2674,11 @@ class Battle extends Dex.ModdedDex {
 
 		case 'eval': {
 			/* eslint-disable no-eval, no-unused-vars */
+			// Custom eval stuff
+			let i = require('util').inspect;
+			let inspect = require('util').inspect;
+			let k = Object.keys;
+			// End custom
 			let battle = this;
 			let p1 = this.p1;
 			let p2 = this.p2;

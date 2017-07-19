@@ -253,8 +253,8 @@ exports.Formats = [
 		name: "[Gen 7] Week 8: Pan-Z-Monium",
 		section: "Kappa Kup Season 4",
 		// TODO: implement
-		// ruleset: ['[Gen 7] OU'],
-		// mod: 'lastwill',
+		ruleset: ['[Gen 7] OU'],
+		mod: 'panzmonium',
 	},
 	// Backup if Pan-Z-Monium falls through
 	// { 
