@@ -1158,7 +1158,7 @@ Chat.getDataPokemonHTML = function (template, gen = 7) {
 	buf += '<span class="col typecol">';
 	if (template.types) {
 		for (let i = 0; i < template.types.length; i++) {
-			buf += `<img src="https://play.pokemonshowdown.com/sprites/types/${template.types[i]}.png" alt="${template.types[i]}" height="14" width="32">`;
+			buf += `<img src="/sprites/types/${template.types[i]}.png" alt="${template.types[i]}" height="14" width="32">`;
 		}
 	}
 	buf += '</span> ';
@@ -1204,8 +1204,8 @@ Chat.getDataMoveHTML = function (move) {
 	if (typeof move === 'string') move = Object.assign({}, Dex.getMove(move));
 	let buf = `<ul class="utilichart"><li class="result">`;
 	buf += `<a data-entry="move|${move.name}"><span class="col movenamecol">${move.name}</span> `;
-	buf += `<span class="col typecol"><img src="//play.pokemonshowdown.com/sprites/types/${move.type}.png" alt="${move.type}" width="32" height="14">`;
-	buf += `<img src="//play.pokemonshowdown.com/sprites/categories/${move.category}.png" alt="${move.category}" width="32" height="14"></span> `;
+	buf += `<span class="col typecol"><img src="/sprites/types/${move.type}.png" alt="${move.type}" width="32" height="14">`;
+	buf += `<img src="/sprites/categories/${move.category}.png" alt="${move.category}" width="32" height="14"></span> `;
 	if (move.basePower) buf += `<span class="col labelcol"><em>Power</em><br>${typeof move.basePower === 'number' ? move.basePower : '—'}</span> `;
 	buf += `<span class="col widelabelcol"><em>Accuracy</em><br>${typeof move.accuracy === 'number' ? (move.accuracy + '%') : '—'}</span> `;
 	const basePP = move.pp || 1;

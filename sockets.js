@@ -258,7 +258,7 @@ if (cluster.isMaster) {
 
 	const sockjs = require('sockjs');
 	const server = sockjs.createServer({
-		sockjs_url: "//play.pokemonshowdown.com/js/lib/sockjs-1.1.1-nwjsfix.min.js",
+		sockjs_url: "/js/lib/sockjs-1.1.1-nwjsfix.min.js",
 		log: (severity, message) => {
 			if (severity === 'error') console.log('ERROR: ' + message);
 		},
