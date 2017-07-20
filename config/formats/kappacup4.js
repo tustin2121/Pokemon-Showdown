@@ -252,6 +252,9 @@ exports.Formats = [
 	{
 		name: "[Gen 7] Week 8: Pan-Z-Monium",
 		section: "Kappa Kup Season 4",
+		desc: [
+			"Z-Crystals can trigger any move as a z-move, and can be used once per move instead of once per battle.",
+		],
 		// TODO: implement
 		ruleset: ['[Gen 7] OU'],
 		mod: 'panzmonium',
