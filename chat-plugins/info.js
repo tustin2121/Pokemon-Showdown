@@ -1590,6 +1590,7 @@ exports.commands = {
 	'!smogdex': true,
 	analysis: 'smogdex',
 	strategy: 'smogdex',
+	strat: 'smogdex',
 	smogdex: function (target, room, user) {
 		if (!this.runBroadcast()) return;
 
