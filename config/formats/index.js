@@ -6,6 +6,7 @@
 // happen, so we don't lock up the server entirely in case of a name collision.
 let formatList = {};
 let sectionList = {};
+let columnList = {};
 
 if (!global.toId) {
 	// Copied from Tools.getId, which isn't defined yet when this is first included
@@ -54,6 +55,9 @@ for (let i = 0; i < sublists.length; i++) {
 	if (info.Sections) {
 		sectionList = Object.assign(sectionList, info.Sections);
 	}
+	if (info.Columns) {
+		columnList = Object.assign(columnList, info.Columns);
+	}
 	// For each format in the list
 	let section = '';
 	let column = 1;
@@ -78,10 +82,22 @@ for (let i = 0; i < sublists.length; i++) {
 			continue;
 		}
 		let id = toId(format.name);
-		if (formatList[id]) {
+		
+		if (format.overrides) {
+			let baseformat = formatList[id];
+			if (format.overrides === true) {
+				if (!baseformat) console.warn(`Format "${format.name}" in file '${sublists[i]}' intends to override an existing format, but one no longer exists.`);
+			} else if (format.overrides === 'ensure') {
+				if (baseformat) continue; // If the format exists, ignore this format
+				console.log(`Format "${format.name}" has been orphaned from the main list.`);
+			} else {
+				console.warn(`Format "${format.name}" in file '${sublists[i]}' has unknown "overrides" directive.`);
+			}
+		} else if (formatList[id]) {
 			console.warn(`Format "${format.name}" in file '${sublists[i]}' is overriding an existing format from file '${formatList[id].__source}'`);
 		}
 		formatList[id] = format;
+		
 		format.__source = sublists[i];
 		if (format.section && sectionList[format.section]) {
 			format.column = sectionList[format.section].column;
@@ -91,6 +107,7 @@ for (let i = 0; i < sublists.length; i++) {
 			format.column = sectionList[section].column;
 			format.__sectionSort = sectionList[section].sort;
 		}
+		if (format.column) format.columnName = `${columnList[format.column].name}${columnList[format.column].style}`;
 		if (!format.__subsort) format.__subsort = f;
 		if (typeof format.__subsort === 'function') {
 			let subSortOf = (b)=>{ 

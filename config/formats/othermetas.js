@@ -167,27 +167,34 @@ exports.Formats = [
 			}
 		},
 	},
-	/* Uncomment this if Mix and Mega is ever removed from smogon's formats, for whatever reason.
+	//* Uncomment this if Mix and Mega is ever removed from smogon's formats, for whatever reason.
 	{
-		name: "Mix and Mega",
+		name: "[Gen 7] Mix and Mega",
+		overrides: 'ensure', //If smogon ever removes this format, we'll still have it.
 		desc: [
 			"Mega Stones and Primal Orbs can be used on almost any fully evolved Pok&eacute;mon with no Mega Evolution limit.",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3540979/\">Mix and Mega</a>",
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587740/\">Mix and Mega</a>",
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3591580/\">Mix and Mega Resources</a>",
+			"&bullet; <a href=\"https://www.smogon.com/tiers/om/analyses/mix_and_mega/\">Mix and Mega Analyses</a>",
 		],
-		section: "Other Metagames",
 
-		searchShow: false,
 		mod: 'mixandmega',
-		ruleset: ['Ubers', 'Baton Pass Clause'],
-		banlist: ['Dynamic Punch', 'Electrify', 'Zap Cannon'],
+		searchShow: false,
+		ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Mega Rayquaza Clause', 'Team Preview'],
+		banlist: ['Baton Pass', 'Electrify'],
 		onValidateTeam: function (team) {
 			let itemTable = {};
 			for (let i = 0; i < team.length; i++) {
 				let item = this.getItem(team[i].item);
 				if (!item) continue;
-				if (itemTable[item] && item.megaStone) return ["You are limited to one of each Mega Stone.", "(You have more than one " + this.getItem(item).name + ")"];
-				if (itemTable[item] && (item.id === 'blueorb' || item.id === 'redorb')) return ["You are limited to one of each Primal Orb.", "(You have more than one " + this.getItem(item).name + ")"];
-				itemTable[item] = true;
+				if (!(item in itemTable)) {
+					itemTable[item] = 1;
+				} else if (itemTable[item] < 2) {
+					itemTable[item]++;
+				} else {
+					if (item.megaStone) return ["You are limited to two of each Mega Stone.", "(You have more than two " + this.getItem(item).name + ")"];
+					if (item.id === 'blueorb' || item.id === 'redorb') return ["You are limited to two of each Primal Orb.", "(You have more than two " + this.getItem(item).name + ")"];
+				}
 			}
 		},
 		onValidateSet: function (set) {
@@ -196,8 +203,8 @@ exports.Formats = [
 			if (!item.megaEvolves && item.id !== 'blueorb' && item.id !== 'redorb') return;
 			if (template.baseSpecies === item.megaEvolves || (template.baseSpecies === 'Groudon' && item.id === 'redorb') || (template.baseSpecies === 'Kyogre' && item.id === 'blueorb')) return;
 			if (template.evos.length) return ["" + template.species + " is not allowed to hold " + item.name + " because it's not fully evolved."];
-			let uberStones = ['beedrillite', 'gengarite', 'kangaskhanite', 'mawilite', 'medichamite'];
-			if (template.tier === 'Uber' || uberStones.indexOf(item.id) >= 0) return ["" + template.species + " is not allowed to hold " + item.name + "."];
+			let uberStones = ['beedrillite', 'blazikenite', 'gengarite', 'kangaskhanite', 'mawilite', 'medichamite'];
+			if (template.tier === 'Uber' || set.ability === 'Power Construct' || uberStones.includes(item.id)) return ["" + template.species + " is not allowed to hold " + item.name + "."];
 		},
 		onBegin: function () {
 			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
@@ -224,7 +231,6 @@ exports.Formats = [
 			}
 		},
 	},
-	*/
 	{
 		name: "[Gen 0] Type Omelette",
 		section: "Other Metagames",
@@ -447,10 +453,49 @@ exports.Formats = [
 	},
 	{
 		name: "[Gen 7] Ubers Plus",
-
 		mod: 'gen7',
+		section: "SM Singles",
 		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
 		banlist: ['Allow Fake'],
 		__subsort: subSortOf => subSortOf("[Gen 7] Ubers")+0.1,
+	},
+	{
+		name: "[Gen 7] Reverse Type Matchup",
+		desc: [
+			"The Attackers and Defenders on the type chart are reversed.",
+		],
+		section: "Other Metagames",
+		mod: 'reverse',
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Allow Fake'],
+	},
+	{
+		name: '[Gen 7] Snowball Fight',
+		section: 'Other Metagames',
+		column: 4,
+		ruleset: ['Ubers'],
+		banlist: [],
+		mod: 'snowballfight',
+		onValidateSet: function (set) {
+			set.moves.push('fling');
+		},
+		onBeforeTurn: function () {
+			if (!this.p1.snowballs) {
+				this.p1.snowballs = 0;
+			}
+			if (!this.p2.snowballs) {
+				this.p2.snowballs = 0;
+			}
+		},
+		onFaintPriority: 100,
+		onFaint: function (pokemon) {
+			if (pokemon.side.pokemonLeft === 0) {
+				if (this.p1.snowballs > this.p2.snowballs) {
+					this.win(this.p1);
+				} else if (this.p2.snowballs > this.p1.snowballs) {
+					this.win(this.p2);
+				}
+			}
+		},
 	},
 ];

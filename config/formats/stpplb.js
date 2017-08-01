@@ -1,7 +1,7 @@
 //
 
 exports.Sections = {
-	"STPPLB":	{ column: 5, sort: 2, },
+	"STPPLB":	{ column: 5, sort: 3, },
 };
 
 function create(base, mod) {
@@ -128,24 +128,26 @@ let superglitch = {
 };
 
 exports.Formats = [
-	// Singles
+	// STPPLB
 	create(stpplb, {
 		name: "Super TPPL Bros.",
 		team: 'randomtpplb',
 	}),
 	create(stpplb, {
-		name: "Super TPPL Bros. Plus",
-		team: 'randomtpplbp',
-	}),
-	create(stpplb, {
-		name: "Super TPP Bros.",
-		team: 'randomtppb',
-	}),
-	// Doubles
-	create(stpplb, {
 		name: "Super TPPL Bros. Doubles",
 		team: 'randomtpplb',
 		gameType: 'doubles',
+	}),
+	create(stpplb, {
+		name: "Super TPPL Bros. Triples",
+		team: 'randomtpplb',
+		gameType: 'triples',
+	}),
+	
+	// STPPLBP
+	create(stpplb, {
+		name: "Super TPPL Bros. Plus",
+		team: 'randomtpplbp',
 	}),
 	create(stpplb, {
 		name: "Super TPPL Bros. Plus Doubles",
@@ -153,20 +155,20 @@ exports.Formats = [
 		gameType: 'doubles',
 	}),
 	create(stpplb, {
-		name: "Super TPP Bros. Doubles",
-		team: 'randomtppb',
-		gameType: 'doubles',
-	}),
-	// Triples
-	create(stpplb, {
-		name: "Super TPPL Bros. Triples",
-		team: 'randomtpplb',
-		gameType: 'triples',
-	}),
-	create(stpplb, {
 		name: "Super TPPL Bros. Plus Triples",
 		team: 'randomtpplbp',
 		gameType: 'triples',
+	}),
+	
+	// STPPB
+	create(stpplb, {
+		name: "Super TPP Bros.",
+		team: 'randomtppb',
+	}),
+	create(stpplb, {
+		name: "Super TPP Bros. Doubles",
+		team: 'randomtppb',
+		gameType: 'doubles',
 	}),
 	create(stpplb, {
 		name: "Super TPP Bros. Triples",

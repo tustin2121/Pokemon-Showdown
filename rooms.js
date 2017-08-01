@@ -440,7 +440,10 @@ class GlobalRoom {
 
 			if (section !== prevSection) {
 				prevSection = section;
-				this.formatList += '|,' + curColumn + '|' + section;
+				if (format.columnName)
+					this.formatList += `|,${curColumn}:${format.columnName}|${section}`;
+				else
+					this.formatList += `|,${curColumn}|${section}`;
 			}
 			this.formatList += '|' + format.name;
 			let displayCode = 0;

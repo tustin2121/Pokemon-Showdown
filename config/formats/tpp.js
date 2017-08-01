@@ -15,7 +15,8 @@ function loadLeague() {
 
 /* global toId */
 exports.Sections = {
-	"TPP":			{ column: 5, sort: 1, },
+	"TPP League":			{ column: 5, sort: 1, },
+	"TPPLA":			{ column: 5, sort: 2, },
 };
 exports.Formats = [];
 
@@ -28,7 +29,7 @@ function create(base, mod) {
 let leagueFormat = {
 	name: "[Gen 7] TPPLeague",
 	desc: ["The Format used by TPPLeague for normal and test fights."],
-	section: "TPP",
+	section: "TPP League",
 	team: undefined,
 	searchShow: false,
 	challengeShow: true,
@@ -291,7 +292,7 @@ create(leagueFormat, {
 	
 let tppla = {
 	name: "TPPLA",
-	section: "TPP",
+	section: "TPPLA",
 	mod: 'tppla',
 	column: 4,
 
@@ -309,32 +310,3 @@ create(tppla, {
 	gameType: 'triples',
 });
 	
-create({
-	name: '[Gen 7] Snowball Fight',
-	section: 'TPP',
-	column: 4,
-	ruleset: ['Ubers'],
-	banlist: [],
-	mod: 'snowballfight',
-	onValidateSet: function (set) {
-		set.moves.push('fling');
-	},
-	onBeforeTurn: function () {
-		if (!this.p1.snowballs) {
-			this.p1.snowballs = 0;
-		}
-		if (!this.p2.snowballs) {
-			this.p2.snowballs = 0;
-		}
-	},
-	onFaintPriority: 100,
-	onFaint: function (pokemon) {
-		if (pokemon.side.pokemonLeft === 0) {
-			if (this.p1.snowballs > this.p2.snowballs) {
-				this.win(this.p1);
-			} else if (this.p2.snowballs > this.p1.snowballs) {
-				this.win(this.p2);
-			}
-		}
-	},
-});
