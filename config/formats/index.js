@@ -43,7 +43,7 @@ let sublists = [
 	'othermetas.js',
 	'tpp.js',
 	'stpplb.js',
-	'kappacup3.js',
+	'kappacup4.js',
 ];
 
 for (let i = 0; i < sublists.length; i++) {
