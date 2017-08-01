@@ -15,6 +15,7 @@ exports.Formats = [
 		],
 	 
 		mod: 'gen7',
+		searchShow: false,
 		ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
 		banlist: ['Baton Pass'],
 	},
@@ -29,6 +30,7 @@ exports.Formats = [
 		banlist: ['Nature Power', 'Secret Power', 'Camoflauge', 'Raichu-Alola'],
 		unbanlist: ['Landorus'],
 		mod: 'allterrain',
+		searchShow: false,
 		onBegin: function() {
 			this.setTerrain('allterrain');
 		},
@@ -41,6 +43,7 @@ exports.Formats = [
 		section: "Kappa Kup Season 4",
 		
 		mod: 'gen7',
+		searchShow: false,
 		gameType: 'doubles',
 		ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
 		banlist: ['Illegal', 'Unreleased', 'Dark Void'],
@@ -120,6 +123,7 @@ exports.Formats = [
 	    section: "Kappa Kup Season 4",
 		
 	    mod: 'gen7',
+	    searchShow: false,
 	    ruleset: ['[Gen 7] OU'],
 	    banlist: ['Mud Slap', 'Power-Up Punch', 'Fell Stinger'],
 		
@@ -146,15 +150,16 @@ exports.Formats = [
 	// Week 7: Cross Evo Doubles
 	{
 		name: "[Gen 7] Week 7: Cross Evolution",
+		section: "Kappa Kup Season 4",
 		desc: [
 			"You can \"cross-evolve\" your Pok&eacute;mon by naming them after the intended Pok&eacute;mon.",
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3594854/\">Cross Evolution</a>",
 		],
 		mod: 'gen7',
+		searchShow: false,
 		gameType: 'doubles',
 		ruleset: ['[Gen 7] Doubles Ubers', 'Baton Pass Clause'],
 		banlist: ['Rule:nicknameclause'],
-		searchShow: false,
 		onValidateTeam: function (team) {
 			let nameTable = {};
 			for (let i = 0; i < team.length; i++) {
@@ -258,6 +263,7 @@ exports.Formats = [
 		// TODO: implement
 		ruleset: ['[Gen 7] OU'],
 		mod: 'panzmonium',
+		searchShow: false,
 	},
 	// Backup if Pan-Z-Monium falls through
 	// { 
@@ -282,5 +288,6 @@ exports.Formats = [
 		desc: ["&bullet; Every Pokemon will use the move in their last moveslot before fainting in battle."],
 		ruleset: ['[Gen 7] OU'],
 		mod: 'lastwill',
+		searchShow: false,
 	},
 ];
