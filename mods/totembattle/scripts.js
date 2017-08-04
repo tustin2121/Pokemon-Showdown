@@ -1,9 +1,34 @@
 "use strict";
 
-const Tools = require('../../tools');
+const Dex = require('../../sim/dex');
 
 exports.BattleScripts = {
 	inherit: 'gen7',
+	
+	unpackTotemBoosts: function(team) {
+		for (let i = 0; i < team.length; i++) {
+			let set = team[i];
+			if (set.gender && set.gender.length > 1) {
+				let gen = set.gender;
+				let tb = {};
+				console.log("TOTEM gen="+gen);
+				if (/[FMN]/.test(gen.charAt(0))) {
+					set.gender = gen.charAt(0);
+					gen = gen.substr(1);
+				} else {
+					set.gender = undefined;
+				}
+				let it = 0;
+				while (gen.length > 0) {
+					tb[gen.slice(0,3)] = (tb[gen.slice(0,3)] || 0)+1;
+					gen = gen.substr(3);
+					if (++it > 1000) throw new Error("GOOD JOB MAKING THE SERVER HANG AGAIN, NITWIT!");
+					console.log("TOTEM it="+it+" gen="+gen);
+				}
+				set.totemboost = tb;
+			}
+		}
+	},
 	
 	receive: function(data, more) {
 		this.messageLog.push(data.join(' '));
@@ -11,35 +36,11 @@ exports.BattleScripts = {
 		let alreadyEnded = this.ended;
 		switch (data[1]) {
 		case 'join': {
-			let team = '';
+			let team;
 			//////// 
 			try {
-				if (more) team = Tools.fastUnpackTeam(more);
-				
-				// Unencode totem boosts
-				for (let i = 0; i < team.length; i++) {
-					let set = team[i];
-					if (set.gender && set.gender.length > 1) {
-						let gen = set.gender;
-						let tb = {};
-						console.log("TOTEM gen="+gen);
-						if (/[FMN]/.test(gen.charAt(0))) {
-							set.gender = gen.charAt(0);
-							gen = gen.substr(1);
-						} else {
-							set.gender = undefined;
-						}
-						let it = 0;
-						while (gen.length > 0) {
-							tb[gen.slice(0,3)] = (tb[gen.slice(0,3)] || 0)+1;
-							gen = gen.substr(3);
-							if (++it > 1000) throw new Error("GOOD JOB MAKING THE SERVER HANG AGAIN, NITWIT!");
-							console.log("TOTEM it="+it+" gen="+gen);
-						}
-						set.totemboost = tb;
-					}
-				}
-				
+				if (more) team = Dex.fastUnpackTeam(more);
+				this.unpackTotemBoosts(team);
 			} catch (e) {
 				console.log('TEAM PARSE ERROR: ' + more);
 				console.log('ERROR: ', e);
