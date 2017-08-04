@@ -5,7 +5,7 @@
 exports.Columns = {
 	1: { name: "Gen 7", style:'+' },
 	2: { name: "Gen 6", style:'+' },
-	3: { name: "Past Gens", style:'+' },
+	3: { name: "Past Gens", style:'-' },
 	4: { name: "Other Metas", style:'-' },
 	5: { name: "TPP", style:'=' },
 	6: { name: "Kappa Cup", style:'+' },
