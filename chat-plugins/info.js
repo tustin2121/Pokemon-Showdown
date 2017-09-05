@@ -36,6 +36,8 @@ exports.commands = {
 		}
 
 		let buf = Chat.html`<strong class="username"><small style="display:none">${targetUser.group}</small>${targetUser.name}</strong> `;
+		const ac = targetUser.autoconfirmed;
+		if (ac && showAll) buf += ` <small style="color:gray">(ac${targetUser.userid === ac ? `` : `: ${ac}`})</small>`;
 		if (!targetUser.connected) buf += ` <em style="color:gray">(offline)</em>`;
 		let roomauth = '';
 		if (room.auth && targetUser.userid in room.auth) roomauth = room.auth[targetUser.userid];
@@ -100,7 +102,7 @@ exports.commands = {
 				if (punishment) {
 					let expiresIn = Punishments.checkLockExpiration(targetUser.locked);
 					if (expiresIn) buf += expiresIn;
-					if (punishment[3]) buf += ` (reason: ${punishment[3]})`;
+					if (punishment[3]) buf += Chat.html` (reason: ${punishment[3]})`;
 				}
 			} else if (targetUser.locked) {
 				buf += `<br />LOCKED: ${targetUser.locked}`;
@@ -119,7 +121,7 @@ exports.commands = {
 				if (punishment) {
 					let expiresIn = Punishments.checkLockExpiration(targetUser.locked);
 					if (expiresIn) buf += expiresIn;
-					if (punishment[3]) buf += ` (reason: ${punishment[3]})`;
+					if (punishment[3]) buf += Chat.html` (reason: ${punishment[3]})`;
 				}
 			}
 			if (targetUser.semilocked) {
@@ -207,7 +209,7 @@ exports.commands = {
 			buf += `${punishName}: ${punishUserid}`;
 			let expiresIn = Punishments.checkLockExpiration(userid);
 			if (expiresIn) buf += expiresIn;
-			if (reason) buf += ` (reason: ${reason})`;
+			if (reason) buf += Chat.html` (reason: ${reason})`;
 			buf += '<br />';
 			atLeastOne = true;
 		}
@@ -321,10 +323,10 @@ exports.commands = {
 			return this.errorReply(`Both users must be in this room.`);
 		}
 		let challenges = [];
-		if (user1.challengeTo && user1.challengeTo.to === user2.userid) {
+		if (user1.challengeTo && Users.get(user1.challengeTo.to) === user2) {
 			challenges.push(Chat.html`${user1.name} is challenging ${user2.name} in ${Dex.getFormat(user1.challengeTo.format).name}.`);
 		}
-		if (user2.challengeTo && user2.challengeTo.to === user1.userid) {
+		if (user2.challengeTo && Users.get(user2.challengeTo.to) === user1) {
 			challenges.push(Chat.html`${user2.name} is challenging ${user1.name} in ${Dex.getFormat(user2.challengeTo.format).name}.`);
 		}
 		if (!challenges.length) {
@@ -530,6 +532,9 @@ exports.commands = {
 				if (move.id === 'mirrormove') {
 					details['<a href="https://pokemonshowdown.com/dex/moves/mirrormove">Mirrorable Moves</a>'] = '';
 				}
+				if (move.isUnreleased) {
+					details["Unreleased in Gen " + mod.gen] = "";
+				}
 			} else if (newTargets[0].searchType === 'item') {
 				let item = mod.getItem(newTargets[0].name);
 				details = {
@@ -551,6 +556,9 @@ exports.commands = {
 				if (item.naturalGift && mod.gen >= 3) {
 					details["Natural Gift Type"] = item.naturalGift.type;
 					details["Natural Gift Base Power"] = item.naturalGift.basePower;
+				}
+				if (item.isUnreleased) {
+					details["Unreleased in Gen " + mod.gen] = "";
 				}
 			} else {
 				details = {};
@@ -1222,7 +1230,7 @@ exports.commands = {
 			this.sendReplyBox(
 				"Have a replay showcasing a bug on Pok&eacute;mon Showdown?<br />" +
 				"- <a href=\"https://www.smogon.com/forums/threads/3520646/\">Questions</a><br />" +
-				"- <a href=\"https://www.smogon.com/forums/threads/3469932/\">Bug Reports</a>"
+				"- <a href=\"https://www.smogon.com/forums/threads/3469932/\">Bug Reports</a> (ask in <a href=\"/help\">Help</a> before posting in the thread if you're unsure)"
 			);
 		}
 	},
@@ -1317,42 +1325,6 @@ exports.commands = {
 		);
 	},
 
-	'!othermetas': true,
-	om: 'othermetas',
-	othermetas: function (target, room, user) {
-		if (!this.runBroadcast()) return;
-		target = toId(target);
-		let buffer = "";
-
-		if (target === 'all' && this.broadcasting) {
-			return this.sendReplyBox("You cannot broadcast information about all Other Metagames at once.");
-		}
-
-		if (!target || target === 'all') {
-			buffer += "- <a href=\"https://www.smogon.com/forums/forums/other-metagames.394/\">Other Metagames Forum</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/forums/om-analyses.416/\">Other Metagames Analyses</a><br />";
-			if (!target) return this.sendReplyBox(buffer);
-		}
-		let showMonthly = (target === 'all' || target === 'omofthemonth' || target === 'omotm' || target === 'month');
-
-		if (target === 'all') {
-			// Display OMotM formats, with forum thread links as caption
-			this.parse('/formathelp omofthemonth');
-
-			// Display the rest of OM formats, with OM hub/index forum links as caption
-			this.parse('/formathelp othermetagames');
-			return this.sendReply('|raw|<center>' + buffer + '</center>');
-		}
-		if (showMonthly) {
-			this.target = 'omofthemonth';
-			this.run('formathelp');
-		} else {
-			this.run('formathelp');
-		}
-	},
-	othermetashelp: ["/om - Provides links to information on the Other Metagames.",
-		"!om - Show everyone that information. Requires: + % @ * # & ~"],
-
 	'!formathelp': true,
 	banlists: 'formathelp',
 	tier: 'formathelp',
@@ -1360,6 +1332,7 @@ exports.commands = {
 	formats: 'formathelp',
 	tiershelp: 'formathelp',
 	formatshelp: 'formathelp',
+	viewbanlist: 'formathelp',
 	formathelp: function (target, room, user, connection, cmd) {
 		if (!this.runBroadcast()) return;
 		if (!target) {
@@ -1379,7 +1352,7 @@ exports.commands = {
 
 		let formatList;
 		let format = Dex.getFormat(targetId);
-		if (format.effectType === 'Format') formatList = [targetId];
+		if (format.effectType === 'Format' || format.effectType === 'ValidatorRule' || format.effectType === 'Rule') formatList = [targetId];
 		if (!formatList) {
 			formatList = Object.keys(Dex.formats);
 		}
@@ -1406,11 +1379,31 @@ exports.commands = {
 
 		if (!totalMatches) return this.errorReply("No " + (target ? "matched " : "") + "formats found.");
 		if (totalMatches === 1) {
-			let format = Dex.getFormat(Object.values(sections)[0].formats[0]);
+			let rules = [];
+			let rulesetHtml = '';
+			let format = Dex.getFormat(targetId);
+			if (format.effectType === 'ValidatorRule' || format.effectType === 'Rule' || format.effectType === 'Format') {
+				if (format.ruleset && format.ruleset.length) rules.push("<b>Ruleset</b> - " + Chat.escapeHTML(format.ruleset.join(", ")));
+				if (format.removedRules && format.removedRules.length) rules.push("<b>Removed rules</b> - " + Chat.escapeHTML(format.removedRules.join(", ")));
+				if (format.banlist && format.banlist.length) rules.push("<b>Bans</b> - " + Chat.escapeHTML(format.banlist.join(", ")));
+				if (format.unbanlist && format.unbanlist.length) rules.push("<b>Unbans</b> - " + Chat.escapeHTML(format.unbanlist.join(", ")));
+				if (rules.length > 0) {
+					rulesetHtml = `<details><summary>Banlist/Ruleset</summary>${rules.join("<br />")}</details>`;
+				} else {
+					rulesetHtml = "No ruleset found for " + format.name;
+				}
+			}
+			format = Dex.getFormat(Object.values(sections)[0].formats[0]);
 			let formatType = (format.gameType || "singles");
 			formatType = formatType.charAt(0).toUpperCase() + formatType.slice(1).toLowerCase();
-			if (!format.desc) return this.sendReplyBox("No description found for this " + formatType + " " + format.section + " format.");
-			return this.sendReplyBox(format.desc.join("<br />"));
+			if (!format.desc) {
+				if (format.effectType === 'Format') {
+					return this.sendReplyBox("No description found for this " + formatType + " " + format.section + " format." + "<br />" + rulesetHtml);
+				} else {
+					return this.sendReplyBox("No description found for this rule." + "<br />" + rulesetHtml);
+				}
+			}
+			return this.sendReplyBox(format.desc.join("<br />") + "<br />" + rulesetHtml);
 		}
 
 		let tableStyle = `border:1px solid gray; border-collapse:collapse`;
