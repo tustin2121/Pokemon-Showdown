@@ -17,7 +17,9 @@ const MONITOR_CLEAN_TIMEOUT = 2 * 60 * 60 * 1000;
  * delta of time since the last time it was committed. Actions include
  * connecting to the server, starting a battle, validating a team, and
  * sending/receiving data over a connection's socket.
+ * @augments {Map<string, [number, number]>}
  */
+// @ts-ignore TypeScript bug
 class TimedCounter extends Map {
 	/**
 	 * Increments the number of times an action has been committed by one, and
@@ -126,11 +128,11 @@ const Monitor = module.exports = {
 	battlePreps: new TimedCounter(),
 	groupChats: new TimedCounter(),
 
-	/** @type {?string} */
+	/** @type {string | null} */
 	activeIp: null,
 	networkUse: {},
 	networkCount: {},
-	hotpatchLock: false,
+	hotpatchLock: {},
 
 	/**
 	 * Counts a connection. Returns true if the connection should be terminated for abuse.
@@ -227,14 +229,18 @@ const Monitor = module.exports = {
 	 * @param {number} size
 	 */
 	countNetworkUse(size) {
-		if (Config.emergency && this.activeIp) {
-			if (this.activeIp in this.networkUse) {
-				this.networkUse[this.activeIp] += size;
-				this.networkCount[this.activeIp]++;
-			} else {
-				this.networkUse[this.activeIp] = size;
-				this.networkCount[this.activeIp] = 1;
-			}
+		if (!Config.emergency || typeof this.activeIp !== 'string') return;
+		// @ts-ignore
+		if (this.activeIp in this.networkUse) {
+			// @ts-ignore
+			this.networkUse[this.activeIp] += size;
+			// @ts-ignore
+			this.networkCount[this.activeIp]++;
+		} else {
+			// @ts-ignore
+			this.networkUse[this.activeIp] = size;
+			// @ts-ignore
+			this.networkCount[this.activeIp] = 1;
 		}
 	},
 
