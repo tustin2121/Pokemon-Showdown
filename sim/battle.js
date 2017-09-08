@@ -1409,8 +1409,6 @@ class Battle extends Dex.ModdedDex {
 		this.add('gametype', this.gameType);
 		this.add('gen', this.gen);
 		
-		Dex.mod(format.mod).getBanlistTable(format); // fill in format ruleset
-		
 		this.add('tier', format.name);
 		if (this.rated) {
 			this.add('rated');
