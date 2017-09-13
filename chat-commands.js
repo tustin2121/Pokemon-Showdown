@@ -3438,7 +3438,7 @@ exports.commands = {
 				}
 			}
 			
-			user.makeChallenge(targetUser, target);
+			user.makeChallenge(targetUser, target, validTeam);
 		});
 	},
 

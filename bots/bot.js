@@ -29,7 +29,7 @@ const pgpool = Pool.createPool({
 // Data parsing
 const dataParsers = {
 	pokemon: function (specie) {
-		let specieData = Tools.getTemplate(specie);
+		let specieData = Dex.getTemplate(specie);
 		let result = [];
 		let tier = specieData.tier;
 		if (!require('../data/tpp').BattleTPP[specieData.id] && !specieData.isNonstandard && !specieData.isUnreleased) {
@@ -73,15 +73,15 @@ const dataParsers = {
 		return result.join(' | ');
 	},
 	item: function (item) {
-		let itemData = Tools.getItem(item);
+		let itemData = Dex.getItem(item);
 		return [itemData.name, itemData.desc].join(' | ');
 	},
 	ability: function (ability) {
-		let abilityData = Tools.getAbility(ability);
+		let abilityData = Dex.getAbility(ability);
 		return [abilityData.name, abilityData.shortDesc].join(' | ');
 	},
 	move: function (move) {
-		let moveData = Tools.getMove(move);
+		let moveData = Dex.getMove(move);
 
 		let result = [];
 		result.push(moveData.name);
@@ -219,6 +219,12 @@ class Bot {
 				finalParts.push(...this.formatRaw(dataParsers[type](what)));
 				return;
 			}
+			signal = `|html|<div class="infobox">`;
+			if (part.startsWith(signal)) {
+				let msg = part.slice(signal.length, -('</div>'.length));
+				finalParts.push(msg);
+				return;
+			}
 			signal = '|html|<div class="message-error">';
 			if (!part.startsWith(signal)) {
 				finalParts.push(part);
@@ -250,12 +256,13 @@ class Bot {
 		if (text.slice(0,2) === '!?') return;
 		if (text.charAt(0) !== '!') return;
 		let res = this.parseCommand('/'+text.slice(1), this.say.bind(this, room));
-		console.log(res);
+		console.log(`onMessage:${sender.username}: [${text}] => ${res}`);
 	}
 	
 	onPrivateMessage(sender, text, reply) {
 		if (text.charAt(0) === '!' || text.charAt(0) === '/') text = text.slice(1);
 		let res = this.parseCommand('/'+text, reply)
+		console.log(`onPM:${sender.username}: [${text}] => ${res}`);
 		if (res) { reply(res); }
 	}
 	

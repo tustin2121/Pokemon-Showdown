@@ -2665,6 +2665,7 @@ class Battle extends Dex.ModdedDex {
 		case 'join': {
 			let team;
 			if (more) team = Dex.fastUnpackTeam(more);
+			console.log(`TEAM: ${require('util').inspect(data)}\n${more}\n${team}\n======`);
 			this.join(data[2], data[3], data[4], team);
 			break;
 		}

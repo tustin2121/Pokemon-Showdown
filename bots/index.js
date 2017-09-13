@@ -17,9 +17,11 @@ class BotManager {
 	}
 	
 	destroy() {
-		this.botList.forEach((bot)=>{
-			bot.destroy();
-		});
+		if (this.botList) {
+			this.botList.forEach((bot)=>{
+				bot.destroy();
+			});
+		}
 		this.botList = null;
 	}
 	
