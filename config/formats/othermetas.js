@@ -498,4 +498,23 @@ exports.Formats = [
 			}
 		},
 	},
+	/*
+	{
+		name: "[Gen 7] Seasons Samba",
+		desc: [
+			"Over the course of the battle, the seasons change rapidly. Every 3 turns, the battle moves into the next season. The battle starts at the beginning of a random season. While a season is in effect, passive stat stage boosts (+2) are given to the pokemon on the field. These boosts are lost when the season changes. A season also has a common weather effect associated with it, and a chance of a random move happening during the game.",
+			"Spring: There's a 60% chance it will start or stop raining, at the end of a given turn. There's a 5% chance of a random Thunderbolt hitting one of the battlers during a rain storm. Grass +SpA, Bug +Atk, Flying +Spe, Fairy +SpD.",
+			"Summer: There's a 60% chance it will start or stop being sunny, at the end of a turn. There's a 5% chance of a random Heat Wave hitting all of the battlers during a sunny day. Fire +SpA, Steel +Atk, Fighting +Spe, Electric +SpD.",
+			"Autumn: There's a 30% chance of 'high winds', at the end of the turn. High winds are randomly either from player 1's or player 2's side of the field. The source side gains tailwind speed for the following turn. Many field effects (spikes, pointed stones, leech seed, etc) are swept away from the destination side of the field. Many of the the same are transferred from the source to the destination side. There's a 5% chance of a random Rock Throw hitting one of the battlers during a high winds. Ghost +SpA, Dark +Atk, Poison +SpD, Psychic +Spe.",
+			"Winter: There's a 60% chance of hail starting or stopping at the end of a turn. There's a 5% chance of a random Blizzard hitting all of the battlers during a hail storm. Ice +Spe, Water +Def, Ground +SpD, Rock +Atk",
+			"All weather-altering moves and abilities are banned.",
+			
+			"Camoflauge: Spring=>Grass, Summer=>Fire, Autumn=>Ghost, Winter=>Ice",
+			"Grassy Terrain: Winter ends Grassy Terrain early. Using Grassy Terrain during winter will fail.",
+			"Misty Terrain: High Winds during Autumn ends Misty Terrain. Using it during high winds will fail.",
+			"Electric Terrain: When Electric Terrain is active at the end of a turn when springtime rain is active, the chance of the random Thunderbolt becomes 100%, and the Electric Terrain 'is discharged' as a result of the attack.",
+			"Psychic Terrain: All chances of random attacks due to weather become 0% while Psychic Terrain is active.",
+		],
+	},
+	*/
 ];

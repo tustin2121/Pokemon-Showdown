@@ -71,8 +71,8 @@ class DiscordBot extends Bot {
 	}
 	
 	get defaultRoom() {
-		let chan = this.client.channels.find(c => c.name === this.announceChannel);
-		if (!chan) chan = this.client.channels.filter(c=>c.type === 'text').first();
+		let chan = this.client.channels.get(this.announceChannel);
+		// if (!chan) chan = this.client.channels.filter(c=>c.type === 'text').first();
 		if (chan) return chan;
 		else {
 			console.error('DISCORD BOT ERROR: Cannot find channel to send announcement to!');

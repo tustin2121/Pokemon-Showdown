@@ -168,39 +168,32 @@ exports.Formats = [
 			}
 		},
 		validateSet: function (set, teamHas) {
-			let crossTemplate = Dex.getTemplate(set.name);
+			let crossTemplate = this.dex.getTemplate(set.name);
 			if (!crossTemplate.exists || crossTemplate.isNonstandard) return this.validateSet(set, teamHas);
-			let template = Dex.getTemplate(set.species);
-			if (!template.exists) return [`The Pokemon ${set.species} does not exist.`];
-			if (!template.evos.length) return [`${template.species} cannot cross evolve because it doesn't evolve.`];
+			let template = this.dex.getTemplate(set.species);
+			if (!template.exists || template.isNonstandard || template === crossTemplate) return this.validateSet(set, teamHas);
+			if (!template.nfe) return [`${template.species} cannot cross evolve because it doesn't evolve.`];
+			if (crossTemplate.battleOnly || !crossTemplate.prevo) return [`${template.species} cannot cross evolve into ${crossTemplate.species} because it isn't an evolution.`];
 			if (template.species === 'Sneasel') return [`Sneasel as a base Pokemon is banned.`];
 			let crossBans = {'shedinja': 1, 'solgaleo': 1, 'lunala': 1};
 			if (crossTemplate.id in crossBans) return [`${template.species} cannot cross evolve into ${crossTemplate.species} because it is banned.`];
-			if (crossTemplate.battleOnly || !crossTemplate.prevo) return [`${template.species} cannot cross evolve into ${crossTemplate.species} because it isn't an evolution.`];
-			let crossPrevoTemplate = Dex.getTemplate(crossTemplate.prevo);
+			let crossPrevoTemplate = this.dex.getTemplate(crossTemplate.prevo);
 			if (!crossPrevoTemplate.prevo !== !template.prevo) return [`${template.species} cannot cross into ${crossTemplate.species} because they are not consecutive evolutionary stages.`];
 
 			// Make sure no stat is too high/low to cross evolve to
-			let stats = {
-				'hp': 'HP',
-				'atk': 'Attack',
-				'def': 'Defense',
-				'spa': 'Special Attack',
-				'spd': 'Special Defense',
-				'spe': 'Speed',
-			};
+			let stats = {'hp':'HP', 'atk':'Attack', 'def':'Defense', 'spa':'Special Attack', 'spd':'Special Defense', 'spe':'Speed'};
 			for (let statid in template.baseStats) {
 				let evoStat = template.baseStats[statid] + crossTemplate.baseStats[statid] - crossPrevoTemplate.baseStats[statid];
 				if (evoStat < 1) {
 					return [`${template.species} cannot cross evolve to ${crossTemplate.species} because its ${stats[statid]} would be too low.`];
 				} else if (evoStat > 255) {
-					return [`{template.species} cannot cross evolve to ${crossTemplate.species} because its ${stats[statid]} would be too high.`];
+					return [`${template.species} cannot cross evolve to ${crossTemplate.species} because its ${stats[statid]} would be too high.`];
 				}
 			}
 
 			let mixedTemplate = Object.assign({}, template);
 			// Ability test
-			let ability = Dex.getAbility(set.ability);
+			let ability = this.dex.getAbility(set.ability);
 			let abilityBans = {'hugepower': 1, 'purepower': 1, 'shadowtag': 1};
 			if (!(ability.id in abilityBans)) mixedTemplate.abilities = crossTemplate.abilities;
 
@@ -215,10 +208,13 @@ exports.Formats = [
 			}
 			return this.validateSet(set, teamHas, mixedTemplate);
 		},
-		onModifyTemplate: function (template, pokemon) {
-			if (pokemon.crossEvolved || pokemon.set.name === pokemon.species) return template;
-			let crossTemplate = this.getTemplate(pokemon.name);
-			if (!crossTemplate.exists || crossTemplate.num === template.num) return template;
+		onModifyTemplate: function (template, pokemon, source) {
+			if (source) return;
+			if (pokemon.set.name === pokemon.set.species) return;
+			let crossTemplate = this.getTemplate(pokemon.set.name);
+			if (!crossTemplate.exists) return;
+			if (template.battleOnly || !template.nfe) return;
+			if (crossTemplate.battleOnly || !crossTemplate.prevo) return;
 			let crossPrevoTemplate = this.getTemplate(crossTemplate.prevo);
 			let mixedTemplate = Object.assign({}, template);
 			mixedTemplate.baseSpecies = mixedTemplate.species = template.species + '-' + crossTemplate.species;
@@ -235,13 +231,18 @@ exports.Formats = [
 			if (crossTemplate.types[1] !== crossPrevoTemplate.types[1]) mixedTemplate.types[1] = crossTemplate.types[1] || crossTemplate.types[0];
 			if (mixedTemplate.types[0] === mixedTemplate.types[1]) mixedTemplate.types.length = 1;
 
-			pokemon.baseTemplate = mixedTemplate;
-			pokemon.crossEvolved = "Yes";
+			pokemon.crossEvolved = true;
 			return mixedTemplate;
+		},
+		onBegin: function () {
+			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
+			for (let i = 0, len = allPokemon.length; i < len; i++) {
+				allPokemon[i].baseTemplate = allPokemon[i].template;
+			}
 		},
 		onSwitchInPriority: 1,
 		onSwitchIn: function (pokemon) {
-			if (pokemon.crossEvolved === "Yes") {
+			if (pokemon.crossEvolved) {
 				this.add('-start', pokemon, 'typechange', pokemon.types.join('/'), '[silent]');
 			}
 		},
@@ -253,12 +254,22 @@ exports.Formats = [
 		name: "[Gen 7] Week 8: Pan-Z-Monium",
 		section: "Kappa Kup Season 4",
 		desc: [
-			"Z-Crystals can trigger any move as a z-move, and can be used once per move instead of once per battle.",
+			"Z-Crystals can trigger any move as a z-move, and can be used once per move instead of once per battle. Ubers are not allowed to hold Z-Crystals.",
 		],
 		// TODO: implement
-		ruleset: ['[Gen 7] OU'],
+		ruleset: ['[Gen 7] Ubers'],
+		banlist: ['Uber + Z-Crystal'],
 		mod: 'panzmonium',
 		searchShow: false,
+		
+		onChangeSet: function(set, format, setHas) {
+			let item = this.getItem(set.item);
+			if (item.zMove) setHas['zcrystal'] = true;
+		},
+		
+		// onValidateSet: function(set, format, setHas, teamHas) {
+		// 	console.log(`PZM: onValidateSet:  ${require('util').inspect(setHas)}`);
+		// }
 	},
 	// Backup if Pan-Z-Monium falls through
 	// { 
