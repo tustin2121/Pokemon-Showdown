@@ -167,8 +167,7 @@ Punishments.loadPunishments = async function () {
 		if (Date.now() >= expireTime) {
 			continue;
 		}
-		for (let j = 0; j < keys.length; j++) {
-			const key = keys[j];
+		for (const key of keys) {
 			if (!USERID_REGEX.test(key)) {
 				Punishments.ips.set(key, punishment);
 			} else {
@@ -205,92 +204,94 @@ Punishments.loadRoomPunishments = async function () {
 };
 
 Punishments.savePunishments = function () {
-	const saveTable = new Map();
-	Punishments.ips.forEach((punishment, ip) => {
-		const [punishType, id, ...rest] = punishment;
-		if (id.charAt(0) === '#') return;
-		let entry = saveTable.get(id);
+	FS(PUNISHMENT_FILE).writeUpdate(() => {
+		const saveTable = new Map();
+		Punishments.ips.forEach((punishment, ip) => {
+			const [punishType, id, ...rest] = punishment;
+			if (id.charAt(0) === '#') return;
+			let entry = saveTable.get(id);
 
-		if (entry) {
-			entry.keys.push(ip);
-			return;
-		}
+			if (entry) {
+				entry.keys.push(ip);
+				return;
+			}
 
-		entry = {
-			keys: [ip],
-			punishType: punishType,
-			rest: rest,
-		};
-		saveTable.set(id, entry);
-	});
-	Punishments.userids.forEach((punishment, userid) => {
-		const [punishType, id, ...rest] = punishment;
-		if (id.charAt(0) === '#') return;
-		let entry = saveTable.get(id);
-
-		if (!entry) {
 			entry = {
-				keys: [],
+				keys: [ip],
 				punishType: punishType,
 				rest: rest,
 			};
 			saveTable.set(id, entry);
-		}
+		});
+		Punishments.userids.forEach((punishment, userid) => {
+			const [punishType, id, ...rest] = punishment;
+			if (id.charAt(0) === '#') return;
+			let entry = saveTable.get(id);
 
-		if (userid !== id) entry.keys.push(userid);
+			if (!entry) {
+				entry = {
+					keys: [],
+					punishType: punishType,
+					rest: rest,
+				};
+				saveTable.set(id, entry);
+			}
+
+			if (userid !== id) entry.keys.push(userid);
+		});
+
+		let buf = 'Punishment\tUser ID\tIPs and alts\tExpires\r\n';
+		saveTable.forEach((entry, id) => {
+			buf += Punishments.renderEntry(entry, id);
+		});
+		return buf;
 	});
-
-	let buf = 'Punishment\tUser ID\tIPs and alts\tExpires\r\n';
-	saveTable.forEach((entry, id) => {
-		buf += Punishments.renderEntry(entry, id);
-	});
-
-	FS(PUNISHMENT_FILE).write(buf);
 };
 
 Punishments.saveRoomPunishments = function () {
-	const saveTable = new Map();
-	Punishments.roomIps.nestedForEach((punishment, roomid, ip) => {
-		const [punishType, punishUserid, ...rest] = punishment;
-		const id = roomid + ':' + punishUserid;
-		if (id.charAt(0) === '#') return;
-		let entry = saveTable.get(id);
+	FS(ROOM_PUNISHMENT_FILE).writeUpdate(() => {
+		const saveTable = new Map();
+		Punishments.roomIps.nestedForEach((punishment, roomid, ip) => {
+			const [punishType, punishUserid, ...rest] = punishment;
+			const id = roomid + ':' + punishUserid;
+			if (id.charAt(0) === '#') return;
+			let entry = saveTable.get(id);
 
-		if (entry) {
-			entry.keys.push(ip);
-			return;
-		}
+			if (entry) {
+				entry.keys.push(ip);
+				return;
+			}
 
-		entry = {
-			keys: [ip],
-			punishType: punishType,
-			rest: rest,
-		};
-		saveTable.set(id, entry);
-	});
-	Punishments.roomUserids.nestedForEach((punishment, roomid, userid) => {
-		const [punishType, punishUserid, ...rest] = punishment;
-		const id = roomid + ':' + punishUserid;
-		let entry = saveTable.get(id);
-
-		if (!entry) {
 			entry = {
-				keys: [],
+				keys: [ip],
 				punishType: punishType,
 				rest: rest,
 			};
 			saveTable.set(id, entry);
-		}
+		});
+		Punishments.roomUserids.nestedForEach((punishment, roomid, userid) => {
+			const [punishType, punishUserid, ...rest] = punishment;
+			const id = roomid + ':' + punishUserid;
+			let entry = saveTable.get(id);
 
-		if (userid !== punishUserid) entry.keys.push(userid);
+			if (!entry) {
+				entry = {
+					keys: [],
+					punishType: punishType,
+					rest: rest,
+				};
+				saveTable.set(id, entry);
+			}
+
+			if (userid !== punishUserid) entry.keys.push(userid);
+		});
+
+		let buf = 'Punishment\tRoom ID:User ID\tIPs and alts\tExpires\r\n';
+		saveTable.forEach((entry, id) => {
+			buf += Punishments.renderEntry(entry, id);
+		});
+		return buf;
 	});
-
-	let buf = 'Punishment\tRoom ID:User ID\tIPs and alts\tExpires\r\n';
-	saveTable.forEach((entry, id) => {
-		buf += Punishments.renderEntry(entry, id);
-	});
-
-	FS(ROOM_PUNISHMENT_FILE).write(buf);
 };
 
 /**
@@ -1101,11 +1102,10 @@ Punishments.checkName = function (user, registered) {
 Punishments.checkIp = function (user, connection) {
 	let ip = connection.ip;
 	let punishment = Punishments.ipSearch(ip);
-
 	if (punishment) {
 		if (Punishments.sharedIps.has(user.latestIp)) {
-			if (connection.user && !connection.user.locked && !connection.user.autoconfirmed) {
-				connection.user.semilocked = `#sharedip ${punishment[1]}`;
+			if (!user.locked && !user.autoconfirmed) {
+				user.semilocked = `#sharedip ${punishment[1]}`;
 			}
 		} else {
 			user.locked = punishment[1];
@@ -1115,16 +1115,29 @@ Punishments.checkIp = function (user, connection) {
 		}
 	}
 
-	Dnsbl.reverse(ip).then(host => {
+	Dnsbl.reverse(ip).catch(e => {
+		// If connection.user is reassigned before async tasks can run, user
+		// may no longer be equal to it.
+		user = connection.user || user;
+		if (e.code === 'EINVAL') {
+			if (!user.locked && !user.autoconfirmed) {
+				user.semilocked = '#dnsbl';
+			}
+			return null;
+		}
+		throw e;
+	}).then(host => {
+		user = connection.user || user;
 		if (host) user.latestHost = host;
-		if (Config.hostfilter) Config.hostfilter(host, user, connection);
+		Chat.hostfilter(host, user, connection);
 	});
 
 	if (Config.dnsbl) {
 		Dnsbl.query(connection.ip).then(isBlocked => {
+			user = connection.user || user;
 			if (isBlocked) {
-				if (connection.user && !connection.user.locked && !connection.user.autoconfirmed) {
-					connection.user.semilocked = '#dnsbl';
+				if (!user.locked && !user.autoconfirmed) {
+					user.semilocked = '#dnsbl';
 				}
 			}
 		});
@@ -1168,7 +1181,7 @@ Punishments.checkIpBanned = function (connection) {
 		let appeal = (Config.appealurl ? `||||Or you can appeal at: ${Config.appealurl}` : ``);
 		connection.send(`|popup||modal|You are banned because you have the same IP (${ip}) as banned user '${banned}'. Your ban will expire in a few days.${appeal}`);
 	}
-	if (!Config.quietconsole) console.log(`CONNECT BLOCKED - IP BANNED: ${ip} (${banned})`);
+	Monitor.notice(`CONNECT BLOCKED - IP BANNED: ${ip} (${banned})`);
 
 	return banned;
 };
@@ -1249,13 +1262,13 @@ Punishments.isRoomBanned = function (user, roomid) {
 	for (let ip in user.ips) {
 		punishment = Punishments.roomIps.nestedGet(roomid, ip);
 		if (punishment) {
-			 if (punishment[0] === 'ROOMBAN') {
+			if (punishment[0] === 'ROOMBAN') {
 				return punishment;
-			 } else if (punishment[0] === 'BLACKLIST') {
+			} else if (punishment[0] === 'BLACKLIST') {
 				if (Punishments.sharedIps.has(ip) && user.autoconfirmed) return;
 
 				return punishment;
-			 }
+			}
 		}
 	}
 };
@@ -1277,8 +1290,7 @@ Punishments.getRoomPunishments = function (user, options) {
 
 	let punishments = [];
 
-	for (let i = 0; i < Rooms.global.chatRooms.length; i++) {
-		const curRoom = Rooms.global.chatRooms[i];
+	for (const curRoom of Rooms.global.chatRooms) {
 		if (!curRoom || curRoom.isPrivate === true || ((options && options.publicOnly) && (curRoom.isPersonal || curRoom.battle))) continue;
 		let punishment = Punishments.roomUserids.nestedGet(curRoom.id, userid);
 		if (punishment) {
@@ -1294,12 +1306,11 @@ Punishments.getRoomPunishments = function (user, options) {
 			}
 		}
 		if (checkMutes && curRoom.muteQueue) {
-			for (let i = 0; i < curRoom.muteQueue.length; i++) {
-				let entry = curRoom.muteQueue[i];
+			for (const entry of curRoom.muteQueue) {
 				if (userid === entry.userid ||
 					user.guestNum === entry.guestNum ||
 					(user.autoconfirmed && user.autoconfirmed === entry.autoconfirmed)) {
-					punishments.push([curRoom, ['MUTE', entry.userid, curRoom.muteQueue[i].time]]);
+					punishments.push([curRoom, ['MUTE', entry.userid, entry.time]]);
 				}
 			}
 		}
