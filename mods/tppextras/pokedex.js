@@ -15,6 +15,52 @@ exports.BattlePokedex = {
 		eggGroups: ["Undiscovered"],
 	},
 	
+	//*
+	unown: {
+		num: 201,
+		species: "Unown",
+		baseForme: "A",
+		types: ["Psychic"],
+		gender: "N",
+		baseStats: {hp: 48, atk: 72, def: 48, spa: 72, spd: 48, spe: 48},
+		abilities: {0: "Levitate", H: "Swarming"},
+		heightm: 0.5,
+		weightkg: 5,
+		color: "Black",
+		eggGroups: ["Undiscovered"],
+		otherForms: ["unownb", "unownc", "unownd", "unowne", "unownf", "unowng", "unownh", "unowni", "unownj", "unownk", "unownl", "unownm", "unownn", "unowno", "unownp", "unownq", "unownr", "unowns", "unownt", "unownu", "unownv", "unownw", "unownx", "unowny", "unownz", "unownexclamation", "unownquestion"],
+		otherFormes: ["unownswarm"], //Yes, there's apparently a BIG difference FailFish
+	},
+	unownswarm: {
+		num: 201,
+		species: "Unown-Swarm",
+		baseSpecies: "unown",
+		forme: "Swarm",
+		formeLetter: "S",
+		types: ["Psychic"],
+		baseStats: {hp: 48, atk: 174, def: 116, spa: 174, spd: 116, spe: 40}, //BST = 668
+		abilities: {0: "Swarming", H: "Swarming"},
+		heightm: 14.0,
+		weightkg: 140,
+		color: "Black",
+		eggGroups: ["Undiscovered"],
+	},
+	
+	// Different from Unown-Swarm, in that this is an "Ultra Beast" form of it
+	swarmofunown: { 
+		num: -153,
+		species: "Swarm of Unown",
+		types: ["Psychic"],
+		gender: "N",
+		baseStats: {hp: 48, atk: 116, def: 116, spa: 174, spd: 174, spe: 40}, //BST = 668
+		abilities: {0: "Psychic Swarm"},
+		heightm: 40,
+		weightkg: 300,
+		color: "Purple",
+		eggGroups: ["Undiscovered"],
+	},
+	//*/
+	
 	////////////////////////////////////
 	// Prism Fakemon (Dex Number = 9000+)
 	////////////////////////////////////

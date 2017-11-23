@@ -2684,7 +2684,7 @@ class Battle extends Dex.ModdedDex {
 			break;
 		
 		case 'stadium':
-			this.runEvent('StadiumRequest', null, null, null, data.slice(3));
+			this.runEvent('StadiumRequest', null, null, null, data.slice(2));
 			break;
 
 		case 'eval': {

@@ -72,6 +72,29 @@ exports.BattleLearnsets = {
 		waterpulse: ["7L33"],
 	}},
 	
+	unown: {learnset: {
+		hiddenpower: ["7M", "7L1", "6L1", "5L1", "4L1", "3L1"],
+		naturepower: ["7D"], // We're using Dream World moves, because idk why not?
+		secretpower: ["7D"],
+		superpower: ["7D"],
+		ancientpower: ["7D"],
+		cosmicpower: ["7D"],
+		earthpower: ["7D"],
+		trickroom: ["7D"],
+		wonderroom: ["7D"],
+		magicroom: ["7D"],
+		prismaticlaser: ["7D"],
+		psychic: ["7D"],
+		psychicfangs: ["7D"],
+		psychicterrain: ["7D"],
+		mirrorcoat: ["7D"],
+		
+	}},
+	swarmofunown: {learnset: {
+		hiddenpower: ["7M", "7L1", "6L1", "5L1", "4L1", "3L1"],
+		//TODO all Psychic moves
+	}},
+	
 	///////////////////////////////////
 	// Prism Fakemon
 	///////////////////////////////////

@@ -256,7 +256,6 @@ exports.Formats = [
 		desc: [
 			"Z-Crystals can trigger any move as a z-move, and can be used once per move instead of once per battle. Ubers are not allowed to hold Z-Crystals.",
 		],
-		// TODO: implement
 		ruleset: ['[Gen 7] Ubers'],
 		banlist: ['Uber + Z-Crystal'],
 		mod: 'panzmonium',
@@ -291,9 +290,22 @@ exports.Formats = [
 	{
 		name: "[Gen 7] Week 9: Last Will",
 		section: "Kappa Kup Season 4",
-		desc: ["&bullet; Every Pokemon will use the move in their last moveslot before fainting in battle."],
-		ruleset: ['[Gen 7] OU'],
-		mod: 'lastwill',
+		desc: [
+            "Before fainting, Pok&eacute;mon will use the move in their last moveslot.",
+            "&bullet; <a href=\"https://www.smogon.com/forums/threads/3601362/\">Last Will</a>",
+        ],
+		ruleset: ['[Gen 7] Ubers'],
+		banlist: ['Endeavor', 'Blast Burn + Explosion + Frenzy Plant + Giga Impact + Hydro Cannon + Hyper Beam + Self Destruct + V-Create > 2'],
 		searchShow: false,
+		
+		onBeforeFaint: function(pokemon, source) {
+			if ( !(pokemon.baseTemplate.tier in { Uber:1 }) ) {
+				// Ubers may not do this.
+				this.add('-hint', `${pokemon.name || pokemon.species}'s Last Will made it get off one last move!`);
+				this.runMove(pokemon.moves[pokemon.moves.length - 1], pokemon);
+			} else {
+				this.add('-hint', `${pokemon.name || pokemon.species} tried to invoke its Last Will... but it failed!`);
+			}
+		},
 	},
 ];

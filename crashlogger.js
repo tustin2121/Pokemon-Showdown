@@ -41,7 +41,7 @@ module.exports = function crashlogger(err, description, data = null) {
 		}
 	}
 
-	console.error(`\nCRASH: ${stack}\n`);
+	console.error(`\n******** ${description} CRASHED: ********\n${stack}\n`);
 	let out = fs.createWriteStream(logPath, {'flags': 'a'});
 	out.on('open', () => {
 		out.write(`\n${stack}\n`);

@@ -13,8 +13,15 @@ exports.BattleScripts = {
 				source: source,
 				effect: effect,
 			});
-			this.battle.add('-hint', `${this.name || this.species}'s Last Will made it get off one last move!`);
-			this.battle.useMove(this.moves[this.moves.length - 1], this);
+			
+			// The meta's changes start here
+			if ( !(this.baseTemplate.tier in { Uber:1 }) ) {
+				// Ubers may not do this.
+				this.battle.add('-hint', `${this.name || this.species}'s Last Will made it get off one last move!`);
+				this.battle.useMove(this.moves[this.moves.length - 1], this);
+			} else {
+				this.battle.add('-hint', `${this.name || this.species} tried to invoke its Last Will... but it failed!`);
+			}
 			return d;
 		},
 	},

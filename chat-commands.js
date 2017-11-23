@@ -133,7 +133,7 @@ exports.commands = {
 		
 		let where;
 		if (room) {
-			room.setAlias(user, alias);
+			room.setUserAlias(user, alias);
 			where = room.id;
 			if (room.id.startsWith('battle')) where = "this battle";
 		} else {

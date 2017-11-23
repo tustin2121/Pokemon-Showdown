@@ -7,11 +7,14 @@ exports.BattleScripts = {
 	gen: 7,
 	
 	// Stores off a copy of the format, so we can modify it without affecting the global format.
-	getFormat: function() {
-		if (!this.__moddedFormat) {
-			this.__moddedFormat = clone(this.getEffect(this.format));
+	getFormat: function(format) {
+		if (format === undefined || format === this.formatid) {
+			if (!this.__moddedFormat) {
+				this.__moddedFormat = clone(this.getEffect(this.format));
+			}
+			return this.__moddedFormat;
 		}
-		return this.__moddedFormat;
+		return super.getFormat(format);
 	},
 	
 	applyGymSettings: function(gym) {
@@ -48,6 +51,7 @@ exports.BattleScripts = {
 		if (Array.isArray(gym.rulesets)) {
 			for (let i = 0; i < gym.rulesets.length; i++) {
 				//TODO allow the user to disable certain rules by checking for a "!" at the front?
+				// nevermind, showdown did that part for me.
 				format.ruleset.push(gym.rulesets[i]);
 			}
 		}

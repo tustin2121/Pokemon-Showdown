@@ -35,31 +35,31 @@ exports.BattleFormats = {
 				let bgmindex = Config.stadium.music();
 				let bgiindex = Config.stadium.background();
 				
-				switch (request[0]) {
+				switch (request[1]) {
 					case 'field': 
-						let id = bgiindex.convertToId(request[1]);
+						let id = bgiindex.convertToId(request[2]);
 						this.stadium.update({ bgimg: id });
 						break;
 					case 'music': 
-						if (!bgmindex.isValidBattle(request[1])) {
-							this.add('error', `'${request[1]}' is an invalid battle music id.`);
+						if (!bgmindex.isValidBattle(request[2])) {
+							this.add('error', `'${request[2]}' is an invalid battle music id.`);
 							break;
 						}
-						this.stadium.update({ m_battle: request[1] });
+						this.stadium.update({ m_battle: request[2] });
 						break;
 					case 'vmusic': 
-						if (!bgmindex.isValidVictory(request[1])) {
-							this.add('error', `'${request[1]}' is an invalid victory music id.`);
+						if (!bgmindex.isValidVictory(request[2])) {
+							this.add('error', `'${request[2]}' is an invalid victory music id.`);
 							break;
 						}
-						this.stadium.update({ m_victory: request[1] });
+						this.stadium.update({ m_victory: request[2] });
 						break;
 					case 'premusic': 
-						if (!bgmindex.isValid(request[1])) {
-							this.add('error', `'${request[1]}' is an invalid music id.`);
+						if (!bgmindex.isValid(request[2])) {
+							this.add('error', `'${request[2]}' is an invalid music id.`);
 							break;
 						}
-						this.stadium.update({ m_pre: request[1] });
+						this.stadium.update({ m_pre: request[2] });
 						break;
 				}
 			} catch (e) {
@@ -97,6 +97,101 @@ exports.BattleFormats = {
 			if (changes.m_pre !== undefined && changes.m_pre !== std.m_pre) {
 				std.m_pre = changes.m_pre;
 				args.push('[premusic] '+this.stadium.m_pre);
+			}
+			if (args.length > 0) {
+				this.add('-stadium', args.join('|'));
+			}
+		},
+	},
+	
+	// Stadium Theatrics: Allow player 1 to choose battle field and music during battle.
+	// Note: Don't use both Stadium Selection and Stadium Theatrics on the same format
+	stadiumtheatrics: {
+		effectType: 'Rule',
+		name: "Stadium Theatrics",
+		onStartPriority: -11,
+		onStart: function () {
+			try {
+				let bgmindex = Config.stadium.music();
+				let bgiindex = Config.stadium.background();
+				
+				this.stadium = {};
+				this.stadium.update = this.effect.updateStadium.bind(this);
+				this.stadium.update({
+					ready: false,
+					m_battle: bgmindex.randBattle(),
+					bgimg: bgiindex.convertToId(bgiindex.getRandomBG(this.gen)),
+				});
+				
+				this.add('rule', "Stadium Selection: Combatants can use the Battle Options before battle to choose battle music and background selection.");
+			} catch (e) {
+				console.error("Stadium Selection rule failed."+
+					"The following error occurred while loading music and backgrounds:\n", e);
+				this.add('error', 'Stadium Selection rule failed. Please see console.');
+			}
+		},
+		onStadiumRequest: function(request) {
+			this.debug("StadiumRequest: "+request.join('|'));
+			if (!this.stadium || !this.stadium.ready || !request) return;
+			if (request[0] !== 'p1') return;
+			try {
+				let bgmindex = Config.stadium.music();
+				let bgiindex = Config.stadium.background();
+				
+				switch (request[1]) {
+					case 'field': 
+						let id = bgiindex.convertToId(request[2]);
+						this.stadium.update({ bgimg: id });
+						break;
+					case 'music': 
+						if (!bgmindex.isValidBattle(request[2])) {
+							this.add('error', `'${request[2]}' is an invalid battle music id.`);
+							break;
+						}
+						this.stadium.update({ m_battle: request[2] });
+						break;
+					case 'vmusic': 
+						if (!bgmindex.isValidVictory(request[2])) {
+							this.add('error', `'${request[2]}' is an invalid victory music id.`);
+							break;
+						}
+						this.stadium.update({ m_victory: request[2] });
+						break;
+					case 'premusic': 
+						this.add('error', `Pre-music is no longer relevant after battle has begun.`);
+						break;
+				}
+			} catch (e) {
+				console.error("Error processing stadium request."+
+					"The command '/stadium "+request.join('|')+"' gave the following error occurred:\n", e);
+				this.add('error', 'Error processing stadium request.');
+			}
+		},
+		onSwitchInPriority: 1,
+		onSwitchIn: function() {
+			if (this.stadium) {
+				this.stadium.update({ ready: true, });
+			}
+		},
+		updateStadium : function(changes){
+			if (!this.stadium) return;
+			let std = this.stadium;
+			let args = ['[fadeTo]'];
+			if (changes.ready !== undefined && changes.ready !== std.ready) {
+				std.ready = changes.ready;
+				args.push(std.ready? '[ready]' : '[notready]'); //can change these options in this battle
+			}
+			if (changes.bgimg !== undefined && changes.bgimg !== std.bgimg) {
+				std.bgimg = changes.bgimg;
+				args.push('[bg] '+this.stadium.bgimg);
+			}
+			if (changes.m_battle !== undefined && changes.m_battle !== std.m_battle) {
+				std.m_battle = changes.m_battle;
+				args.push('[music] '+this.stadium.m_battle);
+			}
+			if (changes.m_victory !== undefined && changes.m_victory !== std.m_victory) {
+				std.m_victory = changes.m_victory;
+				args.push('[vmusic] '+this.stadium.m_victory);
 			}
 			if (args.length > 0) {
 				this.add('-stadium', args.join('|'));
