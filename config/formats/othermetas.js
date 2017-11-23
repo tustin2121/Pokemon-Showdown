@@ -1,10 +1,44 @@
 // This is a list of OMs we're keeping around, even if showdown has removed them.
 
 exports.Formats = [
+	
+	// Recategorize Metas
+	///////////////////////////////////////////////////////////////////
+	
+	{
+		name: "[Gen 6] Random Battle",
+		overrides: 'section',
+		section: "Randomized Past Gens",
+	},
+	{
+		name: "[Gen 5] Random Battle",
+		overrides: 'section',
+		section: "Randomized Past Gens",
+	},
+	{
+		name: "[Gen 4] Random Battle",
+		overrides: 'section',
+		section: "Randomized Past Gens",
+	},
+	{
+		name: "[Gen 3] Random Battle",
+		overrides: 'section',
+		section: "Randomized Past Gens",
+	},
+	{
+		name: "[Gen 2] Random Battle",
+		overrides: 'section',
+		section: "Randomized Past Gens",
+	},
+	{
+		name: "[Gen 1] Random Battle",
+		overrides: 'section',
+		section: "Randomized Past Gens",
+	},
 
 	// Other Metagames
 	///////////////////////////////////////////////////////////////////
-
+	
 	{
 		name: "[Gen 0] Acid Rain",
 		section: "Other Metagames",
@@ -311,7 +345,7 @@ exports.Formats = [
 		desc: [
 			"The tier below PU. Only available here!",
 		],
-		section: "ORAS Singles",
+		section: "OR/AS Singles",
 
 		ruleset: ['PU'],
 		banlist: ['PU', 'Chatter'],
@@ -320,7 +354,7 @@ exports.Formats = [
 	},
 	{
 		name: "LC Supreme",
-		section: "ORAS Singles",
+		section: "OR/AS Singles",
 		desc: [
 			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3505710/\">LC Metagame Discussion</a>",
 			"&bullet; <a href=\"https://www.smogon.com/dex/xy/formats/lc/\">LC Banlist</a>",
@@ -336,10 +370,11 @@ exports.Formats = [
 	
 	{
 		name: "[Gen 7] Totem Battle",
-		section: "SM Singles",
+		section: "US/UM Singles",
 		desc: ["Player 1 is a Totem Pokemon."],
 		gameType: 'totem',
 		mod: 'totembattle',
+		__subsort: subSortOf => subSortOf("[Gen 7] CAP")+0.1,
 		
 		maxLevel: 1000,
 		defaultLevel: 100,
@@ -454,7 +489,7 @@ exports.Formats = [
 	{
 		name: "[Gen 7] Ubers Plus",
 		mod: 'gen7',
-		section: "SM Singles",
+		section: "US/UM Singles",
 		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
 		banlist: ['Allow Fake'],
 		__subsort: subSortOf => subSortOf("[Gen 7] Ubers")+0.1,

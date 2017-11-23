@@ -466,7 +466,7 @@ class User {
 				return mutedSymbol + this.name;
 			}
 			if (inChar !== undefined) {
-				let alias = room.getAlias(this);
+				let alias = room.getUserAlias(this);
 				if (alias) {
 					if (inChar) {
 						return `${room.getAuth(this)}${alias}{${this.name}`;

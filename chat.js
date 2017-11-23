@@ -268,7 +268,7 @@ class CommandContext {
 
 		if (message && message !== true && typeof message.then !== 'function') {
 			let inChar;
-			if ((this.pmTarget && this.user.pmAlias) || (this.room && this.room.getAlias(this.user)) ) {
+			if ((this.pmTarget && this.user.pmAlias) || (this.room && this.room.getUserAlias(this.user)) ) {
 				inChar = false;
 				let msgtest = message.replace('/mee','').replace('/me','').trim();
 				if (msgtest.slice(-1) === '"' && msgtest.charAt(0) === '"') inChar = true;

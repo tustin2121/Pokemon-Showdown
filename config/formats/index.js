@@ -87,10 +87,22 @@ for (let i = 0; i < sublists.length; i++) {
 			let baseformat = formatList[id];
 			if (format.overrides === true) {
 				if (!baseformat) console.warn(`Format "${format.name}" in file '${sublists[i]}' intends to override an existing format, but one no longer exists.`);
-			} else if (format.overrides === 'ensure') {
+			} 
+			else if (format.overrides === 'ensure') {
 				if (baseformat) continue; // If the format exists, ignore this format
 				console.log(`Format "${format.name}" has been orphaned from the main list.`);
-			} else {
+			} 
+			else if (format.overrides === 'section') {
+				if (!baseformat) {
+					console.warn(`Format "${format.name}" in file '${sublists[i]}' is overriding the section of a nonexistent format!`);
+					continue;
+				}
+				baseformat.section = format.section;
+				baseformat.__sectionSort = format.__sectionSort;
+				baseformat.__subsort = format.__subsort;
+				continue;
+			} 
+			else {
 				console.warn(`Format "${format.name}" in file '${sublists[i]}' has unknown "overrides" directive.`);
 			}
 		} else if (formatList[id]) {

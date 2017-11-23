@@ -43,7 +43,7 @@ class BasicRoom {
 		/** @type {{[userid: string]: User}} */
 		this.users = Object.create(null);
 		this.userCount = 0;
-		this.aliases = Object.create(null);
+		this.useraliases = Object.create(null);
 
 		/** @type {'chat' | 'battle' | 'global'} */
 		this.type = 'chat';
@@ -403,19 +403,19 @@ class BasicRoom {
 	destroy() {}
 	
 	// Aliases for In-Character speaking
-	setAlias(user, alias) {
+	setUserAlias(user, alias) {
 		if (!user) return;
 		if (this.id === 'lobby') return; // No aliases in the lobby
 		if (alias) {
-			this.aliases[user.userid] = alias;
+			this.useraliases[user.userid] = alias;
 		} else {
-			delete this.aliases[user.userid];
+			delete this.useraliases[user.userid];
 		}
 		return true;
 	}
-	getAlias(user) {
+	getUserAlias(user) {
 		if (!user) return;
-		return this.aliases[user.userid];
+		return this.useraliases[user.userid];
 	}
 }
 
