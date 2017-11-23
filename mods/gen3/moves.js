@@ -328,6 +328,7 @@ exports.BattleMovedex = {
 	ingrain: {
 		inherit: true,
 		desc: "The user has 1/16 of its maximum HP restored at the end of each turn, but it is prevented from switching out and other Pokemon cannot force the user to switch out. The user can still switch out if it uses Baton Pass, and the replacement will remain trapped and still receive the healing effect.",
+		shortDesc: "User recovers 1/16 max HP per turn. Traps user.",
 	},
 	jumpkick: {
 		inherit: true,
@@ -493,9 +494,9 @@ exports.BattleMovedex = {
 	struggle: {
 		inherit: true,
 		accuracy: 100,
-		desc: "Deals typeless damage to one adjacent foe at random. If this move was successful, the user takes damage equal to 1/2 the HP lost by the target, rounded down, but not less than 1 HP; the Ability Rock Head does not prevent this. This move can only be used if none of the user's known moves can be selected.",
-		shortDesc: "User loses 1/2 the HP lost by the target.",
-		recoil: [1, 2],
+		desc: "Deals typeless damage to one adjacent foe at random. If this move was successful, the user takes damage equal to 1/4 the HP lost by the target, rounded down, but not less than 1 HP; the Ability Rock Head does not prevent this. This move can only be used if none of the user's known moves can be selected.",
+		shortDesc: "User loses 1/4 the HP lost by the target.",
+		recoil: [1, 4],
 		struggleRecoil: false,
 	},
 	surf: {

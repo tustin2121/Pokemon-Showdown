@@ -16,11 +16,16 @@ exports.Sections = {
 	"SM Doubles": { column: 1, sort: 2, },
 	
 	"ORAS Singles":			{ column: 2, sort: 1, },
-	"ORAS Doubles/Triples":	{ column: 2, sort: 1, },
+	"ORAS Doubles/Triples":	{ column: 2, sort: 2, },
+	"OR/AS Singles":		{ column: 2, sort: 1, },
+	"OR/AS Doubles/Triples":{ column: 2, sort: 2, },
 	
 	"BW2 Singles":		{ column: 3, sort: 5, },
 	"BW2 Doubles":		{ column: 3, sort: 6, },
+	"B2/W2 Singles":	{ column: 3, sort: 5, },
+	"B2/W2 Doubles":	{ column: 3, sort: 6, },
 	"Past Generations":	{ column: 3, sort: 10, },
+	"Randomized Past Gens":	{ column: 3, sort: 11, },
 	
 	"OM of the Month":	{ column: 4, sort: 1, },
 	"Other Metagames":	{ column: 4, sort: 2, },
