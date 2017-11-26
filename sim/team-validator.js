@@ -131,7 +131,7 @@ class Validator {
 	 * @param {AnyObject} teamHas
 	 * @return {string[] | false}
 	 */
-	validateSet(set, teamHas) {
+	validateSet(set, teamHas, passedTemplate) {
 		let format = this.format;
 		let dex = this.dex;
 
@@ -140,7 +140,7 @@ class Validator {
 			return [`This is not a Pokemon.`];
 		}
 
-		let template = dex.getTemplate(set.species);
+		let template = passedTemplate || dex.getTemplate(set.species);
 		set.species = Dex.getSpecies(set.species);
 		set.name = dex.getName(set.name);
 		let item = dex.getItem(Dex.getString(set.item));
@@ -170,7 +170,7 @@ class Validator {
 		}
 
 		let nameTemplate = dex.getTemplate(set.name);
-		if (toId(format.name).endsWith('crossevolution') && nameTemplate.exists && nameTemplate.name.toLowerCase() === set.name.toLowerCase()) {
+		if (!toId(format.name).endsWith('crossevolution') && nameTemplate.exists && nameTemplate.name.toLowerCase() === set.name.toLowerCase()) {
 			// Name must not be the name of another pokemon
 			// @ts-ignore
 			set.name = null;
@@ -195,19 +195,19 @@ class Validator {
 		}
 
 		// onChangeSet can modify set.species, set.item, set.ability
-		template = dex.getTemplate(set.species);
+		template = passedTemplate || dex.getTemplate(set.species);
 		item = dex.getItem(set.item);
 		ability = dex.getAbility(set.ability);
 
 		if (ability.id === 'battlebond' && template.id === 'greninja' && !ruleTable.has('ignoreillegalabilities')) {
-			template = dex.getTemplate('greninjaash');
+			template = passedTemplate || dex.getTemplate('greninjaash');
 			if (set.gender && set.gender !== 'M') {
 				problems.push(`Battle Bond Greninja must be male.`);
 			}
 			set.gender = 'M';
 		}
 		if (ability.id === 'owntempo' && template.id === 'rockruff') {
-			template = dex.getTemplate('rockruffdusk');
+			template = passedTemplate || dex.getTemplate('rockruffdusk');
 		}
 		if (!template.exists) {
 			return [`The Pokemon "${set.species}" does not exist.`];
