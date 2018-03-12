@@ -234,7 +234,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "Raises the user's evasiveness by 2 stages. Whether or not the user's evasiveness was changed, Body Slam, Dragon Rush, Flying Press, Heat Crash, Heavy Slam, Phantom Force, Shadow Force, Steamroller, Stomp, T-Body Slam and T-Stomp will not check accuracy and have their damage doubled if used against the user while it is active.",
+		desc: "Raises the user's evasiveness by 2 stages. Whether or not the user's evasiveness was changed, Body Slam, Dragon Rush, Flying Press, Heat Crash, Heavy Slam, Phantom Force, Shadow Force, Steamroller, Stomp, T-Body Slam, T-Stomp and Shadow Dive will not check accuracy and have their damage doubled if used against the user while it is active.",
 		shortDesc: "Raises the user's evasiveness by 2.",
 		id: "minimize",
 		name: "Minimize",
@@ -245,7 +245,7 @@ exports.BattleMovedex = {
 		effect: {
 			noCopy: true,
 			onSourceModifyDamage: function (damage, source, target, move) {
-				if (move.id in {'stomp':1, 'steamroller':1, 'bodyslam':1, 'flyingpress':1, 'dragonrush':1, 'phantomforce':1, 'heatcrash':1, 'shadowforce':1, 'heavyslam':1, 'tbodyslam':1, 'tstomp':1}) {
+				if (move.id in {'stomp':1, 'steamroller':1, 'bodyslam':1, 'flyingpress':1, 'dragonrush':1, 'phantomforce':1, 'heatcrash':1, 'shadowforce':1, 'heavyslam':1, 'tbodyslam':1, 'tstomp':1, 'shadowdive':1}) {
 					return this.chainModify(2);
 				}
 			},
@@ -1514,5 +1514,261 @@ exports.BattleMovedex = {
 		type: "Psychic",
 		zMovePower: 190,
 		contestType: "Clever",
+	},
+	"tdoubleedge": {
+		num: 20040,
+		accuracy: 90,
+		basePower: 120,
+		category: "Physical",
+		desc: "If the target lost HP, the user takes recoil damage equal to 33% the HP lost by the target, rounded half up, but not less than 1 HP.",
+		shortDesc: "Has 33% recoil.",
+		id: "tdoubleedge",
+		isViable: true,
+		name: "T-Double-Edge",
+		pp: 10,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		recoil: [33, 100],
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Double-Edge');
+		},
+		secondary: false,
+		target: "normal",
+		type: "Rock",
+		zMovePower: 190,
+		contestType: "Tough",
+	},
+	"tskullbash": {
+		num: 20041,
+		accuracy: 100,
+		basePower: 130,
+		category: "Physical",
+		desc: "This attack charges on the first turn and executes on the second. Raises the user's Defense by 1 stage on the first turn. If the user is holding a Power Herb, the move completes in one turn.",
+		shortDesc: "Raises user's Defense by 1 on turn 1. Hits turn 2.",
+		id: "tskullbash",
+		name: "T-Skull Bash",
+		pp: 10,
+		priority: 0,
+		flags: {contact: 1, charge: 1, protect: 1, mirror: 1},
+		onTry: function (attacker, defender, move) {
+			if (attacker.removeVolatile(move.id)) {
+				return;
+			}
+			this.add('-prepare', attacker, move.name, defender);
+			this.boost({def:1}, attacker, attacker, this.getMove('tskullbash'));
+			if (!this.runEvent('ChargeMove', attacker, defender, move)) {
+				this.add('-anim', attacker, move.name, defender);
+				attacker.removeVolatile(move.id);
+				return;
+			}
+			attacker.addVolatile('twoturnmove', defender);
+			return null;
+		},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Skull Bash');
+		},
+		secondary: false,
+		target: "normal",
+		type: "Steel",
+		zMovePower: 195,
+		contestType: "Tough",
+	},
+	"ticeball": {
+		num: 20042,
+		accuracy: 100,
+		basePower: 90,
+		category: "Physical",
+		desc: "Has a 10% chance to lower the target's Defense by 1 stage.",
+		shortDesc: "10% chance to lower the target's Defense by 1.",
+		id: "ticeball",
+		isViable: true,
+		name: "T-Ice Ball",
+		pp: 10,
+		priority: 0,
+		flags: {bullet: 1, contact: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Ice Ball');
+		},
+		secondary: {
+			chance: 20,
+			boosts: {
+				def: -1,
+			},
+		},
+		target: "normal",
+		type: "Ice",
+		zMovePower: 175,
+		contestType: "Beautiful",
+	},
+	"tastonish": {
+		num: 20043,
+		accuracy: 100,
+		basePower: 50,
+		category: "Physical",
+		desc: "Has a 30% chance to flinch the target.",
+		shortDesc: "30% chance to flinch the target.",
+		id: "tastonish",
+		name: "T-Astonish",
+		pp: 25,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Astonish');
+		},
+		secondary: {
+			chance: 30,
+			volatileStatus: 'flinch',
+		},
+		target: "normal",
+		type: "Ghost",
+		zMovePower: 100,
+		contestType: "Cute",
+	},
+	"tshadowball": {
+		num: 20044,
+		accuracy: 100,
+		basePower: 90,
+		category: "Special",
+		desc: "Has a 10% chance to lower the target's Special Defense by 1 stage.",
+		shortDesc: "10% chance to lower the target's Sp. Def by 1.",
+		id: "tshadowball",
+		isViable: true,
+		name: "T-Shadow Ball",
+		pp: 15,
+		priority: 0,
+		flags: {bullet: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Shadow Ball');
+		},
+		secondary: {
+			chance: 10,
+			boosts: {
+				spd: -1,
+			},
+		},
+		target: "normal",
+		type: "Ghost",
+		zMovePower: 175,
+		contestType: "Clever",
+	},
+	"psyshot": {
+		num: 20045,
+		accuracy: 100,
+		basePower: 40,
+		category: "Special",
+		desc: "Has a 10% chance to confuse the target.",
+		shortDesc: "10% chance to confuse the target.",
+		id: "psyshot",
+		name: "Psyshot",
+		pp: 25,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Psybeam');
+		},
+		secondary: {
+			chance: 10,
+			volatileStatus: 'confusion',
+		},
+		target: "normal",
+		type: "Psychic",
+		zMovePower: 100,
+		contestType: "Clever",
+	},
+	"blackripple": {
+		num: 20046,
+		accuracy: 100,
+		basePower: 60,
+		category: "Special",
+		desc: "Has a 20% chance to paralyze the target.",
+		shortDesc: "20% chance to paralyze the target.",
+		id: "blackripple",
+		name: "Black Ripple",
+		pp: 25,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Black Hole Eclipse');
+		},
+		secondary: {
+			chance: 20,
+			status: 'par',
+		},
+		target: "normal",
+		type: "Dark",
+		zMovePower: 120,
+		contestType: "Cool",
+	},
+	"thyperbeam": {
+		num: 20047,
+		accuracy: 80,
+		basePower: 120,
+		category: "Special",
+		desc: "Has a 20% chance to lower the target's Special Defense by 1 stage.",
+		shortDesc: "20% chance to lower the target's Sp. Def by 1.",
+		id: "thyperbeam",
+		isViable: true,
+		name: "T-Hyper Beam",
+		pp: 5,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Hyper Beam');
+		},
+		secondary: {
+			chance: 20,
+			boosts: {
+				spd: -1,
+			},
+		},
+		target: "normal",
+		type: "Dark",
+		zMovePower: 190,
+		contestType: "Cool",
+	},
+	"shadowdive": {
+		num: 20048,
+		accuracy: 100,
+		basePower: 140,
+		category: "Physical",
+		desc: "If this move is successful, it breaks through the target's Baneful Bunker, Detect, King's Shield, Protect, or Spiky Shield for this turn, allowing other Pokemon to attack the target normally. If the target's side is protected by Crafty Shield, Mat Block, Quick Guard, or Wide Guard, that protection is also broken for this turn and other Pokemon may attack the target's side normally. This attack charges on the first turn and executes on the second. On the first turn, the user avoids all attacks. If the user is holding a Power Herb, the move completes in one turn. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
+		shortDesc: "Disappears turn 1. Hits turn 2. Breaks protection.",
+		id: "shadowdive",
+		isViable: true,
+		name: "Shadow Dive",
+		pp: 5,
+		priority: 0,
+		flags: {contact: 1, charge: 1, mirror: 1},
+		breaksProtect: true,
+		onTry: function (attacker, defender, move) {
+			if (attacker.removeVolatile(move.id)) {
+				return;
+			}
+			this.add('-prepare', attacker, move.name, defender);
+			if (!this.runEvent('ChargeMove', attacker, defender, move)) {
+				this.add('-anim', attacker, move.name, defender);
+				return;
+			}
+			attacker.addVolatile('twoturnmove', defender);
+			return null;
+		},
+		effect: {
+			duration: 2,
+			onAccuracy: function (accuracy, target, source, move) {
+				if (move.id === 'helpinghand') {
+					return;
+				}
+				if (source.hasAbility('noguard') || target.hasAbility('noguard')) {
+					return;
+				}
+				if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return;
+				return 0;
+			},
+		},
+		secondary: false,
+		target: "normal",
+		type: "Ghost",
+		zMovePower: 200,
+		contestType: "Cool",
 	},
 };
