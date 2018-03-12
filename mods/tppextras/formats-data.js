@@ -57,6 +57,14 @@ exports.BattleFormatsData = {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
+	chibicirno: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	cirno: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
 	chibisatori: {
 		isNonstandard: true,
 		tier: "Touhou",
@@ -66,6 +74,18 @@ exports.BattleFormatsData = {
 		tier: "Touhou",
 	},
 	defensemomiji: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	mima: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	speedcirno: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	technicalcirno: {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
@@ -82,6 +102,14 @@ exports.BattleFormatsData = {
 		tier: "Touhou",
 	},
 	technicalsanae: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	adventcirno: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	chibimima: {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
