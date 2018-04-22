@@ -77,8 +77,7 @@ exports.Formats = [
 		name: "[Gen 0] 5 Star Battalion",
 		section: "Other Metagames",
 		
-		ruleset: ['Ubers'],
-		banlist: ['Allow More Moves'],
+		ruleset: ['Ubers Plus', 'Allow More Moves'],
 		onValidateSet: function (set) {
 			if (set.moves && set.moves.length > 5) {
 				return [(set.name || set.species) + ' has more than five moves.'];
@@ -490,8 +489,7 @@ exports.Formats = [
 		name: "[Gen 7] Ubers Plus",
 		mod: 'gen7',
 		section: "US/UM Singles",
-		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
-		banlist: ['Allow Fake'],
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
 		__subsort: subSortOf => subSortOf("[Gen 7] Ubers")+0.1,
 	},
 	{
@@ -501,8 +499,7 @@ exports.Formats = [
 		],
 		section: "Other Metagames",
 		mod: 'reverse',
-		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
-		banlist: ['Allow Fake'],
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
 	},
 	{
 		name: '[Gen 7] Snowball Fight',

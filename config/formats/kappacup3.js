@@ -298,8 +298,7 @@ exports.Formats = [
 		section: "Kappa Cup Season 3",
 
 		mod: 'reverse',
-		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause'],
-		banlist: ['Allow Fake'],
+		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
 	},
 	{
 		name: "Linked",

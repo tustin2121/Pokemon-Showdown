@@ -203,12 +203,16 @@ exports.BattleFormats = {
 	pokemonplus: {
 		effectType: 'ValidatorRule',
 		name: 'Pokemon Plus',
+		desc: ["Basically Pokemon, but allow fakemons too if the Allow Fake rule is added"],
 		onValidateTeam: function (team, format) {
 			let problems = [];
+			if (team.length > 6) problems.push('Your team has more than six Pok\u00E9mon.');
 			// ----------- legality line ------------------------------------------
-			if (!format || !format.banlistTable || !format.banlistTable['illegal']) return problems;
+			if (!format || !this.getRuleTable(format).has('-illegal')) return problems;
 			// everything after this line only happens if we're doing legality enforcement
 			let kyurems = 0;
+			let ndm = 0;
+			let ndw = 0;
 			for (let i = 0; i < team.length; i++) {
 				if (team[i].species === 'Kyurem-White' || team[i].species === 'Kyurem-Black') {
 					if (kyurems > 0) {
@@ -216,6 +220,20 @@ exports.BattleFormats = {
 						break;
 					}
 					kyurems++;
+				}
+				if (team[i].species === 'Necrozma-Dusk-Mane') {
+					if (ndm > 0) {
+						problems.push('You cannot have more than one Necrozma-Dusk-Mane.');
+						break;
+					}
+					ndm++;
+				}
+				if (team[i].species === 'Necrozma-Dawn-Wings') {
+					if (ndw > 0) {
+						problems.push('You cannot have more than one Necrozma-Dawn-Wings.');
+						break;
+					}
+					ndw++;
 				}
 			}
 			return problems;
@@ -225,7 +243,7 @@ exports.BattleFormats = {
 			let template = this.getTemplate(set.species);
 			let problems = [];
 			let totalEV = 0;
-			let allowFake = !!(format && format.banlistTable && format.banlistTable['allowfake']);
+			let allowFake = !!(format && this.getRuleTable(format).has('allowfake'));
 
 			if (set.species === set.name) delete set.name;
 			if (template.gen > this.gen) {
@@ -254,7 +272,7 @@ exports.BattleFormats = {
 			if (item.gen > this.gen) {
 				problems.push(item.name + ' does not exist in gen ' + this.gen + '.');
 			}
-			if (set.moves && set.moves.length > 4 && format.banlistTable['allowMoreMoves']) {
+			if (set.moves && set.moves.length > 4  && format && this.getRuleTable(format).has('allowmoremoves')) {
 				problems.push((set.name || set.species) + ' has more than four moves.');
 			}
 			if (set.level && set.level > 100) {
@@ -265,17 +283,20 @@ exports.BattleFormats = {
 				if (template.isNonstandard) {
 					problems.push(set.species + ' does not exist.');
 				}
-				if (ability.isNonstandard) {
-					problems.push(ability.name + ' does not exist.');
-				}
-				if (item.isNonstandard) {
-					if (item.isNonstandard === 'gen2') {
-						problems.push(item.name + ' does not exist outside of gen 2.');
-					} else {
-						problems.push(item.name + ' does not exist.');
-					}
+			}
+
+			if (!allowFake && ability.isNonstandard) {
+				problems.push(ability.name + ' does not exist.');
+			}
+
+			if (item.isNonstandard) {
+				if (item.isNonstandard === 'gen2') {
+					problems.push(item.name + ' does not exist outside of gen 2.');
+				} else if (!allowFake) {
+					problems.push(item.name + ' does not exist.');
 				}
 			}
+
 			for (let k in set.evs) {
 				if (typeof set.evs[k] !== 'number' || set.evs[k] < 0) {
 					set.evs[k] = 0;
@@ -288,7 +309,7 @@ exports.BattleFormats = {
 			}
 
 			// ----------- legality line ------------------------------------------
-			if (!format.banlistTable || !format.banlistTable['illegal']) return problems;
+			if (!this.getRuleTable(format).has('-illegal')) return problems;
 			// everything after this line only happens if we're doing legality enforcement
 
 			// only in gen 1 and 2 it was legal to max out all EVs
@@ -338,22 +359,26 @@ exports.BattleFormats = {
 				if (template.requiredAbility && set.ability !== template.requiredAbility) {
 					problems.push("" + template.species + " transforms in-battle with " + template.requiredAbility + "."); // Darmanitan-Zen, Zygarde-Complete
 				}
-				if (template.requiredItems && !template.requiredItems.includes(item.name)) {
-					problems.push("" + template.species + " transforms in-battle with " + Chat.plural(template.requiredItems.length, "either ") + template.requiredItems.join(" or ") + '.'); // Mega or Primal
+				if (template.requiredItems) {
+					if (template.species === 'Necrozma-Ultra') {
+						problems.push(`Necrozma-Ultra must start the battle as Necrozma-Dawn-Wings or Necrozma-Dusk-Mane holding Ultranecrozium Z.`); // Necrozma-Ultra transforms from one of two formes, and neither one is the base forme
+					} else if (!template.requiredItems.includes(item.name)) {
+						problems.push(`${template.species} transforms in-battle with ${Chat.plural(template.requiredItems.length, "either ") + template.requiredItems.join(" or ")}.`); // Mega or Primal
+					}
 				}
 				if (template.requiredMove && set.moves.indexOf(toId(template.requiredMove)) < 0) {
-					problems.push("" + template.species + " transforms in-battle with " + template.requiredMove + "."); // Meloetta-Pirouette, Rayquaza-Mega
+					problems.push(`${template.species} transforms in-battle with ${template.requiredMove}.`); // Meloetta-Pirouette, Rayquaza-Mega
 				}
-				if (!format.noChangeForme) set.species = template.baseSpecies; // Fix forme for Aegislash, Castform, etc.
+				if (!format.noChangeForme) set.species = template.baseSpecies; // Fix battle-only forme
 			} else {
 				if (template.requiredAbility && set.ability !== template.requiredAbility) {
-					problems.push("" + (set.name || set.species) + " needs the ability " + template.requiredAbility + "."); // No cases currently.
+					problems.push(`${(set.name || set.species)} needs the ability ${template.requiredAbility}.`); // No cases currently.
 				}
 				if (template.requiredItems && !template.requiredItems.includes(item.name)) {
-					problems.push("" + (set.name || set.species) + " needs to hold " + Chat.plural(template.requiredItems.length, "either ") + template.requiredItems.join(" or ") + '.'); // Memory/Drive/Griseous Orb/Plate/Z-Crystal - Forme mismatch
+					problems.push(`${(set.name || set.species)} needs to hold ${Chat.plural(template.requiredItems.length, "either ") + template.requiredItems.join(" or ")}.`); // Memory/Drive/Griseous Orb/Plate/Z-Crystal - Forme mismatch
 				}
 				if (template.requiredMove && set.moves.indexOf(toId(template.requiredMove)) < 0) {
-					problems.push("" + (set.name || set.species) + " needs to have the move " + template.requiredMove + "."); // Keldeo-Resolute
+					problems.push(`${(set.name || set.species)} needs to have the move ${template.requiredMove}.`); // Keldeo-Resolute
 				}
 
 				// Mismatches between the set forme (if not base) and the item signature forme will have been rejected already.
@@ -377,7 +402,7 @@ exports.BattleFormats = {
 				// Autofixed forme.
 				template = this.getTemplate(set.species);
 
-				if (!format.banlistTable['ignoreillegalabilities'] && !format.noChangeAbility) {
+				if (!this.getRuleTable(format).has('ignoreillegalabilities') && !format.noChangeAbility) {
 					// Ensure that the ability is (still) legal.
 					let legalAbility = false;
 					for (let i in template.abilities) {
