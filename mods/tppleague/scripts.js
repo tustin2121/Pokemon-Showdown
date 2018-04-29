@@ -14,7 +14,7 @@ exports.BattleScripts = {
 			}
 			return this.__moddedFormat;
 		}
-		return super.getFormat(format);
+		return this.ModdedDex.prototype.getFormat.call(this, format);
 	},
 	
 	applyGymSettings: function(gym) {

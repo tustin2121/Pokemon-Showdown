@@ -387,7 +387,7 @@ exports.Formats = [
 		
 		// Called first
 		validateTeam: function(team, removeNicknames) {
-			this.tools.getName = this.format.getName;
+			this.dex.getName = this.format.getName;
 			return this.baseValidateTeam(team, removeNicknames);
 		},
 		

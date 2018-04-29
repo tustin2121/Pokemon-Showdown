@@ -1,0 +1,29 @@
+
+
+Working with Items?
+	- What happens when it is stolen (Theif, Trick, etc)?
+	- What happens when it is knocked off?
+	- What is its interaction with Mega Stones?
+	- what is its interaction with Z-Crystals?
+	- What is its interaction with Plates (Arceus) or Drives (Genesect)?
+
+Working with Moves?
+	- Sky Drop (and other two-turn moves, but specifically Sky Drop).
+	- Metronome
+	- Z-Moves
+	- How does it work with Transformed Pokemon (Mew / Ditto)? Or when Sketched (Smeargle)?
+	- How does it deal with type-normalizing abiltiies (Aerialate/Normalize/Pixilate/Refrigerate/Galvanize)?
+	- How does it compete with weather abilities (Drizzle/Drought, Desolate Land/Primodial Sea/Delta Stream)?
+	- How does it interact with Terrain (Misty/Psychic/Grassy/Electric)?
+	- How do abilities affect it (Adaptability, Mega Launcher, Strong Jaw, etc)?
+	- What happens when the move is absorbed (Water Absorb, Volt Absorb, Sound Proof, Wonder Guard, etc)?
+
+Working with Abilities?
+	- What happens when a pokemon copies another's ability (Trace/Receiver/Power of Alchemy, Role Play/Skill Swap/Entrainment)?
+	- What happens when an ability is ignored (Mold Breaker/Turboblaze/Teravolt, Sunsteel Strike/Moongeist Beam)?
+	- What happens when an ability is changed (Mummy, Worry Seed/Simple Beam)
+	- What does it do when an ability is suppressed (Gastro Acid, Core Enforcer)?
+	- How does it interact with Wonder Guard?
+	- How does it interact with Illusion?
+	- How does it compete with weather abilities (Drizzle/Drought/Sand Stream/Air Lock, Desolate Land/Primodial Sea/Delta Stream)?
+	

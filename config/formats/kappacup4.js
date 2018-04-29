@@ -362,7 +362,7 @@ exports.Formats = [
 
 		mod: 'gen7',
 		searchShow: false,
-		ruleset: ['[Gen 7] OU', 'Ignore STAB Moves'],
+		ruleset: ['[Gen 7] Ubers', 'Ignore STAB Moves'],
 		banlist: ['Aerodactylite', 'King\'s Rock', 'Metagrossite', 'Razor Fang'],
 		noLearn: ['Acupressure', 'Belly Drum', 'Chatter', 'Geomancy', 'Lovely Kiss', 'Shell Smash', 'Shift Gear', 'Thousand Arrows'],
 		bannedMons: ['Kartana', 'Komala', 'Kyurem-Black', 'Silvally-Ghost', 'Tapu Koko', 'Tapu Lele'],
