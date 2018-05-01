@@ -14,89 +14,92 @@
 
 'use strict';
 
-let Ladders = module.exports = getLadder;
-Object.assign(Ladders, require('./ladders-matchmaker'));
-
-Ladders.get = Ladders;
-Ladders.formatsListPrefix = '';
-Ladders.disabled = false;
-
-class Ladder {
+class LadderStore {
+	/**
+	 * @param {string} formatid
+	 */
 	constructor(formatid) {
-		this.formatid = toId(formatid);
+		this.formatid = formatid;
 	}
 
-	getTop() {
-		return Promise.resolve(null);
+	/**
+	 * Returns [formatid, html], where html is an the HTML source of a
+	 * ladder toplist, to be displayed directly in the ladder tab of the
+	 * client.
+	 * @return {Promise<[string, string]?>}
+	 */
+	async getTop() {
+		return null;
 	}
 
-	getRating(userid) {
+	/**
+	 * Returns a Promise for the Elo rating of a user
+	 * @param {string} userid
+	 * @return {Promise<number>}
+	 */
+	async getRating(userid) {
 		let formatid = this.formatid;
 		let user = Users.getExact(userid);
-		if (!user) {
-			return Promise.reject(new Error(`Expired rating for ${userid}`));
+		if (user && user.mmrCache[formatid]) {
+			return user.mmrCache[formatid];
 		}
-		if (Ladders.disabled === true || Ladders.disabled === 'db' && !user.mmrCache[formatid]) {
-			return Promise.reject(new Error(`Ladders are disabled.`));
-		}
-		if (user.mmrCache[formatid]) {
-			return Promise.resolve(user.mmrCache[formatid]);
-		}
-		return new Promise((resolve, reject) => {
-			LoginServer.request('mmr', {
-				format: formatid,
-				user: userid,
-			}, (data, statusCode, error) => {
-				if (!data) return resolve(1000);
-				if (data.errorip) {
-					return resolve(1000);
-				}
-
-				let mmr = parseInt(data);
-				if (isNaN(mmr)) return resolve(1000);
-				if (user.userid !== userid) return reject(new Error(`Expired rating for ${userid}`));
-
-				user.mmrCache[formatid] = mmr;
-				resolve(mmr);
-			});
+		const [data] = await LoginServer.request('mmr', {
+			format: formatid,
+			user: userid,
 		});
+		let mmr = NaN;
+		if (data && !data.errorip) {
+			mmr = parseInt(data);
+		}
+		if (isNaN(mmr)) return 1000;
+
+		if (user && user.userid === userid) {
+			user.mmrCache[formatid] = mmr;
+		}
+		return mmr;
 	}
 
+	/**
+	 * Update the Elo rating for two players after a battle, and display
+	 * the results in the passed room.
+	 * @param {string} p1name
+	 * @param {string} p2name
+	 * @param {number} p1score
+	 * @param {GameRoom} room
+	 * @return {Promise<[number, AnyObject?, AnyObject?]>}
+	 */
 	async updateRating(p1name, p2name, p1score, room) {
 		if (Ladders.disabled) {
 			room.addRaw(`Ratings not updated. The ladders are currently disabled.`).update();
-			return [p1score, undefined, undefined];
+			return [p1score, null, null];
 		}
 
 		let formatid = this.formatid;
 		room.update();
 		room.send(`||Ladder updating...`);
-		let data;
-		try {
-			data = await new Promise((resolve, reject) => {
-				LoginServer.request('ladderupdate', {
-					p1: p1name,
-					p2: p2name,
-					score: p1score,
-					format: formatid,
-				}, (data, statusCode, error) => {
-					if (error) return reject(error);
-					resolve(data);
-				});
-			});
-		} catch (error) {
-			room.add(`||Ladder (probably) updated, but score could not be retrieved (${error.message}).`);
-			return [p1score, undefined, undefined];
+		let [data, , error] = await LoginServer.request('ladderupdate', {
+			p1: p1name,
+			p2: p2name,
+			score: p1score,
+			format: formatid,
+		});
+		if (error) {
+			if (error.message === 'stream interrupt') {
+				room.add(`||Ladder updated, but score could not be retrieved.`);
+			} else {
+				room.add(`||Ladder (probably) updated, but score could not be retrieved (${error.message}).`);
+			}
+			return [p1score, null, null];
 		}
 		if (!room.battle) {
 			Monitor.warn(`room expired before ladder update was received`);
-			return [p1score, undefined, undefined];
+			return [p1score, null, null];
 		}
 		if (data.errorip) {
 			room.add(`||This server's request IP ${data.errorip} is not a registered server.`);
 			room.add(`||You should be using ladders.js and not ladders-remote.js for ladder tracking.`);
 			room.update();
-			return [p1score, undefined, undefined];
+			return [p1score, null, null];
 		}
 
 		let p1rating, p2rating;
@@ -133,12 +136,17 @@ class Ladder {
 
 		return [p1score, p1rating, p2rating];
 	}
+
+	/**
+	 * Returns a Promise for an array of strings of <tr>s for ladder ratings of the user
+	 * @param {string} username
+	 * @return {Promise<string[]>}
+	 */
+	static async visualizeAll(username) {
+		return [`<tr><td><strong>Please use the official client at play.pokemonshowdown.com</strong></td></tr>`];
+	}
 }
 
-function getLadder(formatid) {
-	return new Ladder(formatid);
-}
+LadderStore.formatsListPrefix = '';
 
-Ladders.visualizeAll = function (username) {
-	return Promise.resolve([`<tr><td><strong>Please use the official client at play.pokemonshowdown.com</strong></td></tr>`]);
-};
+module.exports = LadderStore;

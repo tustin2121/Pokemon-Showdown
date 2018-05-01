@@ -17,6 +17,11 @@ exports.BattleAbilities = {
 			}
 		},
 	},
+	"damp": {
+		inherit: true,
+		desc: "While this Pokemon is active, Explosion, Self-Destruct, and the Ability Aftermath are prevented from having an effect.",
+		shortDesc: "Prevents Explosion/Self-Destruct/Aftermath while this Pokemon is active.",
+	},
 	"galewings": {
 		inherit: true,
 		shortDesc: "This Pokemon's Flying-type moves have their priority increased by 1.",
@@ -52,6 +57,10 @@ exports.BattleAbilities = {
 	"multitype": {
 		inherit: true,
 		shortDesc: "If this Pokemon is an Arceus, its type changes to match its held Plate.",
+	},
+	"mummy": {
+		inherit: true,
+		desc: "Pokemon making contact with this Pokemon have their Ability changed to Mummy. Does not affect the Abilities Multitype or Stance Change.",
 	},
 	"normalize": {
 		inherit: true,
@@ -112,7 +121,7 @@ exports.BattleAbilities = {
 		shortDesc: "If a physical attack hits this Pokemon, Defense is lowered by 1, Speed is raised by 1.",
 		onAfterDamage: function (damage, target, source, move) {
 			if (move.category === 'Physical') {
-				this.boost({def:-1, spe:1});
+				this.boost({def: -1, spe: 1}, target, target);
 			}
 		},
 		rating: 0.5,

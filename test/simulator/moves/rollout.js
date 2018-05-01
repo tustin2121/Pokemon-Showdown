@@ -7,9 +7,9 @@ let battle;
 
 let moves = ['Ice Ball', 'Rollout'];
 
-for (let i = 0; i < moves.length; i++) {
-	describe(moves[i], function () {
-		let id = moves[i].toLowerCase().replace(/\W+/g, '');
+for (const move of moves) {
+	describe(move, function () {
+		let id = move.toLowerCase().replace(/\W+/g, '');
 
 		afterEach(function () {
 			battle.destroy();
@@ -33,8 +33,8 @@ for (let i = 0; i < moves.length; i++) {
 				}
 			});
 
-			for (let j = 0; j < 8; j++) {
-				battle.commitDecisions();
+			for (let i = 0; i < 8; i++) {
+				battle.makeChoices('move ' + id, 'move recover');
 			}
 			assert.strictEqual(count, 8);
 		});
@@ -63,8 +63,8 @@ for (let i = 0; i < moves.length; i++) {
 				ebp *= 2;
 			});
 
-			for (let j = 0; j < 5; j++) {
-				battle.commitDecisions();
+			for (let i = 0; i < 5; i++) {
+				battle.makeChoices('move ' + id, 'move recover');
 			}
 			assert.strictEqual(count, 5);
 		});
@@ -91,8 +91,8 @@ for (let i = 0; i < moves.length; i++) {
 				ebp *= 2;
 			});
 
-			for (let j = 0; j < 5; j++) {
-				battle.commitDecisions();
+			for (let i = 0; i < 5; i++) {
+				battle.makeChoices('move ' + id, 'move recover');
 			}
 			assert.strictEqual(count, 5);
 		});
@@ -109,9 +109,8 @@ for (let i = 0; i < moves.length; i++) {
 				runCount++;
 			});
 
-			battle.choose('p1', 'move 2');
-			battle.commitDecisions();
-			battle.commitDecisions();
+			battle.makeChoices('move defensecurl', 'move recover');
+			battle.makeChoices('move ' + id, 'move recover');
 			assert.strictEqual(runCount, 1);
 		});
 
@@ -127,7 +126,7 @@ for (let i = 0; i < moves.length; i++) {
 				hitCount++;
 			});
 
-			battle.commitDecisions();
+			battle.makeChoices('move ' + id, 'move recover');
 			assert.strictEqual(hitCount, 1);
 		});
 	});

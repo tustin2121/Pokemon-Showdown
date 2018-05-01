@@ -1,6 +1,7 @@
 'use strict';
 
-exports.BattleAbilities = {
+/**@type {{[k: string]: ModdedAbilityData}} */
+let BattleAbilities = {
 	"angerpoint": {
 		inherit: true,
 		desc: "If this Pokemon, or its substitute, is struck by a critical hit, its Attack is raised by 12 stages.",
@@ -13,6 +14,34 @@ exports.BattleAbilities = {
 			}
 		},
 		rating: 1.5,
+	},
+	"blaze": {
+		desc: "When this Pokemon has 1/3 or less of its maximum HP, rounded down, its Fire-type attacks have their power multiplied by 1.5.",
+		shortDesc: "At 1/3 or less of its max HP, this Pokemon's Fire-type attacks have 1.5x power.",
+		onBasePowerPriority: 2,
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.type === 'Fire' && attacker.hp <= attacker.maxhp / 3) {
+				this.debug('Blaze boost');
+				return this.chainModify(1.5);
+			}
+		},
+		id: "blaze",
+		name: "Blaze",
+		rating: 2,
+		num: 66,
+	},
+	"colorchange": {
+		inherit: true,
+		desc: "This Pokemon's type changes to match the type of the last move that hit it, unless that type is already one of its types. This effect applies after each hit from a multi-hit move.",
+		onAfterDamage: function (damage, target, source, move) {
+			if (!target.hp) return;
+			let type = move.type;
+			if (target.isActive && move.effectType === 'Move' && move.category !== 'Status' && type !== '???' && !target.hasType(type)) {
+				if (!target.setType(type)) return false;
+				this.add('-start', target, 'typechange', type, '[from] Color Change');
+			}
+		},
+		onAfterMoveSecondary: function () {},
 	},
 	"effectspore": {
 		inherit: true,
@@ -31,6 +60,17 @@ exports.BattleAbilities = {
 	},
 	"flashfire": {
 		inherit: true,
+		onTryHit: function (target, source, move) {
+			if (target !== source && move.type === 'Fire') {
+				if (target.status === 'frz') {
+					return;
+				}
+				if (!target.addVolatile('flashfire')) {
+					this.add('-immune', target, '[msg]', '[from] ability: Flash Fire');
+				}
+				return null;
+			}
+		},
 		effect: {
 			noCopy: true, // doesn't get copied by Baton Pass
 			onStart: function (target) {
@@ -65,13 +105,13 @@ exports.BattleAbilities = {
 	"forewarn": {
 		inherit: true,
 		onStart: function (pokemon) {
-			let targets = pokemon.side.foe.active;
+			/**@type {Move[]} */
 			let warnMoves = [];
 			let warnBp = 1;
-			for (let i = 0; i < targets.length; i++) {
-				if (targets[i].fainted) continue;
-				for (let j = 0; j < targets[i].moveset.length; j++) {
-					let move = this.getMove(targets[i].moveset[j].move);
+			for (const target of pokemon.side.foe.active) {
+				if (target.fainted) continue;
+				for (const moveSlot of target.moveSlots) {
+					let move = this.getMove(moveSlot.move);
 					let bp = move.basePower;
 					if (move.ohko) bp = 160;
 					if (move.id === 'counter' || move.id === 'metalburst' || move.id === 'mirrorcoat') bp = 120;
@@ -85,7 +125,7 @@ exports.BattleAbilities = {
 				}
 			}
 			if (!warnMoves.length) return;
-			let warnMove = warnMoves[this.random(warnMoves.length)];
+			let warnMove = this.sample(warnMoves);
 			this.add('-activate', pokemon, 'ability: Forewarn', warnMove);
 		},
 	},
@@ -138,8 +178,8 @@ exports.BattleAbilities = {
 			if (allyActive.length === 1) {
 				return;
 			}
-			for (let i = 0; i < allyActive.length; i++) {
-				if (allyActive[i] && allyActive[i].position !== pokemon.position && !allyActive[i].fainted && allyActive[i].ability === 'plus') {
+			for (const ally of allyActive) {
+				if (ally && ally.position !== pokemon.position && !ally.fainted && ally.ability === 'plus') {
 					return spa * 1.5;
 				}
 			}
@@ -170,6 +210,21 @@ exports.BattleAbilities = {
 			}
 		},
 	},
+	"overgrow": {
+		desc: "When this Pokemon has 1/3 or less of its maximum HP, rounded down, its Grass-type attacks have their power multiplied by 1.5.",
+		shortDesc: "At 1/3 or less of its max HP, this Pokemon's Grass-type attacks have 1.5x power.",
+		onBasePowerPriority: 2,
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.type === 'Grass' && attacker.hp <= attacker.maxhp / 3) {
+				this.debug('Overgrow boost');
+				return this.chainModify(1.5);
+			}
+		},
+		id: "overgrow",
+		name: "Overgrow",
+		rating: 2,
+		num: 65,
+	},
 	"pickup": {
 		desc: "No competitive use.",
 		shortDesc: "No competitive use.",
@@ -186,8 +241,8 @@ exports.BattleAbilities = {
 			if (allyActive.length === 1) {
 				return;
 			}
-			for (let i = 0; i < allyActive.length; i++) {
-				if (allyActive[i] && allyActive[i].position !== pokemon.position && !allyActive[i].fainted && allyActive[i].ability === 'minus') {
+			for (const ally of allyActive) {
+				if (ally && ally.position !== pokemon.position && !ally.fainted && ally.ability === 'minus') {
 					return spa * 1.5;
 				}
 			}
@@ -217,8 +272,9 @@ exports.BattleAbilities = {
 		onModifyMove: function (move) {
 			if (move.secondaries) {
 				this.debug('doubling secondary chance');
-				for (let i = 0; i < move.secondaries.length; i++) {
-					move.secondaries[i].chance *= 2;
+				for (const secondary of move.secondaries) {
+					// @ts-ignore
+					secondary.chance *= 2;
 				}
 			}
 		},
@@ -227,6 +283,7 @@ exports.BattleAbilities = {
 		shortDesc: "This Pokemon's stat stages are considered doubled during stat calculations.",
 		onModifyBoost: function (boosts) {
 			for (let key in boosts) {
+				// @ts-ignore
 				boosts[key] *= 2;
 			}
 		},
@@ -247,7 +304,7 @@ exports.BattleAbilities = {
 		inherit: true,
 		onTakeItem: function (item, pokemon, source) {
 			if (this.suppressingAttackEvents() && pokemon !== this.activePokemon) return;
-			if ((source && source !== pokemon) || this.activeMove.id === 'knockoff') {
+			if ((source && source !== pokemon) || (this.activeMove && this.activeMove.id === 'knockoff')) {
 				this.add('-activate', pokemon, 'ability: Sticky Hold');
 				return false;
 			}
@@ -267,6 +324,21 @@ exports.BattleAbilities = {
 		onDamage: function () {},
 		rating: 0,
 	},
+	"swarm": {
+		desc: "When this Pokemon has 1/3 or less of its maximum HP, rounded down, its Bug-type attacks have their power multiplied by 1.5.",
+		shortDesc: "At 1/3 or less of its max HP, this Pokemon's Bug-type attacks have 1.5x power.",
+		onBasePowerPriority: 2,
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.type === 'Bug' && attacker.hp <= attacker.maxhp / 3) {
+				this.debug('Swarm boost');
+				return this.chainModify(1.5);
+			}
+		},
+		id: "swarm",
+		name: "Swarm",
+		rating: 2,
+		num: 68,
+	},
 	"synchronize": {
 		inherit: true,
 		desc: "If another Pokemon burns, paralyzes, or poisons this Pokemon, that Pokemon receives the same major status condition. If another Pokemon badly poisons this Pokemon, that Pokemon becomes poisoned.",
@@ -279,6 +351,21 @@ exports.BattleAbilities = {
 			source.trySetStatus(id);
 		},
 	},
+	"torrent": {
+		desc: "When this Pokemon has 1/3 or less of its maximum HP, rounded down, its Water-type attacks have their power multiplied by 1.5.",
+		shortDesc: "At 1/3 or less of its max HP, this Pokemon's Water-type attacks have 1.5x power.",
+		onBasePowerPriority: 2,
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.type === 'Water' && attacker.hp <= attacker.maxhp / 3) {
+				this.debug('Torrent boost');
+				return this.chainModify(1.5);
+			}
+		},
+		id: "torrent",
+		name: "Torrent",
+		rating: 2,
+		num: 67,
+	},
 	"trace": {
 		inherit: true,
 		onUpdate: function (pokemon) {
@@ -286,8 +373,8 @@ exports.BattleAbilities = {
 			let target = pokemon.side.foe.randomActive();
 			if (!target || target.fainted) return;
 			let ability = this.getAbility(target.ability);
-			let bannedAbilities = {forecast:1, multitype:1, trace:1};
-			if (bannedAbilities[target.ability]) {
+			let bannedAbilities = ['forecast', 'multitype', 'trace'];
+			if (bannedAbilities.includes(target.ability)) {
 				return;
 			}
 			if (pokemon.setAbility(ability)) {
@@ -312,3 +399,5 @@ exports.BattleAbilities = {
 		},
 	},
 };
+
+exports.BattleAbilities = BattleAbilities;

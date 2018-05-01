@@ -88,6 +88,7 @@ exports.BattleScripts = {
 		if (!lockedMove && !pokemon.volatiles['partialtrappinglock']) {
 			pokemon.deductPP(move, null, target);
 		}
+		pokemon.moveUsed(move);
 		this.useMove(move, pokemon, target, sourceEffect);
 		this.singleEvent('AfterMove', move, null, pokemon, target, move);
 
@@ -171,7 +172,7 @@ exports.BattleScripts = {
 		accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
 
 		// Stadium fixes the 1/256 accuracy bug.
-		if (accuracy !== true && this.random(256) > accuracy) {
+		if (accuracy !== true && !this.randomChance(accuracy + 1, 256)) {
 			this.attrLastMove('[miss]');
 			this.add('-miss', pokemon);
 			damage = false;
@@ -185,7 +186,7 @@ exports.BattleScripts = {
 				if (hits.length) {
 					// Yes, it's hardcoded... meh
 					if (hits[0] === 2 && hits[1] === 5) {
-						hits = [2, 2, 3, 3, 4, 5][this.random(6)];
+						hits = this.sample([2, 2, 3, 3, 4, 5]);
 					} else {
 						hits = this.random(hits[0], hits[1] + 1);
 					}
@@ -381,15 +382,15 @@ exports.BattleScripts = {
 
 		// Apply move secondaries.
 		if (moveData.secondaries) {
-			for (let i = 0; i < moveData.secondaries.length; i++) {
+			for (const secondary of moveData.secondaries) {
 				// We check here whether to negate the probable secondary status if it's para, burn, or freeze.
 				// In the game, this is checked and if true, the random number generator is not called.
 				// That means that a move that does not share the type of the target can status it.
 				// If a move that was not fire-type would exist on Gen 1, it could burn a Pokémon.
-				if (!(moveData.secondaries[i].status && ['par', 'brn', 'frz'].includes(moveData.secondaries[i].status) && target && target.hasType(move.type))) {
-					let effectChance = Math.floor(moveData.secondaries[i].chance * 255 / 100);
-					if (typeof moveData.secondaries[i].chance === 'undefined' || this.random(256) <= effectChance) {
-						this.moveHit(target, pokemon, move, moveData.secondaries[i], true, isSelf);
+				if (!(secondary.status && ['par', 'brn', 'frz'].includes(secondary.status) && target && target.hasType(move.type))) {
+					let effectChance = Math.floor(secondary.chance * 255 / 100);
+					if (typeof secondary.chance === 'undefined' || this.randomChance(effectChance + 1, 256)) {
+						this.moveHit(target, pokemon, move, secondary, true, isSelf);
 					}
 				}
 			}
@@ -507,7 +508,7 @@ exports.BattleScripts = {
 			// We compare our critical hit chance against a random number between 0 and 255.
 			// If the random number is lower, we get a critical hit. This means there is always a 1/255 chance of not hitting critically.
 			if (critChance > 0) {
-				move.crit = (this.random(256) < critChance);
+				move.crit = this.randomChance(critChance, 256);
 			}
 		}
 		// There is a critical hit.
@@ -646,7 +647,7 @@ exports.BattleScripts = {
 			}
 		}
 		if (damage !== 0) damage = this.clampIntRange(damage, 1);
-		target.battle.lastDamage = damage;
+		this.lastDamage = damage;
 		damage = target.damage(damage, source, effect);
 		if (source) source.lastDamage = damage;
 		let name = effect.fullname;

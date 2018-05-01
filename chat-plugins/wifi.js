@@ -6,7 +6,7 @@
 
 'use strict';
 
-const FS = require('../fs');
+const FS = require('./../lib/fs');
 
 Punishments.roomPunishmentTypes.set('GIVEAWAYBAN', 'banned from giveaways');
 
@@ -41,7 +41,7 @@ function saveBreedingData() {
 }
 
 function toPokemonId(str) {
-	return str.toLowerCase().replace(/é/g, 'e').replace(/[^a-z0-9 /]/g, '');
+	return str.toLowerCase().replace(/é/g, 'e').replace(/[^a-z0-9 -/]/g, '');
 }
 
 class Giveaway {
@@ -193,8 +193,8 @@ class Giveaway {
 	generateWindow(rightSide) {
 		return `<p style="text-align:center;font-size:14pt;font-weight:bold;margin-bottom:2px;">It's giveaway time!</p>` +
 			`<p style="text-align:center;font-size:7pt;">Giveaway started by ${Chat.escapeHTML(this.host.name)}</p>` +
-			`<table style="margin-left:auto;margin-right:auto;"><tr><td style="text-align:center;width:45%">${this.sprite}<p style="font-weight:bold;">Giver: ${this.giver}</p>${Chat.formatText(this.prize)}<br />OT: ${Chat.escapeHTML(this.ot)}, TID: ${this.tid}</td>` +
-			`<td style="text-align:center;width:45%">${rightSide}</td></tr></table><p style="text-align:center;font-size:7pt;font-weight:bold;"><u>Note:</u> Please do not join if you don't have a 3DS, a copy of Pokémon Sun/Moon, or are currently unable to receive the prize.</p>`;
+			`<table style="margin-left:auto;margin-right:auto;"><tr><td style="text-align:center;width:45%">${this.sprite}<p style="font-weight:bold;">Giver: ${this.giver}</p>${Chat.formatText(this.prize, true)}<br />OT: ${Chat.escapeHTML(this.ot)}, TID: ${this.tid}</td>` +
+			`<td style="text-align:center;width:45%">${rightSide}</td></tr></table><p style="text-align:center;font-size:7pt;font-weight:bold;"><u>Note:</u> You must have a 3DS and a copy of either Pokémon Sun/Moon or Ultra Sun/Ultra Moon to receive the prize. Do not join if you are currently unable to receive the prize.</p>`;
 	}
 }
 
@@ -277,7 +277,7 @@ class QuestionGiveaway extends Giveaway {
 				this.changeUhtml('<p style="text-align:center;font-size:13pt;font-weight:bold;">The giveaway has ended! Scroll down to see the answer.</p>');
 				this.phase = 'ended';
 				this.clearTimer();
-				this.room.modlog(`${this.winner.name} won ${this.giver.name}'s giveaway for a "${this.prize}" (OT: ${this.ot} TID: ${this.tid} FC: ${this.fc})`);
+				this.room.modlog(`(wifi) GIVEAWAY WIN: ${this.winner.name} won ${this.giver.name}'s giveaway for a "${this.prize}" (OT: ${this.ot} TID: ${this.tid} FC: ${this.fc})`);
 				this.send(this.generateWindow(`<p style="text-align:center;font-size:12pt;"><b>${Chat.escapeHTML(this.winner.name)}</b> won the giveaway! Congratulations!</p>` +
 				`<p style="text-align:center;">${this.question}<br />Correct answer${Chat.plural(this.answers)}: ${this.answers.join(', ')}</p>`));
 				this.winner.sendTo(this.room, `|raw|You have won the giveaway. PM <b>${Chat.escapeHTML(this.giver.name)}</b> (FC: ${this.fc}) to claim your prize!`);
@@ -320,7 +320,7 @@ class LotteryGiveaway extends Giveaway {
 	generateReminder(joined) {
 		let cmd = (joined ? 'Leave' : 'Join');
 		let button = `<button style="margin:4px;" name="send" value="/giveaway ${toId(cmd)}lottery"><font size=1><b>${cmd}</b></font></button>`;
-		return this.generateWindow(`The lottery drawing will occur in 2 minutes, and with ${this.maxwinners} winner${Chat.plural(this.maxwinners)}!<br />${button}</p>`);
+		return this.generateWindow(`The lottery drawing will occur in 2 minutes, and with ${Chat.count(this.maxwinners, "winners")}!<br />${button}</p>`);
 	}
 
 	display() {
@@ -389,7 +389,7 @@ class LotteryGiveaway extends Giveaway {
 			this.changeUhtml(`<p style="text-align:center;font-size:13pt;font-weight:bold;">The giveaway has ended! Scroll down to see the winner${Chat.plural(this.winners)}.</p>`);
 			this.phase = 'ended';
 			let winnerNames = this.winners.map(winner => winner.name).join(', ');
-			this.room.modlog(`${winnerNames} won ${this.giver.name}'s giveaway for "${this.prize}" (OT: ${this.ot} TID: ${this.tid} FC: ${this.fc})`);
+			this.room.modlog(`(wifi) GIVEAWAY WIN: ${winnerNames} won ${this.giver.name}'s giveaway for "${this.prize}" (OT: ${this.ot} TID: ${this.tid} FC: ${this.fc})`);
 			this.send(this.generateWindow(`<p style="text-align:center;font-size:10pt;font-weight:bold;">Lottery Draw</p><p style="text-align:center;">${Object.keys(this.joined).length} users joined the giveaway.<br />Our lucky winner${Chat.plural(this.winners)}: <b>${Chat.escapeHTML(winnerNames)}!</b> Congratulations!</p>`));
 			for (let i = 0; i < this.winners.length; i++) {
 				this.winners[i].sendTo(this.room, `|raw|You have won the lottery giveaway! PM <b>${this.giver.name}</b> (FC: ${this.fc}) to claim your prize!`);
@@ -448,7 +448,7 @@ class GtsGiveaway {
 			`<p style="text-align:center;font-size:10pt;margin-top:0px;">Hosted by: ${Chat.escapeHTML(this.giver.name)} | Left: <b>${this.left}</b></p>` +
 			`<table style="margin-left:auto;margin-right:auto;"><tr>` +
 			(sentModifier ? `<td style="text-align:center;width:10%"><b>Last winners:</b><br/>${this.sent.join('<br/>')}</td>` : '') +
-			`<td style="text-align:center;width:15%">${this.sprite}</td><td style="text-align:center;width:${40 - sentModifier}%">${Chat.formatText(this.summary)}</td>` +
+			`<td style="text-align:center;width:15%">${this.sprite}</td><td style="text-align:center;width:${40 - sentModifier}%">${Chat.formatText(this.summary, true)}</td>` +
 			`<td style="text-align:center;width:${35 - sentModifier}%">${rightSide}</td></tr></table>`;
 	}
 
@@ -484,7 +484,7 @@ class GtsGiveaway {
 		} else {
 			this.clearTimer();
 			this.changeUhtml(`<p style="text-align:center;font-size:13pt;font-weight:bold;">The GTS giveaway has finished.</p>`);
-			this.room.modlog(`${this.giver.name} has finished their GTS giveaway for "${this.summary}"`);
+			this.room.modlog(`(wifi) GTS FINISHED: ${this.giver.name} has finished their GTS giveaway for "${this.summary}"`);
 			this.send(`<p style="text-align:center;font-size:11pt">The GTS giveaway for a "<strong>${Chat.escapeHTML(this.lookfor)}</strong>" has finished.</p>`);
 			Giveaway.updateStats(this.monIds);
 		}
@@ -533,7 +533,8 @@ let commands = {
 
 		room.giveaway = new QuestionGiveaway(user, targetUser, room, ot, tid, fc, prize, question, answers);
 
-		this.privateModCommand(`(${user.name} started a question giveaway for ${targetUser.name})`);
+		this.privateModAction(`(${user.name} started a question giveaway for ${targetUser.name})`);
+		this.modlog('QUESTION GIVEAWAY', null, `for ${targetUser.getLastId()}`);
 	},
 	changeanswer: 'changequestion',
 	changequestion: function (target, room, user, conn, cmd) {
@@ -592,7 +593,8 @@ let commands = {
 
 		room.giveaway = new LotteryGiveaway(user, targetUser, room, ot, tid, fc, prize, numWinners);
 
-		this.privateModCommand(`(${user.name} started a lottery giveaway for ${targetUser.name})`);
+		this.privateModAction(`(${user.name} started a lottery giveaway for ${targetUser.name})`);
+		this.modlog('LOTTERY GIVEAWAY', null, `for ${targetUser.getLastId()}`);
 	},
 	leavelotto: 'join',
 	leavelottery: 'join',
@@ -638,7 +640,8 @@ let commands = {
 
 			room.gtsga = new GtsGiveaway(room, targetUser, amount, summary, deposit, lookfor);
 
-			this.privateModCommand(`(${user.name} started a GTS giveaway for ${targetUser.name})`);
+			this.privateModAction(`(${user.name} started a GTS giveaway for ${targetUser.name})`);
+			this.modlog('GTS GIVEAWAY', null, `for ${targetUser.getLastId()}`);
 		},
 		left: function (target, room, user) {
 			if (room.id !== 'wifi') return false;
@@ -682,8 +685,9 @@ let commands = {
 				return this.errorReply("The reason is too long. It cannot exceed 300 characters.");
 			}
 			room.gtsga.end(true);
+			this.modlog('GTS END', null, target);
 			if (target) target = `: ${target}`;
-			this.privateModCommand(`(The giveaway was forcibly ended by ${user.name}${target})`);
+			this.privateModAction(`(The giveaway was forcibly ended by ${user.name}${target})`);
 		},
 	},
 	// general.
@@ -702,8 +706,9 @@ let commands = {
 
 		Giveaway.ban(room, targetUser, target);
 		if (room.giveaway) room.giveaway.kickUser(targetUser);
+		this.modlog('GIVEAWAYBAN', targetUser, target);
 		if (target) target = ` (${target})`;
-		this.privateModCommand(`(${targetUser.name} was banned from entering giveaways by ${user.name}.${target})`);
+		this.privateModAction(`(${targetUser.name} was banned from entering giveaways by ${user.name}.${target})`);
 	},
 	unban: function (target, room, user) {
 		if (!target) return false;
@@ -716,7 +721,8 @@ let commands = {
 		if (!Giveaway.checkBanned(room, targetUser)) return this.errorReply(`User '${this.targetUsername}' isn't banned from entering giveaways.`);
 
 		Giveaway.unban(room, targetUser);
-		this.privateModCommand(`${targetUser.name} was unbanned from entering giveaways by ${user.name}.`);
+		this.privateModAction(`${targetUser.name} was unbanned from entering giveaways by ${user.name}.`);
+		this.modlog('GIVEAWAYUNBAN', targetUser, null, {noip: 1, noalts: 1});
 	},
 	stop: 'end',
 	end: function (target, room, user) {
@@ -728,8 +734,9 @@ let commands = {
 			return this.errorReply("The reason is too long. It cannot exceed 300 characters.");
 		}
 		room.giveaway.end(true);
+		this.modlog('GIVEAWAY END', null, target);
 		if (target) target = `: ${target}`;
-		this.privateModCommand(`(The giveaway was forcibly ended by ${user.name}${target})`);
+		this.privateModAction(`(The giveaway was forcibly ended by ${user.name}${target})`);
 	},
 	rm: 'remind',
 	remind: function (target, room, user) {
@@ -755,7 +762,7 @@ let commands = {
 		if (!count) return this.sendReplyBox("This Pokémon has never been given away.");
 		let recent = count.filter(val => val + RECENT_THRESHOLD > Date.now()).length;
 
-		this.sendReplyBox(`This Pokémon has been given away ${count.length} time${Chat.plural(count)}, a total of ${recent} time${Chat.plural(recent)} in the past month.`);
+		this.sendReplyBox(`This Pokémon has been given away ${Chat.count(count, "times")}, a total of ${Chat.count(recent, "times")} in the past month.`);
 	},
 	'': 'help',
 	help: function (target, room, user) {
@@ -820,7 +827,8 @@ let breedingcontests = {
 		breedingData.latest = toId(contestName);
 
 		saveBreedingData();
-		this.privateModCommand(`(A winner for the '${contestName}' breeding contest was set by ${user.name}.)`);
+		this.privateModAction(`(A winner for the '${contestName}' breeding contest was set by ${user.name}.)`);
+		this.modlog('BREEDING WINNER', null, `for the '${contestName}' breeding contest`);
 	},
 	view: function (target, room, user) {
 		if (room.id !== 'wifi') return this.errorReply("This command can only be used in the Wi-Fi room.");
@@ -833,7 +841,7 @@ let breedingcontests = {
 		let entry = breedingData.winners[contest];
 		return this.sendReplyBox(`<div class="broadcast-blue"><p style="text-align:center;font-size:14pt;font-weight:bold;margin-bottom:2px;">Breeding contest: <a href="${entry.link}"><b>${Chat.escapeHTML(entry.name)}</b></a>. Winner: <b>${Chat.escapeHTML(entry.winner)}</b></p>` +
 			`<table style="margin-left:auto;margin-right:auto;"><tr>` +
-			`<td style="text-align:center;width:15%">${Giveaway.getSprite(entry.description)[1]}</td><td style="text-align:center;width:40%">${Chat.parseText(entry.description)}</td>` +
+			`<td style="text-align:center;width:15%">${Giveaway.getSprite(`shiny ${entry.description}`)[1]}</td><td style="text-align:center;width:40%">${Chat.formatText(entry.description, true)}</td>` +
 			(entry.comment ? `<td style="text-align:center;width:35%"><b>Breeder's comments:</b><br/><i>${Chat.escapeHTML(entry.comment)}</i></td>` : '') +
 			`</tr></table></div>`);
 	},

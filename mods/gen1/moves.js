@@ -5,7 +5,8 @@
 
 'use strict';
 
-exports.BattleMovedex = {
+/**@type {{[k: string]: ModdedMoveData}} */
+let BattleMovedex = {
 	acid: {
 		inherit: true,
 		desc: "Has a 33% chance to lower the target's Defense by 1 stage.",
@@ -21,7 +22,7 @@ exports.BattleMovedex = {
 	amnesia: {
 		inherit: true,
 		desc: "Raises the user's Special by 2 stages.",
-		shortDesc: "Boosts the user's Special by 2.",
+		shortDesc: "Raises the user's Special by 2.",
 		boosts: {
 			spd: 2,
 			spa: 2,
@@ -96,6 +97,7 @@ exports.BattleMovedex = {
 					}
 					this.add('-end', pokemon, 'Bide');
 					let target = this.effectData.sourceSide.active[this.effectData.sourcePosition];
+					// @ts-ignore
 					this.moveHit(target, pokemon, 'bide', {damage: this.effectData.totalDamage * 2});
 					return false;
 				}
@@ -106,10 +108,9 @@ exports.BattleMovedex = {
 				if (!pokemon.hasMove('bide')) {
 					return;
 				}
-				let moves = pokemon.moveset;
-				for (let i = 0; i < moves.length; i++) {
-					if (moves[i].id !== 'bide') {
-						pokemon.disableMove(moves[i].id);
+				for (const moveSlot of pokemon.moveSlots) {
+					if (moveSlot.id !== 'bide') {
+						pokemon.disableMove(moveSlot.id);
 					}
 				}
 			},
@@ -233,9 +234,9 @@ exports.BattleMovedex = {
 			// It will fail if the last move selected by the opponent has base power 0 or is not Normal or Fighting Type.
 			// If both are true, counter will deal twice the last damage dealt in battle, no matter what was the move.
 			// That means that, if opponent switches, counter will use last counter damage * 2.
-			let lastUsedMove = this.getMove(target.side.lastMove);
-			if (lastUsedMove && lastUsedMove.basePower > 0 && ['Normal', 'Fighting'].includes(lastUsedMove.type) && target.battle.lastDamage > 0 && !this.willMove(target)) {
-				return 2 * target.battle.lastDamage;
+			let lastUsedMove = target.side.lastMove && this.getMove(target.side.lastMove.id);
+			if (lastUsedMove && lastUsedMove.basePower > 0 && ['Normal', 'Fighting'].includes(lastUsedMove.type) && this.lastDamage > 0 && !this.willMove(target)) {
+				return 2 * this.lastDamage;
 			}
 			this.add('-fail', pokemon);
 			return false;
@@ -252,7 +253,7 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 2,
 			onLockMove: 'dig',
-			onAccuracy: function (accuracy, target, source, move) {
+			onTryImmunity: function (target, source, move) {
 				if (move.id === 'swift') return true;
 				this.add('-message', 'The foe ' + target.name + ' can\'t be hit underground!');
 				return null;
@@ -281,7 +282,7 @@ exports.BattleMovedex = {
 					this.effectData.duration++;
 				}
 				let moves = pokemon.moves;
-				let move = this.getMove(moves[this.random(moves.length)]);
+				let move = this.getMove(this.sample(moves));
 				this.add('-start', pokemon, 'Disable', move.name);
 				this.effectData.move = move.id;
 				return;
@@ -297,10 +298,9 @@ exports.BattleMovedex = {
 				}
 			},
 			onDisableMove: function (pokemon) {
-				let moves = pokemon.moveset;
-				for (let i = 0; i < moves.length; i++) {
-					if (moves[i].id === this.effectData.move) {
-						pokemon.disableMove(moves[i].id);
+				for (const moveSlot of pokemon.moveSlots) {
+					if (moveSlot.id === this.effectData.move) {
+						pokemon.disableMove(moveSlot.id);
 					}
 				}
 			},
@@ -308,8 +308,8 @@ exports.BattleMovedex = {
 	},
 	dizzypunch: {
 		inherit: true,
-		desc: "Deals damage to the target.",
-		shortDesc: "Deals damage.",
+		desc: "No additional effect.",
+		shortDesc: "No additional effect.",
 		secondary: false,
 	},
 	doubleedge: {
@@ -366,7 +366,7 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 2,
 			onLockMove: 'fly',
-			onAccuracy: function (accuracy, target, source, move) {
+			onTryImmunity: function (target, source, move) {
 				if (move.id === 'swift') return true;
 				this.add('-message', 'The foe ' + target.name + ' can\'t be hit while flying!');
 				return null;
@@ -400,7 +400,7 @@ exports.BattleMovedex = {
 	growth: {
 		inherit: true,
 		desc: "Raises the user's Special by 1 stage.",
-		shortDesc: "Boosts the user's Special by 1.",
+		shortDesc: "Raises the user's Special by 1.",
 		boosts: {
 			spa: 1,
 			spd: 1,
@@ -416,9 +416,8 @@ exports.BattleMovedex = {
 		shortDesc: "Eliminates all stat changes and status.",
 		onHit: function (target, source) {
 			this.add('-clearallboost');
-			for (let i = 0; i < this.sides.length; i++) {
-				for (let j = 0; j < this.sides[i].active.length; j++) {
-					let pokemon = this.sides[i].active[j];
+			for (const side of this.sides) {
+				for (const pokemon of side.active) {
 					pokemon.clearBoosts();
 
 					if (pokemon !== source) {
@@ -428,9 +427,7 @@ exports.BattleMovedex = {
 					if (pokemon.status === 'tox') {
 						pokemon.setStatus('psn');
 					}
-					let volatiles = Object.keys(pokemon.volatiles);
-					for (let n = 0; n < volatiles.length; n++) {
-						let id = volatiles[n];
+					for (const id of Object.keys(pokemon.volatiles)) {
 						if (id === 'residualdmg') {
 							pokemon.volatiles[id].counter = 0;
 						} else {
@@ -446,22 +443,22 @@ exports.BattleMovedex = {
 	highjumpkick: {
 		inherit: true,
 		desc: "If this attack misses the target, the user takes 1 HP of damage.",
-		shortDesc: "User takes 1 HP damage it would have dealt if miss.",
+		shortDesc: "User takes 1 HP of damage if it misses.",
 		onMoveFail: function (target, source, move) {
-			if (target.type !== 'ghost') {
+			if (!target.types.includes('Ghost')) {
 				this.directDamage(1, source);
 			}
 		},
 	},
 	hyperbeam: {
 		inherit: true,
-		desc: "Deals damage to a target. If this move is successful, the user must recharge on the following turn and cannot make a move, unless the opponent faints or a Substitute is destroyed.",
-		shortDesc: "User cannot move next turn unless target or substitute faints.",
+		desc: "If this move is successful, the user must recharge on the following turn and cannot make a move, unless the target or its substitute was knocked out by this move.",
+		shortDesc: "Can't move next turn if target or sub is not KOed.",
 	},
 	jumpkick: {
 		inherit: true,
-		desc: "If this attack misses the target, the user 1HP of damage.",
-		shortDesc: "User takes 1 HP damage if miss.",
+		desc: "If this attack misses the target, the user takes 1 HP of damage.",
+		shortDesc: "User takes 1 HP of damage if it misses.",
 		onMoveFail: function (target, source, move) {
 			this.damage(1, source);
 		},
@@ -502,8 +499,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "For 5 turns, the user has double Special when attacked. Removed by Haze.",
-		shortDesc: "For 5 turns, user's Special is 2x when attacked.",
+		desc: "While the user remains active, its Special is doubled when taking damage. Critical hits ignore this protection. This effect can be removed by Haze.",
+		shortDesc: "While active, user's Special is 2x when damaged.",
 		id: "lightscreen",
 		isViable: true,
 		name: "Light Screen",
@@ -526,33 +523,32 @@ exports.BattleMovedex = {
 	},
 	metronome: {
 		inherit: true,
-		noMetronome: {metronome:1, struggle:1},
+		noMetronome: ['metronome', 'struggle'],
 		secondary: false,
 		target: "self",
 		type: "Normal",
 	},
 	mimic: {
 		inherit: true,
-		desc: "This move is replaced by a random move on target's moveset. The copied move has the maximum PP for that move. Ignores a target's Substitute.",
-		shortDesc: "A random target's move replaces this one.",
+		desc: "This move is replaced by a random move known by the target, even if the user already knows that move. The copied move has the maximum PP for that move.",
+		shortDesc: "Random move known by the target replaces this.",
 		onHit: function (target, source) {
 			let moveslot = source.moves.indexOf('mimic');
 			if (moveslot < 0) return false;
 			let moves = target.moves;
-			let move = moves[this.random(moves.length)];
-			if (!move) return false;
-			move = this.getMove(move);
-			source.moveset[moveslot] = {
+			let moveid = this.sample(moves);
+			if (!moveid) return false;
+			let move = this.getMove(moveid);
+			source.moveSlots[moveslot] = {
 				move: move.name,
 				id: move.id,
-				pp: source.moveset[moveslot].pp,
+				pp: source.moveSlots[moveslot].pp,
 				maxpp: move.pp * 8 / 5,
 				target: move.target,
 				disabled: false,
 				used: false,
 				virtual: true,
 			};
-			source.moves[moveslot] = toId(move.name);
 			this.add('-start', source, 'Mimic', move.name);
 		},
 	},
@@ -560,10 +556,10 @@ exports.BattleMovedex = {
 		inherit: true,
 		onHit: function (pokemon) {
 			let foe = pokemon.side.foe.active[0];
-			if (!foe || !foe.lastMove || foe.lastMove === 'mirrormove') {
+			if (!foe || !foe.lastMove || foe.lastMove.id === 'mirrormove') {
 				return false;
 			}
-			this.useMove(foe.lastMove, pokemon);
+			this.useMove(foe.lastMove.id, pokemon);
 		},
 	},
 	nightshade: {
@@ -612,12 +608,12 @@ exports.BattleMovedex = {
 			onLockMove: 'rage',
 			onTryHit: function (target, source, move) {
 				if (target.boosts.atk < 6 && move.id === 'disable') {
-					this.boost({atk:1});
+					this.boost({atk: 1});
 				}
 			},
 			onHit: function (target, source, move) {
 				if (target.boosts.atk < 6 && move.category !== 'Status') {
-					this.boost({atk:1});
+					this.boost({atk: 1});
 				}
 			},
 		},
@@ -648,8 +644,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "The user has doubled Defense. Critical hits ignore this protection. It is removed from the user if it is successfully hit by Haze.",
-		shortDesc: "User's Defense is 2x.",
+		desc: "While the user remains active, its Defense is doubled when taking damage. Critical hits ignore this protection. This effect can be removed by Haze.",
+		shortDesc: "While active, the user's Defense is doubled.",
 		id: "reflect",
 		isViable: true,
 		name: "Reflect",
@@ -697,8 +693,8 @@ exports.BattleMovedex = {
 	},
 	rockslide: {
 		inherit: true,
-		desc: "Deals damage to a foe.",
-		shortDesc: "Deals damage.",
+		desc: "No additional effect.",
+		shortDesc: "No additional effect.",
 		secondary: false,
 		target: "normal",
 	},
@@ -804,10 +800,8 @@ exports.BattleMovedex = {
 				if (move.category === 'Status') {
 					// In gen 1 it only blocks:
 					// poison, confusion, secondary effect confusion, stat reducing moves and Leech Seed.
-					let SubBlocked = {
-						lockon:1, meanlook:1, mindreader:1, nightmare:1,
-					};
-					if (move.status === 'psn' || move.status === 'tox' || (move.boosts && target !== source) || move.volatileStatus === 'confusion' || SubBlocked[move.id]) {
+					let SubBlocked = ['lockon', 'meanlook', 'mindreader', 'nightmare'];
+					if (move.status === 'psn' || move.status === 'tox' || (move.boosts && target !== source) || move.volatileStatus === 'confusion' || SubBlocked.includes(move.id)) {
 						return false;
 					}
 					return;
@@ -877,6 +871,7 @@ exports.BattleMovedex = {
 	},
 	triattack: {
 		inherit: true,
+		onHit: function () {},
 		secondary: false,
 	},
 	whirlwind: {
@@ -920,3 +915,5 @@ exports.BattleMovedex = {
 		},
 	},
 };
+
+exports.BattleMovedex = BattleMovedex;

@@ -8,7 +8,7 @@
  */
 'use strict';
 
-const FS = require('../fs');
+const FS = require('./../lib/fs');
 
 const HF_DATA_PATH = 'config/chat-plugins/health-fitness.json';
 const MAX_DATA_LENGTH = 500;
@@ -55,9 +55,9 @@ exports.commands = {
 		'': function (target, room, user) {
 			if (room.id !== 'healthfitness') return this.errorReply("This command can only be used in Health & Fitness.");
 			if (!this.runBroadcast()) return;
-			const cardio = Chat.formatText(HF.hfData.cardio || NOT_SET);
-			const gym = Chat.formatText(HF.hfData.gym || NOT_SET);
-			const quote = Chat.formatText(HF.hfData.quote || NOT_SET);
+			const cardio = Chat.formatText(HF.hfData.cardio || NOT_SET, true);
+			const gym = Chat.formatText(HF.hfData.gym || NOT_SET, true);
+			const quote = Chat.formatText(HF.hfData.quote || NOT_SET, true);
 			return this.sendReplyBox(
 				`<strong>Cardio Challenge:</strong> ${cardio}<br />` +
 				`<strong>Gym Challenge:</strong> ${gym}<br />` +
@@ -67,12 +67,12 @@ exports.commands = {
 		cardio: function (target, room, user) {
 			if (room.id !== 'healthfitness') return this.errorReply("This command can only be used in Health & Fitness.");
 			if (!target) {
-				if (!this.canBroadcast('!healthfitness cardio')) return;
+				if (!this.canBroadcast(false, '!healthfitness cardio')) return;
 				if (this.broadcastMessage && !this.can('broadcast', null, room)) return false;
 
-				if (!this.runBroadcast('!healthfitness cardio')) return;
+				if (!this.runBroadcast(false, '!healthfitness cardio')) return;
 
-				const cardio = Chat.formatText(HF.hfData.cardio || NOT_SET);
+				const cardio = Chat.formatText(HF.hfData.cardio || NOT_SET, true);
 				return this.sendReplyBox(`<strong>Cardio Challenge:</strong> ${cardio}`);
 			} else {
 				if (!this.can('broadcast', null, room)) return;
@@ -83,19 +83,20 @@ exports.commands = {
 				if (!target) return;
 
 				HF.setCardio(target);
-				this.privateModCommand(`(${user.name} has set the cardio challenge to: ${target})`);
+				this.privateModAction(`(${user.name} has set the cardio challenge to: ${target})`);
+				this.modlog('CARDIO CHALLENGE', null, target);
 				this.sendReply(`The daily cardio challenge has been updated to: ${target}`);
 			}
 		},
 		gym: function (target, room, user) {
 			if (room.id !== 'healthfitness') return this.errorReply("This command can only be used in Health & Fitness.");
 			if (!target) {
-				if (!this.canBroadcast('!healthfitness gym')) return;
+				if (!this.canBroadcast(false, '!healthfitness gym')) return;
 				if (this.broadcastMessage && !this.can('broadcast', null, room)) return false;
 
-				if (!this.runBroadcast('!healthfitness gym')) return;
+				if (!this.runBroadcast(false, '!healthfitness gym')) return;
 
-				const gym = Chat.formatText(HF.hfData.gym || NOT_SET);
+				const gym = Chat.formatText(HF.hfData.gym || NOT_SET, true);
 				return this.sendReplyBox(`<strong>Gym Challenge:</strong> ${gym}`);
 			} else {
 				if (!this.can('broadcast', null, room)) return;
@@ -106,19 +107,20 @@ exports.commands = {
 				if (!target) return;
 
 				HF.setGym(target);
-				this.privateModCommand(`(${user.name} has set the gym challenge to: ${target})`);
+				this.privateModAction(`(${user.name} has set the gym challenge to: ${target})`);
+				this.modlog('GYM CHALLENGE', null, target);
 				this.sendReply(`The daily gym challenge has been updated to: ${target}`);
 			}
 		},
 		quote: function (target, room, user) {
 			if (room.id !== 'healthfitness') return this.errorReply("This command can only be used in Health & Fitness.");
 			if (!target) {
-				if (!this.canBroadcast('!healthfitness quote')) return;
+				if (!this.canBroadcast(false, '!healthfitness quote')) return;
 				if (this.broadcastMessage && !this.can('broadcast', null, room)) return false;
 
-				if (!this.runBroadcast('!healthfitness quote')) return;
+				if (!this.runBroadcast(false, '!healthfitness quote')) return;
 
-				const quote = Chat.formatText(HF.hfData.quote || NOT_SET);
+				const quote = Chat.formatText(HF.hfData.quote || NOT_SET, true);
 				return this.sendReplyBox(`<strong>Quote of the Day:</strong> ${quote}`);
 			} else {
 				if (!this.can('broadcast', null, room)) return;
@@ -129,7 +131,8 @@ exports.commands = {
 				if (!target) return;
 
 				HF.setQuote(target);
-				this.privateModCommand(`(${user.name} has set the daily quote to: ${target})`);
+				this.privateModAction(`(${user.name} has set the daily quote to: ${target})`);
+				this.modlog('HF QUOTE', null, target);
 				this.sendReply(`The daily quote has been updated to: ${target}`);
 			}
 		},
@@ -138,13 +141,13 @@ exports.commands = {
 		},
 	},
 	healthfitnesshelp: [
-		"/healthfitness - Shows the daily cardio challenge, gym challenge, and quote of the day.",
-		"/healthfitness cardio - Shows the cardio challenge of the day.",
-		"/healthfitness cardio [challenge] - Sets the cardio challenge of the day. Requires: + or above",
-		"/healthfitness gym - Shows the gym challenge of the day.",
-		"/healthfitness gym [challenge] - Sets the gym challenge of the day. Requires: + or above",
-		"/healthfitness quote - Shows the quote of the day.",
-		"/healthfitness quote [quote] - Sets the quote of the day. Requires: + or above",
-		"Note: These challenges and quotes support PS formatting (**bold**, __italics__, etc.)",
+		`/healthfitness - Shows the daily cardio challenge, gym challenge, and quote of the day.`,
+		`/healthfitness cardio - Shows the cardio challenge of the day.`,
+		`/healthfitness cardio [challenge] - Sets the cardio challenge of the day. Requires: + or above`,
+		`/healthfitness gym - Shows the gym challenge of the day.`,
+		`/healthfitness gym [challenge] - Sets the gym challenge of the day. Requires: + or above`,
+		`/healthfitness quote - Shows the quote of the day.`,
+		`/healthfitness quote [quote] - Sets the quote of the day. Requires: + or above`,
+		`Note: These challenges and quotes support PS formatting (**bold**, __italics__, etc.)`,
 	],
 };
