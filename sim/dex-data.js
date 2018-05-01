@@ -84,7 +84,7 @@ class Effect {
 		this.fullname = '';
 		/**
 		 * Effect type.
-		 * @type {'Effect' | 'Pokemon' | 'Move' | 'Item' | 'Ability' | 'Format' | 'Ruleset' | 'Weather' | 'Status' | 'Rule' | 'ValidatorRule'}
+		 * @type {EffectTypes}
 		 */
 		this.effectType = 'Effect';
 		/**
@@ -117,6 +117,16 @@ class Effect {
 		 */
 		this.isUnreleased = false;
 		/**
+		 * A shortened form of the description of this effect. Not all effects have this
+		 * @type {string}
+		 */
+		this.shortDesc = '';
+		/**
+		 * The full description for this effect
+		 * @type {string}
+		 */
+		this.desc = '';
+		/**
 		 * Is this item/move/ability/pokemon nonstandard? True for effects
 		 * that have no use in standard formats: made-up pokemon (CAP),
 		 * glitches (Missingno etc), and Pokestar pokemon.
@@ -125,7 +135,7 @@ class Effect {
 		this.isNonstandard = false;
 		/**
 		 * The duration of the effect.
-		 * @type {?number}
+		 * @type {number | undefined}
 		 */
 		this.duration = this.duration;
 		/**
@@ -151,21 +161,19 @@ class Effect {
 
 		/**
 		 * HP that the effect may drain.
-		 * @type {?number[]}
+		 * @type {number[] | undefined}
 		 */
 		this.drain = this.drain;
-		/**
-		 * @type {?Function}
-		 */
-		this.onRestart = this.onRestart;
-		/**
-		 * @type {?Function}
-		 */
-		this.durationCallback = this.durationCallback;
+
 		/**
 		 * @type {AnyObject}
 		 */
 		this.flags = this.flags || {};
+
+		/**
+		 * @type {string}
+		 */
+		this.sourceEffect = this.sourceEffect || '';
 
 		Object.assign(this, data);
 		if (moreData) Object.assign(this, moreData);
@@ -204,21 +212,24 @@ class RuleTable extends Map {
 		 * @type {[string, string, number, string[]][]}
 		 */
 		this.complexTeamBans = [];
+		/** @type {[Function, string]?} */
+		this.checkLearnset = null;
 	}
 	/**
 	 * @param {string} thing
-	 * @param {{[id: string]: true}} setHas
+	 * @param {{[id: string]: true}?} setHas
 	 * @return {string}
 	 */
-	check(thing, setHas) {
-		setHas[thing] = true;
-		return this.getReason(this.get('-' + thing));
+	check(thing, setHas = null) {
+		if (setHas) setHas[thing] = true;
+		return this.getReason('-' + thing);
 	}
 	/**
-	 * @param {string | undefined} source
+	 * @param {string} key
 	 * @return {string}
 	 */
-	getReason(source) {
+	getReason(key) {
+		const source = this.get(key);
 		if (source === undefined) return '';
 		return source ? `banned by ${source}` : `banned`;
 	}
@@ -237,7 +248,7 @@ class Format extends Effect {
 		/**
 		 * Name of the team generator algorithm, if this format uses
 		 * random/fixed teams. null if players can bring teams.
-		 * @type {?string}
+		 * @type {string | undefined}
 		 */
 		this.team = this.team;
 		/** @type {'Format' | 'Ruleset' | 'Rule' | 'ValidatorRule'} */
@@ -255,7 +266,7 @@ class Format extends Effect {
 		this.rated = this.rated;
 		/**
 		 * Game type.
-		 * @type {'singles' | 'doubles' | 'triples' | 'rotation'}
+		 * @type {GameType}
 		 */
 		this.gameType = this.gameType || 'singles';
 		/**
@@ -292,12 +303,12 @@ class Format extends Effect {
 		/**
 		 * The number of Pokemon players can bring to battle and
 		 * the number that can actually be used.
-		 * @type {?{battle: number, validate: number[]}}
+		 * @type {{battle?: number, validate?: [number, number]} | undefined}
 		 */
 		this.teamLength = this.teamLength;
 		/**
 		 * An optional function that runs at the start of a battle.
-		 * @type {?Function}
+		 * @type {(this: Battle) => void}
 		 */
 		this.onBegin = this.onBegin;
 
@@ -337,7 +348,7 @@ class Format extends Effect {
 		 * formats will change level 1 and level 100 pokemon to level 50,
 		 * which is what you want here. You usually want maxForcedLevel
 		 * instead.
-		 * @type {number?}
+		 * @type {number | undefined}
 		 */
 		this.forcedLevel = this.forcedLevel;
 		/**
@@ -345,30 +356,12 @@ class Format extends Effect {
 		 * will allow e.g. level 50 Hydreigon in Gen 5, which is not
 		 * normally legal because Hydreigon doesn't evolve until level
 		 * 64.
-		 * @type {number?}
+		 * @type {number | undefined}
 		 */
 		this.maxForcedLevel = this.maxForcedLevel;
 
-		/**
-		 * @type {((this: Validator, set: PokemonSet, teamHas: AnyObject) => string[] | false)?}
-		 */
-		this.validateSet = this.validateSet;
-		/**
-		 * @type {((this: Validator, team: PokemonSet[], removeNicknames: boolean) => string[] | false)?}
-		 */
-		this.validateTeam = this.validateTeam;
-		/**
-		 * @type {((this: Validator, set: PokemonSet, format: Format, setHas: AnyObject, teamHas: AnyObject) => string[] | false)?}
-		 */
-		this.onChangeSet = this.onChangeSet;
-		/**
-		 * @type {((this: Validator, set: PokemonSet, format: Format, setHas: AnyObject, teamHas: AnyObject) => string[] | false)?}
-		 */
-		this.onValidateSet = this.onValidateSet;
-		/**
-		 * @type {((this: Validator, team: PokemonSet[], format: Format, teamHas: AnyObject) => string[] | false)?}
-		 */
-		this.onValidateTeam = this.onValidateTeam;
+		/** @type {boolean} */
+		this.noLog = !!this.noLog;
 	}
 }
 
@@ -397,33 +390,33 @@ class Item extends Effect {
 		/**
 		 * A Move-like object depicting what happens when Fling is used on
 		 * this item.
-		 * @type {?AnyObject}
+		 * @type {FlingData | undefined}
 		 */
 		this.fling = this.fling;
 		/**
 		 * If this is a Drive: The type it turns Techno Blast into.
 		 * undefined, if not a Drive.
-		 * @type {?string}
+		 * @type {string | undefined}
 		 */
 		this.onDrive = this.onDrive;
 		/**
 		 * If this is a Memory: The type it turns Multi-Attack into.
 		 * undefined, if not a Memory.
-		 * @type {?string}
+		 * @type {string | undefined}
 		 */
 		this.onMemory = this.onMemory;
 		/**
 		 * If this is a mega stone: The name (e.g. Charizard-Mega-X) of the
 		 * forme this allows transformation into.
 		 * undefined, if not a mega stone.
-		 * @type {?string}
+		 * @type {string | undefined}
 		 */
 		this.megaStone = this.megaStone;
 		/**
 		 * If this is a mega stone: The name (e.g. Charizard) of the
 		 * forme this allows transformation from.
 		 * undefined, if not a mega stone.
-		 * @type {?string}
+		 * @type {string | undefined}
 		 */
 		this.megaEvolves = this.megaEvolves;
 		/**
@@ -486,10 +479,16 @@ class Ability extends Effect {
 		this.effectType = 'Ability';
 
 		/**
+		 * Represents how useful or detrimental this ability is.
+		 * @type {number}
+		 */
+		this.rating = this.rating;
+
+		/**
 		 * Whether or not this ability suppresses weather.
 		 * @type {boolean}
 		 */
-		this.suppressWeather = this.suppressWeather;
+		this.suppressWeather = !!this.suppressWeather;
 
 		if (!this.gen) {
 			if (this.num >= 192) {
@@ -556,9 +555,16 @@ class Template extends Effect {
 		 * Other forms. List of names of cosmetic forms. These should have
 		 * `aliases.js` aliases to this entry, but not have their own
 		 * entry in `pokedex.js`.
-		 * @type {?string[]}
+		 * @type {string[] | undefined}
 		 */
-		this.otherForms = this.otherForms || null;
+		this.otherForms = this.otherForms;
+
+		/**
+		 * Other formes. List of names of formes, appears only on the base
+		 * forme. Unlike forms, these have their own entry in `pokedex.js`.
+		 * @type {string[] | undefined}
+		 */
+		this.otherFormes = this.otherFormes;
 
 		/**
 		 * Forme letter. One-letter version of the forme name. Usually the
@@ -577,7 +583,7 @@ class Template extends Effect {
 
 		/**
 		 * Abilities
-		 * @type {{0: string, 1?: string, H?: string}}
+		 * @type {TemplateAbility}
 		 */
 		this.abilities = this.abilities || {0: ""};
 
@@ -589,7 +595,7 @@ class Template extends Effect {
 
 		/**
 		 * Added type (used in OMs)
-		 * @type {?string}
+		 * @type {string | undefined}
 		 */
 		this.addedType = this.addedType;
 
@@ -607,6 +613,13 @@ class Template extends Effect {
 		this.tier = this.tier || '';
 
 		/**
+		 * Doubles Tier. The Pokemon's location in the Smogon doubles tier system.
+		 * Do not use for LC bans.
+		 * @type {string}
+		 */
+		this.doublesTier = this.doublesTier || '';
+
+		/**
 		 * Evolutions. Array because many Pokemon have multiple evolutions.
 		 * @type {string[]}
 		 */
@@ -614,9 +627,9 @@ class Template extends Effect {
 
 		/**
 		 * Evolution level. falsy if doesn't evolve
-		 * @type {number?}
+		 * @type {number | undefined}
 		 */
-		this.evoLevel = this.evoLevel || null;
+		this.evoLevel = this.evoLevel;
 
 		/**
 		 * Is NFE? True if this Pokemon can evolve (Mega evolution doesn't
@@ -642,14 +655,14 @@ class Template extends Effect {
 		 * Gender ratio. Should add up to 1 unless genderless.
 		 * @type {{M: number, F: number}}
 		 */
-		this.genderRatio = this.genderRatio || (this.gender === 'M' ? {M:1, F:0} :
-			this.gender === 'F' ? {M:0, F:1} :
-				this.gender === 'N' ? {M:0, F:0} :
-					{M:0.5, F:0.5});
+		this.genderRatio = this.genderRatio || (this.gender === 'M' ? {M: 1, F: 0} :
+			this.gender === 'F' ? {M: 0, F: 1} :
+				this.gender === 'N' ? {M: 0, F: 0} :
+					{M: 0.5, F: 0.5});
 
 		/**
 		 * Required item. Do not use this directly; see requiredItems.
-		 * @type {string}
+		 * @type {string | undefined}
 		 */
 		this.requiredItem = this.requiredItem;
 
@@ -657,13 +670,13 @@ class Template extends Effect {
 		 * Required items. Items required to be in this forme, e.g. a mega
 		 * stone, or Griseous Orb. Array because Arceus formes can hold
 		 * either a Plate or a Z-Crystal.
-		 * @type {?string[]}
+		 * @type {string[] | undefined}
 		 */
-		this.requiredItems = this.requiredItems || (this.requiredItem && [this.requiredItem]) || null;
+		this.requiredItems = this.requiredItems || (this.requiredItem ? [this.requiredItem] : undefined);
 
 		/**
 		 * Base stats
-		 * @type {AnyObject}
+		 * @type {StatsTable}
 		 */
 		this.baseStats = this.baseStats;
 
@@ -680,6 +693,12 @@ class Template extends Effect {
 		this.heightm = this.heightm;
 
 		/**
+		 * Color
+		 * @type {string}
+		 */
+		this.color = this.color || '';
+
+		/**
 		 * Does this Pokemon have an unreleased hidden ability?
 		 * @type {boolean}
 		 */
@@ -694,13 +713,13 @@ class Template extends Effect {
 
 		/**
 		 * Max HP. Used in the battle engine
-		 * @type {?number}
+		 * @type {number | undefined}
 		 */
 		this.maxHP = this.maxHP;
 
 		/**
 		 * Keeps track of exactly how a pokemon might learn a move, in the form moveid:sources[]
-		 * @type {?{[moveid: string]: MoveSource[]}}
+		 * @type {{[moveid: string]: MoveSource[]} | undefined}
 		 */
 		this.learnset = this.learnset;
 		/**
@@ -710,12 +729,12 @@ class Template extends Effect {
 		this.eventOnly = !!this.eventOnly;
 		/**
 		 * List of event data for each event.
-		 * @type {?EventInfo[]}
+		 * @type {EventInfo[] | undefined}
 		 */
 		this.eventPokemon = this.eventPokemon;
 
 		if (!this.gen) {
-			if (this.num >= 722 || this.forme === 'Alola') {
+			if (this.num >= 722 || this.forme.startsWith('Alola')) {
 				this.gen = 7;
 			} else if (this.forme && ['Mega', 'Mega-X', 'Mega-Y'].includes(this.forme)) {
 				this.gen = 6;
@@ -798,6 +817,12 @@ class Move extends Effect {
 		this.basePower = this.basePower;
 
 		/**
+		 * Move base accuracy. True denotes a move that always hits
+		 * @type {true | number}
+		 */
+		this.accuracy = this.accuracy;
+
+		/**
 		 * Critical hit ratio. Defaults to 1.
 		 * @type {number}
 		 */
@@ -817,7 +842,7 @@ class Move extends Effect {
 
 		/**
 		 * Can this move OHKO foes?
-		 * @type {boolean}
+		 * @type {boolean | string}
 		 */
 		this.ohko = this.ohko;
 
@@ -831,7 +856,7 @@ class Move extends Effect {
 		/**
 		 * Secondary effect. You usually don't want to access this
 		 * directly; but through the secondaries array.
-		 * @type {?AnyObject}
+		 * @type {boolean  | SecondaryEffect | undefined}
 		 */
 		this.secondary = this.secondary;
 
@@ -839,9 +864,9 @@ class Move extends Effect {
 		 * Secondary effects. An array because there can be more than one
 		 * (for instance, Fire Fang has both a burn and a flinch
 		 * secondary).
-		 * @type {?AnyObject[]}
+		 * @type {false | SecondaryEffect[] | undefined}
 		 */
-		this.secondaries = this.secondaries || (this.secondary && [this.secondary]);
+		this.secondaries = this.secondaries || (this.secondary && typeof this.secondary !== 'boolean' && [this.secondary]);
 
 		/**
 		 * Move priority. Higher priorities go before lower priorities,
@@ -859,7 +884,7 @@ class Move extends Effect {
 		/**
 		 * Category that changes which defense to use when calculating
 		 * move damage.
-		 * @type {?'Physical' | 'Special' | 'Status'}
+		 * @type {'Physical' | 'Special' | 'Status' | undefined}
 		 */
 		this.defensiveCategory = this.defensiveCategory;
 
@@ -900,12 +925,6 @@ class Move extends Effect {
 		this.ignoreDefensive = this.ignoreDefensive;
 
 		/**
-		 * Whether or not this move uses the source's highest raw stat.
-		 * @type {boolean}
-		 */
-		this.useBestSourceOffensive = this.useBestSourceOffensive;
-
-		/**
 		 * Whether or not this move ignores type immunities. Defaults to
 		 * true for Status moves and false for Physical/Special moves.
 		 * @type {AnyObject | boolean}
@@ -927,7 +946,7 @@ class Move extends Effect {
 
 		/**
 		 * Is this move a Z-Move?
-		 * @type {boolean}
+		 * @type {boolean | string | undefined}
 		 */
 		this.isZ = this.isZ;
 
@@ -954,13 +973,13 @@ class Move extends Effect {
 		 * Move target only used by Pressure
 		 * @type {string}
 		 */
-		this.pressureTarget = this.pressureTarget;
+		this.pressureTarget = this.pressureTarget || '';
 
 		/**
 		 * Move target used if the user is not a Ghost type
 		 * @type {string}
 		 */
-		this.nonGhostTarget = this.nonGhostTarget;
+		this.nonGhostTarget = this.nonGhostTarget || '';
 
 		/**
 		 * Whether or not the move ignores abilities
@@ -983,14 +1002,14 @@ class Move extends Effect {
 		/**
 		 * Modifier that affects damage when multiple targets
 		 * are hit
-		 * @type {?number}
+		 * @type {number | undefined}
 		 */
 		this.spreadModifier = this.spreadModifier;
 
 		/**
 		 * Modifier that affects damage when this move is
 		 * a critical hit
-		 * @type {?number}
+		 * @type {number | undefined}
 		 */
 		this.critModifier = this.critModifier;
 
@@ -998,7 +1017,7 @@ class Move extends Effect {
 		 * Damage modifier based on the user's types
 		 * @type {number}
 		 */
-		this.typeMod = this.typeMod;
+		this.typeMod = this.typeMod || 0;
 
 		/**
 		 * Whether or not this move gets STAB
@@ -1014,24 +1033,9 @@ class Move extends Effect {
 
 		/**
 		 * STAB (can be modified by other effects)
-		 * @type {?number}
+		 * @type {number | undefined}
 		 */
 		this.stab = this.stab;
-
-		/**
-		 * @type {?Function}
-		 */
-		this.damageCallback = this.damageCallback;
-
-		/**
-		 * @type {?Function}
-		 */
-		this.basePowerCallback = this.basePowerCallback;
-
-		/**
-		 * @type {?Function}
-		 */
-		this.beforeTurnCallback = this.beforeTurnCallback;
 
 		if (!this.gen) {
 			if (this.num >= 622) {

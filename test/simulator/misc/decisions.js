@@ -98,13 +98,13 @@ const TRIPLES_TEAMS = {
 
 let battle;
 
-describe('Decisions', function () {
+describe('Choices', function () {
 	afterEach(function () {
 		battle.destroy();
 	});
 
 	describe('Generic', function () {
-		it('should wait for players to send their decisions and run them as soon as they are all received', function (done) {
+		it('should wait for players to send their choices and run them as soon as they are all received', function (done) {
 			battle = common.createBattle();
 			battle.join('p1', 'Guest 1', 1, [{species: "Mew", ability: 'synchronize', moves: ['recover']}]);
 			battle.join('p2', 'Guest 2', 1, [{species: "Rhydon", ability: 'prankster', moves: ['sketch']}]);
@@ -133,10 +133,9 @@ describe('Decisions', function () {
 				for (let j = 0; j < 2; j++) {
 					const beforeHP = activeMons.map(pokemon => pokemon.hp);
 					const beforeAtk = activeMons.map(pokemon => pokemon.boosts.atk);
-					battle.p1.chooseMove(i + 1);
-					battle.p2.chooseMove(j + 1);
-					assert.strictEqual(activeMons[0].lastMove, MOVES[0][i]);
-					assert.strictEqual(activeMons[1].lastMove, MOVES[1][j]);
+					battle.makeChoices('move ' + (i + 1), 'move ' + (j + 1));
+					assert.strictEqual(activeMons[0].lastMove.id, MOVES[0][i]);
+					assert.strictEqual(activeMons[1].lastMove.id, MOVES[1][j]);
 
 					if (i >= 1) { // p1 used a damaging move
 						assert.atMost(activeMons[1].hp, beforeHP[1] - 1);
@@ -163,8 +162,7 @@ describe('Decisions', function () {
 			]);
 			const p2active = battle.p2.active;
 
-			battle.p1.chooseMove(1, 1).chooseMove(1, 2);
-			battle.p2.chooseMove(1, -2).chooseMove(1, -1);
+			battle.makeChoices('move gastroacid 1, move leechseed 2', 'move knockoff -2, move thunderwave -1');
 			assert.strictEqual(battle.turn, 2);
 
 			assert(p2active[0].volatiles['gastroacid']);
@@ -266,19 +264,17 @@ describe('Decisions', function () {
 
 		it('should allow shifting the Pokémon on the right to the center', function () {
 			battle = common.createBattle({gameType: 'triples'});
-			const p1 = battle.join('p1', 'Guest 1', 1, [
+			battle.join('p1', 'Guest 1', 1, [
 				{species: "Pineco", ability: 'sturdy', moves: ['harden']},
 				{species: "Geodude", ability: 'sturdy', moves: ['defensecurl']},
 				{species: "Gastly", ability: 'levitate', moves: ['spite']},
 			]);
-			const p2 = battle.join('p2', 'Guest 2', 1, [
+			battle.join('p2', 'Guest 2', 1, [
 				{species: "Skarmory", ability: 'sturdy', moves: ['roost']},
 				{species: "Aggron", ability: 'sturdy', moves: ['irondefense']},
 				{species: "Golem", ability: 'sturdy', moves: ['defensecurl']},
 			]);
-			p1.chooseShift();
-			p2.chooseShift();
-			battle.commitDecisions();
+			battle.makeChoices('shift, move harden, move defensecurl', 'shift, move roost, move irondefense');
 
 			['Geodude', 'Pineco', 'Gastly'].forEach((species, index) => assert.species(battle.p1.active[index], species));
 			['Aggron', 'Skarmory', 'Golem'].forEach((species, index) => assert.species(battle.p2.active[index], species));
@@ -299,11 +295,11 @@ describe('Decisions', function () {
 
 			// Implementation-dependent paths
 			if (battle.turn === 3) {
-				assert.strictEqual(battle.p2.active[0].lastMove, 'struggle');
+				assert.strictEqual(battle.p2.active[0].lastMove.id, 'struggle');
 			} else {
 				battle.choose('p2', 'move 1');
 				assert.strictEqual(battle.turn, 3);
-				assert.strictEqual(battle.p2.active[0].lastMove, 'struggle');
+				assert.strictEqual(battle.p2.active[0].lastMove.id, 'struggle');
 			}
 		});
 
@@ -316,7 +312,7 @@ describe('Decisions', function () {
 			battle.p2.chooseMove(2);
 
 			assert.strictEqual(battle.turn, 2);
-			assert.notStrictEqual(battle.p2.active[0].lastMove, 'struggle');
+			assert.notStrictEqual(battle.p2.active[0].lastMove.id, 'struggle');
 		});
 
 		it('should not force Struggle usage on move attempt when choosing a disabled move', function () {
@@ -328,11 +324,11 @@ describe('Decisions', function () {
 
 			battle.p1.chooseMove(1);
 			assert.strictEqual(battle.turn, 1);
-			assert.notStrictEqual(failingAttacker.lastMove, 'struggle');
+			assert.notStrictEqual(failingAttacker.lastMove && failingAttacker.lastMove.id, 'struggle');
 
 			battle.p1.chooseMove('recover');
 			assert.strictEqual(battle.turn, 1);
-			assert.notStrictEqual(failingAttacker.lastMove, 'struggle');
+			assert.notStrictEqual(failingAttacker.lastMove && failingAttacker.lastMove.id, 'struggle');
 		});
 
 		it('should send meaningful feedback to players if they try to use a disabled move', function () {
@@ -340,7 +336,7 @@ describe('Decisions', function () {
 			battle.join('p1', 'Guest 1', 1, [{species: "Skarmory", ability: 'sturdy', moves: ['spikes', 'roost']}]);
 			battle.join('p2', 'Guest 2', 1, [{species: "Smeargle", ability: 'owntempo', moves: ['imprison', 'spikes']}]);
 
-			battle.commitDecisions();
+			battle.makeChoices('move spikes', 'move imprison');
 
 			const buffer = [];
 			battle.send = (type, data) => {
@@ -385,7 +381,7 @@ describe('Decisions', function () {
 				{species: 'Charizard', ability: 'blaze', moves: ['scratch']},
 			]]);
 
-			battle.commitDecisions();
+			battle.makeChoices('move lunardance', 'move lunardance');
 			battle.p1.chooseSwitch(2);
 			battle.p2.chooseSwitch(3);
 
@@ -404,7 +400,7 @@ describe('Decisions', function () {
 				{species: 'Charizard', ability: 'blaze', moves: ['scratch']},
 			]]);
 
-			battle.commitDecisions();
+			battle.makeChoices('move lunardance, move lunardance', 'move lunardance, move lunardance');
 			battle.sides.forEach(side => side.active.forEach(pokemon => assert.fainted(pokemon)));
 
 			battle.p1.choosePass();
@@ -432,7 +428,7 @@ describe('Decisions', function () {
 				{species: 'Charizard', ability: 'blaze', moves: ['scratch']},
 			]]);
 
-			battle.commitDecisions();
+			battle.makeChoices('move tackle, move healingwish, move lunardance', 'move scratch, move healingwish, move lunardance');
 			assert.sets(() => battle.turn, battle.turn + 1, () => {
 				battle.p1.choosePass();
 				battle.p1.choosePass();
@@ -459,7 +455,7 @@ describe('Decisions', function () {
 				{species: 'Charizard', ability: 'blaze', moves: ['scratch']},
 			]]);
 
-			battle.commitDecisions();
+			battle.makeChoices('move lunardance, move lunardance', 'move lunardance, move lunardance');
 			battle.sides.forEach(side => side.active.forEach(pokemon => assert.fainted(pokemon)));
 
 			assert.constant(() => battle.turn, () => {
@@ -499,7 +495,7 @@ describe('Decisions', function () {
 			}
 		});
 
-		it('should autocomplete a single-slot decision in Singles for no Illusion', function () {
+		it('should autocomplete a single-slot action in Singles for no Illusion', function () {
 			// Backwards-compatibility with the client. It should be useful for 3rd party bots/clients (Android?)
 			for (let i = 0; i < 5; i++) {
 				battle = common.createBattle({preview: true}, SINGLES_TEAMS.full);
@@ -582,9 +578,8 @@ describe('Decisions', function () {
 			battle.p1.chooseMove(1);
 			battle.p2.chooseMove('growl');
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|move tackle|', '|choice||move growl', '|choice|move tackle|move growl'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 move tackle\n>p2 move growl';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -599,9 +594,8 @@ describe('Decisions', function () {
 			battle.p1.chooseMove(1, 1).chooseMove(1, 2);
 			battle.p2.chooseMove(1, 2).chooseMove(1, 1);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|move tackle 1, move tackle 2|', '|choice||move scratch 2, move scratch 1', '|choice|move tackle 1, move tackle 2|move scratch 2, move scratch 1'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 move tackle 1, move tackle 2\n>p2 move scratch 2, move scratch 1';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -616,9 +610,8 @@ describe('Decisions', function () {
 			battle.p1.chooseMove(1).chooseMove(1);
 			battle.p2.chooseMove(1, 1).chooseMove(1, 1);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|move magnitude, move rockslide|', '|choice||move scratch 1, move scratch 1', '|choice|move magnitude, move rockslide|move scratch 1, move scratch 1'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 move magnitude, move rockslide\n>p2 move scratch 1, move scratch 1';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -630,9 +623,8 @@ describe('Decisions', function () {
 			battle.p1.chooseMove(1, null, true);
 			battle.p2.chooseMove(1, null, true);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|move tackle mega|', '|choice||move tailwhip mega', '|choice|move tackle mega|move tailwhip mega'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 move tackle mega\n>p2 move tailwhip mega';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -644,9 +636,8 @@ describe('Decisions', function () {
 			battle.p1.chooseMove(1, null, true);
 			battle.p2.chooseMove(1, null, true);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|move scratch mega|', '|choice||move ember mega', '|choice|move scratch mega|move ember mega'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 move scratch mega\n>p2 move ember mega';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -664,9 +655,8 @@ describe('Decisions', function () {
 			battle.p1.chooseSwitch(2);
 			battle.p2.chooseSwitch(3);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|switch 2|', '|choice||switch 3', '|choice|switch 2|switch 3'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 switch 2\n>p2 switch 3';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -686,9 +676,8 @@ describe('Decisions', function () {
 			battle.p1.chooseTeam('1342');
 			battle.p2.chooseTeam('1234');
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|team 1, team 3, team 4, team 2|', '|choice||team 1, team 2, team 3, team 4', '|choice|team 1, team 3, team 4, team 2|team 1, team 2, team 3, team 4'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 team 1, 3, 4, 2\n>p2 team 1, 2, 3, 4';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -707,9 +696,8 @@ describe('Decisions', function () {
 			p1.chooseShift().chooseMove(1).chooseMove(1);
 			p2.chooseMove(1).chooseMove(1).chooseMove(1);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|shift, move defensecurl, move haze|', '|choice||move roost, move irondefense, move defensecurl', '|choice|shift, move defensecurl, move haze|move roost, move irondefense, move defensecurl'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 shift, move defensecurl, move haze\n>p2 move roost, move irondefense, move defensecurl';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 
@@ -728,19 +716,18 @@ describe('Decisions', function () {
 			p1.chooseMove(1).chooseMove(1).chooseShift();
 			p2.chooseMove(1).chooseMove(1).chooseMove(1);
 
-			const logText = battle.log.join('\n');
-			const logs = ['|choice||', '|choice|move harden, move defensecurl, shift|', '|choice||move roost, move irondefense, move defensecurl', '|choice|move harden, move defensecurl, shift|move roost, move irondefense, move defensecurl'];
-			const subString = '|split\n' + logs.join('\n');
+			const logText = battle.inputLog.join('\n');
+			const subString = '>p1 move harden, move defensecurl, shift\n>p2 move roost, move irondefense, move defensecurl';
 			assert(logText.includes(subString), `${logText} does not include ${subString}`);
 		});
 	});
 });
 
-describe('Decision extensions', function () {
+describe('Choice extensions', function () {
 	describe('Undo', function () {
 		const MODES = ['revoke', 'override'];
 		for (const mode of MODES) {
-			it(`should disallow to ${mode} decisions after every player has sent an unrevoked decision`, function () {
+			it(`should disallow to ${mode} decisions after every player has sent an unrevoked action`, function () {
 				battle = common.createBattle({cancel: true});
 				battle.join('p1', 'Guest 1', 1, [{species: "Bulbasaur", ability: 'overgrow', moves: ['tackle', 'growl']}]);
 				battle.join('p2', 'Guest 2', 1, [{species: "Charmander", ability: 'blaze', moves: ['tackle', 'growl']}]);
@@ -751,8 +738,8 @@ describe('Decision extensions', function () {
 				battle.choose('p1', 'move growl');
 
 				assert.strictEqual(battle.turn, 2);
-				assert.strictEqual(battle.p1.active[0].lastMove, 'tackle');
-				assert.strictEqual(battle.p2.active[0].lastMove, 'growl');
+				assert.strictEqual(battle.p1.active[0].lastMove.id, 'tackle');
+				assert.strictEqual(battle.p2.active[0].lastMove.id, 'growl');
 			});
 
 			it(`should support to ${mode} move decisions`, function () {
@@ -766,7 +753,7 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move growl');
 
 				assert.strictEqual(battle.turn, 2);
-				assert.strictEqual(battle.p1.active[0].lastMove, 'growl');
+				assert.strictEqual(battle.p1.active[0].lastMove.id, 'growl');
 			});
 
 			it(`should disallow to ${mode} move decisions for maybe-disabled Pokémon`, function () {
@@ -783,7 +770,7 @@ describe('Decision extensions', function () {
 				battle.choose('p1', 'move growl');
 				battle.choose('p2', 'move scratch');
 
-				assert.strictEqual(target.lastMove, 'tackle');
+				assert.strictEqual(target.lastMove.id, 'tackle');
 			});
 
 			it(`should disallow to ${mode} move decisions by default`, function () {
@@ -797,8 +784,8 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move growl');
 
 				assert.strictEqual(battle.turn, 2);
-				assert.strictEqual(battle.p1.active[0].lastMove, 'tackle');
-				assert.strictEqual(battle.p2.active[0].lastMove, 'growl');
+				assert.strictEqual(battle.p1.active[0].lastMove.id, 'tackle');
+				assert.strictEqual(battle.p2.active[0].lastMove.id, 'growl');
 			});
 
 			it(`should support to ${mode} switch decisions on move requests`, function () {
@@ -817,7 +804,7 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move 1');
 
 				['Bulbasaur', 'Ivysaur', 'Venusaur'].forEach((species, index) => assert.species(battle.p1.pokemon[index], species));
-				assert.strictEqual(battle.p1.active[0].lastMove, 'synthesis');
+				assert.strictEqual(battle.p1.active[0].lastMove.id, 'synthesis');
 
 				battle.destroy();
 				battle = common.createBattle({cancel: true}, TEAMS);
@@ -931,7 +918,7 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move 1, move 1, move 1');
 
 				['Bulbasaur', 'Ivysaur', 'Venusaur'].forEach((species, index) => assert.species(battle.p1.active[index], species));
-				assert.strictEqual(battle.p1.active[0].lastMove, 'synthesis');
+				assert.strictEqual(battle.p1.active[0].lastMove.id, 'synthesis');
 
 				battle.destroy();
 				battle = common.createBattle({gameType: 'triples', cancel: true}, TEAMS);
@@ -942,7 +929,7 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move 1, move 1, move 1');
 
 				['Bulbasaur', 'Ivysaur', 'Venusaur'].forEach((species, index) => assert.species(battle.p1.active[index], species));
-				assert.strictEqual(battle.p1.active[2].lastMove, 'synthesis');
+				assert.strictEqual(battle.p1.active[2].lastMove.id, 'synthesis');
 			});
 
 			it(`should disallow to ${mode} shift decisions by default`, function () {
@@ -963,7 +950,7 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move 1, move 1, move 1');
 
 				['Ivysaur', 'Bulbasaur', 'Venusaur'].forEach((species, index) => assert.species(battle.p1.active[index], species));
-				assert.strictEqual(battle.p1.active[0].lastMove, 'growth');
+				assert.strictEqual(battle.p1.active[0].lastMove.id, 'growth');
 
 				battle.destroy();
 				battle = common.createBattle({gameType: 'triples'}, TEAMS);
@@ -974,7 +961,7 @@ describe('Decision extensions', function () {
 				battle.choose('p2', 'move 1, move 1, move 1');
 
 				['Bulbasaur', 'Venusaur', 'Ivysaur'].forEach((species, index) => assert.species(battle.p1.active[index], species));
-				assert.strictEqual(battle.p1.active[2].lastMove, 'growth');
+				assert.strictEqual(battle.p1.active[2].lastMove.id, 'growth');
 			});
 
 			it(`should support to ${mode} switch decisions on double switch requests`, function () {
@@ -989,7 +976,7 @@ describe('Decision extensions', function () {
 					{species: "Charmander", ability: 'blaze', moves: ['tackle']},
 				]);
 
-				battle.commitDecisions();
+				battle.makeChoices('move explosion', 'move tackle');
 
 				battle.choose('p1', 'switch 2');
 				if (mode === 'revoke') battle.undoChoice('p1');
@@ -1014,7 +1001,7 @@ describe('Decision extensions', function () {
 					{species: "Cyndaquil", ability: 'blaze', moves: ['tackle']},
 				]);
 
-				battle.commitDecisions();
+				battle.makeChoices('move explosion, move tackle', 'move tackle, move tackle');
 
 				battle.choose('p1', 'pass, switch 3');
 				if (mode === 'revoke') battle.undoChoice('p1');
@@ -1037,7 +1024,7 @@ describe('Decision extensions', function () {
 				]];
 
 				battle = common.createBattle({gameType: 'doubles', cancel: true}, TEAMS);
-				battle.commitDecisions();
+				battle.makeChoices('move lunardance, move healingwish', 'move scratch, move scratch');
 
 				battle.choose('p1', 'switch 3, switch 4');
 				if (mode === 'revoke') battle.undoChoice('p1');
@@ -1058,7 +1045,7 @@ describe('Decision extensions', function () {
 				]];
 
 				battle = common.createBattle({gameType: 'doubles'}, TEAMS);
-				battle.commitDecisions();
+				battle.makeChoices('move lunardance, move healingwish', 'move scratch, move scratch');
 
 				battle.choose('p1', 'pass, switch 3');
 				if (mode === 'revoke') battle.undoChoice('p1');
@@ -1079,7 +1066,7 @@ describe('Decision extensions', function () {
 					{species: "Charmander", ability: 'blaze', moves: ['tackle']},
 				]);
 
-				battle.commitDecisions();
+				battle.makeChoices('move explosion', 'move tackle');
 
 				battle.choose('p1', 'switch 2');
 				if (mode === 'revoke') battle.undoChoice('p1');
@@ -1103,7 +1090,7 @@ describe('Decision extensions', function () {
 					{species: "Cyndaquil", ability: 'blaze', moves: ['tackle']},
 				]);
 
-				battle.commitDecisions();
+				battle.makeChoices('move explosion, move tackle', 'move tackle, move tackle');
 
 				battle.choose('p1', 'pass, switch 3');
 				if (mode === 'revoke') battle.undoChoice('p1');
@@ -1113,7 +1100,7 @@ describe('Decision extensions', function () {
 				['Deoxys-Attack', 'Chikorita'].forEach((species, index) => assert.species(battle.p1.active[index], species));
 			});
 
-			it(`should support to ${mode} team order decision on team preview requests`, function () {
+			it(`should support to ${mode} team order action on team preview requests`, function () {
 				battle = common.createBattle({preview: true, cancel: true}, [
 					[{species: 'Bulbasaur', ability: 'overgrow', moves: ['tackle']}, {species: 'Ivysaur', ability: 'overgrow', moves: ['tackle']}],
 					[{species: 'Charmander', ability: 'blaze', moves: ['scratch']}, {species: 'Charmeleon', ability: 'blaze', moves: ['scratch']}],
@@ -1140,7 +1127,7 @@ describe('Decision extensions', function () {
 				['Bulbasaur', 'Ivysaur'].forEach((species, index) => assert.species(battle.p1.pokemon[index], species));
 			});
 
-			it(`should disallow to ${mode} team order decision on team preview requests by default`, function () {
+			it(`should disallow to ${mode} team order action on team preview requests by default`, function () {
 				battle = common.createBattle({preview: true}, [
 					[{species: 'Bulbasaur', ability: 'overgrow', moves: ['tackle']}, {species: 'Ivysaur', ability: 'overgrow', moves: ['tackle']}],
 					[{species: 'Charmander', ability: 'blaze', moves: ['scratch']}, {species: 'Charmeleon', ability: 'blaze', moves: ['scratch']}],
@@ -1157,7 +1144,7 @@ describe('Decision extensions', function () {
 	});
 });
 
-describe('Decision internals', function () {
+describe('Choice internals', function () {
 	afterEach(function () {
 		battle.destroy();
 	});
@@ -1248,7 +1235,7 @@ describe('Decision internals', function () {
 		assert.strictEqual(p1.active[1].name, 'Ekans');
 	});
 
-	it('should empty the decisions list when undoing a move', function () {
+	it('should empty the actions list when undoing a move', function () {
 		battle = common.createBattle({gameType: 'doubles', cancel: true});
 		const p1 = battle.join('p1', 'Guest 1', 1, [
 			{species: "Pineco", ability: 'sturdy', moves: ['selfdestruct']},
@@ -1271,7 +1258,7 @@ describe('Decision internals', function () {
 		assert.fainted(p1.active[1]);
 	});
 
-	it('should empty the decisions list when undoing a switch', function () {
+	it('should empty the actions list when undoing a switch', function () {
 		battle = common.createBattle({gameType: 'doubles', cancel: true});
 		const p1 = battle.join('p1', 'Guest 1', 1, [
 			{species: "Pineco", ability: 'sturdy', moves: ['selfdestruct']},
@@ -1283,7 +1270,7 @@ describe('Decision internals', function () {
 			{species: "Aggron", ability: 'sturdy', moves: ['irondefense']},
 		]);
 
-		battle.commitDecisions();
+		battle.makeChoices('move selfdestruct, move selfdestruct', 'move roost, move irondefense');
 
 		p1.chooseSwitch(3);
 		assert(p1.choice.actions.length > 0);
@@ -1295,7 +1282,7 @@ describe('Decision internals', function () {
 		assert.species(p1.active[1], 'Koffing');
 	});
 
-	it('should empty the decisions list when undoing a pass', function () {
+	it('should empty the actions list when undoing a pass', function () {
 		battle = common.createBattle({gameType: 'doubles', cancel: true});
 		const p1 = battle.join('p1', 'Guest 1', 1, [
 			{species: "Pineco", ability: 'sturdy', moves: ['selfdestruct']},
@@ -1307,7 +1294,7 @@ describe('Decision internals', function () {
 			{species: "Aggron", ability: 'sturdy', moves: ['irondefense']},
 		]);
 
-		battle.commitDecisions();
+		battle.makeChoices('move selfdestruct, move selfdestruct', 'move roost, move irondefense');
 
 		p1.choosePass();
 		assert(p1.choice.actions.length > 0);
@@ -1319,7 +1306,7 @@ describe('Decision internals', function () {
 		assert.species(p1.active[1], 'Koffing');
 	});
 
-	it('should empty the decisions list when undoing a shift', function () {
+	it('should empty the actions list when undoing a shift', function () {
 		battle = common.createBattle({gameType: 'triples', cancel: true});
 		battle.supportCancel = true;
 		const p1 = battle.join('p1', 'Guest 1', 1, [

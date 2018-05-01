@@ -3,7 +3,9 @@
 /**
  * Gen 2 scripts.
  */
-exports.BattleScripts = {
+
+/**@type {ModdedBattleScriptsData} */
+let BattleScripts = {
 	inherit: 'gen3',
 	gen: 2,
 	// BattlePokemon scripts.
@@ -65,7 +67,7 @@ exports.BattleScripts = {
 	runMove: function (move, pokemon, targetLoc, sourceEffect) {
 		let target = this.getTarget(pokemon, move, targetLoc);
 		if (!sourceEffect && toId(move) !== 'struggle') {
-			let changedMove = this.runEvent('OverrideDecision', pokemon, target, move);
+			let changedMove = this.runEvent('OverrideAction', pokemon, target, move);
 			if (changedMove && changedMove !== true) {
 				move = changedMove;
 				target = null;
@@ -85,12 +87,7 @@ exports.BattleScripts = {
 			return;
 		}
 		if (!this.runEvent('BeforeMove', pokemon, target, move)) {
-			// Prevent invulnerability from persisting until the turn ends
-			pokemon.removeVolatile('twoturnmove');
-			// End Bide
-			pokemon.removeVolatile('bide');
-			// Rampage moves end without causing confusion
-			delete pokemon.volatiles['lockedmove'];
+			this.runEvent('MoveAborted', pokemon, target, move);
 			this.clearActiveMove(true);
 			// This is only run for sleep and fully paralysed.
 			this.runEvent('AfterMoveSelf', pokemon, target, move);
@@ -115,19 +112,166 @@ exports.BattleScripts = {
 		pokemon.moveUsed(move);
 		this.useMove(move, pokemon, target, sourceEffect);
 		this.singleEvent('AfterMove', move, null, pokemon, target, move);
-		if (!move.selfSwitch && target.hp > 0) this.runEvent('AfterMoveSelf', pokemon, target, move);
+		if (!move.selfSwitch && target && target.hp > 0) this.runEvent('AfterMoveSelf', pokemon, target, move);
+	},
+	tryMoveHit: function (target, pokemon, move) {
+		let positiveBoostTable = [1, 1.33, 1.66, 2, 2.33, 2.66, 3];
+		let negativeBoostTable = [1, 0.75, 0.6, 0.5, 0.43, 0.36, 0.33];
+		let doSelfDestruct = true;
+		/**@type {number | false} */
+		let damage = 0;
+		let hitResult = true;
+
+		if (move.selfdestruct && doSelfDestruct) {
+			this.faint(pokemon, pokemon, move);
+		}
+
+		hitResult = this.singleEvent('PrepareHit', move, {}, target, pokemon, move);
+		if (!hitResult) {
+			if (hitResult === false) this.add('-fail', target);
+			return false;
+		}
+		this.runEvent('PrepareHit', pokemon, target, move);
+
+		if (!this.singleEvent('Try', move, null, pokemon, target, move)) {
+			return false;
+		}
+
+		hitResult = this.runEvent('TryImmunity', target, pokemon, move);
+		if (!hitResult) {
+			if (!move.spreadHit) this.attrLastMove('[miss]');
+			this.add('-miss', pokemon);
+			return false;
+		}
+
+		if (move.ignoreImmunity === undefined) {
+			move.ignoreImmunity = (move.category === 'Status');
+		}
+
+		if ((!move.ignoreImmunity || (move.ignoreImmunity !== true && !move.ignoreImmunity[move.type])) && !target.runImmunity(move.type, true)) {
+			return false;
+		}
+
+		hitResult = this.runEvent('TryHit', target, pokemon, move);
+		if (!hitResult) {
+			if (hitResult === false) this.add('-fail', target);
+			return false;
+		}
+
+		/**@type {number | true} */
+		let accuracy = move.accuracy;
+		if (move.alwaysHit) {
+			accuracy = true;
+		} else {
+			accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
+		}
+		// Now, let's calculate the accuracy.
+		if (accuracy !== true) {
+			accuracy = Math.floor(accuracy * 255 / 100);
+			if (move.ohko) {
+				if (pokemon.level >= target.level) {
+					accuracy += (pokemon.level - target.level) * 2;
+					accuracy = Math.min(accuracy, 255);
+				} else {
+					this.add('-immune', target, '[ohko]');
+					return false;
+				}
+			}
+			if (!move.ignoreAccuracy) {
+				if (pokemon.boosts.accuracy > 0) {
+					accuracy *= positiveBoostTable[pokemon.boosts.accuracy];
+				} else {
+					accuracy *= negativeBoostTable[-pokemon.boosts.accuracy];
+				}
+			}
+			if (!move.ignoreEvasion) {
+				if (target.boosts.evasion > 0 && !move.ignorePositiveEvasion) {
+					accuracy *= negativeBoostTable[target.boosts.evasion];
+				} else if (target.boosts.evasion < 0) {
+					accuracy *= positiveBoostTable[-target.boosts.evasion];
+				}
+			}
+			accuracy = Math.min(Math.floor(accuracy), 255);
+			accuracy = Math.max(accuracy, 1);
+		} else {
+			accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
+		}
+		accuracy = this.runEvent('ModifyAccuracy', target, pokemon, move, accuracy);
+		if (accuracy !== true) accuracy = Math.max(accuracy, 0);
+		if (move.alwaysHit) {
+			accuracy = true;
+		} else {
+			accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
+		}
+		if (accuracy !== true && accuracy !== 255 && !this.randomChance(accuracy, 256)) {
+			this.attrLastMove('[miss]');
+			this.add('-miss', pokemon);
+			damage = false;
+			return damage;
+		}
+		move.totalDamage = 0;
+		pokemon.lastDamage = 0;
+		if (move.multihit) {
+			let hits = move.multihit;
+			if (Array.isArray(hits)) {
+				if (hits[0] === 2 && hits[1] === 5) {
+					hits = this.sample([2, 2, 2, 3, 3, 3, 4, 5]);
+				} else {
+					hits = this.random(hits[0], hits[1] + 1);
+				}
+			}
+			hits = Math.floor(hits);
+			let nullDamage = true;
+			/**@type {number | false} */
+			let moveDamage;
+
+			let isSleepUsable = move.sleepUsable || this.getMove(move.sourceEffect).sleepUsable;
+			let i;
+			for (i = 0; i < hits && target.hp && pokemon.hp; i++) {
+				if (pokemon.status === 'slp' && !isSleepUsable) break;
+				moveDamage = this.moveHit(target, pokemon, move);
+				if (moveDamage === false) break;
+				if (nullDamage && (moveDamage || moveDamage === 0 || moveDamage === undefined)) nullDamage = false;
+				damage = (moveDamage || 0);
+				move.totalDamage += damage;
+				this.eachEvent('Update');
+			}
+			if (i === 0) return 1;
+			if (nullDamage) damage = false;
+			this.add('-hitcount', target, i);
+		} else {
+			damage = this.moveHit(target, pokemon, move);
+			move.totalDamage = damage;
+		}
+		if (move.category !== 'Status') {
+			// FIXME: The stored damage should be calculated ignoring Substitute.
+			// https://github.com/Zarel/Pokemon-Showdown/issues/2598
+			target.gotAttacked(move, damage, pokemon);
+		}
+		if (move.ohko) this.add('-ohko');
+
+		if (!move.negateSecondary) {
+			this.singleEvent('AfterMoveSecondary', move, null, target, pokemon, move);
+			this.runEvent('AfterMoveSecondary', target, pokemon, move);
+		}
+
+		if (move.recoil && move.totalDamage) {
+			this.damage(this.calcRecoilDamage(move.totalDamage, move), pokemon, target, 'recoil');
+		}
+		return damage;
 	},
 	moveHit: function (target, pokemon, move, moveData, isSecondary, isSelf) {
 		let damage;
 		move = this.getMoveCopy(move);
 
 		if (!moveData) moveData = move;
+		/**@type {?boolean | number} */
 		let hitResult = true;
 
 		if (move.target === 'all' && !isSelf) {
 			hitResult = this.singleEvent('TryHitField', moveData, {}, target, pokemon, move);
 		} else if ((move.target === 'foeSide' || move.target === 'allySide') && !isSelf) {
-			hitResult = this.singleEvent('TryHitSide', moveData, {}, target.side, pokemon, move);
+			hitResult = this.singleEvent('TryHitSide', moveData, {}, (target ? target.side : null), pokemon, move);
 		} else if (target) {
 			hitResult = this.singleEvent('TryHit', moveData, {}, target, pokemon, move);
 		}
@@ -152,6 +296,7 @@ exports.BattleScripts = {
 		}
 
 		if (target) {
+			/**@type {?boolean | number} */
 			let didSomething = false;
 			damage = this.getDamage(pokemon, target, moveData);
 
@@ -249,23 +394,28 @@ exports.BattleScripts = {
 		}
 		if (moveData.self) {
 			let selfRoll;
+			// @ts-ignore
 			if (!isSecondary && moveData.self.boosts) selfRoll = this.random(100);
 			// This is done solely to mimic in-game RNG behaviour. All self drops have a 100% chance of happening but still grab a random number.
+			// @ts-ignore
 			if (typeof moveData.self.chance === 'undefined' || selfRoll < moveData.self.chance) {
+				// @ts-ignore
 				this.moveHit(pokemon, pokemon, move, moveData.self, isSecondary, true);
 			}
 		}
 		if (moveData.secondaries && this.runEvent('TrySecondaryHit', target, pokemon, moveData)) {
-			for (let i = 0; i < moveData.secondaries.length; i++) {
+			for (const secondary of moveData.secondaries) {
 				// We check here whether to negate the probable secondary status if it's burn or freeze.
 				// In the game, this is checked and if true, the random number generator is not called.
 				// That means that a move that does not share the type of the target can status it.
 				// This means tri-attack can burn fire-types and freeze ice-types.
 				// Unlike gen 1, though, paralysis works for all unless the target is immune to direct move (ie. ground-types and t-wave).
-				if (!(moveData.secondaries[i].status && ['brn', 'frz'].includes(moveData.secondaries[i].status) && target && target.hasType(move.type))) {
-					let effectChance = Math.floor(moveData.secondaries[i].chance * 255 / 100);
-					if (typeof moveData.secondaries[i].chance === 'undefined' || this.random(256) <= effectChance) {
-						this.moveHit(target, pokemon, move, moveData.secondaries[i], true, isSelf);
+				if (!(secondary.status && ['brn', 'frz'].includes(secondary.status) && target && target.hasType(move.type))) {
+					// @ts-ignore
+					let effectChance = Math.floor(secondary.chance * 255 / 100);
+					if (typeof secondary.chance === 'undefined' || this.randomChance(effectChance, 256)) {
+						// @ts-ignore
+						this.moveHit(target, pokemon, move, secondary, true, isSelf);
 					}
 				}
 			}
@@ -279,14 +429,16 @@ exports.BattleScripts = {
 			}
 		}
 		if (move.selfSwitch && pokemon.hp) {
-			pokemon.switchFlag = move.selfSwitch;
+			pokemon.switchFlag = move.fullname;
 		}
 		return damage;
 	},
 	getDamage: function (pokemon, target, move, suppressMessages) {
 		// First of all, we get the move.
-		if (typeof move === 'string') move = this.getMove(move);
-		if (typeof move === 'number') {
+		if (typeof move === 'string') {
+			move = this.getMove(move);
+		} else if (typeof move === 'number') {
+			// @ts-ignore
 			move = {
 				basePower: move,
 				type: '???',
@@ -295,6 +447,8 @@ exports.BattleScripts = {
 				flags: {},
 			};
 		}
+
+		move = /**@type {Move} */ (move); // eslint-disable-line no-self-assign
 
 		// Let's test for immunities.
 		if (!move.ignoreImmunity || (move.ignoreImmunity !== true && !move.ignoreImmunity[move.type])) {
@@ -349,7 +503,7 @@ exports.BattleScripts = {
 		move.crit = move.willCrit || false;
 		if (typeof move.willCrit === 'undefined') {
 			if (move.critRatio) {
-				move.crit = (this.random(critMult[move.critRatio]) === 0);
+				move.crit = this.randomChance(1, critMult[move.critRatio]);
 			}
 		}
 
@@ -359,7 +513,9 @@ exports.BattleScripts = {
 
 		// Happens after crit calculation
 		if (basePower) {
+			// confusion damage
 			if (move.isSelfHit) {
+				// @ts-ignore
 				move.type = move.baseMoveType;
 				basePower = this.runEvent('BasePower', pokemon, target, move, basePower, true);
 				move.type = '???';
@@ -409,7 +565,8 @@ exports.BattleScripts = {
 
 		// Using Beat Up
 		if (move.allies) {
-			attack = move.allies.shift().template.baseStats.atk;
+			attack = move.allies[0].template.baseStats.atk;
+			move.allies.shift();
 			defense = defender.template.baseStats.def;
 		}
 
@@ -422,6 +579,21 @@ exports.BattleScripts = {
 		if (move.ignoreDefensive) {
 			this.debug('Negating (sp)def boost/penalty.');
 			defense = target.getStat(defType, true, true);
+		}
+
+		// Gen 2 Present has a glitched damage calculation using the secondary types of the Pokemon for the Attacker's Level and Defender's Defense.
+		if (move.id === 'present') {
+			const typeIndexes = {"Normal": 0, "Fighting": 1, "Flying": 2, "Poison": 3, "Ground": 4, "Rock": 5, "Bug": 7, "Ghost": 8, "Steel": 9, "Fire": 20, "Water": 21, "Grass": 22, "Electric": 23, "Psychic": 24, "Ice": 25, "Dragon": 26, "Dark": 27};
+			attack = 10;
+
+			const attackerLastType = attacker.getTypes().slice(-1)[0];
+			const defenderLastType = defender.getTypes().slice(-1)[0];
+
+			defense = typeIndexes[attackerLastType] || 1;
+			level = typeIndexes[defenderLastType] || 1;
+			if (move.crit) {
+				level *= 2;
+			}
 		}
 
 		// When either attack or defense are higher than 256, they are both divided by 4 and moded by 256.
@@ -460,7 +632,7 @@ exports.BattleScripts = {
 		}
 
 		// Type effectiveness
-		let totalTypeMod = this.getEffectiveness(type, target);
+		let totalTypeMod = target.runEffectiveness(move);
 		// Super effective attack
 		if (totalTypeMod > 0) {
 			if (!suppressMessages) this.add('-supereffective', target);
@@ -549,3 +721,5 @@ exports.BattleScripts = {
 		return damage;
 	},
 };
+
+exports.BattleScripts = BattleScripts;

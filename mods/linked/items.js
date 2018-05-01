@@ -4,16 +4,13 @@ exports.BattleItems = {
 	leppaberry: {
 		inherit: true,
 		onUpdate: function (pokemon) {
-			var move = pokemon.getMoveData(pokemon.getLastMoveAbsolute());
-			if (move && move.pp === 0) {
+			if (!pokemon.hp) return;
+			let moveSlot = pokemon.getMoveData(pokemon.getLastMoveAbsolute());
+			if (moveSlot && moveSlot.pp === 0) {
 				pokemon.addVolatile('leppaberry');
-				pokemon.volatiles['leppaberry'].move = move;
+				pokemon.volatiles['leppaberry'].moveSlot = moveSlot;
 				pokemon.eatItem();
 			}
-		}
+		},
 	},
-	metronome: {
-		inherit: true
-		// Mod-specific: default mechanics
-	}
 };

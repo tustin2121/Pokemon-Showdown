@@ -8,9 +8,8 @@ exports.BattleMovedex = {
 	pursuit: {
 		inherit: true,
 		beforeTurnCallback: function (pokemon, target) {
-			var linkedMoves = pokemon.getLinkedMoves();
+			let linkedMoves = pokemon.getLinkedMoves();
 			if (linkedMoves.length && !linkedMoves.disabled) {
-				if (linkedMoves[0] === 'pursuit' && linkedMoves[1] !== 'pursuit') return;
 				if (linkedMoves[0] !== 'pursuit' && linkedMoves[1] === 'pursuit') return;
 			}
 
@@ -19,29 +18,24 @@ exports.BattleMovedex = {
 				target.side.sideConditions['pursuit'].sources = [];
 			}
 			target.side.sideConditions['pursuit'].sources.push(pokemon);
-		}
+		},
 	},
 	mefirst: {
 		inherit: true,
-		onHit: function (target, pokemon) {
-			var decision = this.willMove(target);
-			if (!decision) return false;
-			var noMeFirst = {
-				chatter:1, counter:1, covet:1, focuspunch:1, mefirst:1, metalburst:1, mirrorcoat:1, struggle:1, thief:1
-			};
-			// Mod-specific: Me First copies the first move in the link
-			var move = this.getMove(decision.linked ? decision.linked[0] : decision.move);
-			if (move.category !== 'Status' && !noMeFirst[move]) {
-				pokemon.addVolatile('mefirst');
-				this.useMove(move, pokemon);
-				return;
+		onTryHit: function (target, pokemon) {
+			let action = this.willMove(target);
+			if (action) {
+				let noMeFirst = ['chatter', 'counter', 'covet', 'focuspunch', 'mefirst', 'metalburst', 'mirrorcoat', 'struggle', 'thief'];
+				// Mod-specific: Me First copies the first move in the link
+				let move = this.getMoveCopy(action.linked ? action.linked[0] : action.move);
+				if (move.category !== 'Status' && !noMeFirst.includes(move.id)) {
+					pokemon.addVolatile('mefirst');
+					this.useMove(move, pokemon, target);
+					return null;
+				}
 			}
 			return false;
-		}
-	},
-	quash: {
-		inherit: true
-		// Mod-specific: default mechanics
+		},
 	},
 
 	/**
@@ -49,53 +43,38 @@ exports.BattleMovedex = {
 	 *	Will miss on two linked Status moves
 	 *
 	 */
+
 	suckerpunch: {
 		inherit: true,
 		onTry: function (source, target) {
-			var decision = this.willMove(target);
-			if (!decision || decision.choice !== 'move') {
+			let action = this.willMove(target);
+			if (!action || action.choice !== 'move') {
+				this.attrLastMove('[still]');
 				this.add('-fail', source);
-				return false;
+				return null;
 			}
-			if (target.volatiles['mustrecharge'] && target.volatiles['mustrecharge'].duration < 2) {
+			if (target.volatiles.mustrecharge && target.volatiles.mustrecharge.duration < 2) {
 				// Duration may not be lower than 2 if Sucker Punch is used as a low-priority move
 				// i.e. if Sucker Punch is linked with a negative priority move
+				this.attrLastMove('[still]');
 				this.add('-fail', source);
-				return false;
+				return null;
 			}
-			if (!decision.linked) {
-				if (decision.move.category !== 'Status' || decision.move.id === 'mefirst') return;
+			if (!action.linked) {
+				if (action.move.category === 'Status' && action.move.id !== 'mefirst') {
+					this.attrLastMove('[still]');
+					this.add('-fail', source);
+					return null;
+				}
+			} else {
+				for (const linkedMove of action.linked) {
+					if (linkedMove.category !== 'Status' || linkedMove.id === 'mefirst') return;
+				}
+				this.attrLastMove('[still]');
 				this.add('-fail', source);
-				return false;
+				return null;
 			}
-
-			for (var i = 0; i < decision.linked.length; i++) {
-				var linkedMove = this.getMove(decision.linked[i]);
-				if (linkedMove.category !== 'Status' || linkedMove.id === 'mefirst') return;
-			}
-			this.add('-fail', source);
-			return false;
-		}
-	},
-
-
-	/**
-	 * Pledges
-	 * If two Pledge moves are linked, the joint effect is triggered
-	 *
-	 **/
-
-	firepledge: {
-		inherit: true
-		// Mod-specific: default mechanics
-	},
-	grasspledge: {
-		inherit: true
-		// Mod-specific: default mechanics
-	},
-	waterpledge: {
-		inherit: true
-		// Mod-specific: default mechanics
+		},
 	},
 
 	/**
@@ -108,92 +87,83 @@ exports.BattleMovedex = {
 	sketch: {
 		inherit: true,
 		onHit: function (target, source) {
-			var disallowedMoves = {chatter:1, sketch:1, struggle:1};
-			var lastMove = target.getLastMoveAbsolute();
-			if (source.transformed || !lastMove || disallowedMoves[lastMove] || source.moves.indexOf(lastMove) !== -1) return false;
-			var moveslot = source.moves.indexOf('sketch');
-			if (moveslot === -1) return false;
-			var move = Tools.getMove(lastMove);
-			var sketchedMove = {
+			let disallowedMoves = ['chatter', 'sketch', 'struggle'];
+			let lastMove = target.getLastMoveAbsolute();
+			if (source.transformed || !lastMove || disallowedMoves.includes(lastMove.id) || source.moves.indexOf(lastMove.id) >= 0 || lastMove.isZ) return false;
+			let sketchIndex = source.moves.indexOf('sketch');
+			if (sketchIndex < 0) return false;
+			let move = this.getMove(lastMove);
+			let sketchedMove = {
 				move: move.name,
 				id: move.id,
 				pp: move.pp,
 				maxpp: move.pp,
 				target: move.target,
 				disabled: false,
-				used: false
+				used: false,
 			};
-			source.moveset[moveslot] = sketchedMove;
-			source.baseMoveset[moveslot] = sketchedMove;
-			source.moves[moveslot] = toId(move.name);
+			source.moveSlots[sketchIndex] = sketchedMove;
+			source.baseMoveSlots[sketchIndex] = sketchedMove;
 			this.add('-activate', source, 'move: Sketch', move.name);
-		}
+		},
 	},
 	mimic: {
 		inherit: true,
 		onHit: function (target, source) {
-			var disallowedMoves = {chatter:1, mimic:1, sketch:1, struggle:1, transform:1};
-			var lastMove = target.getLastMoveAbsolute();
-			if (source.transformed || !lastMove || disallowedMoves[lastMove] || source.moves.indexOf(lastMove) !== -1) return false;
-			var moveslot = source.moves.indexOf('mimic');
-			if (moveslot === -1) return false;
-			var move = Tools.getMove(lastMove);
-			source.moveset[moveslot] = {
+			let disallowedMoves = ['chatter', 'mimic', 'sketch', 'struggle', 'transform'];
+			let lastMove = target.getLastMoveAbsolute();
+			if (source.transformed || !lastMove || disallowedMoves.includes(lastMove.id) || source.moves.indexOf(lastMove.id) >= 0 || lastMove.isZ) return false;
+			let mimicIndex = source.moves.indexOf('mimic');
+			if (mimicIndex < 0) return false;
+			let move = this.getMove(lastMove);
+			source.moveSlots[mimicIndex] = {
 				move: move.name,
 				id: move.id,
 				pp: move.pp,
 				maxpp: move.pp,
 				target: move.target,
 				disabled: false,
-				used: false
+				used: false,
+				virtual: true,
 			};
-			source.moves[moveslot] = toId(move.name);
 			this.add('-start', source, 'Mimic', move.name);
-		}
+		},
 	},
 
-/**
-	 * Copycat and Mirror Move
+	/**
+	 * Instruct and Mirror Move
 	 * Copy/call the last absolute move used by the target
 	 *
 	 */
 
-	copycat: {
+	instruct: {
 		inherit: true,
-		onHit: function (pokemon) {
-			var noCopycat = {assist:1, bestow:1, chatter:1, circlethrow:1, copycat:1, counter:1, covet:1, destinybond:1, detect:1, dragontail:1, endure:1, feint:1, focuspunch:1, followme:1, helpinghand:1, mefirst:1, metronome:1, mimic:1, mirrorcoat:1, mirrormove:1, naturepower:1, protect:1, ragepowder:1, roar:1, sketch:1, sleeptalk:1, snatch:1, struggle:1, switcheroo:1, thief:1, transform:1, trick:1, whirlwind:1};
-			var lastMove = pokemon.getLastMoveAbsolute();
-			if (!lastMove || noCopycat[lastMove]) return false;
-			this.useMove(lastMove, pokemon);
-		}
+		onHit: function (target, source) {
+			let lastMove = target.getLastMoveAbsolute();
+			if (!lastMove) return false;
+			let moveIndex = target.moves.indexOf(lastMove.id);
+			let noInstruct = ['assist', 'beakblast', 'bide', 'copycat', 'focuspunch', 'iceball', 'instruct', 'mefirst', 'metronome', 'mimic', 'mirrormove', 'naturepower', 'outrage', 'petaldance', 'rollout', 'shelltrap', 'sketch', 'sleeptalk', 'thrash', 'transform'];
+			if (noInstruct.includes(lastMove.id) || lastMove.isZ || lastMove.flags['charge'] || lastMove.flags['recharge'] || target.volatiles['beakblast'] || target.volatiles['focuspunch'] || target.volatiles['shelltrap'] || (target.moveSlots[moveIndex] && target.moveSlots[moveIndex].pp <= 0)) {
+				return false;
+			}
+			this.add('-singleturn', target, 'move: Instruct', '[of] ' + source);
+			this.runMove(lastMove.id, target, target.lastMoveTargetLoc);
+		},
 	},
 	mirrormove: {
 		inherit: true,
-		onTryHit: function (target) {
-			var lastMove = target.getLastMoveAbsolute();
-			if (!lastMove || !this.getMove(lastMove).flags['mirror']) {
+		onTryHit: function (target, pokemon) {
+			let lastMove = target.getLastMoveAbsolute();
+			if (!lastMove || !lastMove.flags['mirror']) {
 				return false;
 			}
+			this.useMove(lastMove.id, pokemon, target);
+			return null;
 		},
-		onHit: function (target, source) {
-			this.useMove(target.getLastMoveAbsolute(), source);
-		}
 	},
-	// mirrormove: {
-	// 	inherit: true,
-	// 	onTryHit: function (target) {
-	// 		var noMirrorMove = {acupressure:1, afteryou:1, aromatherapy:1, chatter:1, conversion2:1, counter:1, curse:1, doomdesire:1, feint:1, finalgambit:1, focuspunch:1, futuresight:1, gravity:1, guardsplit:1, hail:1, haze:1, healbell:1, healpulse:1, helpinghand:1, lightscreen:1, luckychant:1, mefirst:1, mimic:1, mirrorcoat:1, mirrormove:1, mist:1, mudsport:1, naturepower:1, perishsong:1, powersplit:1, psychup:1, quickguard:1, raindance:1, reflect:1, reflecttype:1, roleplay:1, safeguard:1, sandstorm:1, sketch:1, spikes:1, spitup:1, stealthrock:1, struggle:1, sunnyday:1, tailwind:1, toxicspikes:1, transform:1, watersport:1, wideguard:1};
-	// 		var lastMove = target.getLastMoveAbsolute();
-	// 		if (!lastMove || noMirrorMove[lastMove] || this.getMove(lastMove).target === 'self') {
-	// 			return false;
-	// 		}
-	// 	},
-	// 	onHit: function (target, source) {
-	// 		this.useMove(target.getLastMoveAbsolute(), source);
-	// 	}
-	// },
+
 	/**
-	 * Disable, Encore and Torment
+	 * Disable, Encore, and Torment
 	 * Disabling effects
 	 *
 	 */
@@ -203,8 +173,8 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 4,
 			noCopy: true, // doesn't get copied by Baton Pass
-			onStart: function (pokemon) {
-				var lastMove = pokemon.getLastMoveAbsolute();
+			onStart: function (pokemon, source, effect) {
+				let lastMove = pokemon.getLastMoveAbsolute();
 				if (!this.willMove(pokemon)) {
 					this.effectData.duration++;
 				}
@@ -212,20 +182,22 @@ exports.BattleMovedex = {
 					this.debug('pokemon hasn\'t moved yet');
 					return false;
 				}
-				var moves = pokemon.moveset;
-				for (var i = 0; i < moves.length; i++) {
-					if (moves[i].id === lastMove) {
-						if (!moves[i].pp) {
+				for (const moveSlot of pokemon.moveSlots) {
+					if (moveSlot.id === lastMove.id) {
+						if (!moveSlot.pp) {
 							this.debug('Move out of PP');
 							return false;
 						} else {
-							this.add('-start', pokemon, 'Disable', moves[i].move);
-							this.effectData.move = lastMove;
+							if (effect.id === 'cursedbody') {
+								this.add('-start', pokemon, 'Disable', moveSlot.move, '[from] ability: Cursed Body', '[of] ' + source);
+							} else {
+								this.add('-start', pokemon, 'Disable', moveSlot.move);
+							}
+							this.effectData.move = lastMove.id;
 							return;
 						}
 					}
 				}
-				this.debug('Move doesn\'t exist ???');
 				return false;
 			},
 			onResidualOrder: 14,
@@ -240,52 +212,45 @@ exports.BattleMovedex = {
 				}
 			},
 			onDisableMove: function (pokemon) {
-				var moves = pokemon.moveset;
-				for (var i = 0; i < moves.length; i++) {
-					if (moves[i].id === this.effectData.move) {
-						pokemon.disableMove(moves[i].id);
+				for (const moveSlot of pokemon.moveSlots) {
+					if (moveSlot.id === this.effectData.move) {
+						pokemon.disableMove(moveSlot.id);
 					}
 				}
-			}
-		}
+			},
+		},
 	},
 	encore: {
 		inherit: true,
 		effect: {
 			duration: 3,
+			noCopy: true, // doesn't get copied by Z-Baton Pass
 			onStart: function (target) {
-				var noEncore = {encore:1, mimic:1, mirrormove:1, sketch:1, struggle:1, transform:1};
-				var lastMove = target.getLastMoveAbsolute();
-				var moveIndex = target.moves.indexOf(lastMove);
-				if (!lastMove) {
+				let noEncore = ['assist', 'copycat', 'encore', 'mefirst', 'metronome', 'mimic', 'mirrormove', 'naturepower', 'sketch', 'sleeptalk', 'struggle', 'transform'];
+				let lastMove = target.getLastMoveAbsolute();
+				let linkedMoves = target.getLinkedMoves();
+				let moveIndex = lastMove ? target.moves.indexOf(lastMove.id) : -1;
+				if (lastMove && linkedMoves.includes(lastMove.id) && noEncore.includes(linkedMoves[0]) && noEncore.includes(linkedMoves[1])) {
+					// both moves cannot be encored
+					delete target.volatiles['encore'];
+					return false;
+				}
+				if (!lastMove || lastMove.isZ || noEncore.includes(lastMove.id) || (target.moveSlots[moveIndex] && target.moveSlots[moveIndex].pp <= 0)) {
 					// it failed
 					delete target.volatiles['encore'];
 					return false;
 				}
-				if (target.hasLinkedMove(lastMove)) {
-					// TODO: Check instead whether the last executed move was linked
-					var linkedMoves = target.getLinkedMoves();
-					if (noEncore[linkedMoves[0]] || noEncore[linkedMoves[1]] || target.moveset[0].pp <= 0 || target.moveset[1].pp <= 0) {
-						// it failed
-						delete target.volatiles['encore'];
-						return false;
-					}
-					this.effectData.move = linkedMoves;
-				} else {
-					if (noEncore[lastMove] || (target.moveset[moveIndex] && target.moveset[moveIndex].pp <= 0)) {
-						// it failed
-						delete target.volatiles['encore'];
-						return false;
-					}
-					this.effectData.move = lastMove;
-				}
 				this.effectData.turnsActivated = {};
+				this.effectData.move = lastMove.id;
 				this.add('-start', target, 'Encore');
+				if (linkedMoves.includes(lastMove.id)) {
+					this.effectData.move = linkedMoves;
+				}
 				if (!this.willMove(target)) {
 					this.effectData.duration++;
 				}
 			},
-			onOverrideDecision: function (pokemon, target, move) {
+			onOverrideAction: function (pokemon, target, move) {
 				if (!this.effectData.turnsActivated[this.turn]) {
 					// Initialize Encore effect for this turn
 					this.effectData.turnsActivated[this.turn] = 0;
@@ -295,21 +260,18 @@ exports.BattleMovedex = {
 				}
 				this.effectData.turnsActivated[this.turn]++;
 				if (!Array.isArray(this.effectData.move)) {
-					var nextDecision = this.willMove(pokemon);
-					if (nextDecision) this.queue.splice(this.queue.indexOf(nextDecision), 1);
+					let nextAction = this.willMove(pokemon);
+					if (nextAction) this.queue.splice(this.queue.indexOf(nextAction), 1);
 					if (move.id !== this.effectData.move) return this.effectData.move;
 					return;
 				}
 
 				// Locked into a link
 				switch (this.effectData.turnsActivated[this.turn]) {
-				case 1:
-					if (!this.willMove(pokemon)) {
-						var pseudoDecision = {choice: 'move', move: this.effectData.move[1], targetLoc: this.currentDecision.targetLoc, pokemon: this.currentDecision.pokemon, targetPosition: this.currentDecision.targetPosition, targetSide: this.currentDecision.targetSide};
-						this.queue.unshift(pseudoDecision);
-					}
+				case 1: {
 					if (this.effectData.move[0] !== move.id) return this.effectData.move[0];
 					return;
+				}
 				case 2:
 					if (this.effectData.move[1] !== move.id) return this.effectData.move[1];
 					return;
@@ -318,19 +280,18 @@ exports.BattleMovedex = {
 			onResidualOrder: 13,
 			onResidual: function (target) {
 				// early termination if you run out of PP
-				var lastMove = target.getLastMoveAbsolute();
-
-				var index = target.moves.indexOf(lastMove);
+				let lastMove = target.getLastMoveAbsolute();
+				let index = target.moves.indexOf(lastMove.id);
 				if (index === -1) return; // no last move
 
-				if (target.hasLinkedMove(lastMove)) {
+				if (target.hasLinkedMove(lastMove.id)) {
 					// TODO: Check instead whether the last executed move was linked
-					if (target.moveset[0].pp <= 0 || target.moveset[1].pp <= 0) {
+					if (target.moveSlots[0].pp <= 0 || target.moveSlots[1].pp <= 0) {
 						delete target.volatiles.encore;
 						this.add('-end', target, 'Encore');
 					}
 				} else {
-					if (target.moveset[index].pp <= 0) {
+					if (target.moveSlots[index].pp <= 0) {
 						delete target.volatiles.encore;
 						this.add('-end', target, 'Encore');
 					}
@@ -340,25 +301,23 @@ exports.BattleMovedex = {
 				this.add('-end', target, 'Encore');
 			},
 			onDisableMove: function (pokemon) {
-				if (!this.effectData.move) return; // ??
-				if (!Array.isArray(this.effectData.move)) {
-					if (!pokemon.hasMove(this.effectData.move)) return;
-					for (var i = 0; i < pokemon.moveset.length; i++) {
-						if (pokemon.moveset[i].id !== this.effectData.move) {
-							pokemon.disableMove(pokemon.moveset[i].id);
+				if (Array.isArray(this.effectData.move)) {
+					for (const moveSlot of pokemon.moveSlots) {
+						if (moveSlot.id !== this.effectData.move[0] && moveSlot.id !== this.effectData.move[1]) {
+							pokemon.disableMove(moveSlot.id);
 						}
 					}
-				} else {
-					for (var i = 0; i < this.effectData.move.length; i++) {
-						if (!pokemon.hasMove(this.effectData.move[i])) return;
-					}
-					for (var i = this.effectData.move.length; i < pokemon.moveset.length; i++) {
-						if (this.effectData.move.indexOf(pokemon.moveset[i].id) >= 0) continue;
-						pokemon.disableMove(pokemon.moveset[i].id);
+				}
+				if (!this.effectData.move || !pokemon.hasMove(this.effectData.move)) {
+					return;
+				}
+				for (const moveSlot of pokemon.moveSlots) {
+					if (moveSlot.id !== this.effectData.move) {
+						pokemon.disableMove(moveSlot.id);
 					}
 				}
-			}
-		}
+			},
+		},
 	},
 	torment: {
 		inherit: true,
@@ -370,18 +329,18 @@ exports.BattleMovedex = {
 				this.add('-end', pokemon, 'Torment');
 			},
 			onDisableMove: function (pokemon) {
-				var lastMove = pokemon.lastMove;
-				if (lastMove === 'struggle') return;
+				let lastMove = pokemon.lastMove;
+				if (!lastMove || lastMove.id === 'struggle') return;
 
 				if (Array.isArray(lastMove)) {
-					for (var i = 0; i < lastMove.length; i++) {
-						pokemon.disableMove(lastMove[i]);
+					for (const move of lastMove) {
+						pokemon.disableMove(move.id);
 					}
 				} else {
-					pokemon.disableMove(lastMove);
+					pokemon.disableMove(lastMove.id);
 				}
-			}
-		}
+			},
+		},
 	},
 
 	/**
@@ -398,14 +357,13 @@ exports.BattleMovedex = {
 				this.add('-singlemove', pokemon, 'Grudge');
 			},
 			onFaint: function (target, source, effect) {
-				this.debug('Grudge detected fainted pokemon');
-				if (!source || !effect) return;
-				if (effect.effectType === 'Move') {
-					var lastMove = source.getLastMoveAbsolute();
-					for (var i in source.moveset) {
-						if (source.moveset[i].id === lastMove) {
-							source.moveset[i].pp = 0;
-							this.add('-activate', source, 'Grudge', this.getMove(lastMove).name);
+				if (!source || source.fainted || !effect) return;
+				let lastMove = source.getLastMoveAbsolute();
+				if (effect.effectType === 'Move' && !effect.isFutureMove && lastMove) {
+					for (const moveSlot of source.moveSlots) {
+						if (moveSlot.id === lastMove.id) {
+							moveSlot.pp = 0;
+							this.add('-activate', source, 'move: Grudge', this.getMove(lastMove.id).name);
 						}
 					}
 				}
@@ -415,33 +373,19 @@ exports.BattleMovedex = {
 				if (pokemon.moveThisTurn) return; // Second stage of a Linked move
 				this.debug('removing Grudge before attack');
 				pokemon.removeVolatile('grudge');
-			}
-		}
+			},
+		},
 	},
 	spite: {
 		inherit: true,
 		onHit: function (target) {
-			var lastMove = target.getLastMoveAbsolute();
-			if (target.deductPP(lastMove, 4)) {
-				this.add("-activate", target, 'move: Spite', lastMove, 4);
+			let lastMove = target.getLastMoveAbsolute();
+			if (lastMove && target.deductPP(lastMove.id, 4)) {
+				this.add("-activate", target, 'move: Spite', this.getMove(lastMove.id).name, 4);
 				return;
 			}
 			return false;
-		}
-	},
-
-	/**
-	 * Rollout and Ice Ball
-	 *
-	 */
-
-	rollout: {
-		inherit: true
-		// Mod-specific: default mechanics
-	},
-	iceball: {
-		inherit: true
-		// Mod-specific: default mechanics
+		},
 	},
 
 	/**
@@ -453,13 +397,13 @@ exports.BattleMovedex = {
 	conversion2: {
 		inherit: true,
 		onHit: function (target, source) {
-			var lastMove = target.getLastMoveAbsolute();
+			let lastMove = target.getLastMoveAbsolute();
 			if (!lastMove) return false;
-			var possibleTypes = [];
-			var attackType = this.getMove(lastMove).type;
-			for (var type in this.data.TypeChart) {
+			let possibleTypes = [];
+			let attackType = lastMove.type;
+			for (let type in this.data.TypeChart) {
 				if (source.hasType(type) || target.hasType(type)) continue;
-				var typeCheck = this.data.TypeChart[type].damageTaken[attackType];
+				let typeCheck = this.data.TypeChart[type].damageTaken[attackType];
 				if (typeCheck === 2 || typeCheck === 3) {
 					possibleTypes.push(type);
 				}
@@ -467,11 +411,11 @@ exports.BattleMovedex = {
 			if (!possibleTypes.length) {
 				return false;
 			}
-			var type = possibleTypes[this.random(possibleTypes.length)];
+			let randomType = this.sample(possibleTypes);
 
-			if (!source.setType(type)) return false;
-			this.add('-start', source, 'typechange', type);
-		}
+			if (!source.setType(randomType)) return false;
+			this.add('-start', source, 'typechange', randomType);
+		},
 	},
 	destinybond: {
 		inherit: true,
@@ -480,240 +424,101 @@ exports.BattleMovedex = {
 				this.add('-singlemove', pokemon, 'Destiny Bond');
 			},
 			onFaint: function (target, source, effect) {
-				if (!source || !effect) return;
+				if (!source || !effect || target.side === source.side) return;
 				if (effect.effectType === 'Move' && !effect.isFutureMove) {
-					this.add('-activate', target, 'Destiny Bond');
+					this.add('-activate', target, 'move: Destiny Bond');
 					source.faint();
 				}
 			},
-			onBeforeMovePriority: 100,
+			onBeforeMovePriority: -1,
 			onBeforeMove: function (pokemon, target, move) {
 				// Second stage of a Linked move does not remove Destiny Bond
-				if (pokemon.moveThisTurn) return;
+				if (pokemon.moveThisTurn || move.id === 'destinybond') return;
 				this.debug('removing Destiny Bond before attack');
 				pokemon.removeVolatile('destinybond');
-			}
-		}
+			},
+			onMoveAborted: function (pokemon, target, move) {
+				pokemon.removeVolatile('destinybond');
+			},
+			onBeforeSwitchOutPriority: 1,
+			onBeforeSwitchOut: function (pokemon) {
+				pokemon.removeVolatile('destinybond');
+			},
+		},
 	},
-	trumpcard: {
+	iceball: {
 		inherit: true,
-		basePowerCallback: function (pokemon) {
-			var move = pokemon.getMoveData(pokemon.getLastMoveAbsolute()); // Account for calling Trump Card via other moves
-			switch (move.pp) {
-			case 0:
-				return 200;
-			case 1:
-				return 80;
-			case 2:
-				return 60;
-			case 3:
-				return 50;
-			default:
-				return 40;
-			}
-		}
+		effect: {
+			duration: 2,
+			onLockMove: 'iceball',
+			onStart: function () {
+				this.effectData.hitCount = 1;
+			},
+			onRestart: function () {
+				this.effectData.hitCount++;
+				if (this.effectData.hitCount < 5) {
+					this.effectData.duration = 2;
+				}
+			},
+			onResidual: function (target) {
+				// This is just to ensure the volatile is deleted correctly
+				let lastMove = target.getLastMoveAbsolute();
+				if (lastMove && lastMove.id === 'struggle') {
+					delete target.volatiles['iceball'];
+				}
+			},
+		},
 	},
-	uproar: {
-		inherit: true
-		// Mod-specific: default mechanics
+	rollout: {
+		inherit: true,
+		effect: {
+			duration: 2,
+			onLockMove: 'rollout',
+			onStart: function () {
+				this.effectData.hitCount = 1;
+			},
+			onRestart: function () {
+				this.effectData.hitCount++;
+				if (this.effectData.hitCount < 5) {
+					this.effectData.duration = 2;
+				}
+			},
+			onResidual: function (target) {
+				// This is just to ensure the volatile is deleted correctly
+				let lastMove = target.getLastMoveAbsolute();
+				if (lastMove && lastMove.id === 'struggle') {
+					delete target.volatiles['rollout'];
+				}
+			},
+		},
 	},
 
 	/**
 	 * Moves that check `pokemon.moveThisTurn`
 	 * (may behave counter-intuitively if left unmodded)
 	 *
-	 **/
+	 */
 
 	fusionbolt: {
 		inherit: true,
 		onBasePower: function (basePower, pokemon) {
-			var actives = pokemon.side.active;
-			for (var i = 0; i < actives.length; i++) {
-				if (actives[i] && actives[i].checkMoveThisTurn('fusionflare')) {
+			for (const active of pokemon.side.active) {
+				if (active && active.checkMoveThisTurn('fusionflare')) {
 					this.debug('double power');
 					return this.chainModify(2);
 				}
 			}
-		}
-	 },
+		},
+	},
 	fusionflare: {
 		inherit: true,
 		onBasePower: function (basePower, pokemon) {
-			var actives = pokemon.side.active;
-			for (var i = 0; i < actives.length; i++) {
-				if (actives[i] && actives[i].checkMoveThisTurn('fusionbolt')) {
+			for (const active of pokemon.side.active) {
+				if (active && active.checkMoveThisTurn('fusionbolt')) {
 					this.debug('double power');
 					return this.chainModify(2);
 				}
 			}
-		}
-	 },
-
-	/**
-	 * Moves that should clean the house after running
-	 * (but aren't doing so in standard for whatever reason)
-	 */
-
-	beatup: {
-		inherit: true,
-		onAfterMove: function (pokemon) {
-			pokemon.removeVolatile('beatup');
-		}
-	},
-	triplekick: {
-		inherit: true,
-		onAfterMove: function (pokemon) {
-			pokemon.removeVolatile('triplekick');
-		}
-	},
-
-	/**
-	 * Moves that should clean the house if they aren't run
-	 *
-	 */
-
-	furycutter: {
-		inherit: true,
-		effect: {
-			duration: 2,
-			onStart: function () {
-				this.effectData.multiplier = 1;
-			},
-			onRestart: function () {
-				if (this.effectData.multiplier < 4) {
-					this.effectData.multiplier <<= 1;
-				}
-				this.effectData.duration = 2;
-			},
-			onBeforeMove: function (pokemon, target, move) {
-				if (move.id !== 'furycutter') pokemon.removeVolatile('furycutter');
-			}
-		}
-	 },
-	 
-	/**
-	 * Attract
-	 * Should only check before the first linked move
-	 *
-	 */
-
-	attract: {
-		inherit: true,
-		effect: {
-			noCopy: true, // doesn't get copied by Baton Pass
-			onStart: function (pokemon, source, effect) {
-				if (!(pokemon.gender === 'M' && source.gender === 'F') && !(pokemon.gender === 'F' && source.gender === 'M')) {
-					this.debug('incompatible gender');
-					return false;
-				}
-				if (!this.runEvent('Attract', pokemon, source)) {
-					this.debug('Attract event failed');
-					return false;
-				}
-
-				if (effect.id === 'cutecharm') {
-					this.add('-start', pokemon, 'Attract', '[from] ability: Cute Charm', '[of] ' + source);
-				} else if (effect.id === 'destinyknot') {
-					this.add('-start', pokemon, 'Attract', '[from] item: Destiny Knot', '[of] ' + source);
-				} else {
-					this.add('-start', pokemon, 'Attract');
-				}
-				
-				this.effectData.lastChecked = this.turn;
-			},
-			onUpdate: function (pokemon) {
-				if (this.effectData.source && !this.effectData.source.isActive && pokemon.volatiles['attract']) {
-					this.debug('Removing Attract volatile on ' + pokemon);
-					pokemon.removeVolatile('attract');
-				}
-			},
-			onBeforeMovePriority: 2,
-			onBeforeMove: function (pokemon, target, move) {
-				if (this.effectData.lastChecked === this.turn && this.effectData.movePrevented) return false;
-				if (this.effectData.lastChecked !== this.turn) {
-					this.effectData.movePrevented = false;
-					this.effectData.lastChecked = this.turn;
-					this.add('-activate', pokemon, 'move: Attract', '[of] ' + this.effectData.source);
-					if (this.random(2) === 0) return;
-					this.add('cant', pokemon, 'Attract');
-					this.effectData.movePrevented = true;
-					return false;
-				}
-			},
-			onEnd: function (pokemon) {
-				this.add('-end', pokemon, 'Attract', '[silent]');
-			},
 		},
 	},
-
-	/**
-	 * First Law of Pokémon Simulation:
-	 * Always make sure that Sky Drop works
-	 *
-	 */
-
-	skydrop: {
-		inherit: true,
-		effect: {
-			duration: 2,
-			onDragOut: false,
-			onSourceDragOut: false,
-			onFoeModifyPokemon: function (defender) {
-				if (defender !== this.effectData.source) return;
-				defender.trapped = true;
-			},
-			onFoeBeforeMovePriority: 11,
-			onFoeBeforeMove: function (attacker, defender, move) {
-				if (attacker === this.effectData.source) {
-					this.debug('Sky drop nullifying.');
-					return null;
-				}
-			},
-			onRedirectTarget: function (target, source, source2) {
-				if (source !== this.effectData.target) return;
-				if (this.effectData.source.fainted) return;
-				return this.effectData.source;
-			},
-			onAnyAccuracy: function (accuracy, target, source, move) {
-				// both user and target of Sky Drop avoid moves, yet
-				// not moves targetting themselves (Linked)
-
-				if (target !== this.effectData.target && target !== this.effectData.source) {
-					return;
-				}
-				if (source === this.effectData.target && target === this.effectData.source) {
-					return;
-				}
-				if (source === target) return;
-
-				if (move.id === 'gust' || move.id === 'twister') {
-					return;
-				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'thousandarrows' || move.id === 'helpinghand') {
-					return;
-				}
-				if (source.hasAbility('noguard') || target.hasAbility('noguard')) {
-					return;
-				}
-				if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return;
-				return 0;
-			},
-			onAnyBasePower: function (basePower, target, source, move) {
-				if (target !== this.effectData.target && target !== this.effectData.source) {
-					return;
-				}
-				if (source === this.effectData.target && target === this.effectData.source) {
-					return;
-				}
-				if (move.id === 'gust' || move.id === 'twister') {
-					return this.chainModify(2);
-				}
-			},
-			onFaint: function (target) {
-				if (target.volatiles['skydrop'] && target.volatiles['twoturnmove'].source) {
-					this.add('-end', target.volatiles['twoturnmove'].source, 'Sky Drop', '[interrupt]');
-				}
-			}
-		}
-	}
 };

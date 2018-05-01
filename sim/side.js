@@ -11,17 +11,17 @@ const Pokemon = require('./pokemon');
 /**
  * An object representing a single action that can be chosen.
  *
- * @typedef {Object} Action
- * @property {string} choice - a choice
- * @property {Pokemon} [pokemon] - the pokemon making the choice
- * @property {number} [targetLoc] - location of the target, relative to pokemon's side
- * @property {string} [move] - a move to use
- * @property {Pokemon} [target] - the target of the choice
- * @property {number} [index] - the chosen index in team preview
- * @property {number} [priority] - priority of the chosen index
- * @property {Side} [side] - the pokemon's side
+ * @typedef {Object} ChosenAction
+ * @property {'move' | 'switch' | 'instaswitch' | 'team' | 'shift' | 'pass'} choice - action type
+ * @property {Pokemon} [pokemon] - the pokemon doing the action
+ * @property {number} [targetLoc] - relative location of the target to pokemon (move action only)
+ * @property {string} [moveid] - a move to use (move action only)
+ * @property {Pokemon} [target] - the target of the action
+ * @property {number} [index] - the chosen index in Team Preview
+ * @property {Side} [side] - the action's side
  * @property {?boolean} [mega] - true if megaing or ultra bursting
- * @property {?boolean} [zmove] - true if zmoving
+ * @property {string | undefined} [zmove] - if zmoving, the name of the zmove
+ * @property {number} [priority] - priority of the action
  */
 
 /**
@@ -30,7 +30,7 @@ const Pokemon = require('./pokemon');
  * @typedef {Object} Choice
  * @property {boolean} cantUndo - true if the choice can't be cancelled because of the maybeTrapped issue
  * @property {string} error - contains error text in the case of a choice error
- * @property {Action[]} actions - array of chosen actions
+ * @property {ChosenAction[]} actions - array of chosen actions
  * @property {number} forcedSwitchesLeft - number of switches left that need to be performed
  * @property {number} forcedPassesLeft - number of passes left that need to be performed
  * @property {Set<number>} switchIns - indexes of pokemon chosen to switch in
@@ -44,13 +44,11 @@ class Side {
 	 * @param {string} name
 	 * @param {Battle} battle
 	 * @param {number} sideNum
-	 * @param {any} team
+	 * @param {PokemonSet[]} team
 	 */
 	constructor(name, battle, sideNum, team) {
 		let sideScripts = battle.data.Scripts.side;
 		if (sideScripts) Object.assign(this, sideScripts);
-
-		this.getChoice = (/**@param {Side} side */side => this.getChoiceInner(side));
 
 		/**@type {Battle} */
 		this.battle = battle;
@@ -68,6 +66,7 @@ class Side {
 		this.pokemonLeft = 0;
 		this.faintedLastTurn = false;
 		this.faintedThisTurn = false;
+		this.zMoveUsed = false;
 		/** @type {Choice} */
 		this.choice = {
 			cantUndo: false,
@@ -111,16 +110,19 @@ class Side {
 			this.pokemon.push(new Pokemon(this.team[i], this));
 		}
 		this.pokemonLeft = this.pokemon.length;
-		for (let i = 0; i < this.pokemon.length; i++) {
-			this.pokemon[i].position = i;
+		for (const [i, pokemon] of this.pokemon.entries()) {
+			pokemon.position = i;
 		}
+
+		// old-gens
+		/**@type {?Move} */
+		this.lastMove = null;
 	}
 
-	/**
-	 * @param {Side | boolean} side
-	 */
-	getChoiceInner(side) {
-		if (side !== this && side !== true) return '';
+	getChoice() {
+		if (this.choice.actions.length > 1 && this.choice.actions.every(action => action.choice === 'team')) {
+			return `team ` + this.choice.actions.map(action => action.pokemon.position + 1).join(', ');
+		}
 		return this.choice.actions.map(action => {
 			switch (action.choice) {
 			case 'move':
@@ -128,7 +130,7 @@ class Side {
 				if (action.targetLoc && this.active.length > 1) details += ` ${action.targetLoc}`;
 				if (action.mega) details += ` mega`;
 				if (action.zmove) details += ` zmove`;
-				return `move ${toId(action.move)}${details}`;
+				return `move ${action.moveid}${details}`;
 			case 'switch':
 			case 'instaswitch':
 				return `switch ${action.target.position + 1}`;
@@ -151,8 +153,7 @@ class Side {
 			/**@type {AnyObject[]} */
 			pokemon: [],
 		};
-		for (let i = 0; i < this.pokemon.length; i++) {
-			let pokemon = this.pokemon[i];
+		for (const pokemon of this.pokemon) {
 			let entry = {
 				ident: pokemon.fullname,
 				details: pokemon.details,
@@ -184,8 +185,7 @@ class Side {
 	randomActive() {
 		let actives = this.active.filter(active => active && !active.fainted);
 		if (!actives.length) return null;
-		let i = Math.floor(Math.random() * actives.length);
-		return actives[i];
+		return this.battle.sample(actives);
 	}
 
 	/**
@@ -260,7 +260,7 @@ class Side {
 	 * @param {AnyObject} update
 	 */
 	emitRequest(update) {
-		this.battle.send('request', `${this.id}\n${JSON.stringify(update)}`);
+		this.battle.send('sideupdate', `${this.id}\n|request|${JSON.stringify(update)}`);
 	}
 
 	/**
@@ -307,13 +307,13 @@ class Side {
 		if (!targetLoc) targetLoc = 0;
 
 		// Parse moveText (name or index)
-		// If the move is not found, the decision is invalid without requiring further inspection.
+		// If the move is not found, the action is invalid without requiring further inspection.
 
 		const requestMoves = pokemon.getRequestData().moves;
 		let moveid = '';
 		let targetType = '';
 		if (autoChoose) moveText = 1;
-		if (typeof moveText === 'number' || /^[0-9]+$/.test(moveText)) {
+		if (typeof moveText === 'number' || (moveText && /^[0-9]+$/.test(moveText))) {
 			// Parse a one-based move index.
 			const moveIndex = +moveText - 1;
 			if (moveIndex < 0 || moveIndex >= requestMoves.length || !requestMoves[moveIndex]) {
@@ -328,9 +328,9 @@ class Side {
 			if (moveid.startsWith('hiddenpower')) {
 				moveid = 'hiddenpower';
 			}
-			for (let i = 0; i < requestMoves.length; i++) {
-				if (requestMoves[i].id !== moveid) continue;
-				targetType = requestMoves[i].target || 'normal';
+			for (const move of requestMoves) {
+				if (move.id !== moveid) continue;
+				targetType = move.target || 'normal';
 				break;
 			}
 			if (!targetType) {
@@ -340,11 +340,11 @@ class Side {
 
 		const moves = pokemon.getMoves();
 		if (autoChoose) {
-			for (let i = 0; i < requestMoves.length; i++) {
-				if (requestMoves[i].disabled) continue;
-				if (i < moves.length && requestMoves[i].id === moves[i].id && moves[i].disabled) continue;
-				moveid = requestMoves[i].id;
-				targetType = requestMoves[i].target;
+			for (const [i, move] of requestMoves.entries()) {
+				if (move.disabled) continue;
+				if (i < moves.length && move.id === moves[i].id && moves[i].disabled) continue;
+				moveid = move.id;
+				targetType = move.target;
 				break;
 			}
 		}
@@ -352,7 +352,6 @@ class Side {
 
 		// Z-move
 
-		// @ts-ignore - battle script
 		const zMove = megaOrZ === 'zmove' ? this.battle.getZMove(move, pokemon) : undefined;
 		if (megaOrZ === 'zmove' && !zMove) {
 			return this.emitChoiceError(`Can't move: ${pokemon.name} can't use ${move.name} as a Z-move`);
@@ -369,7 +368,6 @@ class Side {
 
 		if (autoChoose) {
 			targetLoc = 0;
-			// @ts-ignore - battle script
 		} else if (this.battle.targetTypeChoices(targetType)) {
 			if (!targetLoc && this.active.length >= 2) {
 				return this.emitChoiceError(`Can't move: ${move.name} needs a target`);
@@ -390,11 +388,11 @@ class Side {
 				choice: 'move',
 				pokemon: pokemon,
 				targetLoc: lockedMoveTarget || 0,
-				move: lockedMove,
+				moveid: toId(lockedMove),
 			});
 			return true;
 		} else if (!moves.length && !zMove) {
-			// Override decision and use Struggle if there are no enabled moves with PP
+			// Override action and use Struggle if there are no enabled moves with PP
 			// Gen 4 and earlier announce a Pokemon has no moves left before the turn begins, and only to that player's side.
 			if (this.battle.gen <= 4) this.send('-activate', pokemon, 'move: Struggle');
 			moveid = 'struggle';
@@ -402,13 +400,16 @@ class Side {
 			// Check for disabled moves
 			let isEnabled = false;
 			let disabledSource = '';
-			for (let i = 0; i < moves.length; i++) {
-				if (moves[i].id !== moveid) continue;
-				if (!moves[i].disabled) {
+			for (const moveId of moves) {
+				if (moveId.id !== moveid) continue;
+				// @ts-ignore
+				if (!moveId.disabled) {
 					isEnabled = true;
 					break;
-				} else if (moves[i].disabledSource) {
-					disabledSource = moves[i].disabledSource;
+				// @ts-ignore
+				} else if (moveId.disabledSource) {
+					// @ts-ignore
+					disabledSource = moveId.disabledSource;
 				}
 			}
 			if (!isEnabled) {
@@ -445,7 +446,7 @@ class Side {
 			choice: 'move',
 			pokemon: pokemon,
 			targetLoc: targetLoc,
-			move: moveid,
+			moveid: moveid,
 			mega: mega || ultra,
 			zmove: zMove,
 		});
@@ -458,7 +459,7 @@ class Side {
 		if (ultra) this.choice.ultra = true;
 		if (zMove) this.choice.zMove = true;
 
-		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkDecisions()) return this;
+		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkActions()) return this;
 		return true;
 	}
 
@@ -473,11 +474,9 @@ class Side {
 		if (index >= this.active.length) {
 			return this.emitChoiceError(`Can't switch: You do not have a Pokémon in slot ${index + 1}`);
 		}
-		/**@type {Pokemon} */
-		// @ts-ignore
 		const pokemon = this.active[index];
 		const autoChoose = !slotText;
-		let slot = parseInt(slotText) - 1;
+		let slot;
 		if (autoChoose) {
 			if (this.currentRequest !== 'switch') {
 				return this.emitChoiceError(`Can't switch: You need to select a Pokémon to switch in`);
@@ -485,8 +484,24 @@ class Side {
 			if (!this.choice.forcedSwitchesLeft) return this.choosePass();
 			slot = this.active.length;
 			while (this.choice.switchIns.has(slot) || this.pokemon[slot].fainted) slot++;
+		} else {
+			// @ts-ignore
+			slot = parseInt(slotText) - 1;
 		}
-		if (isNaN(slot) || slot >= this.pokemon.length) {
+		if (isNaN(slot) || slot < 0) {
+			// maybe it's a name!
+			slot = -1;
+			for (const [i, pokemon] of this.pokemon.entries()) {
+				if (slotText === pokemon.name) {
+					slot = i;
+					break;
+				}
+			}
+			if (slot < 0) {
+				return this.emitChoiceError(`Can't switch: You do not have a Pokémon named "${slotText}" to switch to`);
+			}
+		}
+		if (slot >= this.pokemon.length) {
 			return this.emitChoiceError(`Can't switch: You do not have a Pokémon in slot ${slot + 1} to switch to`);
 		} else if (slot < this.active.length) {
 			return this.emitChoiceError(`Can't switch: You can't switch to an active Pokémon`);
@@ -521,7 +536,7 @@ class Side {
 			target: targetPokemon,
 		});
 
-		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkDecisions()) return this;
+		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkActions()) return this;
 		return true;
 	}
 
@@ -530,7 +545,8 @@ class Side {
 	 */
 	chooseTeam(data) {
 		const autoFill = !data;
-		if (autoFill) data = `123456`;
+		// default to sending team in order
+		if (!data) data = `123456`;
 		let positions;
 		if (data.includes(',')) {
 			positions = ('' + data).split(',').map(datum => parseInt(datum) - 1);
@@ -573,7 +589,7 @@ class Side {
 			});
 		}
 
-		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkDecisions()) return this;
+		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkActions()) return this;
 		return true;
 	}
 
@@ -597,7 +613,7 @@ class Side {
 			pokemon: pokemon,
 		});
 
-		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkDecisions()) return this;
+		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkActions()) return this;
 		return true;
 	}
 
@@ -752,7 +768,7 @@ class Side {
 		this.choice.actions.push({
 			choice: 'pass',
 		});
-		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkDecisions()) return this;
+		if (this.battle.LEGACY_API_DO_NOT_USE && !this.battle.checkActions()) return this;
 		return true;
 	}
 
@@ -789,8 +805,8 @@ class Side {
 		// deallocate ourself
 
 		// deallocate children and get rid of references to them
-		for (let i = 0; i < this.pokemon.length; i++) {
-			if (this.pokemon[i]) this.pokemon[i].destroy();
+		for (const pokemon of this.pokemon) {
+			if (pokemon) pokemon.destroy();
 		}
 		this.pokemon = [];
 		this.active = [];

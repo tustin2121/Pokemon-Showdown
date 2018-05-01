@@ -10,20 +10,37 @@
         "checkJs": true
     },
     "types": ["node"],
+    "exclude": [
+        "./mods/gen1/pokedex.js",
+    ],
     "include": [
+        "./config/formats.js",
+        "./data/*",
         "./dev-tools/global.d.ts",
         "./dev-tools/globals.ts",
         "./dev-tools/node.d.ts",
         "./sim/*.js",
-        "./crashlogger.js",
+        "./lib/*.js",
         "./dnsbl.js",
-        "./ladders-matchmaker.js",
+        "./ladders-local.js",
+        "./ladders-remote.js",
+        "./ladders.js",
+        "./mods/gen1/*",
+        "./mods/gen2/*",
+        "./mods/gen3/*",
+        "./mods/gen4/*",
         "./monitor.js",
-        "./repl.js",
+        "./loginserver.js",
         "./rooms.js",
-        "./fs.js",
+        "./roomlogs.js",
+        "./chat-formatter.js",
         "./room-game.js",
+        "./room-battle.js",
         "./process-manager.js",
-        "./verifier.js"
+        "./team-validator-async.js",
+        "./verifier.js",
+        "./chat.js",
+        "./users.js",
+        "./punishments.js"
     ]
 }
