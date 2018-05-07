@@ -3887,21 +3887,22 @@ exports.commands = {
 		let targetUser = this.targetUser;
 		
 		let gym;
-		if (global.LeagueSetup && target.startsWith("tppleague")) {
+		if (global.LeagueSetup && target.startsWith("gen7tppleague")) {
 			switch (target) {
-				case 'tppleaguegym':
+				case 'gen7tppleaguegym':
 					gym = LeagueSetup.gyms[toId(this.targetUsername)];
 					break;
-				case 'tppleagueelitefour':
+				case 'gen7tppleagueelitefour':
 					gym = LeagueSetup.elites[toId(this.targetUsername)];
 					if (gym && gym.isChamp) gym = null;
 					break;
-				case 'tppleaguechampion':
+				case 'gen7tppleaguechampion':
 					gym = LeagueSetup.elites[toId(this.targetUsername)];
 					if (gym && !gym.isChamp) gym = null;
 					break;
 			}
 		}
+		console.log('gym=>', gym);
 		
 		if (!targetUser || !targetUser.connected) {
 			if (gym){
@@ -3928,12 +3929,10 @@ exports.commands = {
 			}
 		}
 		// See tournaments/index.js @ setCustomRules() to see wtf is up with this insanity --tustin
-		if (gym && gym.customrules) {
-			target = `${target}@@@${gym.customrules.join(', ')}`;
+		if (gym && gym.banlist) {
+			target = `${target}@@@${gym.banlist.join(',')}`;
 		}
-		else if (gym && gym.banlist) {
-			target = `${target}@@@-${gym.banlist.join(', -')}`;
-		}
+		console.log('target=>', target);
 		Ladders(target).makeChallenge(connection, targetUser).then(isValid=>{
 			if (isValid === false) return;
 			if (gym) {

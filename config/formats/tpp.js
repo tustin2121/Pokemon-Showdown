@@ -122,9 +122,12 @@ create(leagueFormat, {
 		let LeagueSetup = loadLeague();
 		if (!LeagueSetup) return this.add('error', 'Fatal: Could not load league settings. Defaulting to Standard Battle.');
 		
-		let gym = LeagueSetup.gyms[toId(this.p1.name)];
+		this.pLeader = this.p2;
+		this.pChallenger = this.p1;
+		
+		let gym = LeagueSetup.gyms[toId(this.pLeader.name)];
 		if (!gym) {
-			this.add('error', `Player 1 (${this.p1.name}) has no defined gym! Please forfeit this match and have the challenger challenge the leader, so that the leader is player 1.`);
+			this.add('error', `Player 2 (${this.pLeader.name}) has no defined gym! Please forfeit this match and have the challenger challenge the leader, so that the leader is player 2.`);
 			return this.denyBattle("Invalid Gym Setup.");
 		}
 		
@@ -135,7 +138,7 @@ create(leagueFormat, {
 	onBegin: function() {
 		let LeagueSetup = loadLeague();
 		if (!LeagueSetup) return;
-		let gym = LeagueSetup.gyms[ toId(this.p1.name) ];
+		let gym = LeagueSetup.gyms[ toId(this.pLeader.name) ];
 		if (!gym) return;
 		
 		let bgmindex = Config.stadium.music();
@@ -146,15 +149,15 @@ create(leagueFormat, {
 		let bgm = gym.bgmusic || bgmindex.randInCategory("gym");
 		let img = bgiindex.convertToId(gym.bgimg || randlist[Math.floor(Math.random()*randlist.length)]);
 		
-		this.add('-tppgym', this.p1, (gym.battletype==='trial')?'Captain':'Leader');
+		this.add('-tppgym', this.pLeader, (gym.battletype==='trial')?'Captain':'Leader');
 		this.add('-stadium', '[norequest]', `[bg] ${img}`, `[music] ${bgm}`, `[premusic] ${pre}`);
-		this.add('title', `${this.p2.name} vs. The ${gym.name} ${(gym.battletype==='trial')?'Trial':'Gym'}`);
+		this.add('title', `${this.pChallenger.name} vs. The ${gym.name} ${(gym.battletype==='trial')?'Trial':'Gym'}`);
 	},
 	
 	// Custom Event sent just after the win messages are sent
 	onBattleFinished: function(sideWon) {
-		if (sideWon === this.p2) {
-			this.add('raw', `<div class="broadcast-blue">Gym Leader: Remember to use the <code>/givebadge ${this.p2.name}</code> command to give the challenger a badge (if applicable at this time).</div>`);
+		if (sideWon === this.pChallenger) {
+			this.add('raw', `<div class="broadcast-blue">Gym Leader: Remember to use the <code>/givebadge ${this.pChallenger.name}</code> command to give the challenger a badge (if applicable at this time).</div>`);
 		}
 	},
 });
@@ -168,9 +171,12 @@ create(leagueFormat, {
 		let LeagueSetup = loadLeague();
 		if (!LeagueSetup) return this.add('error', 'Fatal: Could not load league settings. Defaulting to Standard Battle.');
 		
-		let gym = LeagueSetup.elites[toId(this.p1.name)];
+		this.pLeader = this.p2;
+		this.pChallenger = this.p1;
+		
+		let gym = LeagueSetup.elites[toId(this.pLeader.name)];
 		if (!gym) {
-			this.add('error', `Player 1 (${this.p1.name}) has no defined Elite settings! Please forfeit this match and have the challenger challenge the E4 member, so that the E4 member is player 1.`);
+			this.add('error', `Player 1 (${this.pLeader.name}) has no defined Elite settings! Please forfeit this match and have the challenger challenge the E4 member, so that the E4 member is player 1.`);
 			return this.denyBattle("Invalid Elite Setup");
 		}
 		
@@ -181,7 +187,7 @@ create(leagueFormat, {
 	onBegin: function() {
 		let LeagueSetup = loadLeague();
 		if (!LeagueSetup) return;
-		let gym = LeagueSetup.elites[ toId(this.p1.name) ];
+		let gym = LeagueSetup.elites[ toId(this.pLeader.name) ];
 		if (!gym) return;
 		
 		let bgmindex = Config.stadium.music();
@@ -192,18 +198,18 @@ create(leagueFormat, {
 		let bgm = gym.bgmusic || bgmindex.randInCategory("e4");
 		let img = bgiindex.convertToId(gym.bgimg || randlist[Math.floor(Math.random()*randlist.length)]);
 		
-		this.add('-tppgym', this.p1, gym.name || 'Elite Four');
+		this.add('-tppgym', this.pLeader, gym.name || 'Elite Four');
 		this.add('-stadium', '[norequest]', `[bg] ${img}`, `[music] ${bgm}`, `[premusic] ${pre}`);
-		this.add('title', `${this.p2.name} vs. ${(gym.name || 'Elite Four')} ${this.p1.name}`);
+		this.add('title', `${this.pChallenger.name} vs. ${(gym.name || 'Elite Four')} ${this.pLeader.name}`);
 	},
 	
 	// Custom Event sent just after the win messages are sent
 	onBattleFinished: function(sideWon) {
 		if (this.turn === 0) return; //If this is before a fight even begins, ignore it.
-		if (sideWon === this.p2) {
+		if (sideWon === this.pChallenger) {
 			// Challenger won
 			this.send('e4fight', 'advance');
-		} else if (sideWon === this.p1) {
+		} else if (sideWon === this.pLeader) {
 			// Challenger lost
 			this.send('e4fight', 'restart');
 		} else {
@@ -222,13 +228,16 @@ create(leagueFormat, {
 		let LeagueSetup = loadLeague();
 		if (!LeagueSetup) return this.add('error', 'Fatal: Could not load league settings.');
 		
-		let gym = LeagueSetup.elites[ toId(this.p1.name) ];
+		this.pLeader = this.p2;
+		this.pChallenger = this.p1;
+		
+		let gym = LeagueSetup.elites[ toId(this.pLeader.name) ];
 		if (!gym) {
-			this.add('error', `Player 1 (${this.p1.name}) has no defined Elite settings! Please forfeit this match and have the challenger challenge the Champion, so that the Champion is player 1.`);
+			this.add('error', `Player 1 (${this.pLeader.name}) has no defined Elite settings! Please forfeit this match and have the challenger challenge the Champion, so that the Champion is player 1.`);
 			return this.denyBattle("Illegal Champion.");
 		}
 		if (!gym.isChamp) {
-			this.add('error', `Player 1 (${this.p1.name}) is not a champion. Get out and play a format you're allowed to use.`);
+			this.add('error', `Player 1 (${this.pLeader.name}) is not a champion. Get out and play a format you're allowed to use.`);
 			return this.denyBattle("Illegal Champion, imo.");
 		}
 		
@@ -239,7 +248,7 @@ create(leagueFormat, {
 	onBegin: function() {
 		let LeagueSetup = loadLeague();
 		if (!LeagueSetup) return;
-		let gym = LeagueSetup.elites[ toId(this.p1.name) ];
+		let gym = LeagueSetup.elites[ toId(this.pLeader.name) ];
 		if (!gym) return;
 		
 		let bgmindex = Config.stadium.music();
@@ -250,9 +259,9 @@ create(leagueFormat, {
 		let bgm = gym.bgmusic || bgmindex.randInCategory("champ");
 		let img = bgiindex.convertToId(gym.bgimg || randlist[Math.floor(Math.random()*randlist.length)]);
 		
-		this.add('-tppgym', this.p1, gym.name || 'Champion');
+		this.add('-tppgym', this.pLeader, gym.name || 'Champion');
 		this.add('-stadium', '[norequest]', `[bg] ${img}`, `[music] ${bgm}`, `[premusic] ${pre}`);
-		this.add('title', `${this.p2.name} vs. ${(gym.name || 'Champion')} ${this.p1.name}`);
+		this.add('title', `${this.pChallenger.name} vs. ${(gym.name || 'Champion')} ${this.pLeader.name}`);
 		this.send('champion', 'prep');
 	},
 	
@@ -271,12 +280,12 @@ create(leagueFormat, {
 	// Custom Event sent just after the win messages are sent
 	onBattleFinished: function(sideWon) {
 		if (this.turn === 0) return; //If this is before a fight even begins, ignore it.
-		if (sideWon === this.p2) {
+		if (sideWon === this.pChallenger) {
 			// Challenger won
-			let team = this.p2.pokemon.map(x => `${x.name}|${x.species}|${x.gender||"N"}${x.set.shiny?"*":""}`).join('[');
+			let team = this.pChallenger.pokemon.map(x => `${x.name}|${x.species}|${x.gender||"N"}${x.set.shiny?"*":""}`).join('[');
 			this.send('champion', 'finished');
 			this.send('e4fight', ['complete', this.gameType, team]);
-		} else if (sideWon === this.p1) {
+		} else if (sideWon === this.pLeader) {
 			// Challenger lost
 			this.send('champion', 'finished-lose');
 			this.send('e4fight', 'restart');

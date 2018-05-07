@@ -616,7 +616,12 @@ exports.commands = {
 					if (obj.banlist) {
 						let val = obj.banlist;
 						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
-							save.banlist = val.map(x=>x.trim()).filter(x => !!x);
+							try {
+								Dex.validateFormat(`gen7tppleagueelitefour@@@${val.join(',')}`);
+								save.banlist = val.map(x=>x.trim()).filter(x => !!x);
+							} catch (e) {
+								errors.push(`Banlist is invalid: ${e.message} \n (Hint: You must put a '-' in front of moves to ban them, otherwise the validator thinks it's a rule.)`);
+							}
 						} else {
 							errors.push("Banlist is invalid.");
 						}
@@ -722,7 +727,12 @@ exports.commands = {
 					if (obj.banlist) {
 						let val = obj.banlist;
 						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
-							save.banlist = val.map(x=>x.trim()).filter(x => !!x);
+							try {
+								Dex.validateFormat(`gen7tppleaguegym@@@${val.join(',')}`);
+								save.banlist = val.map(x=>x.trim()).filter(x => !!x);
+							} catch (e) {
+								errors.push(`Banlist is invalid: ${e.message} \n (Hint: You must put a '-' in front of moves to ban them, otherwise the validator thinks it's a rule.)`);
+							}
 						} else {
 							errors.push("Banlist is invalid.");
 						}
