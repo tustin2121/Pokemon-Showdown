@@ -37,6 +37,10 @@ exports.BattleMovedex = {
 			return false;
 		},
 	},
+	quash: {
+		inherit: true
+		// Mod-specific: default mechanics
+	},
 
 	/**
 	 *	Sucker Punch
@@ -76,6 +80,25 @@ exports.BattleMovedex = {
 			}
 		},
 	},
+	
+	/**	
+	 * Pledges	
+	 * If two Pledge moves are linked, the joint effect is triggered	
+	 *	
+	 **/	
+	
+	firepledge: {	
+		inherit: true	
+		// Mod-specific: default mechanics	
+	},	
+	grasspledge: {	
+		inherit: true	
+		// Mod-specific: default mechanics	
+	},	
+	waterpledge: {	
+		inherit: true	
+		// Mod-specific: default mechanics	
+ 	},
 
 	/**
 	 * Mimic and Sketch
@@ -131,7 +154,7 @@ exports.BattleMovedex = {
 	},
 
 	/**
-	 * Instruct and Mirror Move
+	 * Instruct, Copycat, and Mirror Move
 	 * Copy/call the last absolute move used by the target
 	 *
 	 */
@@ -148,6 +171,17 @@ exports.BattleMovedex = {
 			}
 			this.add('-singleturn', target, 'move: Instruct', '[of] ' + source);
 			this.runMove(lastMove.id, target, target.lastMoveTargetLoc);
+		},
+	},
+	copycat: {
+		inherit: true,
+		onHit: function (pokemon) {
+			let lastMove = pokemon.getLastMoveAbsolute();
+			let noCopycat = ['assist', 'banefulbunker', 'bestow', 'chatter', 'circlethrow', 'copycat', 'counter', 'covet', 'destinybond', 'detect', 'dragontail', 'endure', 'feint', 'focuspunch', 'followme', 'helpinghand', 'mefirst', 'metronome', 'mimic', 'mirrorcoat', 'mirrormove', 'naturepower', 'protect', 'ragepowder', 'roar', 'sketch', 'sleeptalk', 'snatch', 'struggle', 'switcheroo', 'thief', 'transform', 'trick', 'whirlwind'];
+			if (!lastMove || noCopycat.includes(lastMove.id) || lastMove.isZ) {
+				return false;
+			}
+			this.useMove(lastMove.id, pokemon);
 		},
 	},
 	mirrormove: {
@@ -387,7 +421,7 @@ exports.BattleMovedex = {
 			return false;
 		},
 	},
-
+	
 	/**
 	 * Other moves that check `pokemon.lastMove`
 	 * (may behave counter-intuitively if left unmodded)
@@ -521,4 +555,124 @@ exports.BattleMovedex = {
 			}
 		},
 	},
+	
+	trumpcard: {
+		inherit: true,
+		basePowerCallback: function (source, target, move) {
+			const moveSlot = source.getMoveData(source.getLastMoveAbsolute());
+			// @ts-ignore
+			switch (moveSlot.pp) {
+			case 0:
+				return 200;
+			case 1:
+				return 80;
+			case 2:
+				return 60;
+			case 3:
+				return 50;
+			default:
+				return 40;
+			}
+		},
+	},
+	
+	uproar: {	
+		inherit: true	
+		// Mod-specific: default mechanics	
+ 	},
+ 	
+ 	/**	
+	 * Moves that should clean up after running	(or if they aren't run)
+	 * (but aren't doing so in standard for whatever reason)	
+	 */	
+	beatup: {	
+		inherit: true,	
+		onAfterMove: function (pokemon) {	
+			pokemon.removeVolatile('beatup');	
+		}	
+	},	
+	triplekick: {	
+		inherit: true,	
+		onAfterMove: function (pokemon) {	
+			pokemon.removeVolatile('triplekick');	
+		}	
+ 	},
+ 	furycutter: {
+ 		inherit: true,
+ 		effect: {
+			duration: 2,
+			onStart: function () {
+				this.effectData.multiplier = 1;
+			},
+			onRestart: function () {
+				if (this.effectData.multiplier < 4) {
+					this.effectData.multiplier <<= 1;
+				}
+				this.effectData.duration = 2;
+			},
+			onBeforeMove: function (pokemon, target, move) {
+				if (move.id !== 'furycutter') pokemon.removeVolatile('furycutter');
+			},
+		},
+ 	},
+ 	
+ 	attract: {
+ 		inherit: true,
+ 		effect: {
+			noCopy: true, // doesn't get copied by Baton Pass
+			onStart: function (pokemon, source, effect) {
+				if (!(pokemon.gender === 'M' && source.gender === 'F') && !(pokemon.gender === 'F' && source.gender === 'M')) {
+					this.debug('incompatible gender');
+					return false;
+				}
+				if (!this.runEvent('Attract', pokemon, source)) {
+					this.debug('Attract event failed');
+					return false;
+				}
+
+				if (effect.id === 'cutecharm') {
+					this.add('-start', pokemon, 'Attract', '[from] ability: Cute Charm', '[of] ' + source);
+				} else if (effect.id === 'destinyknot') {
+					this.add('-start', pokemon, 'Attract', '[from] item: Destiny Knot', '[of] ' + source);
+				} else {
+					this.add('-start', pokemon, 'Attract');
+				}
+				this.effectData.lastChecked = this.turn;
+			},
+			onUpdate: function (pokemon) {
+				if (this.effectData.source && !this.effectData.source.isActive && pokemon.volatiles['attract']) {
+					this.debug('Removing Attract volatile on ' + pokemon);
+					pokemon.removeVolatile('attract');
+				}
+			},
+			onBeforeMovePriority: 2,
+			onBeforeMove: function (pokemon, target, move) {
+				if (this.effectData.lastChecked === this.turn && this.effectData.movePrevented) return false;
+				if (this.effectData.lastChecked !== this.turn) {
+					this.effectData.movePrevented = false;
+					this.effectData.lastChecked = this.turn;
+					this.add('-activate', pokemon, 'move: Attract', '[of] ' + this.effectData.source);
+					if (this.randomChance(1, 2)) {
+						this.add('cant', pokemon, 'Attract');
+						this.effectData.movePrevented = true;
+						return false;
+					}
+				}
+			},
+			onEnd: function (pokemon) {
+				this.add('-end', pokemon, 'Attract', '[silent]');
+			},
+		},
+ 	},
+ 	
+ 	/**
+	 * First Law of Pokémon Simulation:
+	 * Always make sure that Sky Drop works
+ 	 *
+ 	 */
+ 	 skydrop: {
+ 	 	inherit: true,
+ 	 	// ????
+ 	 },
+ 	
 };

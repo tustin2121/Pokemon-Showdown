@@ -155,12 +155,12 @@ exports.BattleScripts = {
 		let atLeastOne = false;
 		let zMoves = [];
 		for (let i = 0; i < pokemon.moves.length; i++) {
-			if (pokemon.moveset[i].pp <= 0) {
+			if (pokemon.moveSlots[i].pp <= 0) {
 				zMoves.push(null);
 				continue;
 			}
 			// Add check to see if z move has been used for the given move
-			if (pokemon.moveset[i].zMoveUsed) {
+			if (pokemon.moveSlots[i].zMoveUsed) {
 				zMoves.push(null);
 				continue;
 			}

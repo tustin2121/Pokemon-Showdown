@@ -9,31 +9,37 @@ exports.Formats = [
 		name: "[Gen 6] Random Battle",
 		overrides: 'section',
 		section: "Randomized Past Gens",
+		__subsort: 1,
 	},
 	{
 		name: "[Gen 5] Random Battle",
 		overrides: 'section',
 		section: "Randomized Past Gens",
+		__subsort: 2,
 	},
 	{
 		name: "[Gen 4] Random Battle",
 		overrides: 'section',
 		section: "Randomized Past Gens",
+		__subsort: 3,
 	},
 	{
 		name: "[Gen 3] Random Battle",
 		overrides: 'section',
 		section: "Randomized Past Gens",
+		__subsort: 4,
 	},
 	{
 		name: "[Gen 2] Random Battle",
 		overrides: 'section',
 		section: "Randomized Past Gens",
+		__subsort: 5,
 	},
 	{
 		name: "[Gen 1] Random Battle",
 		overrides: 'section',
 		section: "Randomized Past Gens",
+		__subsort: 6,
 	},
 
 	// Other Metagames
@@ -200,70 +206,7 @@ exports.Formats = [
 			}
 		},
 	},
-	//* Uncomment this if Mix and Mega is ever removed from smogon's formats, for whatever reason.
-	{
-		name: "[Gen 7] Mix and Mega",
-		overrides: 'ensure', //If smogon ever removes this format, we'll still have it.
-		desc: [
-			"Mega Stones and Primal Orbs can be used on almost any fully evolved Pok&eacute;mon with no Mega Evolution limit.",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3587740/\">Mix and Mega</a>",
-			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3591580/\">Mix and Mega Resources</a>",
-			"&bullet; <a href=\"https://www.smogon.com/tiers/om/analyses/mix_and_mega/\">Mix and Mega Analyses</a>",
-		],
-
-		mod: 'mixandmega',
-		searchShow: false,
-		ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Mega Rayquaza Clause', 'Team Preview'],
-		banlist: ['Baton Pass', 'Electrify'],
-		onValidateTeam: function (team) {
-			let itemTable = {};
-			for (let i = 0; i < team.length; i++) {
-				let item = this.getItem(team[i].item);
-				if (!item) continue;
-				if (!(item in itemTable)) {
-					itemTable[item] = 1;
-				} else if (itemTable[item] < 2) {
-					itemTable[item]++;
-				} else {
-					if (item.megaStone) return ["You are limited to two of each Mega Stone.", "(You have more than two " + this.getItem(item).name + ")"];
-					if (item.id === 'blueorb' || item.id === 'redorb') return ["You are limited to two of each Primal Orb.", "(You have more than two " + this.getItem(item).name + ")"];
-				}
-			}
-		},
-		onValidateSet: function (set) {
-			let template = this.getTemplate(set.species || set.name);
-			let item = this.getItem(set.item);
-			if (!item.megaEvolves && item.id !== 'blueorb' && item.id !== 'redorb') return;
-			if (template.baseSpecies === item.megaEvolves || (template.baseSpecies === 'Groudon' && item.id === 'redorb') || (template.baseSpecies === 'Kyogre' && item.id === 'blueorb')) return;
-			if (template.evos.length) return ["" + template.species + " is not allowed to hold " + item.name + " because it's not fully evolved."];
-			let uberStones = ['beedrillite', 'blazikenite', 'gengarite', 'kangaskhanite', 'mawilite', 'medichamite'];
-			if (template.tier === 'Uber' || set.ability === 'Power Construct' || uberStones.includes(item.id)) return ["" + template.species + " is not allowed to hold " + item.name + "."];
-		},
-		onBegin: function () {
-			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
-			for (let i = 0, len = allPokemon.length; i < len; i++) {
-				let pokemon = allPokemon[i];
-				pokemon.originalSpecies = pokemon.baseTemplate.species;
-			}
-		},
-		onSwitchIn: function (pokemon) {
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				// Place volatiles on the Pokémon to show its mega-evolved condition and details
-				this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-				let oTemplate = this.getTemplate(pokemon.originalSpecies);
-				if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
-					this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
-				}
-			}
-		},
-		onSwitchOut: function (pokemon) {
-			let oMegaTemplate = this.getTemplate(pokemon.template.originalMega);
-			if (oMegaTemplate.exists && pokemon.originalSpecies !== oMegaTemplate.baseSpecies) {
-				this.add('-end', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
-			}
-		},
-	},
+	
 	{
 		name: "[Gen 0] Type Omelette",
 		section: "Other Metagames",
@@ -340,16 +283,16 @@ exports.Formats = [
 		},
 	},
 	{
-		name: "FU",
+		name: "[Gen 6] FU",
 		desc: [
 			"The tier below PU. Only available here!",
 		],
 		section: "OR/AS Singles",
 
-		ruleset: ['PU'],
-		banlist: ['PU', 'Chatter'],
+		ruleset: ['[Gen 6] PU'],
+		banlist: ['[Gen 6] PU', 'Chatter'],
 		
-		__subsort: subSortOf => subSortOf("PU")+0.1,
+		__subsort: subSortOf => subSortOf("[Gen 6] PU")+0.1,
 	},
 	{
 		name: "LC Supreme",
@@ -505,11 +448,15 @@ exports.Formats = [
 		name: '[Gen 7] Snowball Fight',
 		section: 'Other Metagames',
 		column: 4,
-		ruleset: ['Ubers'],
+		ruleset: ['[Gen 7] Ubers'],
 		banlist: [],
 		mod: 'snowballfight',
 		onValidateSet: function (set) {
 			set.moves.push('fling');
+		},
+		// Standard PseudoEvent
+		onBegin: function() {
+			this.add('-stadium', '[norequest]', `[bg] bg-snow.jpg`);
 		},
 		onBeforeTurn: function () {
 			if (!this.p1.snowballs) {

@@ -41,6 +41,7 @@ function tryRequire(filePath) {
 let sublists = [
 	'showdowncats.js',
 	'../formats.js', //Showdown's format list
+	'mixandmega.js',
 	'othermetas.js',
 	'tpp.js',
 	'stpplb.js',
@@ -87,10 +88,12 @@ for (let i = 0; i < sublists.length; i++) {
 			let baseformat = formatList[id];
 			if (format.overrides === true) {
 				if (!baseformat) console.warn(`Format "${format.name}" in file '${sublists[i]}' intends to override an existing format, but one no longer exists.`);
+				format.__source = sublists[i];
 			} 
 			else if (format.overrides === 'ensure') {
 				if (baseformat) continue; // If the format exists, ignore this format
 				console.log(`Format "${format.name}" has been orphaned from the main list.`);
+				format.__source = sublists[i];
 			} 
 			else if (format.overrides === 'section') {
 				if (!baseformat) {
@@ -100,17 +103,18 @@ for (let i = 0; i < sublists.length; i++) {
 				baseformat.section = format.section;
 				baseformat.__sectionSort = format.__sectionSort;
 				baseformat.__subsort = format.__subsort;
-				continue;
+				// continue;
 			} 
 			else {
 				console.warn(`Format "${format.name}" in file '${sublists[i]}' has unknown "overrides" directive.`);
+				format.__source = sublists[i];
 			}
 		} else if (formatList[id]) {
 			console.warn(`Format "${format.name}" in file '${sublists[i]}' is overriding an existing format from file '${formatList[id].__source}'`);
+			format.__source = sublists[i];
 		}
 		formatList[id] = format;
 		
-		format.__source = sublists[i];
 		if (format.section && sectionList[format.section]) {
 			format.column = sectionList[format.section].column;
 			format.__sectionSort = sectionList[format.section].sort;
@@ -141,3 +145,5 @@ exports.Formats = Object.keys(formatList)
 		if (comp === 0) comp = a.__subsort - b.__subsort;
 		return comp;
 	});
+
+// console.log(exports.Formats.map(x=>`FORMAT: ${x.name} | ${x.column} | ${x.__sectionSort} | ${x.__subsort}`).join('\n'));

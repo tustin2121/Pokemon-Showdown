@@ -62,6 +62,31 @@ exports.BattleStatuses = {
 			return false;
 		},
 	},
+	flinch: {
+		inherit: true,
+		onBeforeMove: function (pokemon) {
+			if (this.effectData.movePrevented) return false;
+			if (!this.runEvent('Flinch', pokemon)) return false;
+			if (!this.effectData.movePrevented) {
+				// no need to display the recharge message twice
+				this.effectData.movePrevented = true;
+				this.add('cant', pokemon, 'flinch');
+			}
+			return false;
+		}
+	},
+	mustrecharge: {	
+		inherit: true,
+		onBeforeMove: function (pokemon) {
+			if (!this.effectData.movePrevented) {
+				// no need to display the recharge message twice
+				this.effectData.movePrevented = true;
+				this.add('cant', pokemon, 'recharge');
+			}
+			if (!pokemon.moveThisTurn) pokemon.removeVolatile('mustrecharge');
+			return false;
+		}
+ 	},
 
 	/**
 	 * Gems
@@ -73,6 +98,12 @@ exports.BattleStatuses = {
 		inherit: true,
 		onBeforeMove: function (pokemon) {
 			if (pokemon.moveThisTurn) pokemon.removeVolatile('gem');
+		},
+	},
+	aura: {
+		inherit: true,
+		onBeforeMove: function (pokemon) {
+			if (pokemon.moveThisTurn) pokemon.removeVolatile('aura');
 		},
 	},
 };

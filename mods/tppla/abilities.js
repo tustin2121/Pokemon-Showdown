@@ -527,7 +527,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			if (!move) {
 				return false;
 			}
-			pokemon.moveset[0] = {
+			pokemon.moveSlots[0] = {
 				move: move.name,
 				id: move.id,
 				pp: move.pp,
@@ -537,7 +537,6 @@ exports.BattleAbilities = { // define custom abilities here.
 				used: false,
 				virtual: true,
 			};
-			pokemon.moves[0] = toId(move.name);
 			this.add('message', pokemon.name + ' acquired a new move using its Drawing Request!');
 		},
 	},
@@ -660,7 +659,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			}
 			let index = pokemon.moves.indexOf('godswrath');
 			move = this.getMove(move);
-			pokemon.moveset[index] = {
+			pokemon.moveSlots[index] = {
 				move: move.name,
 				id: move.id,
 				pp: move.pp,
@@ -670,7 +669,6 @@ exports.BattleAbilities = { // define custom abilities here.
 				used: false,
 				virtual: true,
 			};
-			pokemon.moves[index] = toId(move.name);
 		},
 		name: 'Invocation',
 		id: 'invocation',

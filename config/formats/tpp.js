@@ -15,8 +15,8 @@ function loadLeague() {
 
 /* global toId */
 exports.Sections = {
-	"TPP League":			{ column: 5, sort: 1, },
-	"TPPLA":			{ column: 5, sort: 2, },
+	"TPP League":		{ column: 4, sort: 1, },
+	"TPPLA":			{ column: 4, sort: 2, },
 };
 exports.Formats = [];
 

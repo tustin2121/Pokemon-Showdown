@@ -541,7 +541,7 @@ exports.BattleAbilities = { // define custom abilities here.
 			if (!move) {
 				return false;
 			}
-			pokemon.moveset[0] = {
+			pokemon.moveSlots[0] = {
 				move: move.name,
 				id: move.id,
 				pp: move.pp,
@@ -551,7 +551,6 @@ exports.BattleAbilities = { // define custom abilities here.
 				used: false,
 				virtual: true,
 			};
-			pokemon.moves[0] = toId(move.name);
 			this.add('message', pokemon.name + ' acquired a new move using its Drawing Request!');
 			//TODO report ability!
 		},
@@ -718,7 +717,7 @@ CRASH: TypeError: Cannot read property 'fullname' of undefined
 			}
 			let index = pokemon.moves.indexOf('godswrath');
 			move = this.getMove(move);
-			pokemon.moveset[index] = {
+			pokemon.moveSlots[index] = {
 				move: move.name,
 				id: move.id,
 				pp: move.pp,
@@ -728,7 +727,6 @@ CRASH: TypeError: Cannot read property 'fullname' of undefined
 				used: false,
 				virtual: true,
 			};
-			pokemon.moves[index] = toId(move.name);
 		},
 		rating: 1,
 	},
@@ -902,9 +900,8 @@ CRASH: TypeError: Cannot read property 'fullname' of undefined
 					disabled: false,
 					used: false,
 				};
-				pokemon.moveset.push(sketchedMove);
-				pokemon.baseMoveset.push(sketchedMove);
-				pokemon.moves.push(toId(move.name));
+				pokemon.moveSlots.push(sketchedMove);
+				pokemon.baseMoveSlots.push(sketchedMove);
 			}
 			if (addedMoves.length == 0) {
 				this.debug("CheatCode failed to add any moves.");
@@ -995,9 +992,8 @@ CRASH: TypeError: Cannot read property 'fullname' of undefined
 			let index = source.moves.indexOf(move.id);
 			if (index >= 4) {
 				this.debug("Removing move.id "+move.id+" from index "+index);
-				source.moves.splice(index, 1);
-				source.moveset.splice(index, 1);
-				source.baseMoveset.splice(index, 1);
+				source.moveSlots.splice(index, 1);
+				source.baseMoveSlots.splice(index, 1);
 			}
 		},
 		//TODO on end (no funed) remove all extra moves

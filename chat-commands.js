@@ -2855,7 +2855,7 @@ exports.commands = {
 				Chat.uncacheDir('./sim');
 				Chat.uncacheDir('./data');
 				Chat.uncacheDir('./mods');
-				Chat.uncache('./config/formats');
+				Chat.uncacheDir('./config/formats');
 				// reload sim/dex.js
 				global.Dex = require('./sim/dex');
 				// rebuild the formats list
@@ -2870,11 +2870,11 @@ exports.commands = {
 				this.sendReply("Formats have been hot-patched.");
 			} else if (target === 'bot' || target === 'bots') {
 				BotManager.destroy();
-				Chat.uncacheTree('./bots');
+				Chat.uncacheDir('./bots');
 				global.BotManager = require('./bots');
 				this.sendReply("The Bots have been hot-patched.");
 			} else if (target === 'league' || target === 'tppla') {
-				this.parse('/adventbuilder reload');
+				this.parse('/leaguebuilder reload');
 				
 			} else if (target === 'stadium' || target === 'music') {
 				Config.stadium.uncache();

@@ -31,9 +31,9 @@ exports.BattleFormats = {
 		onDisableMove: function(pokemon){
 			let shouldEnable = false; // assume we're disabling it
 			// If you cannot use Super Glitch, enable
-			for (let move of pokemon.moveset) {
-				if (move.id === 'superglitch') {
-					shouldEnable = move.disabled;
+			for (const moveSlot of pokemon.moveSlots) {
+				if (moveSlot.id === 'superglitch') {
+					shouldEnable = moveSlot.disabled;
 				}
 			}
 			// If you can recycle a Leppa Berry, enable

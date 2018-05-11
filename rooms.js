@@ -1220,7 +1220,7 @@ class BasicChatRoom extends BasicRoom {
 		this.users[user.userid] = user;
 		this.userCount++;
 		
-		this.send(this.getUserList()); //This bug doesn't seem to affect showdown?? --tustin 2018-05-06
+		// this.send(this.getUserList()); //This bug doesn't seem to affect showdown?? --tustin 2018-05-06
 		if (this.poll) this.poll.onConnect(user, connection);
 		if (this.game && this.game.onJoin) this.game.onJoin(user, connection);
 		return true;

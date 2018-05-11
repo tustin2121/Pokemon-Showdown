@@ -200,6 +200,13 @@ exports.BattleFormats = {
 	},
 	
 	// Pokemon Plus: Allow all Fakemon if "Allow Fake" is added to banlist.
+	allowfake: {
+		effectType: 'ValidatorRule',
+		name: 'Allow Fake',
+		desc: "Allows fakemons.",
+		// Implemented in the 'pokemonplus' ruleset
+	},
+	
 	pokemonplus: {
 		effectType: 'ValidatorRule',
 		name: 'Pokemon Plus',

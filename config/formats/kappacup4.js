@@ -1,8 +1,8 @@
 // Metas for Kappa Cup Season 4
 
 exports.Sections = {
-	"Kappa Kup Season 4": { column: 6, sort: 4, },
-	"Kappa Kup Season 4 Playoffs": { column: 6, sort: 5, },
+	"Kappa Kup Season 4": { column: 5, sort: 4, },
+	"Kappa Kup Season 4 Playoffs": { column: 5, sort: 5, },
 };
 exports.Formats = [
 	// Week 1: Singles

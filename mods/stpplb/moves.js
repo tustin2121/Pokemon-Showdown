@@ -865,8 +865,8 @@ exports.BattleMovedex = {
 			}
 			
 			let moves = [];
-			for (let i = 0; i < target.moveset.length; i++) {
-				let move = target.moveset[i].id;
+			for (let i = 0; i < target.moveSlots.length; i++) {
+				let move = target.moveSlots[i].id;
 				if (move !== 'reroll') moves.push(move);
 			}
 			let randomMove = '';
@@ -1418,15 +1418,13 @@ exports.BattleMovedex = {
 				disabled: false,
 				used: false,
 			};
-			if (source.moveset.length < 8) {
-				source.moveset.push(sketchedMove);
-				source.baseMoveset.push(sketchedMove);
-				source.moves.push(toId(move.name));
+			if (source.moveSlots.length < 8) {
+				source.moveSlots.push(sketchedMove);
+				source.baseMoveSlots.push(sketchedMove);
 			} else {
 				let r = this.random(8);
-				source.moveset[r] = sketchedMove;
-				source.baseMoveset[r] = sketchedMove;
-				source.moves[r] = toId(move.name);
+				source.moveSlots[r] = sketchedMove;
+				source.baseMoveSlots[r] = sketchedMove;
 			}
 			this.add('message', source.name + ' acquired ' + move.name + ' using its Quick Sketch!');
 			this.useMove(move, target);
@@ -2216,9 +2214,8 @@ exports.BattleMovedex = {
 				used: false,
 				virtual: true,
 			};
-			target.moveset[0] = addedMove;
-			// target.baseMoveset[0] = addedMove;
-			target.moves[0] = toId(move.name);
+			target.moveSlots[0] = addedMove;
+			// target.baseMoveSlots[0] = addedMove;
 		},
 		secondary: false,
 		target: "allAdjacentFoes",

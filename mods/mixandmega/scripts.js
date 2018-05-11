@@ -1,5 +1,7 @@
 'use strict';
 
+const Side = require('../../sim/side');
+
 exports.BattleScripts = {
 	init: function () {
 		for (let id in this.data.Items) {
@@ -8,7 +10,7 @@ exports.BattleScripts = {
 		}
 	},
 	canMegaEvo: function (pokemon) {
-		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
+		if (pokemon.template.isMega || pokemon.template.isPrimal || pokemon.baseTemplate.forme === 'Ultra') return false;
 
 		const item = pokemon.getItem();
 		if (item.megaStone) {
@@ -24,7 +26,8 @@ exports.BattleScripts = {
 		if (pokemon.template.isMega || pokemon.template.isPrimal) return false;
 
 		const isUltraBurst = !pokemon.canMegaEvo;
-		const template = this.getMixedTemplate(pokemon.originalSpecies, pokemon.canMegaEvo || pokemon.canUltraBurst);
+		let species = pokemon.template.baseSpecies == pokemon.originalSpecies ? pokemon.template.species : pokemon.originalSpecies;
+		const template = this.getMixedTemplate(species, pokemon.canMegaEvo || pokemon.canUltraBurst);
 		const side = pokemon.side;
 
 		// Pokémon affected by Sky Drop cannot Mega Evolve. Enforce it here for now.
@@ -40,18 +43,13 @@ exports.BattleScripts = {
 		// Do we have a proper sprite for it?
 		if (this.getTemplate(pokemon.canMegaEvo).baseSpecies === pokemon.originalSpecies || isUltraBurst) {
 			pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-			this.add('detailschange', pokemon, pokemon.details);
 			this.add((isUltraBurst ? '-burst' : '-mega'), pokemon, template.baseSpecies, template.requiredItem);
+			this.add('detailschange', pokemon, pokemon.details);
 		} else {
-			let oTemplate = this.getTemplate(pokemon.originalSpecies);
-			let oMegaTemplate = this.getTemplate(template.originalMega);
-			if (template.originalMega === 'Rayquaza-Mega') {
-				this.add('message', "" + pokemon.side.name + "'s fervent wish has reached " + pokemon.species + "!");
-			} else {
-				this.add('message', "" + pokemon.species + "'s " + pokemon.getItem().name + " is reacting to " + pokemon.side.name + "'s Mega Bracelet!");
-			}
-			this.add('-formechange', pokemon, oTemplate.species, template.requiredItem);
-			this.add('message', template.baseSpecies + " has Mega Evolved into Mega " + template.baseSpecies + "!");
+			let oTemplate = this.getTemplate(species);
+			let oMegaTemplate = this.getTemplate(pokemon.canMegaEvo);
+			this.add('-mega', pokemon, pokemon.originalSpecies, oMegaTemplate.requiredItem);
+			this.add('-formechange', pokemon, species, template.requiredItem);
 			this.add('-start', pokemon, oMegaTemplate.requiredItem || oMegaTemplate.requiredMove, '[silent]');
 			if (oTemplate.types.length !== pokemon.template.types.length || oTemplate.types[1] !== pokemon.template.types[1]) {
 				this.add('-start', pokemon, 'typechange', pokemon.template.types.join('/'), '[silent]');
@@ -63,6 +61,7 @@ exports.BattleScripts = {
 		pokemon.canMegaEvo = false;
 		if (isUltraBurst) pokemon.canUltraBurst = false;
 		return true;
+
 	},
 	getMixedTemplate: function (originalSpecies, megaSpecies) {
 		let originalTemplate = this.getTemplate(originalSpecies);
@@ -113,9 +112,22 @@ exports.BattleScripts = {
 		template.weightkg = Math.max(0.1, template.weightkg + deltas.weightkg);
 		template.originalMega = deltas.originalMega;
 		template.requiredItem = deltas.requiredItem;
-		if (deltas.isMega) template.isMega = true;
-		if (deltas.isPrimal) template.isPrimal = true;
+		if (deltas.isMega) {
+			template.isMega = true;
+			template.species += '-' + deltas.isMega;
+		} else if (deltas.isPrimal) {
+			template.isPrimal = true;
+			template.species += '-Primal';
+		}
+		delete template.onSwitchInPriority;
+		delete template.onSwitchIn;
 		return template;
+	},
+	side: {
+		chooseMove: function (moveText, targetLoc, megaOrZ) {
+			this.choice.mega = false; //????????? --tustin
+			return Side.prototype.chooseMove.call(this, moveText, targetLoc, megaOrZ);
+		},
 	},
 };
 
@@ -129,4 +141,6 @@ exports.inject = function(mod){
 	if (!mod["getMixedTemplate"]) mod["getMixedTemplate"] = exports.BattleScripts["getMixedTemplate"];
 	if (!mod["getMegaDeltas"]) mod["getMegaDeltas"] = exports.BattleScripts["getMegaDeltas"];
 	if (!mod["doGetMixedTemplate"]) mod["doGetMixedTemplate"] = exports.BattleScripts["doGetMixedTemplate"];
+	if (!mod["side"]) mod["side"] = {};
+	if (!mod.side["chooseMove"]) mod.side["chooseMove"] = exports.BattleScripts.side["chooseMove"];
 };
