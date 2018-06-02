@@ -11,6 +11,13 @@ exports.BattleScripts = {
 			if (!learnsets[i]) continue;
 			if (this.data.FormatsData[i].isUnreleased) continue;
 			if (this.data.FormatsData[i].tier && this.data.FormatsData[i].tier === 'Illegal') continue;
+			
+			if (this.data.FormatsData[i].doublesTier) {
+				if (this.data.FormatsData[i].doublesTier === 'DUber') continue;
+			}
+			else if (this.data.FormatsData[i].tier) {
+				if (this.data.FormatsData[i].tier === 'Uber') continue;
+			}
 			dex.push(i);
 		}
 		for (let i = 0; i < dex.length; i++) {

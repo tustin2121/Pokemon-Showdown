@@ -268,7 +268,7 @@ exports.Formats = [
 
 		mod: 'mergemons',
 		gameType: 'doubles',
-		ruleset: ['[Gen 7] OU'],
+		ruleset: ['[Gen 7] Doubles Ubers'],
 		banlist: [],
 	},
 	
@@ -287,11 +287,12 @@ exports.Formats = [
 		],
 
 		mod: 'dualwielding',
-		ruleset: ['[Gen 7] OU'],
+		ruleset: ['[Gen 7] Ubers'],
 		banlist: ['Regigigas', 'Slaking'],
 		validateSet: function (set, teamHas) {
+			let template = this.dex.getTemplate(set.species || set.name);
 			let dual = this.dex.getItem(set.ability);
-			if (!dual.exists) return this.validateSet(set, teamHas);
+			if (!dual.exists || template.tier === 'Uber') return this.validateSet(set, teamHas);
 			let item = this.dex.getItem(set.item);
 			let validator = new this.constructor(Dex.getFormat(this.format.id+'@@@Ignore Illegal Abilities'));
 			let problems = validator.validateSet(Object.assign({}, set, {ability: ''}), teamHas) 
@@ -321,11 +322,16 @@ exports.Formats = [
 		section: "Kappa Kup Season 5",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3604808/\">Metagamiate</a>"],
 		mod: 'gen7',
-		ruleset: ['[Gen 7] OU'],
+		ruleset: ['[Gen 7] Ubers'],
 		banlist: ['Dragonite', 'Kyurem-Black'],
 		onModifyMovePriority: -1,
 		onModifyMove: function (move, pokemon) {
-			if (move.type === 'Normal' && !move.isZ && move.id !== 'hiddenpower' && !pokemon.hasAbility(['aerilate', 'galvanize', 'normalize', 'pixilate', 'refrigerate'])) {
+			if (move.type === 'Normal' 
+				&& !move.isZ 
+				&& move.id !== 'hiddenpower' 
+				&& !pokemon.hasAbility(['aerilate', 'galvanize', 'normalize', 'pixilate', 'refrigerate'])
+				&& !(pokemon.baseTemplate.tier in { Uber:1 }) ) 
+			{
 				let types = pokemon.getTypes();
 				let type = types.length < 2 || !pokemon.set.shiny ? types[0] : types[1];
 				move.type = type;
@@ -338,7 +344,7 @@ exports.Formats = [
 			return this.chainModify([0x1333, 0x1000]);
 		},
 		validateSet: function (set, teamHas) {
-			let trueTemplate = this.dex.getTemplate(set.species)
+			let trueTemplate = this.dex.getTemplate(set.species);
 			let forgedTemplate = Object.assign({}, this.dex.getTemplate(set.species));
 			if (forgedTemplate.eventPokemon) {
 				let ep = []; //Avoid format crosstalk by using an empty array as a base
@@ -368,7 +374,8 @@ exports.Formats = [
 		section: "Kappa Kup Season 5",
 		desc: ["&bullet; <a href=\"http://www.smogon.com/forums/threads/3588652/\">Pokebilities</a>: A Pokemon has all of its abilities active at the same time."],
 		mod: 'pokebilities',
-		ruleset: ["[Gen 7] OU"],
+		ruleset: ["[Gen 7] Ubers"],
+		banlist: ["Blaziken", "Landorus"],
 		onSwitchInPriority: 1,
 		onBegin: function() {
 			// let statusability = {
