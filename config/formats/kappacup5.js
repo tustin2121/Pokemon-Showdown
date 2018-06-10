@@ -5,6 +5,19 @@ exports.Sections = {
 	"Kappa Kup Season 5 Playoffs": { column: 5, sort: 5, },
 };
 exports.Formats = [
+	// Week 0: Type CondensinG
+	{
+		name: "[Gen 7] Week 0: Type CondensinG",
+		section: "Kappa Kup Season 5",
+		desc: "The current 18 types are condensed into the 11 types that are available in the Trading Card Game.",
+		threads: [
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3573231/\">Type CondensinG</a>",
+		],
+
+		mod: 'tcg',
+		ruleset: ['[Gen 7] OU'],
+	},
+	
 	// Week 1: Ubers
 	{
 		name: "[Gen 7] Week 1: Singles", // Uber
@@ -172,7 +185,39 @@ exports.Formats = [
 	},
 	
 	
-	// Week 5: Partners in Crime
+	// Week 5: Scalemons
+	{
+		name: "[Gen 7] Week 5: Scalemons",
+		section: "Kappa Kup Season 5",
+		desc: `Every Pok&eacute;mon's stats, barring HP, are scaled to give them a BST as close to 600 as possible.`,
+		threads: [
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3607934/">Scalemons</a>`,
+		],
+		
+		mod: 'gen7',
+		gameType: 'doubles',
+		ruleset: ['Pokemon', 'Standard', 'Team Preview'],
+		banlist: [
+			'Carvanha', 'Gengar-Mega', 'Mawile-Mega', 'Medicham-Mega', 'Shedinja', 'Arena Trap', 'Shadow Tag', 'Deep Sea Scale',
+			'Deep Sea Tooth', 'Eevium Z', 'Eviolite', 'Light Ball', 'Thick Club', 'Baton Pass',
+		],
+		onModifyTemplate: function (template, target, source) {
+			template = Object.assign({}, template);
+			template.baseStats = Object.assign({}, template.baseStats);
+			let stats = ['atk', 'def', 'spa', 'spd', 'spe'];
+			// @ts-ignore
+			let pst = stats.map(stat => template.baseStats[stat]).reduce((x, y) => x + y);
+			let scale = 600 - template.baseStats['hp'];
+			for (const stat of stats) {
+				// @ts-ignore
+				template.baseStats[stat] = this.clampIntRange(template.baseStats[stat] * scale / pst, 1, 255);
+			}
+			return template;
+		},
+	},
+	
+	
+	// Week 6: Partners in Crime
 	/**
 	Code:
 	- formats.js https://github.com/XpRienzo/DragonHeaven/blob/master/config/formats.js#L3663
@@ -182,7 +227,7 @@ exports.Formats = [
 	- Everything works as intended
 	*/
 	{
-		name: "[Gen 7] Week 5: Partners in Crime",
+		name: "[Gen 7] Week 6: Partners in Crime",
 		section: "Kappa Kup Season 5",
 		desc: [
 			"Doubles-based metagame where both active ally Pok&eacute;mon share abilities and moves.",
@@ -253,13 +298,13 @@ exports.Formats = [
 	},
 	
 	
-	// Week 6: ~~Mix and Mega Doubles~~ Mergemons
+	// Week 7: ~~Mix and Mega Doubles~~ Mergemons
 	/**
 	Status:
 	- Not on the server, but shouldn't be terribly hard to make
 	*/
 	{
-		name: "[Gen 7] Week 6: Mergemons Doubles",
+		name: "[Gen 7] Week 7: Mergemons Doubles",
 		section: "Kappa Kup Season 5",
 		desc: [
 			"Pok&eacute;mon gain the movepool of the previous and the next fully evolved Pok&eacute;mon, according to the Pok&eacute;dex.",
@@ -273,13 +318,13 @@ exports.Formats = [
 	},
 	
 	
-	// Week 7: Dual Wielding
+	// Week 8: Dual Wielding
 	/**
 	Status:
 	- Already on the server as OM of the Month, no issues (presumably)
 	 */
  	{
-		name: "[Gen 7] Week 7: Dual Wielding",
+		name: "[Gen 7] Week 8: Dual Wielding",
 		section: "Kappa Kup Season 5",
 		desc: [
 			"Pok&eacute;mon can forgo their Ability in order to use a second item.",
@@ -305,7 +350,7 @@ exports.Formats = [
 	},
 	
 	
-	// Week 8: Metagamiate
+	// Week 9: Metagamiate
 	/**
 	Description:
 	Each pokemon has an -ate ability corresponding to their type
@@ -318,7 +363,7 @@ exports.Formats = [
 
 	*/
 	{
-		name: "[Gen 7] Week 8: Metagamiate",
+		name: "[Gen 7] Week 9: Metagamiate",
 		section: "Kappa Kup Season 5",
 		desc: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3604808/\">Metagamiate</a>"],
 		mod: 'gen7',
@@ -360,7 +405,7 @@ exports.Formats = [
 	
 	
 	
-	// Week 9: Pokebilities
+	// Week 10: Pokebilities
 	/**
 	Code:
 	- formats.js https://github.com/XpRienzo/DragonHeaven/blob/master/config/formats.js#L3732
@@ -370,7 +415,7 @@ exports.Formats = [
 	- Everything works as intended
 	*/
 	{
-		name: "[Gen 7] Week 9: Pokebilities",
+		name: "[Gen 7] Week 10: Pokebilities",
 		section: "Kappa Kup Season 5",
 		desc: ["&bullet; <a href=\"http://www.smogon.com/forums/threads/3588652/\">Pokebilities</a>: A Pokemon has all of its abilities active at the same time."],
 		mod: 'pokebilities',
