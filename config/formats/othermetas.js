@@ -295,6 +295,19 @@ exports.Formats = [
 		__subsort: subSortOf => subSortOf("[Gen 6] PU")+0.1,
 	},
 	{
+		name: "[Gen 7] ZU",
+		desc: [
+			"The tier below PU. Only available here!",
+		],
+		section: "US/UM Singles",
+
+		mod: 'gen7',
+		ruleset: ['[Gen 7] PU'],
+		banlist: ['PU', 'ZUBL'],
+		
+		__subsort: subSortOf => subSortOf("[Gen 7] Monotype")-0.1,
+	},
+	{
 		name: "LC Supreme",
 		section: "OR/AS Singles",
 		desc: [

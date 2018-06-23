@@ -1521,7 +1521,9 @@ class RandomTeams extends Dex.ModdedDex {
 			let levelScale = {
 				LC: 88,
 				'LC Uber': 86,
-				NFE: 84,
+				NFE: 85,
+				ZU: 85,
+				ZUBL: 84,
 				PU: 83,
 				PUBL: 82,
 				NU: 81,
@@ -1539,7 +1541,7 @@ class RandomTeams extends Dex.ModdedDex {
 				Dugtrio: 77, Gothitelle: 77, Pelipper: 79, Politoed: 79, Wobbuffet: 77,
 
 				// Holistic judgement
-				Unown: 100,
+				Unown: 100, Luvdisc: 99,
 			};
 			let tier = template.tier;
 			if (tier.includes('Unreleased') && baseTemplate.tier === 'Uber') {
