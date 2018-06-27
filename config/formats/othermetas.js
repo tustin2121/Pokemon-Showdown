@@ -308,6 +308,20 @@ exports.Formats = [
 		__subsort: subSortOf => subSortOf("[Gen 7] Monotype")-0.1,
 	},
 	{
+		name: "[Gen 7] ZU Random",
+		desc: [
+			"ZU Random Battles!",
+		],
+		section: "US/UM Singles",
+
+		mod: 'randomzu',
+		team: 'random',
+		
+		ruleset: ['Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Standard'],
+		
+		__subsort: subSortOf => subSortOf("[Gen 7] Monotype")-0.05,
+	},
+	{
 		name: "LC Supreme",
 		section: "OR/AS Singles",
 		desc: [
