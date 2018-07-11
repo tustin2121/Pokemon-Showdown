@@ -89,6 +89,7 @@ function getGymInfo(json){
 			avatar:  LeagueSetup.elites[key].avatar,
 			isChamp: LeagueSetup.elites[key].isChamp,
 			banlist: LeagueSetup.elites[key].banlist,
+			meme: LeagueSetup.elites[key].meme,
 		};
 	});
 	Object.keys(LeagueSetup.gyms).forEach((key)=>{
@@ -100,6 +101,7 @@ function getGymInfo(json){
 			avatar:  LeagueSetup.gyms[key].avatar,
 			badge: LeagueSetup.gyms[key].badge,
 			banlist: LeagueSetup.gyms[key].banlist,
+			meme: LeagueSetup.gyms[key].meme,
 			trialdesc: LeagueSetup.gyms[key].trialdesc,
 		};
 	});
@@ -626,6 +628,9 @@ exports.commands = {
 							errors.push("Banlist is invalid.");
 						}
 					}
+					if (obj.meme) {
+						save.meme = Chat.escapeHTML(obj.meme);
+					}
 					save.avatar = this.user.avatar; //Save off the avatar for later use by others
 					LeagueSetup.markDirty();
 				} catch (e) {
@@ -742,6 +747,9 @@ exports.commands = {
 						if (val === 'undefined' || val === '') val = undefined;
 						else val = val.trim().substr(0, 1000);
 						save.trialdesc = val;
+					}
+					if (obj.meme) {
+						save.meme = Chat.escapeHTML(obj.meme);
 					}
 					save.avatar = this.user.avatar; //Save off the avatar for later use by others
 					LeagueSetup.markDirty();

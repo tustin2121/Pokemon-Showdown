@@ -135,6 +135,7 @@ exports.BattleTypeChart = {
 		damageTaken: {
 			psn: 3,
 			tox: 3,
+			trapped: 3,
 			"Dark": 1,
 			"Dragon": 0,
 			"Electric": 0,

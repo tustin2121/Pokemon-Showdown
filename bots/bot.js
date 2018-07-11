@@ -221,8 +221,9 @@ class Bot {
 			}
 			signal = `|html|<div class="infobox">`;
 			if (part.startsWith(signal)) {
-				let msg = part.slice(signal.length, -('</div>'.length));
-				finalParts.push(msg);
+				// let msg = part.slice(signal.length, -('</div>'.length));
+				// finalParts.push(msg);
+				finalParts.push(...this.formatRaw(part.slice(signal.length, -('</div>'.length))));
 				return;
 			}
 			signal = '|html|<div class="message-error">';

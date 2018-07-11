@@ -62,45 +62,7 @@ exports.Formats = [
 		ruleset: ['PotD', 'Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', "Team Preview"],
 		onAfterDamage: function(damage, target, source, move) {
 			if (!target.willDevolve) return;
-			let template = target.template.isMega ? this.getTemplate(this.getTemplate(target.template.baseSpecies).prevo) : this.getTemplate(target.template.prevo);
-			target.willDevolve = false;
-			target.formeChange(template);
-			target.baseTemplate = template;
-			target.details = template.species + (target.level === 100 ? '' : ', L' + target.level) + (target.gender === '' ? '' : ', ' + target.gender) + (target.set.shiny ? ', shiny' : '');
-			this.add('detailschange', target, target.details);
-			this.add('-message', "" + target.name + " has de-volved into " + template.name + "!");
-			target.setAbility(template.abilities['0']);
-			target.baseAbility = target.ability;
-			let newHP = Math.floor(Math.floor(2 * target.template.baseStats['hp'] + target.set.ivs['hp'] + Math.floor(target.set.evs['hp'] / 4) + 100) * target.level / 100 + 10);
-			target.hp = newHP;
-			target.maxhp = newHP;
-			this.add('-heal', target, target.getHealth, '[silent]');
-			this.heal(target.maxhp, target, source, 'devolution', '[silent]'); //Probably won't work
-			let movepool = template.learnset;
-			let prevo = template.prevo;
-			while (prevo) {
-				let learnset = this.getTemplate(prevo).learnset;
-				for (let i in learnset) {
-					movepool[i] = learnset[i];
-				}
-				prevo = this.getTemplate(prevo).prevo;
-			}
-			let newmoves = [],
-				newbasemoves = [];
-			for (let i = 0; i < target.baseMoveSlots.length; i++) {
-				if (movepool[target.baseMoveSlots[i].id]) {
-					newbasemoves.push(target.baseMoveSlots[i]);
-					newmoves.push(target.moveSlots[i]);
-				}
-			}
-			target.baseMoveSlots = newbasemoves;
-			target.moveSlots = newmoves;
-			target.clearBoosts();
-			this.add('-clearboost', target, "[silent]");
-			target.species = target.template.species;
-			target.canMegaEvo = false;
-			target.cureStatus('[silent]');
-			target.volatiles = {};
+			target.devolve();
 		},
 	},
 	

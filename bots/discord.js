@@ -264,36 +264,62 @@ class DiscordBot extends Bot {
 	formatRaw(message) {
 		// Whole section replacements
 		// Pokemon
-		message = message.replace(/<li class="result"><span (.+)<\/li>/g, (match)=>{
+		message = message.replace(/<li class="result"><span class="col numcol">(.+)<\/li>/g, (match)=>{
 			let obj = {};
 			obj.num = find(match, /<span class="col numcol">(.*?)<\/span>/g, '$1');
 			obj.name = find(match, /<span class="col pokemonnamecol"(?:.*)><a href="([^"]*)"(?:[^>]*)>(.*)<\/a><\/span>/g, '$2');
 			obj.types = find(match, /<img src="\/sprites\/types(?:[^"]+)" alt="([^"]+)"[^>]*>/g, '$1');
-			obj.abilities = find(match, /<span class="col abilitycol">([\w ]+)<\/span>/g, '$1');
-			obj.abilities.push(...find(match, /<span class="col twoabilitycol">([\w ]+)<br \/>([\w ]+)<\/span>/g, '$1, $2'));
-			obj.abilities.push(...find(match, /<span class="col abilitycol"><em>([\w ]+)<\/em><\/span>/g, '*$1*'));
-			obj.abilities.push(...find(match, /<span class="col abilitycol unreleasedhacol"><em>([\w ]+)<\/em><\/span>/g, '~~*$1*~~'));
+			obj.abilities = find(match, /<span class="col abilitycol">([^<]+)<\/span>/g, '$1');
+			obj.abilities.push(...find(match, /<span class="col twoabilitycol">([^<]+)<br \/>([\w ]+)<\/span>/g, '$1, $2'));
+			obj.abilities.push(...find(match, /<span class="col abilitycol"><em>([^<]+)<\/em><\/span>/g, '*$1*'));
+			obj.abilities.push(...find(match, /<span class="col abilitycol unreleasedhacol"><em>([^<]+)<\/em><\/span>/g, '~~*$1*~~'));
 			obj.stats = find(match, /<span class="col statcol"><em>(\w+)<\/em><br \/>(\d+)<\/span>/g, '**$1**: $2');
-			return `${obj.num} | ${obj.name} | ${obj.types.join('/')} | ${obj.abilities.join(', ')} | ${obj.stats.join(' ')}`;
+			obj.bst = find(match, /<span class="col bstcol"><em>BST<br \/>(\d+)<\/em><\/span>/g, '**BST**: $1');
+			return `${obj.num} | ${obj.name} | ${obj.types.join('/')} | ${obj.abilities.join(', ')} | ${obj.stats.join(' ')} | ${obj.bst}`;
 		});
 		// Moves
-		message = message.replace(/<li class="result"><a data-entry="move(.+)<\/li>/g, (match) => {
+		message = message.replace(/<li class="result"><span class="col movenamecol">(.+)<\/li>/g, (match) => {
 			let obj = {};
-			obj.name = find(match, /<span class="col movenamecol">([\w ]+)<\/span>/g, '$1');
+			obj.name = find(match, /<span class="col movenamecol"><a href="([^"]*)">([^<]+)<\/a><\/span>/g, '$2');
 			obj.type = find(match, /<img src="\/sprites\/types(?:[^"]+)" alt="([^"]+)"[^>]*>/g, '$1-type');
 			obj.category = find(match, /<img src="\/sprites\/categories(?:[^"]+)" alt="([^"]+)"[^>]*>/g, '$1');
-			obj.power = find(match, /<span class="col labelcol"><em>Power<\/em><br>(\d+)<\/span>/g, '**Power:** $1 |');
-			obj.accuracy = find(match, /<span class="col widelabelcol"><em>Accuracy<\/em><br>(\d+)%<\/span>/g, '**Accuracy:** $1% |');
+			obj.power = find(match, /<span class="col labelcol"><em>Power<\/em><br>(\d+)<\/span>/g, '**Power:** $1');
+			obj.accuracy = find(match, /<span class="col widelabelcol"><em>Accuracy<\/em><br>([^<]+)<\/span>/g, '**Accuracy:** $1');
 			obj.pp = find(match, /<span class="col pplabelcol"><em>PP<\/em><br>(\d+)<\/span>/g, '**PP:** $1');
 			obj.desc = find(match, /<span class="col movedesccol">(.+)<\/span>/g, '$1');
-			return `${obj.name} | ${obj.category} | ${obj.type} | ${obj.power} ${obj.accuracy} ${obj.pp} | ${obj.desc}`;
+			return `${obj.name} | ${obj.category} | ${obj.type} | ${obj.power} | ${obj.accuracy} | ${obj.pp} | ${obj.desc}`;
 		});
 		// Items
-		message = message.replace(/<li class="result"><a data-entry="item(.+)<\/li>/g, (match) => {
+		message = message.replace(/<li class="result"><span class="col itemiconcol">(.+)<\/li>/g, (match) => {
 			let obj = {};
-			obj.name = find(match, /<span class="col namecol">([\w ]+)<\/span>/g, '$1');
+			obj.name = find(match, /<span class="col namecol"><a href="([^"]*)">([^<]+)<\/a><\/span>/g, '$2');
 			obj.desc = find(match, /<span class="col itemdesccol">(.+)<\/span>/g, '$1');
 			return `${obj.name} | ${obj.desc}`;
+		});
+		// Abilities
+		message = message.replace(/<li class="result"><span class="col namecol">(.+)<\/li>/g, (match) => {
+			let obj = {};
+			obj.name = find(match, /<span class="col namecol"><a href="([^"]*)">([^<]+)<\/a><\/span>/g, '$2');
+			obj.desc = find(match, /<span class="col abilitydesccol">(.+)<\/span>/g, '$1');
+			return `${obj.name} | ${obj.desc}`;
+		});
+		// Move Search
+		message = message.replace(/<span style="color:#999999;">&#x2f;ms(.+)/g, (match) => {
+			let obj = {};
+			obj.command = find(match, /<span style="color:#999999;">&#x2f;(.+)<\/span><br \/>/g, '*/$1*\n');
+			obj.values = [];
+			obj.values.push(...find(match, /<a href="([^"]*)"(?:[^>]*)>([^<]*)<\/a>/g, '$2'));
+			obj.more = find(match, /, and (\d+) more/g, ", and $1 more. Redo the search with ', all' at the end to show all results.");
+			return `${obj.command}${obj.values.join(', ')}${obj.more}`;
+		});
+		// Dex Search, Item Search
+		message = message.replace(/<span style="color:#999999;">&#x2f;(?:d|i)s(.+)/g, (match) => {
+			let obj = {};
+			obj.command = find(match, /<span style="color:#999999;">&#x2f;(.+)<\/span><br \/>/g, '*/$1*\n');
+			obj.values = [];
+			obj.values.push(...find(match, /<a href="([^"]*)"(?:[^>]*)><psicon (?:[^>]*)>([^<]*)<\/a>/g, '$2'));
+			obj.more = find(match, /, and (\d+) more/g, ", and $1 more. Redo the search with ', all' at the end to show all results.");
+			return `${obj.command}${obj.values.join(', ')}${obj.more}`;
 		});
 		// Old replacements
 		message = message

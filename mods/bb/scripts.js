@@ -19,15 +19,27 @@ exports.BattleScripts = {
 			return d;
 		},
 		devolve: function() {
-			if(!this.battle.getTemplate(this.baseTemplate.baseSpecies).prevo || this.transformed) return false;
+			let currTemplate = this.battle.getTemplate(this.baseTemplate.baseSpecies);
+			if(!currTemplate.prevo || this.transformed) return false;
 			let template = this.template.isMega ? this.battle.getTemplate(this.battle.getTemplate(this.template.baseSpecies).prevo) : this.battle.getTemplate(this.template.prevo);
+			
+			let abilityIndex = '0';
+			for (let abilitySlot in currTemplate.abilities) {
+				if (!template.abilities[abilitySlot]) continue;
+				if (toId(currTemplate.abilities[abilitySlot]) === toId(this.set.ability)) {
+					abilityIndex = abilitySlot;
+					break;
+				}
+			}
+			
 			this.willDevolve = false;
 			this.formeChange(template);
 			this.baseTemplate = template;
 			this.details = template.species + (this.level === 100 ? '' : ', L' + this.level) + (this.gender === '' ? '' : ', ' + this.gender) + (this.set.shiny ? ', shiny' : '');
 			this.battle.add('detailschange', this, this.details);
 			this.battle.add('-message', "" + this.name + " has de-volved into "+template.name+"!");
-			this.setAbility(template.abilities['0']);
+			// this.battle.add('-message', `${abilityIndex} => ${template.abilities[abilityIndex]}`);
+			this.setAbility(template.abilities[abilityIndex]);
 			this.baseAbility = this.ability;
 			let newHP = Math.floor(Math.floor(2 * this.template.baseStats['hp'] + this.set.ivs['hp'] + Math.floor(this.set.evs['hp'] / 4) + 100) * this.level / 100 + 10);
 			this.hp = newHP;
