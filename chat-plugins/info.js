@@ -1922,6 +1922,137 @@ exports.commands = {
 		if (!this.runBroadcast()) return;
 		this.sendReplyBox(`You will be prompted to register upon winning a rated battle. Alternatively, there is a register button in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu in the upper right.`);
 	},
+	
+	
+	testteam: function(target, room, user) {
+		if (!this.runBroadcast()) return;
+		try {
+			let format = Dex.validateFormat(target);
+			let team = Dex.generateTeam(format);
+			/* { name: 'Araquanid',
+			species: 'Araquanid',
+			gender: '',
+			moves: [ 'leechlife', 'lunge', 'toxic', 'liquidation' ],
+			ability: 'Water Bubble',
+			evs: { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 },
+			ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
+			item: 'Leftovers',
+			level: 79,
+			shiny: false } */
+			let teamInfo = [`Random Team for ${format}:<ul class="utilichart">`];
+			for (let mon of team) {
+				teamInfo.push(`<li class="result">`);
+				teamInfo.push(`<span class="col iconcol"><psicon pokemon="${toId(mon.species)}"/></span> `);
+				teamInfo.push(`<span class="col pokemonnamecol" style="white-space:nowrap"><a href="https://pokemonshowdown.com/dex/pokemon/${toId(mon.species)}" target="_blank">${mon.species}</a></span> `);
+				
+				if (mon.item) {
+					teamInfo.push(`<span class="col itemiconcol"><psicon item="${toId(mon.item)}"></span> <span class="col namecol"><a href="https://pokemonshowdown.com/dex/items/${toId(mon.id)}">${mon.item}</a></span> `);
+				} else {
+					teamInfo.push(`<span class="col itemiconcol"><psicon item="none"></span> <span class="col namecol">[No Item]</span> `);
+				}
+				
+				teamInfo.push(`<span class="col numcol">Lv ${mon.level||100}<br/>${mon.gender||'-'}</span>`);
+				
+				teamInfo.push(`<span class="col abilitycol"><em>${mon.ability||'--'}</em></span>`);
+				
+				teamInfo.push(`<span class="col twoabilitycol">${mon.moves[0]||'--'}<br/>${mon.moves[1]||'--'}</span>`);
+				teamInfo.push(`<span class="col twoabilitycol">${mon.moves[2]||'--'}<br/>${mon.moves[3]||'--'}</span>`);
+				
+				teamInfo.push(`<span style="float:left;min-height:36px">`);
+				teamInfo.push(`<span class="col statcol"><em>&nbsp;</em><br /><em>IVs</em><br /><em>EVs</em></span> `);
+				teamInfo.push(`<span class="col statcol"><em>HP</em><br />${mon.ivs.hp}<br />${mon.evs.hp}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>Atk</em><br />${mon.ivs.atk}<br />${mon.evs.atk}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>Def</em><br />${mon.ivs.def}<br />${mon.evs.def}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>SpA</em><br />${mon.ivs.spa}<br />${mon.evs.spa}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>SpD</em><br />${mon.ivs.spd}<br />${mon.evs.spd}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>Spe</em><br />${mon.ivs.spe}<br />${mon.evs.spe}</span> `);
+				teamInfo.push(`</span>`);
+				
+				teamInfo.push(`<li style="clear:both"></li>`);
+			}
+			teamInfo.push(`</ul>`);
+			this.sendReplyBox(teamInfo.join(''));
+			// this.sendReplyBox(require('util').inspect(team));
+		} catch (e) {
+			this.errorReply(`Error generating test team: ${e.stack}`);
+		}
+	},
+	testteamhelp: [
+		`/testteam [format] - Generate a random team for the given format and display it.`,
+	],
+	
+	testmon: function(target, room, user) {
+		if (!this.runBroadcast()) return;
+		if (!target) return this.errorReply('Invalid command');
+		try {
+			let [ formatid, species ] = target.split(',').map(x=>x.trim());
+			if (!species) return this.errorReply(`No pokemon name supplied.`);
+			formatid = Dex.validateFormat(formatid);
+			let mod = Dex;
+			if (formatid && toId(formatid) in Dex.dexes) {
+				mod = Dex.mod(toId(formatid));
+			} else if (formatid && Dex.getFormat(formatid).mod) {
+				mod = Dex.mod(Dex.getFormat(formatid).mod);
+			} else if (room && room.battle) {
+				mod = Dex.forFormat(room.battle.format);
+			}
+			species = mod.getTemplate(species);
+			if (!species || !species.exists) return this.errorReply('Pokemon does not exist.');
+			let teamgen = Dex.getTeamGenerator(formatid);
+			let format = Dex.getFormat(formatid);
+			/* { name: 'Araquanid',
+			species: 'Araquanid',
+			gender: '',
+			moves: [ 'leechlife', 'lunge', 'toxic', 'liquidation' ],
+			ability: 'Water Bubble',
+			evs: { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 },
+			ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
+			item: 'Leftovers',
+			level: 79,
+			shiny: false } */
+			let teamInfo = [`Random Sets for ${species} in ${formatid}:<ul class="utilichart">`];
+			let teamDetails = {};
+			for (let i = 0; i < 6; i++) {
+				const mon = teamgen.randomSet(species, i, teamDetails, format.gameType !== 'singles')
+				teamInfo.push(`<li class="result">`);
+				teamInfo.push(`<span class="col iconcol"><psicon pokemon="${toId(mon.species)}"/></span> `);
+				teamInfo.push(`<span class="col pokemonnamecol" style="white-space:nowrap"><a href="https://pokemonshowdown.com/dex/pokemon/${toId(mon.species)}" target="_blank">${mon.species}</a></span> `);
+				
+				if (mon.item) {
+					teamInfo.push(`<span class="col itemiconcol"><psicon item="${toId(mon.item)}"></span> <span class="col namecol"><a href="https://pokemonshowdown.com/dex/items/${toId(mon.id)}">${mon.item}</a></span> `);
+				} else {
+					teamInfo.push(`<span class="col itemiconcol"><psicon item="none"></span> <span class="col namecol">[No Item]</span> `);
+				}
+				
+				teamInfo.push(`<span class="col numcol">Lv ${mon.level||100}<br/>${mon.gender||'-'}</span>`);
+				
+				teamInfo.push(`<span class="col abilitycol"><em>${mon.ability||'--'}</em></span>`);
+				
+				teamInfo.push(`<span class="col twoabilitycol">${mon.moves[0]||'--'}<br/>${mon.moves[1]||'--'}</span>`);
+				teamInfo.push(`<span class="col twoabilitycol">${mon.moves[2]||'--'}<br/>${mon.moves[3]||'--'}</span>`);
+				
+				teamInfo.push(`<span style="float:left;min-height:36px">`);
+				teamInfo.push(`<span class="col statcol"><em>&nbsp;</em><br /><em>IVs</em><br /><em>EVs</em></span> `);
+				teamInfo.push(`<span class="col statcol"><em>HP</em><br />${mon.ivs.hp}<br />${mon.evs.hp}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>Atk</em><br />${mon.ivs.atk}<br />${mon.evs.atk}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>Def</em><br />${mon.ivs.def}<br />${mon.evs.def}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>SpA</em><br />${mon.ivs.spa}<br />${mon.evs.spa}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>SpD</em><br />${mon.ivs.spd}<br />${mon.evs.spd}</span> `);
+				teamInfo.push(`<span class="col statcol"><em>Spe</em><br />${mon.ivs.spe}<br />${mon.evs.spe}</span> `);
+				teamInfo.push(`</span>`);
+				
+				teamInfo.push(`<li style="clear:both"></li>`);
+			}
+			teamInfo.push(`</ul>`);
+			this.sendReplyBox(teamInfo.join(''));
+			// this.sendReplyBox(require('util').inspect(team));
+		} catch (e) {
+			this.errorReply(`Error generating test pokemon: ${e.stack}`);
+		}
+	},
+	testmonhelp: [
+		`/testmon [format], [mon] - Generate a random mon for the given format and display it.`,
+	],
 
 	/*********************************************************
 	 * Miscellaneous commands

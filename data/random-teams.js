@@ -427,7 +427,7 @@ class RandomTeams extends Dex.ModdedDex {
 
 		// Moves that heal a fixed amount:
 		let RecoveryMove = [
-			'healorder', 'milkdrink', 'recover', 'roost', 'slackoff', 'softboiled',
+			'healorder', 'milkdrink', 'moonlight', 'morningsun', 'recover', 'roost', 'slackoff', 'softboiled', 'synthesis',
 		];
 		// Moves which drop stats:
 		let ContraryMove = [
@@ -451,7 +451,7 @@ class RandomTeams extends Dex.ModdedDex {
 		];
 		// Moves that shouldn't be the only STAB moves:
 		let NoStab = [
-			'aquajet', 'bounce', 'explosion', 'fakeout', 'firstimpression', 'flamecharge', 'fly', 'iceshard', 'pursuit', 'quickattack', 'skyattack',
+			'aquajet', 'bounce', 'explosion', 'fakeout', 'firstimpression', 'flamecharge', 'fly', 'iceshard', 'pursuit', 'quickattack', 'skyattack', 'suckerpunch',
 			'chargebeam', 'clearsmog', 'eruption', 'vacuumwave', 'waterspout',
 		];
 

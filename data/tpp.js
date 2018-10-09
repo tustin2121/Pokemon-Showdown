@@ -130,7 +130,63 @@ exports.BattleTPP = {
 	zygarde:1, 
 	rattataalola:1, raticatealola:1,
 	spearow:1, fearow:1, 
-	buzzwole:0, 
+	// Waning Moon
+	starly:1, staravia:1, staraptor:1,
+	litten:1, torracat:1, incineroar:1,
+	ducklett:1, swanna:1,
+	pikipek:1, trumbeak:1, toucannon:1,
+	
+////// Season 4
+	// Chatty Yellow
+	chatot:1,
+	magikarp:1, gyarados:1, gyaradosmega:1,
+	pichu:1, pikachu:1, raichu:1, raichualola:1,
+	pikachucosplay:1, pikachurockstar:1, pikachubelle:1, pikachupopstar:1, pikachuphd:1, pikachulibre:1,
+	// Blazed Glazed
+	oshawott:1, dewott:1, samurott:1,
+	turtwig:1, grotle:1, torterra:1,
+	venipede:1, whirlipede:1, scolipede:1,
+	bagon:1, shelgon:1, salamence:1, salamencemega:1,
+	swinub:1, piloswine:1, mamoswine:1,
+	houndour:1, houndoom:1,
+	// Randomized White 2
+	articuno:1,
+	cresselia:1,
+	buizel:1, floatzel:1,
+	kyogre:1,
+	// Pyrite
+	seel:1, dewgong:1,
+	sentret:1, furret:1,
+	magby:1, magmar:1, magmortar:1,
+	exeggcute:1, exeggutor:1, exeggutoralola:1,
+	// Theta Emerald EX
+	skiddo:1, gogoat:1,
+	mantyke:1, mantine:1,
+	litleo:1, pyroar:1,
+	pancham:1, pangoro:1,
+	inkay:1, malamar:1,
+	// Ultra Sun
+	popplio:1, brionne:1, primarina:1,
+	grubbin:1, charjabug:1, vikavolt:1,
+	rockruff:1, lycanroc:1, lycanrocmidnight:1, lycanrocdusk:1,
+	phantump:1, trevenant:1,
+	
+////// Season 5
+	// Dual Red/Blue
+	ekans:1, arbok:1,
+	meowth:1, persian:1, meowthalola:1, persianalola:1,
+	cleffa:1, clefairy:1, clefable:1,
+	tauros:1,
+	nidoranf:1, nidorina:1, nidoqueen:1,
+	// Storm Silver
+	shellos:1, gastrodon:1,
+	farfetchd:1,
+	stunky:1, skuntank:1,
+	snorunt:1, glalie:1, froslass:1,
+	cyndaquil:1, quilava:1, typhlosion:1,
+	lugia:1,
+	// Bronze
+	growlithe:1, arcanine:1,
 
 
 
@@ -140,24 +196,20 @@ exports.BattleTPP = {
 
 ////// Season 1 TPP Relevant
 	// Red
-	farfetchd:1, 
 	gastly:1, haunter:1, gengar:1, gengarmega:1, 
-	ekans:1, arbok:1, 
+	tyrogue:1, hitmonlee:1, hitmonchan:1, hitmontop:1,
 	// Crystal
 	togepi:1, togetic:1, togekiss:1, 
 	unown:1, 
 	shuckle:1, 
 	drowzee:1, hypno:1, 
 	smoochum:1, jynx:1, 
-	sentret:1, furret:1,
 	goldeen:1, seaking:1, 
 	// Emerald
 	torchic:1, combusken:1, blaziken:1, blazikenmega:1,
-	mudkip:1, marshtomp:1, swampert:1, swampertmega:1, 
 	wurmple:1, silcoon:1, beautifly:1, cascoon:1, dustox:1, 
 	wingull:1, pelipper:1,
 	nincada:1, ninjask:1, shedinja:1, 
-	feebas:1, milotic:1, 
 	lotad:1, lombre:1, ludicolo:1,
 	// FireRed
 	machop:1, machoke:1, machamp:1, 
@@ -167,7 +219,6 @@ exports.BattleTPP = {
 	uxie:1, 
 	kricketot:1, kricketune:1, 
 	giratina:1, giratinaorigin:1,
-	dialga:1, 
 	azelf:1, 
 	sneasel:1, weavile:1,
 	// HeartGold
@@ -189,8 +240,6 @@ exports.BattleTPP = {
 	beldum:1, metang:1, metagross:1, metagrossmega:1, 
 	// OR
 	caterpie:1, metapod:1, butterfree:1, 
-	pichu:1, pikachu:1, raichu:1, raichualola:1,
-	pikachucosplay:1, pikachurockstar:1, pikachubelle:1, pikachupopstar:1, pikachuphd:1, pikachulibre:1,
 	poliwag:1, poliwhirl:1, poliwrath:1, politoed:1,
 	croagunk:1, toxicroak:1,
 	// Stadium / PBR
@@ -200,20 +249,15 @@ exports.BattleTPP = {
 ////// Season 2 
 	// Anniversary Red
 	mimejr:1, mrmime:1, 
-	meowth:1, persian:1, meowthalola:1, persianalola:1, 
-	magikarp:1, gyarados:1, gyaradosmega:1, 
 	cubone:1, marowak:1, marowakalola:1,
 	scatterbug:1, spewpa:1, vivillon:1, 
 	// Viernamese Crystal (Intermission Game)
-	cyndaquil:1, quilava:1, typhlosion:1, 
 	suicune:1, 
 	// Randomized AlphaSapphire
-	magby:1, magmar:1, magmortar:1, 
 	glameow:1, purugly:1, 
 	ferroseed:1, ferrothorn:1, 
 	corsola:1,
-	rufflet:1, braviary:1,
-	swinub:1, piloswine:1, mamoswine:1, 
+	rufflet:1, braviary:1, 
 	litwick:1, lampent:1, chandelure:1,
 	// Colosseum
 	remoraid:1, octillery:1,
@@ -225,12 +269,31 @@ exports.BattleTPP = {
 	munchlax:1, snorlax:1,
 	ledyba:1, ledian:1, 
 	// Brown
+	porygon:1, porygon2:1, porygonz:1,
 	// Randomized Platium
 	chingling:1, chimecho:1,
 	// Sun
-	popplio:1, brionne:1, primarina:1,
+	buzzwole:1,
 	// Prism
 	phancero:1,
+	// Waning Moon
+	sandile:1, krokorok:1, krookodile:1,
+	yungoos:1, gumshoos:1,
+	
+////// Season 4
+	// Chatty Yellow
+	ditto:1,
+	// Blazed Glazed
+	// Randomized White 2
+	// Pyrite
+	// Theta Emerald EX
+	// Ultra Sun
+	
+////// Season 5
+	// Dual Red/Blue
+	// Storm Silver
+	// Bronze
+	
 
 ////// Because L WutFace R E
 	arceus:1, arceusbug:1, arceusdark:1, arceusdragon:1, arceuselectric:1, arceusfairy:1, arceusfighting:1, arceusfire:1, arceusflying:1, arceusghost:1, arceusgrass:1, arceusground:1, arceusice:1, arceuspoison:1, arceuspsychic:1, arceusrock:1, arceussteel:1, arceuswater:1, 
@@ -239,10 +302,11 @@ exports.BattleTPP = {
 	tyrunt:1, tyrantrum:1, 
 	anorith:1, armaldo:1, 
 	archen:1, archeops:1,
+	gumblegoose:1,
 	
 ////// I have no idea...
 	slugma:1, magcargo:1, 
 	shuppet:1, banette:1, banettemega:1,
-	froslass:1,
+	celebi:1,
 	
 };

@@ -9,7 +9,7 @@ exports.BattleScripts = {
 			this.hp -= d;
 			if (this.hp <= 0) {
 				d += this.hp;
-				if (this.battle.getTemplate(this.baseTemplate.baseSpecies).prevo && !this.transformed) {
+				if (this.battle.getTemplate(this.baseTemplate.baseSpecies).prevo && !this.transformed && this.ability !== 'battlebond') {
 					this.willDevolve = true;
 					// return this.hp;
 				}
@@ -21,7 +21,7 @@ exports.BattleScripts = {
 		devolve: function() {
 			let currTemplate = this.battle.getTemplate(this.baseTemplate.baseSpecies);
 			if(!currTemplate.prevo || this.transformed) return false;
-			let template = this.template.isMega ? this.battle.getTemplate(this.battle.getTemplate(this.template.baseSpecies).prevo) : this.battle.getTemplate(this.template.prevo);
+			let template = this.template.isMega ? this.battle.getTemplate(this.battle.getTemplate(this.template.baseSpecies).prevo) : this.battle.getTemplate(currTemplate.prevo);
 			
 			let abilityIndex = '0';
 			for (let abilitySlot in currTemplate.abilities) {
@@ -31,6 +31,8 @@ exports.BattleScripts = {
 					break;
 				}
 			}
+			// Special handling for Lycanroc-Dusk
+			if(this.species === 'lycanroc-dusk') abilityIndex = 'S';
 			
 			this.willDevolve = false;
 			this.formeChange(template);

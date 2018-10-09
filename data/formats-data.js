@@ -7656,4 +7656,9 @@ try {
 	Object.assign(BattleFormatsData, tpp.BattleFormatsData);
 } catch (e) { console.error("Could not load TPP BattleFormatsData!", e); }
 
+try {
+	let retier = require("../mods/tppextras/retier.js");
+	Object.keys(retier).forEach((mon)=>{ BattleFormatsData[mon].tier = retier[mon] });
+} catch (e) { console.error("Could not load TPP Retiering data!", e); }
+
 exports.BattleFormatsData = BattleFormatsData;
