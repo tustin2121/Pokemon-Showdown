@@ -95,6 +95,7 @@ let BattleScripts = {
 			pokemon.side.zMoveUsed = true;
 		}
 		let moveDidSomething = this.useMove(baseMove, pokemon, target, sourceEffect, zMove);
+		if (this.activeMove) move = this.activeMove;
 		this.singleEvent('AfterMove', move, null, pokemon, target, move);
 		this.runEvent('AfterMove', pokemon, target, move);
 
@@ -115,7 +116,7 @@ let BattleScripts = {
 			for (const dancer of dancers) {
 				if (this.faintMessages()) break;
 				this.add('-activate', dancer, 'ability: Dancer');
-				this.runMove(baseMove.id, dancer, 0, this.getAbility('dancer'), undefined, true);
+				this.runMove(move.id, dancer, 0, this.getAbility('dancer'), undefined, true);
 			}
 		}
 		if (noLock && pokemon.volatiles.lockedmove) delete pokemon.volatiles.lockedmove;
@@ -131,6 +132,8 @@ let BattleScripts = {
 	 * Dancer.
 	 */
 	useMove: function (move, pokemon, target, sourceEffect, zMove) {
+		pokemon.moveThisTurnResult = undefined;
+		/** @type {boolean? | undefined} */ // Typescript bug
 		let oldMoveResult = pokemon.moveThisTurnResult;
 		let moveResult = this.useMoveInner(move, pokemon, target, sourceEffect, zMove);
 		if (oldMoveResult === pokemon.moveThisTurnResult) pokemon.moveThisTurnResult = moveResult;
@@ -143,9 +146,11 @@ let BattleScripts = {
 			let baseMove = move;
 			this.singleEvent('ModifyMove', move, null, pokemon, target, move, move);
 			move = this.getZMoveCopy(move, pokemon);
+			move.zPowered = true;
 			if (move.type !== 'Normal') sourceEffect = baseMove;
 		} else if (zMove || (move.category !== 'Status' && sourceEffect && sourceEffect.isZ && sourceEffect.id !== 'instruct')) {
 			move = this.getZMoveCopy(move, pokemon);
+			move.zPowered = true;
 		}
 		if (this.activeMove) {
 			move.priority = this.activeMove.priority;
@@ -192,40 +197,7 @@ let BattleScripts = {
 		}
 		this.addMove('move', pokemon, movename, target + attrs);
 
-		if (zMove && move.category !== 'Status') {
-			this.attrLastMove('[zeffect]');
-		} else if (zMove && move.zMoveBoost) {
-			// @ts-ignore
-			this.boost(move.zMoveBoost, pokemon, pokemon, {id: 'zpower'});
-		} else if (zMove && move.zMoveEffect === 'heal') {
-			// @ts-ignore
-			this.heal(pokemon.maxhp, pokemon, pokemon, {id: 'zpower'});
-		} else if (zMove && move.zMoveEffect === 'healreplacement') {
-			move.self = {sideCondition: 'healreplacement'};
-		} else if (zMove && move.zMoveEffect === 'clearnegativeboost') {
-			let boosts = {};
-			for (let i in pokemon.boosts) {
-				if (pokemon.boosts[i] < 0) {
-					boosts[i] = 0;
-				}
-			}
-			pokemon.setBoost(boosts);
-			this.add('-clearnegativeboost', pokemon, '[zeffect]');
-		} else if (zMove && move.zMoveEffect === 'redirect') {
-			// @ts-ignore
-			pokemon.addVolatile('followme', pokemon, {id: 'zpower'});
-		} else if (zMove && move.zMoveEffect === 'crit2') {
-			// @ts-ignore
-			pokemon.addVolatile('focusenergy', pokemon, {id: 'zpower'});
-		} else if (zMove && move.zMoveEffect === 'curse') {
-			if (pokemon.hasType('Ghost')) {
-				// @ts-ignore
-				this.heal(pokemon.maxhp, pokemon, pokemon, {id: 'zpower'});
-			} else {
-				// @ts-ignore
-				this.boost({atk: 1}, pokemon, pokemon, {id: 'zpower'});
-			}
-		}
+		if (zMove) this.runZPower(move, pokemon);
 
 		if (target === false) {
 			this.attrLastMove('[notarget]');
@@ -299,7 +271,7 @@ let BattleScripts = {
 					lacksTarget = !this.isAdjacent(target, pokemon);
 				}
 			}
-			if (lacksTarget && (!move.flags['charge'] || pokemon.volatiles['twoturnmove'])) {
+			if (lacksTarget && (!move.flags['charge'] || pokemon.volatiles['twoturnmove']) && !move.isFutureMove) {
 				this.attrLastMove('[notarget]');
 				this.add('-notarget');
 				if (move.target === 'normal') pokemon.isStaleCon = 0;
@@ -308,7 +280,6 @@ let BattleScripts = {
 			damage = this.tryMoveHit(target, pokemon, move);
 			if (damage || damage === 0 || damage === undefined) moveResult = true;
 		}
-		// @ts-ignore
 		if (move.selfBoost && moveResult) this.moveHit(pokemon, pokemon, move, move.selfBoost, false, true);
 		if (!pokemon.hp) {
 			this.faint(pokemon, pokemon, move);
@@ -395,6 +366,7 @@ let BattleScripts = {
 		let boostTable = [1, 4 / 3, 5 / 3, 2, 7 / 3, 8 / 3, 3];
 
 		// calculate true accuracy
+		/** @type {number | true} */ // TypeScript bug: incorrectly infers {number | true} as {number | boolean}
 		let accuracy = move.accuracy;
 		let boosts, boost;
 		if (accuracy !== true) {
@@ -438,7 +410,6 @@ let BattleScripts = {
 		} else {
 			accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
 		}
-		// @ts-ignore
 		if (accuracy !== true && !this.randomChance(accuracy, 100)) {
 			if (!move.spreadHit) this.attrLastMove('[miss]');
 			this.add('-miss', pokemon, target);
@@ -461,13 +432,16 @@ let BattleScripts = {
 				} else {
 					this.add('-activate', target, 'move: ' + move.name, '[broken]');
 				}
+				if (this.gen >= 6) delete target.volatiles['stall'];
 			}
 		}
 
 		if (move.stealsBoosts) {
+			/** @type {{[k: string]: number}} */
 			let boosts = {};
 			let stolen = false;
 			for (let statName in target.boosts) {
+				// @ts-ignore
 				let stage = target.boosts[statName];
 				if (stage > 0) {
 					boosts[statName] = stage;
@@ -540,7 +514,6 @@ let BattleScripts = {
 					accuracy = this.runEvent('ModifyAccuracy', target, pokemon, move, accuracy);
 					if (!move.alwaysHit) {
 						accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
-						// @ts-ignore
 						if (accuracy !== true && !this.randomChance(accuracy, 100)) break;
 					}
 				}
@@ -594,7 +567,6 @@ let BattleScripts = {
 		let damage;
 		move = this.getMoveCopy(move);
 
-		// @ts-ignore
 		if (!moveData) moveData = move;
 		if (!moveData.flags) moveData.flags = {};
 		/**@type {?boolean | number} */
@@ -747,20 +719,31 @@ let BattleScripts = {
 				didSomething = didSomething || hitResult;
 			}
 			if (moveData.forceSwitch) {
-				if (this.canSwitch(target.side)) didSomething = true; // at least defer the fail message to later
+				hitResult = this.canSwitch(target.side);
+				didSomething = didSomething || hitResult;
 			}
 			if (moveData.selfSwitch) {
-				// If the move is Parting Shot and it fails to change the target's stats in gen 7, didSomething will be null instead of false.
+				// If the move is Parting Shot and it fails to change the target's stats in gen 7, didSomething will be null instead of undefined.
 				// Leaving didSomething as null will cause this function to return before setting the switch flag, preventing the switch.
-				if (this.canSwitch(pokemon.side) && (didSomething !== null || this.gen < 7)) didSomething = true; // at least defer the fail message to later
+				if (this.canSwitch(pokemon.side) && (didSomething !== null || this.gen < 7)) {
+					didSomething = true;
+				} else {
+					didSomething = didSomething || false;
+				}
 			}
 			// Hit events
 			//   These are like the TryHit events, except we don't need a FieldHit event.
 			//   Scroll up for the TryHit event documentation, and just ignore the "Try" part. ;)
 			if (move.target === 'all' && !isSelf) {
-				if (moveData.onHitField) hitResult = this.singleEvent('HitField', moveData, {}, target, pokemon, move);
+				if (moveData.onHitField) {
+					hitResult = this.singleEvent('HitField', moveData, {}, target, pokemon, move);
+					didSomething = didSomething || hitResult;
+				}
 			} else if ((move.target === 'foeSide' || move.target === 'allySide') && !isSelf) {
-				if (moveData.onHitSide) hitResult = this.singleEvent('HitSide', moveData, {}, target.side, pokemon, move);
+				if (moveData.onHitSide) {
+					hitResult = this.singleEvent('HitSide', moveData, {}, target.side, pokemon, move);
+					didSomething = didSomething || hitResult;
+				}
 			} else {
 				if (moveData.onHit) {
 					hitResult = this.singleEvent('Hit', moveData, {}, target, pokemon, move);
@@ -769,9 +752,11 @@ let BattleScripts = {
 				if (!isSelf && !isSecondary) {
 					this.runEvent('Hit', target, pokemon, move);
 				}
-				if (moveData.onAfterHit) hitResult = this.singleEvent('AfterHit', moveData, {}, target, pokemon, move);
+				if (moveData.onAfterHit) {
+					hitResult = this.singleEvent('AfterHit', moveData, {}, target, pokemon, move);
+					didSomething = didSomething || hitResult;
+				}
 			}
-			didSomething = didSomething || hitResult;
 
 			// Move didn't fail because it didn't try to do anything
 			if (didSomething === undefined) didSomething = true;
@@ -785,24 +770,21 @@ let BattleScripts = {
 			}
 		}
 		if (moveData.self && !move.selfDropped) {
-			let selfRoll;
-			// @ts-ignore
+			let selfRoll = 0;
 			if (!isSecondary && moveData.self.boosts) {
 				selfRoll = this.random(100);
 				if (!move.multihit) move.selfDropped = true;
 			}
 			// This is done solely to mimic in-game RNG behaviour. All self drops have a 100% chance of happening but still grab a random number.
-			// @ts-ignore
-			if (typeof moveData.self.chance === 'undefined' || selfRoll < moveData.self.chance) {
-				// @ts-ignore
+			if (moveData.self.chance === undefined || selfRoll < moveData.self.chance) {
 				this.moveHit(pokemon, pokemon, move, moveData.self, isSecondary, true);
 			}
 		}
 		if (moveData.secondaries) {
-			let secondaryRoll;
+			/** @type {SecondaryEffect[]} */
 			let secondaries = this.runEvent('ModifySecondaries', target, pokemon, moveData, moveData.secondaries.slice());
 			for (const secondary of secondaries) {
-				secondaryRoll = this.random(100);
+				let secondaryRoll = this.random(100);
 				if (typeof secondary.chance === 'undefined' || secondaryRoll < secondary.chance) {
 					this.moveHit(target, pokemon, move, secondary, true, isSelf);
 				}
@@ -866,6 +848,7 @@ let BattleScripts = {
 				if (move.category === "Status") {
 					return move.name;
 				} else if (move.zMovePower) {
+					// @ts-ignore
 					return this.zMoveTable[move.type];
 				}
 			}
@@ -887,6 +870,7 @@ let BattleScripts = {
 			zMove.isZ = true;
 			return zMove;
 		}
+		// @ts-ignore
 		zMove = this.getMoveCopy(this.zMoveTable[move.type]);
 		// @ts-ignore
 		zMove.basePower = move.zMovePower;
@@ -940,9 +924,8 @@ let BattleScripts = {
 	},
 
 	runMegaEvo: function (pokemon) {
-		const effectType = pokemon.canMegaEvo ? '-mega' : '-burst';
-		// @ts-ignore
-		const template = this.getTemplate(pokemon.canMegaEvo || pokemon.canUltraBurst);
+		const templateid = pokemon.canMegaEvo || pokemon.canUltraBurst;
+		if (!templateid) return false;
 		const side = pokemon.side;
 
 		// Pokémon affected by Sky Drop cannot mega evolve. Enforce it here for now.
@@ -952,32 +935,62 @@ let BattleScripts = {
 			}
 		}
 
-		pokemon.formeChange(template);
-		pokemon.baseTemplate = template; // mega evolution is permanent
-		pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
-		if (pokemon.illusion) {
-			pokemon.ability = ''; // Don't allow Illusion to wear off
-			// @ts-ignore
-			this.add(effectType, pokemon, pokemon.illusion.template.baseSpecies, template.requiredItem);
-		} else {
-			// @ts-ignore
-			this.add(effectType, pokemon, template.baseSpecies, template.requiredItem);
-			this.add('detailschange', pokemon, pokemon.details);
-		}
-		pokemon.setAbility(template.abilities['0'], null, true);
-		pokemon.baseAbility = pokemon.ability;
+		pokemon.formeChange(templateid, pokemon.getItem(), true);
 
 		// Limit one mega evolution
+		let wasMega = pokemon.canMegaEvo;
 		for (const ally of side.pokemon) {
-			if (effectType === '-burst') {
-				ally.canUltraBurst = null;
-			} else {
+			if (wasMega) {
 				ally.canMegaEvo = null;
+			} else {
+				ally.canUltraBurst = null;
 			}
 		}
 
 		this.runEvent('AfterMega', pokemon);
 		return true;
+	},
+
+	runZPower: function (move, pokemon) {
+		const zPower = this.getEffect('zpower');
+		if (move.category !== 'Status') {
+			this.attrLastMove('[zeffect]');
+		} else if (move.zMoveBoost) {
+			this.boost(move.zMoveBoost, pokemon, pokemon, zPower);
+		} else {
+			switch (move.zMoveEffect) {
+			case 'heal':
+				this.heal(pokemon.maxhp, pokemon, pokemon, zPower);
+				break;
+			case 'healreplacement':
+				move.self = {sideCondition: 'healreplacement'};
+				break;
+			case 'clearnegativeboost':
+				/** @type {{[k: string]: number}} */
+				let boosts = {};
+				for (let i in pokemon.boosts) {
+					// @ts-ignore
+					if (pokemon.boosts[i] < 0) {
+						boosts[i] = 0;
+					}
+				}
+				pokemon.setBoost(boosts);
+				this.add('-clearnegativeboost', pokemon, '[zeffect]');
+				break;
+			case 'redirect':
+				pokemon.addVolatile('followme', pokemon, zPower);
+				break;
+			case 'crit2':
+				pokemon.addVolatile('focusenergy', pokemon, zPower);
+				break;
+			case 'curse':
+				if (pokemon.hasType('Ghost')) {
+					this.heal(pokemon.maxhp, pokemon, pokemon, zPower);
+				} else {
+					this.boost({atk: 1}, pokemon, pokemon, zPower);
+				}
+			}
+		}
 	},
 
 	isAdjacent: function (pokemon1, pokemon2) {
