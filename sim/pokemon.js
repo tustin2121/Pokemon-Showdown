@@ -811,30 +811,40 @@ class Pokemon {
 	}
 
 	/**
+	 * Changes this Pokemon's forme to match the given templateId (or template).
+	 * This function handles all changes to stats, ability, type, template, etc.
+	 * as well as sending all relevant messages sent to the client.
 	 * @param {string | Template} templateId
-	 * @param {Pokemon | Effect} [source]
+	 * @param {Effect | null} source
+	 * @param {boolean} [isPermanent]
+	 * @param {string} [message]
 	 */
-	formeChange(templateId, source) {
-		let template = this.battle.getTemplate(templateId);
+	formeChange(templateId, source = this.battle.effect, isPermanent, message, abilitySlot = '0') {
+		let rawTemplate = this.battle.getTemplate(templateId);
 
-		if (!template.abilities) return false;
+		if (!rawTemplate.abilities) return false;
 
-		template = this.battle.singleEvent('ModifyTemplate', this.battle.getFormat(), null, this, source, null, template);
+		let template = this.battle.singleEvent('ModifyTemplate', this.battle.getFormat(), null, this, source, null, rawTemplate);
 
 		if (!template) return false;
 
 		this.template = template;
 
-		this.types = template.types;
+		this.setType(template.types, true);
+		this.apparentType = rawTemplate.types.join('/');
 		this.addedType = template.addedType || '';
 		this.knownType = true;
+		if (this.battle.gen >= 7) this.removeVolatile('autotomize');
 
-		if (!source) {
+		if (source) {
 			let stats = this.battle.spreadModify(this.template.baseStats, this.set);
 			if (!this.baseStats) this.baseStats = stats;
 			for (let statName in this.stats) {
+				// @ts-ignore
 				this.stats[statName] = stats[statName];
+				// @ts-ignore
 				this.baseStats[statName] = stats[statName];
+				// @ts-ignore
 				if (this.modifiedStats) this.modifiedStats[statName] = stats[statName]; // Gen 1: Reset modified stats.
 			}
 			if (this.battle.gen <= 1) {
@@ -846,6 +856,47 @@ class Pokemon {
 				if (this.status === 'brn') this.modifyStat('atk', 0.5);
 			}
 			this.speed = this.stats.spe;
+			if ((!source.id && !source.effectType) || this.battle.gen <= 2) return true;
+
+			let apparentSpecies = this.illusion ? this.illusion.template.species : template.baseSpecies; // The species the opponent sees
+			if (isPermanent) {
+				this.baseTemplate = rawTemplate;
+				this.details = template.species + (this.level === 100 ? '' : ', L' + this.level) + (this.gender === '' ? '' : ', ' + this.gender) + (this.set.shiny ? ', shiny' : '');
+				this.battle.add('detailschange', this, (this.illusion || this).details);
+				if (source.effectType === 'Item') {
+					// @ts-ignore
+					if (source.zMove) {
+						this.battle.add('-burst', this, apparentSpecies, template.requiredItem);
+						this.moveThisTurnResult = true; // Ultra Burst counts as an action for Truant
+					} else if (source.onPrimal) {
+						if (this.illusion) {
+							this.ability = '';
+							this.battle.add('-primal', this.illusion);
+						} else {
+							this.battle.add('-primal', this);
+						}
+					} else {
+						this.battle.add('-mega', this, apparentSpecies, template.requiredItem);
+						this.moveThisTurnResult = true; // Mega Evolution counts as an action for Truant
+					}
+				} else if (source.effectType === 'Status') {
+					// Shaymin-Sky -> Shaymin
+					this.battle.add('-formechange', this, template.species, message);
+				}
+			} else {
+				if (source.effectType === 'Ability') {
+					this.battle.add('-formechange', this, template.species, message, `[from] ability: ${source.name}`);
+				} else {
+					this.battle.add('-formechange', this, this.illusion ? this.illusion.template.species : template.species, message);
+				}
+			}
+			if (source.effectType !== 'Ability' && source.id !== 'relicsong' && source.id !== 'zenmode') {
+				if (this.illusion) {
+					this.ability = ''; // Don't allow Illusion to wear off
+				}
+				this.setAbility(template.abilities[abilitySlot], null, true);
+				if (isPermanent) this.baseAbility = this.ability;
+			}
 		}
 		return true;
 	}
