@@ -1,121 +1,103 @@
 "use strict";
 
 exports.BattleMovedex = {
+	"auroraveil": {
+		inherit: true,
+		onTryHitSide: function () {
+			if (this.suppressingWeather()) return false;
+		},
+	},
 	"blizzard": {
 		inherit: true,
 		onModifyMove: function (move) {
-			if (this.isWeather('hail') || this.isWeather('raindance')) move.accuracy = true;
+			if (!this.suppressingWeather()) move.accuracy = true;
 		},
 	},
 	"growth": {
 		inherit: true,
 		onModifyMove: function (move) {
-			if (this.isWeather('sunnyday') || this.isWeather('raindance')) move.boosts = {atk: 2, spa: 2};
+			if (!this.suppressingWeather()) move.boosts = { atk: 2, spa: 2 };
 		},
 	},
 	"hail": {
 		inherit: true,
-		weather: 'raindance',
+		weather: "primordialsea",
 	},
 	"moonlight": {
 		inherit: true,
 		onHit: function (pokemon) {
-			if (this.isWeather('sunnyday')) {
-				this.heal(this.modify(pokemon.maxhp, 0.667));
-			} else if (this.isWeather(['sandstorm', 'hail'])) {
-				this.heal(this.modify(pokemon.maxhp, 0.25));
-			} else if (this.isWeather('raindance')) {
-				this.heal(this.modify(pokemon.maxhp, 0.0833));
-			} else {
-				this.heal(this.modify(pokemon.maxhp, 0.5));
-			}
+			this.heal(pokemon.maxhp / (this.suppressingWeather() ? 2 : 12));
 		},
 	},
 	"morningsun": {
 		inherit: true,
 		onHit: function (pokemon) {
-			if (this.isWeather('sunnyday')) {
-				this.heal(this.modify(pokemon.maxhp, 0.667));
-			} else if (this.isWeather(['sandstorm', 'hail'])) {
-				this.heal(this.modify(pokemon.maxhp, 0.25));
-			} else if (this.isWeather('raindance')) {
-				this.heal(this.modify(pokemon.maxhp, 0.0833));
-			} else {
-				this.heal(this.modify(pokemon.maxhp, 0.5));
-			}
+			this.heal(pokemon.maxhp / (this.suppressingWeather() ? 2 : 12));
 		},
 	},
 	"sandstorm": {
 		inherit: true,
-		weather: 'raindance',
+		weather: "primordialsea",
+	},
+	"shoreup": {
+		inherit: true,
+		onHit: function (pokemon) {
+			this.heal(this.suppressingWeather() ? (pokemon.maxhp / 2) : (pokemon.maxhp * 2 / 3));
+		},
 	},
 	"solarbeam": {
 		inherit: true,
 		onTry: function (attacker, defender, move) {
-			if (attacker.removeVolatile(move.id)) {
-				return;
-			}
+			if (attacker.removeVolatile(move.id)) return;
 			this.add('-prepare', attacker, move.name, defender);
-			if (this.isWeather('sunnyday') || this.isWeather('raindance') || !this.runEvent('ChargeMove', attacker, defender, move)) {
-				this.add('-anim', attacker, move.name, defender);
-				return;
+			if (this.suppressingWeather() && this.runEvent('ChargeMove', attacker, defender, move)) {
+				attacker.addVolatile('twoturnmove', defender);
+				return null;
 			}
-			attacker.addVolatile('twoturnmove', defender);
-			return null;
+			this.add('-anim', attacker, move.name, defender);
 		},
-		onBasePower: function (basePower, pokemon, target) {
-			if (this.isWeather(['sandstorm', 'hail'])) {
-				this.debug('weakened by weather');
-				return this.chainModify(0.5);
-			} else if (this.isWeather('raindance')) {
-				this.debug('super-weakened by weather');
-				return this.chainModify(0.125);
+		onBasePower: function (basePOwer, pokemon, target) {
+			if (!this.suppressingWeather()) this.chainModify(0.125);
+		},
+	},
+	"solarblade": {
+		inherit: true,
+		onTry: function (attacker, defender, move) {
+			if (attacker.removeVolatile(move.id)) return;
+			this.add('-prepare', attacker, move.name, defender);
+			if (this.suppressingWeather() && this.runEvent('ChargeMove', attacker, defender, move)) {
+				attacker.addVolatile('twoturnmove', defender);
+				return null;
 			}
+			this.add('-anim', attacker, move.name, defender);
+		},
+		onBasePower: function (basePOwer, pokemon, target) {
+			if (!this.suppressingWeather()) this.chainModify(0.125);
 		},
 	},
 	"sunnyday": {
 		inherit: true,
-		weather: 'sandstorm',
+		weaather: "primordialsea",
 	},
 	"synthesis": {
 		inherit: true,
 		onHit: function (pokemon) {
-			if (this.isWeather('sunnyday')) {
-				this.heal(this.modify(pokemon.maxhp, 0.667));
-			} else if (this.isWeather(['sandstorm', 'hail'])) {
-				this.heal(this.modify(pokemon.maxhp, 0.25));
-			} else if (this.isWeather('raindance')) {
-				this.heal(this.modify(pokemon.maxhp, 0.0833));
-			} else {
-				this.heal(this.modify(pokemon.maxhp, 0.5));
-			}
+			this.heal(pokemon.maxhp / (this.suppressingWeather() ? 2 : 12));
+		},
+	},
+	"thunder": {
+		inherit: true,
+		onModifyMove: function (move) {
+			if (!this.suppressingWeather()) move.accuracy = true;
 		},
 	},
 	"weatherball": {
 		inherit: true,
-		basePowerCallback: function () {
-			if (this.isWeather('raindance')) {
-				return 800; //We have 4 weathers active at once.
-			} else if (this.weather) {
-				return 100;
-			}
-			return 50;
+		basePowerCallback: function() {
+			return this.suppressingWeather() ? 50 : 800;
 		},
 		onModifyMove: function (move) {
-			switch (this.effectiveWeather()) {
-			case 'sunnyday':
-				move.type = 'Fire';
-				break;
-			case 'raindance':
-				move.type = 'Ice'; //Hail is the highest priority weather.
-				break;
-			case 'sandstorm':
-				move.type = 'Rock';
-				break;
-			case 'hail':
-				move.type = 'Ice';
-				break;
-			}
+			if (!this.suppressingWeather()) move.type = 'Ice';
 		},
 	},
 };

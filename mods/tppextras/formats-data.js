@@ -74,6 +74,46 @@ exports.BattleFormatsData = {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
+	chibidaiyousei: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	daiyousei: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	chibinitori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	nitori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	chibiaya: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	aya: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	attacknitori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	technicalnitori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	speedaya: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	technicalaya: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
 	defensemomiji: {
 		isNonstandard: true,
 		tier: "Touhou",
@@ -106,6 +146,10 @@ exports.BattleFormatsData = {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
+	attackdaiyousei: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
 	adventcirno: {
 		isNonstandard: true,
 		tier: "Touhou",
@@ -114,11 +158,19 @@ exports.BattleFormatsData = {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
+	defensedaiyousei: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
 	technicalsatori: {
 		isNonstandard: true,
 		tier: "Touhou",
 	},
 	defensesatori: {
+		isNonstandard: true,
+		tier: "Touhou",
+	},
+	tenma: {
 		isNonstandard: true,
 		tier: "Touhou",
 	},

@@ -5,6 +5,10 @@ exports.BattleFormatsData = {
 		inherit: true,
 		randomBattleMoves: ["bugbuzz", "quiverdance", "sleeppowder", "substitute", "gigadrain", "stunspore", "airslash", "energyball", "psychic", "roost"],
 	},
+	raticate: {
+		inherit: true,
+		randomBattleMoves: ["facade", "crunch", "stompingtantrum", "suckerpunch", "uturn", "swordsdance", "pursuit", "protect", "shadowclaw"],
+	},
 	raichu: {
 		inherit: true,
 		randomBattleMoves: ["thunderbolt", "hiddenpowerice", "grassknot", "focusblast", "nastyplot", "electricterrain", "raindance", "surf", "thunder", "voltswitch"],
@@ -149,6 +153,10 @@ exports.BattleFormatsData = {
 		inherit: true,
 		randomBattleMoves: ["psychic", "focusblast", "shadowball", "substitute", "psyshock", "calmmind", "healbell", "protect", "signalbeam", "taunt", "thunderwave", "toxic"],
 	},
+	altaria: {
+		inherit: true,
+		randomBattleMoves: ["flamethrower", "toxic", "defog", "healbell", "roost", "fly", "earthquake", "dragondance", "dracometeor", "fireblast", "cottonguard", "dragonbreath", "dragonclaw", "haze", "icebeam", "outrage", "rest", "roar", "skyattack", "substitute"],
+	},
 	cradily: {
 		inherit: true,
 		randomBattleMoves: ["rockslide", "toxic", "stealthrock", "recover", "stoneedge", "gigadrain", "curse", "earthpower", "earthquake", "protect", "seedbomb"],
@@ -188,6 +196,14 @@ exports.BattleFormatsData = {
 	bibarel: {
 		inherit: true,
 		randomBattleMoves: ["swordsdance", "return", "liquidation", "aquajet", "quickattack", "doubleedge", "facade", "waterfall"],
+	},
+	rampardos: {
+		inherit: true,
+		randomBattleMoves: ["headsmash", "rockslide", "firepunch", "blizzard", "crunch", "fireblast", "rockpolish", "stealthrock", "surf", "superpower"],
+	},
+	floatzel: {
+		inherit: true,
+		randomBattleMoves: ["liquidation", "waterfall", "lowkick", "taunt", "bulkup", "brickbreak", "icepunch", "switcheroo", "hydropump", "focusblast", "icebeam", "surf", "aquajet", "blizzard", "crunch", "focuspunch", "hiddenpowerelectric", "poweruppunch", "scald", "substitute", "toxic"],
 	},
 	purugly: {
 		inherit: true,
@@ -241,6 +257,10 @@ exports.BattleFormatsData = {
 		inherit: true,
 		randomBattleMoves: ["shellsmash", "xscissor", "rockblast", "stoneedge", "earthquake", "stealthrock", "spikes", "knockoff", "counter", "toxic"],
 	},
+	swanna: {
+		inherit: true,
+		randomBattleMoves: ["scald", "hurricane", "defog", "roost", "surf", "raindance", "bravebird", "airslash", "aquajet", "icebeam", "liquidation", "mirrormove", "rest", "substitute", "tailwind", "toxic"],
+	},
 	sawsbuck: {
 		inherit: true,
 		randomBattleMoves: ["swordsdance", "hornleech", "doubleedge", "jumpkick", "headbutt", "bounce", "return", "substitute", "toxic"],
@@ -265,6 +285,10 @@ exports.BattleFormatsData = {
 		inherit: true,
 		randomBattleMoves: ["return", "megahorn", "facade", "earthquake", "pursuit", "headcharge", "substitute", "swordsdance", "toxic", "rest", "sleeptalk", "stoneedge", "superpower", "taunt", "wildcharge"],
 	},
+	quilladin: {
+		inherit: true,
+		randomBattleMoves: ["spikes", "roar", "protect", "seedbomb", "synthesis", "leechseed", "taunt", "woodhammer", "zenheadbutt", "drainpunch", "endeavor", "pinmissile", "toxic"],
+	},
 	meowstic: {
 		inherit: true,
 		randomBattleMoves: ["psychic", "yawn", "reflect", "lightscreen", "assist", "barrier", "calmmind", "healbell", "raindance", "rest", "safeguard", "substitute", "sunnyday", "toxic", "trick"],
@@ -280,6 +304,10 @@ exports.BattleFormatsData = {
 	gourgeistlarge: {
 		inherit: true,
 		randomBattleMoves: ["foulplay", "synthesis", "willowisp", "leechseed", "fireblast", "destinybond", "magiccoat", "rockslide", "toxic", "trickroom", "seedbomb", "phantomforce"],
+	},
+	gourgeistsuper: {
+		inherit: true,
+		randomBattleMoves: ["foulplay", "leechseed", "seedbomb", "willowisp", "synthesis", "destinybond", "explosion", "fireblast", "magiccoat", "protect", "rockslide", "toxic", "trickroom", "skillswap"],
 	},
 	toucannon: {
 		inherit: true,
@@ -324,6 +352,10 @@ exports.BattleFormatsData = {
 	silvallywater: {
 		inherit: true,
 		randomBattleMoves: ["surf", "flamethrower", "thunderbolt", "uturn", "partingshot", "defog", "firefang", "flamecharge", "icebeam", "icefang", "multiattack", "swordsdance", "toxic", "zenheadbutt"],
+	},
+	komala: {
+		inherit: true,
+		randomBattleMoves: ["return", "earthquake", "knockoff", "suckerpunch", "uturn", "wish", "protect", "rapidspin", "bulkup", "swordsdance", "woodhammer", "shadowclaw", "sleeptalk", "superpower", "toxic"],
 	},
 	hakamoo: {
 		inherit: true,

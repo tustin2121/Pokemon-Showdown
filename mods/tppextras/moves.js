@@ -529,7 +529,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[anim] Razor Wind');
 		},
 		secondary: false,
-		target: "normal",
+		target: "any",
 		type: "Flying",
 		zMovePower: 120,
 		contestType: "Cool",
@@ -1159,7 +1159,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[anim] Quick Attack');
 		},
 		secondary: false,
-		target: "normal",
+		target: "any",
 		type: "Flying",
 		zMovePower: 100,
 		contestType: "Cool",
@@ -1741,12 +1741,14 @@ exports.BattleMovedex = {
 		flags: {contact: 1, charge: 1, mirror: 1},
 		breaksProtect: true,
 		onTry: function (attacker, defender, move) {
+			this.attrLastMove('[still]');
 			if (attacker.removeVolatile(move.id)) {
+				this.add('-animcustom', attacker, defender, 'dive', '{delay}300', '{status:tt}focuspunch');
 				return;
 			}
-			this.add('-prepare', attacker, move.name, defender);
+			this.add('-animcustom', attacker, defender, '{prepare}phantomforce', '{prepare}dive');
 			if (!this.runEvent('ChargeMove', attacker, defender, move)) {
-				this.add('-anim', attacker, move.name, defender);
+				this.add('-animcustom', attacker, defender, 'dive', '{delay}300', '{status:tt}focuspunch');
 				return;
 			}
 			attacker.addVolatile('twoturnmove', defender);
@@ -1770,5 +1772,314 @@ exports.BattleMovedex = {
 		type: "Ghost",
 		zMovePower: 200,
 		contestType: "Cool",
+	},
+	"gale": {
+		num: 20049,
+		accuracy: 100,
+		basePower: 40,
+		category: "Special",
+		desc: "No additional effect.",
+		shortDesc: "Usually goes first.",
+		id: "gale",
+		isViable: true,
+		name: "Gale",
+		pp: 30,
+		priority: 1,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Gust');
+		},
+		secondary: null,
+		target: "any",
+		type: "Flying",
+		zMovePower: 100,
+		contestType: "Cool",
+	},
+	"batterycharge": {
+		num: 20050,
+		accuracy: true,
+		basePower: 0,
+		category: "Status",
+		desc: "Raises the user's Special Attack by 1 stage.",
+		shortDesc: "Raises the user's Sp. Atk by 1.",
+		id: "batterycharge",
+		name: "Battery Charge",
+		pp: 40,
+		priority: 0,
+		flags: {snatch: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Charge');
+		},
+		boosts: {
+			spa: 1,
+		},
+		secondary: null,
+		target: "self",
+		type: "Normal",
+		zMoveBoost: {spa: 1},
+		contestType: "Clever",
+	},
+	"twhirlpool": {
+		num: 20051,
+		accuracy: 90,
+		basePower: 60,
+		category: "Special",
+		desc: "Prevents the target from switching for four or five turns (seven turns if the user is holding Grip Claw). Causes damage to the target equal to 1/8 of its maximum HP (1/6 if the user is holding Binding Band), rounded down, at the end of each turn during effect. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Parting Shot, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field, or if the target uses Rapid Spin or Substitute successfully. This effect is not stackable or reset by using this or another binding move.",
+		shortDesc: "Traps and damages the target for 4-5 turns.",
+		id: "twhirlpool",
+		name: "T-Whirlpool",
+		pp: 15,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Whirlpool');
+		},
+		volatileStatus: 'partiallytrapped',
+		secondary: null,
+		target: "normal",
+		type: "Water",
+		zMovePower: 120,
+		contestType: "Beautiful",
+	},
+	"trapidspin": {
+		num: 20052,
+		accuracy: 100,
+		basePower: 40,
+		category: "Physical",
+		desc: "If this move is successful and the user has not fainted, the effects of Leech Seed and binding moves end for the user, and all hazards are removed from the user's side of the field.",
+		shortDesc: "Frees user from hazards, binding, Leech Seed.",
+		id: "trapidspin",
+		isViable: true,
+		name: "T-Rapid Spin",
+		pp: 30,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Rapid Spin');
+		},
+		self: {
+			onHit: function (pokemon) {
+				if (pokemon.hp && pokemon.removeVolatile('leechseed')) {
+					this.add('-end', pokemon, 'Leech Seed', '[from] move: T-Rapid Spin', '[of] ' + pokemon);
+				}
+				let sideConditions = ['spikes', 'toxicspikes', 'stealthrock', 'stickyweb'];
+				for (const condition of sideConditions) {
+					if (pokemon.hp && pokemon.side.removeSideCondition(condition)) {
+						this.add('-sideend', pokemon.side, this.getEffect(condition).name, '[from] move: T-Rapid Spin', '[of] ' + pokemon);
+					}
+				}
+				if (pokemon.hp && pokemon.volatiles['partiallytrapped']) {
+					pokemon.removeVolatile('partiallytrapped');
+				}
+			},
+		},
+		secondary: null,
+		target: "normal",
+		type: "Poison",
+		zMovePower: 100,
+		contestType: "Cool",
+	},
+	"thydrocannon": {
+		num: 20053,
+		accuracy: 90,
+		basePower: 130,
+		category: "Special",
+		desc: "Lowers the user's Special Attack by 2 stages.",
+		shortDesc: "Lowers the user's Sp. Atk by 2.",
+		id: "thydrocannon",
+		isViable: true,
+		name: "T-Hydro Cannon",
+		pp: 5,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Hydro Cannon');
+		},
+		self: {
+			boosts: {
+				spa: -2,
+			},
+		},
+		secondary: null,
+		target: "normal",
+		type: "Water",
+		zMovePower: 195,
+		contestType: "Beautiful",
+	},
+	"tneedlearm": {
+		num: 20054,
+		accuracy: 100,
+		basePower: 75,
+		category: "Physical",
+		desc: "Has a 20% chance to flinch the target.",
+		shortDesc: "20% chance to flinch the target.",
+		id: "tneedlearm",
+		isViable: true,
+		name: "T-Needle Arm",
+		pp: 15,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		secondary: {
+			chance: 20,
+			volatileStatus: 'flinch',
+		},
+		target: "normal",
+		type: "Grass",
+		zMovePower: 140,
+		contestType: "Clever",
+	},
+	"wanting": {
+		num: 20055,
+		accuracy: 100,
+		basePower: 60,
+		category: "Physical",
+		desc: "If this attack was successful and the user has not fainted, it steals the target's held item if the user is not holding one. The target's item is not stolen if it is a Mail or Z-Crystal, or if the target is a Kyogre holding a Blue Orb, a Groudon holding a Red Orb, a Giratina holding a Griseous Orb, an Arceus holding a Plate, a Genesect holding a Drive, a Silvally holding a Memory, or a Pokemon that can Mega Evolve holding the Mega Stone for its species. Items lost to this move cannot be regained with Recycle or the Harvest Ability.",
+		shortDesc: "If the user has no item, it steals the target's.",
+		id: "wanting",
+		name: "Wanting",
+		pp: 25,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onAfterHit: function (target, source, move) {
+			if (source.item || source.volatiles['gem']) {
+				return;
+			}
+			let yourItem = target.takeItem(source);
+			if (!yourItem) {
+				return;
+			}
+			if (!this.singleEvent('TakeItem', yourItem, target.itemData, source, target, move, yourItem) || !source.setItem(yourItem)) {
+				target.item = yourItem.id; // bypass setItem so we don't break choicelock or anything
+				return;
+			}
+			this.add('-item', source, yourItem, '[from] move: Wanting', '[of] ' + target);
+		},
+		secondary: null,
+		target: "normal",
+		type: "Bug",
+		zMovePower: 120,
+		contestType: "Cute",
+	},
+	"tcharge": {
+		num: 20056,
+		accuracy: 90,
+		basePower: 50,
+		category: "Special",
+		desc: "Has a 70% chance to raise the user's Special Attack by 1 stage.",
+		shortDesc: "70% chance to raise the user's Sp. Atk by 1.",
+		id: "tcharge",
+		name: "T-Charge",
+		pp: 10,
+		priority: 0,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Parabolic Charge');
+		},
+		secondary: {
+			chance: 70,
+			self: {
+				boosts: {
+					spa: 1,
+				},
+			},
+		},
+		target: "normal",
+		type: "Bug",
+		zMovePower: 100,
+		contestType: "Beautiful",
+	},
+	"tfaketears": {
+		num: 20057,
+		accuracy: 100,
+		basePower: 0,
+		category: "Status",
+		desc: "Lowers the target's Special Attack by 2 stages.",
+		shortDesc: "Lowers the target's Sp. Atk by 2.",
+		id: "tfaketears",
+		name: "T-Fake Tears",
+		pp: 20,
+		priority: 0,
+		flags: {protect: 1, reflectable: 1, mirror: 1, mystery: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Fake Tears');
+		},
+		boosts: {
+			spa: -2,
+		},
+		secondary: null,
+		target: "normal",
+		type: "Dark",
+		zMoveBoost: {spd: 1},
+		contestType: "Cute",
+	},
+	"splashing": {
+		num: 20058,
+		accuracy: 100,
+		basePower: 60,
+		basePowerCallback: function (pokemon, target, move) {
+			let hurtByTarget = pokemon.hurtBy.some(p =>
+				p.source === target && p.damage > 0 && p.thisTurn
+			);
+			if (hurtByTarget) {
+				this.debug('Boosted for getting hit by ' + target);
+				return move.basePower * 2;
+			}
+			return move.basePower;
+		},
+		category: "Physical",
+		desc: "Power doubles if the user was hit by the target this turn.",
+		shortDesc: "Power doubles if user is damaged by the target.",
+		id: "splashing",
+		name: "Splashing",
+		pp: 10,
+		priority: -4,
+		flags: {protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Splash');
+		},
+		secondary: null,
+		target: "normal",
+		type: "Water",
+		zMovePower: 120,
+		contestType: "Cute",
+	},
+	"twrap": {
+		num: 20059,
+		accuracy: 90,
+		basePower: 60,
+		category: "Physical",
+		desc: "Prevents the target from switching for four or five turns (seven turns if the user is holding Grip Claw). Causes damage to the target equal to 1/8 of its maximum HP (1/6 if the user is holding Binding Band), rounded down, at the end of each turn during effect. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Parting Shot, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field, or if the target uses Rapid Spin or Substitute successfully. This effect is not stackable or reset by using this or another binding move.",
+		shortDesc: "Traps and damages the target for 4-5 turns.",
+		id: "twrap",
+		name: "T-Wrap",
+		pp: 15,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1},
+		volatileStatus: 'partiallytrapped',
+		secondary: null,
+		target: "normal",
+		type: "Grass",
+		zMovePower: 120,
+		contestType: "Tough",
+	},
+	"burnpowder": {
+		num: 20060,
+		accuracy: 85,
+		basePower: 0,
+		category: "Status",
+		desc: "Burns the target.",
+		shortDesc: "Burns the target.",
+		id: "burnpowder",
+		isViable: true,
+		name: "Burn Powder",
+		pp: 15,
+		priority: 0,
+		flags: {powder: 1, protect: 1, reflectable: 1, mirror: 1},
+		status: 'brn',
+		secondary: null,
+		target: "normal",
+		type: "Grass",
+		zMoveBoost: {atk: 1},
+		contestType: "Clever",
 	},
 };

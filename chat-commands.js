@@ -3935,13 +3935,13 @@ exports.commands = {
 		console.log('target=>', target);
 		Ladders(target).makeChallenge(connection, targetUser).then(isValid=>{
 			if (isValid === false) return;
-			if (gym) {
-				let pendingIndex = gym.pending.indexOf(user.userid);
-				if (pendingIndex > -1) {
-					gym.pending.splice(pendingIndex, 1);
-					LeagueSetup.markDirty();
-				}
-			}
+			// if (gym) {
+			// 	let pendingIndex = gym.pending.indexOf(user.userid);
+			// 	if (pendingIndex > -1) {
+			// 		gym.pending.splice(pendingIndex, 1);
+			// 		LeagueSetup.markDirty();
+			// 	}
+			// }
 		});
 	},
 

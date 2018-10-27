@@ -599,14 +599,14 @@ exports.commands = {
 							errors.push("Background music is not valid.");
 						}
 					}
-					if (obj.battletype) {
-						let val = obj.battletype;
-						if (/singles|doubles|triples/.test(val)) {
-							save.battletype = val;
-						} else {
-							errors.push("Battle type is not valid.");
-						}
-					}
+//					if (obj.battletype) {
+//						let val = obj.battletype;
+//						if (/singles|doubles|triples/.test(val)) {
+//							save.battletype = val;
+//						} else {
+//							errors.push("Battle type is not valid.");
+//						}
+//					}
 					if (obj.ruleset) {
 						let val = obj.ruleset;
 						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
@@ -659,7 +659,7 @@ exports.commands = {
 					// Limit the values we save, and validate them on the way in.
 					if (obj.name) {
 						if (LeagueSetup.options.gymRename){
-							save.name = Chat.escapeHTML(obj.name.substr(0, 16));
+							save.name = Chat.escapeHTML(obj.name.substr(0, 32));
 						} else if (obj.name !== save.name) {
 							errors.push("Changing of gym names is not allowed at this time by League Admin mandate.");
 						}
@@ -673,6 +673,7 @@ exports.commands = {
 							{
 								let dup = false;
 								Object.keys(LeagueSetup.gyms).forEach((g)=>{
+									if (g === this.user.userid) return; //skip
 									if (val === LeagueSetup.gyms[g].badge) {
 										dup = true;
 									}
@@ -713,15 +714,15 @@ exports.commands = {
 							errors.push("Background music is not valid.");
 						}
 					}
-					if (obj.battletype) {
-						let val = obj.battletype;
-						if (/singles|doubles|triples|trial/.test(val)) {
-							save.battletype = val;
-						} else {
-							errors.push("Battle type is not valid.");
-						}
-					}
-					if (obj.ruleset) {
+//					if (obj.battletype) {
+//						let val = obj.battletype;
+//						if (/singles|doubles|triples|trial/.test(val)) {
+//							save.battletype = val;
+//						} else {
+//							errors.push("Battle type is not valid.");
+//						}
+//					}
+					if (obj.ruleset !== undefined) {
 						let val = obj.ruleset;
 						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
 							save.ruleset = val.map(x=>x.trim()).filter(x => !!x);
@@ -729,7 +730,7 @@ exports.commands = {
 							errors.push("Ruleset is invalid.");
 						}
 					}
-					if (obj.banlist) {
+					if (obj.banlist !== undefined) {
 						let val = obj.banlist;
 						if (Array.isArray(val) && val.every(x => typeof x == 'string')) {
 							try {
@@ -742,13 +743,13 @@ exports.commands = {
 							errors.push("Banlist is invalid.");
 						}
 					}
-					if (obj.trialdesc) {
+					if (obj.trialdesc !== undefined) {
 						var val = obj.trialdesc;
 						if (val === 'undefined' || val === '') val = undefined;
 						else val = val.trim().substr(0, 1000);
 						save.trialdesc = val;
 					}
-					if (obj.meme) {
+					if (obj.meme !== undefined) {
 						save.meme = Chat.escapeHTML(obj.meme);
 					}
 					save.avatar = this.user.avatar; //Save off the avatar for later use by others
@@ -773,31 +774,31 @@ exports.commands = {
 	],
 	
 	pendingchallenges : function(target) {
-		if (this.cmdToken === '!') return this.errorReply('You cannot broadcast this command.');
-		let silent = (target === 'silent');
-		// if (Rooms.global.lockdown) return this.errorReply('The server is in lockdown. You cannot hand out badges at this time.');
-		if (!this.user.registered) {
-			if (!silent) this.errorReply('Please log in first.');
-			return;
-		}
+		// if (this.cmdToken === '!') return this.errorReply('You cannot broadcast this command.');
+		// let silent = (target === 'silent');
+		// // if (Rooms.global.lockdown) return this.errorReply('The server is in lockdown. You cannot hand out badges at this time.');
+		// if (!this.user.registered) {
+		// 	if (!silent) this.errorReply('Please log in first.');
+		// 	return;
+		// }
 		
-		let gym = LeagueSetup.gyms[this.user.userid];
-		if (gym) {
-			if (gym.pending.length) {
-				this.sendReply("Challengers waiting to fight your gym: "+gym.pending.join(","));
-			} else if (!silent) {
-				this.sendReply("There are no challengers waiting to fight your gym right now.");
-			}
-		}
+		// let gym = LeagueSetup.gyms[this.user.userid];
+		// if (gym) {
+		// 	if (gym.pending.length) {
+		// 		this.sendReply("Challengers waiting to fight your gym: "+gym.pending.join(","));
+		// 	} else if (!silent) {
+		// 		this.sendReply("There are no challengers waiting to fight your gym right now.");
+		// 	}
+		// }
 		
-		gym = LeagueSetup.elites[this.user.userid];
-		if (gym) {
-			if (gym.pending.length) {
-				this.sendReply("Challengers waiting to fight your E4 team: "+gym.pending.join(","));
-			} else if (!silent) {
-				this.sendReply("There are no challengers waiting to fight your E4 team right now.");
-			}
-		}
+		// gym = LeagueSetup.elites[this.user.userid];
+		// if (gym) {
+		// 	if (gym.pending && gym.pending.length) {
+		// 		this.sendReply("Challengers waiting to fight your E4 team: "+gym.pending.join(","));
+		// 	} else if (!silent) {
+		// 		this.sendReply("There are no challengers waiting to fight your E4 team right now.");
+		// 	}
+		// }
 	},
 	pendingchallengeshelp : [
 		'/pendingchallenges - Show any pending challenges you have.',

@@ -364,7 +364,7 @@ class RandomZUTeams extends RandomTeams {
 					if ((teamDetails.zMove || !counter.setupType) && !hasAbility['Truant']) rejected = true;
 					break;
 				case 'perishsong':
-					// if (!hasMove['protect']) rejected = true;
+					if (!hasMove['protect'] && !counter.recovery && !hasMove['rest']) rejected = true;
 					if (!counter['trap']) rejected = true;
 					break;
 				case 'reflect':
@@ -376,13 +376,13 @@ class RandomZUTeams extends RandomTeams {
 					break;
 				case 'rest':
 					if (tempMovePool.includes('sleeptalk') && !hasAbility['Hydration']) rejected = true;
-					if (hasAbility['Hydration'] && tempMovePool.includes('sleeptalk') && !hasMove['raindance']) rejected = true;
+					if (hasAbility['Hydration'] && !hasMove['raindance']) rejected = true;
 					if (!hasMove['sleeptalk'] && template.evos.length) rejected = true;
 					if (hasMove['perishsong']) rejected = false;
 					if (hasMove['sleeptalk'] && counter['priority']) rejected = true;
 					break;
 				case 'sleeptalk':
-					if (!hasMove['rest']) rejected = true;
+					if (!hasMove['rest'] && !(hasAbility['Comatose'] && counter.damagingMoves.length)) rejected = true;
 					if (counter['priority']) rejected = true;
 					if (tempMovePool.length > 1) {
 						let rest = tempMovePool.indexOf('rest');
@@ -449,7 +449,6 @@ class RandomZUTeams extends RandomTeams {
 				case 'defog':
 					if (counter.setupType || hasMove['spikes'] || hasMove['stealthrock'] || (hasMove['rest'] && hasMove['sleeptalk']) || teamDetails.hazardClear) rejected = true;
 					break;
-					break;
 				case 'fakeout':
 					if (counter.setupType || hasMove['substitute'] || hasMove['switcheroo'] || hasMove['trick']) rejected = true;
 					break;
@@ -466,8 +465,11 @@ class RandomZUTeams extends RandomTeams {
 				case 'healingwish': case 'memento':
 					if (counter.setupType || !!counter['recovery'] || hasMove['substitute'] || hasMove['destinybond']) rejected = true;
 					break;
-				case 'leechseed': case 'roar': case 'whirlwind':
+				case 'leechseed':
 					if (counter.setupType || !!counter['speedsetup'] || hasMove['dragontail']) rejected = true;
+					break;
+				case 'roar': case 'whirlwind':
+					if (counter.setupType || !!counter['speedsetup'] || hasMove['dragontail'] || hasMove['leechseed']) rejected = true;
 					break;
 				case 'nightshade': case 'seismictoss': case 'superfang':
 					if (counter.damagingMoves.length > 2 || counter.setupType) rejected = true;
@@ -623,7 +625,8 @@ class RandomZUTeams extends RandomTeams {
 					if (hasMove['hex'] && hasMove['willowisp']) rejected = true;
 					break;
 				case 'shadowclaw':
-					if (hasMove['phantomforce'] || (hasMove['shadowball'] && counter.setupType !== 'Physical') || hasMove['shadowsneak']) rejected = true;
+					if (hasMove['phantomforce'] || hasMove['shadowforce'] || hasMove['shadowsneak']) rejected = true;
+					if (hasMove['shadowball'] && counter.setupType !== 'Physical') rejected = true;
 					break;
 				case 'shadowsneak':
 					if (hasType['Ghost'] && template.types.length > 1 && counter.stab < 2) rejected = true;
@@ -1076,6 +1079,9 @@ class RandomZUTeams extends RandomTeams {
 			if (abilities.includes('Hydration') && !hasMove['sleeptalk'] && (hasMove['raindance'] || teamDetails['rain'])) {
 				ability = 'Hydration';
 			}
+			if (abilities.includes('Insomnia') && hasMove['skillswap']) {
+				ability = 'Insomnia';
+			}
 			if (abilities.includes('Prankster') && counter.Status > 1) {
 				ability = 'Prankster';
 			}
@@ -1145,6 +1151,8 @@ class RandomZUTeams extends RandomTeams {
 			item = 'Stick';
 		} else if (template.species === 'Kadabra') {
 			item = (hasMove['counter']) ? 'Focus Sash' : 'Life Orb';
+		} else if (template.species === 'Komala' && hasMove['sleeptalk']) {
+			item = this.randomChance(3, 5) ? 'Choice Scarf' : 'Choice Band';
 		} else if (template.species === 'Kommo-o' && !teamDetails.zMove) {
 			item = hasMove['clangingscales'] ? 'Kommonium Z' : 'Dragonium Z';
 		} else if (template.baseSpecies === 'Lycanroc' && hasMove['stoneedge'] && counter.setupType && !teamDetails.zMove) {
@@ -1216,6 +1224,8 @@ class RandomZUTeams extends RandomTeams {
 			item = 'Firium Z';
 		} else if ((hasMove['fly'] || ((hasMove['bounce'] || (hasAbility['Gale Wings'] && hasMove['bravebird'])) && counter.setupType) || hasMove['mirrormove']) && !teamDetails.zMove) {
 			item = 'Flyinium Z';
+		} else if (hasMove['skyattack']) {
+			item = (ability === 'Unburden' || teamDetails.zMove) ? 'Power Herb' : 'Flyinium Z';
 		} else if (hasMove['solarbeam'] && !hasAbility['Drought'] && !hasMove['sunnyday'] && !teamDetails['sun']) {
 			item = !teamDetails.zMove ? 'Grassium Z' : 'Power Herb';
 		} else if (hasMove['psychup'] && !teamDetails.zMove) {
@@ -1313,10 +1323,10 @@ class RandomZUTeams extends RandomTeams {
 			item = 'Lustrous Orb';
 		} else if (counter.damagingMoves.length >= 3 && !!counter['speedsetup'] && template.baseStats.hp + template.baseStats.def + template.baseStats.spd >= 250) {
 			item = 'Weakness Policy';
-		} else if (slot === 0 && ability !== 'Regenerator' && ability !== 'Sturdy' && !counter['recoil'] && !counter['recovery'] && template.baseStats.hp + template.baseStats.def + template.baseStats.spd < 225) {
+		} else if (slot === 0 && ability !== 'Regenerator' && ability !== 'Sturdy' && !counter['recoil'] && !counter['recovery'] && template.baseStats.hp + template.baseStats.def + template.baseStats.spd < 185) {
 			item = 'Focus Sash';
 		} else if (counter.damagingMoves.length >= 3 && ability !== 'Sturdy' && !hasMove['acidspray'] && !hasMove['dragontail'] && !hasMove['foulplay'] && !hasMove['rapidspin'] && !hasMove['superfang'] && !counter['damage']) {
-			item = (template.baseStats.hp + template.baseStats.def + template.baseStats.spd < 225 || !!counter['speedsetup'] || hasMove['trickroom']) ? 'Life Orb' : 'Leftovers';
+			item = (template.baseStats.hp + template.baseStats.def + template.baseStats.spd < 185 || !!counter['speedsetup'] || hasMove['trickroom']) ? 'Life Orb' : 'Leftovers';
 
 		// This is the "REALLY can't think of a good item" cutoff
 		} else if (ability === 'Sturdy' && hasMove['explosion'] && !counter['speedsetup']) {
@@ -1364,18 +1374,18 @@ class RandomZUTeams extends RandomTeams {
 			};
 			let customScale = {
 				// S Rank, new additions
-				Altaria: 77, Floatzel: 77, "Gourgeist-Super": 77, Komala: 77, Pyukumuku: 77, Swanna: 77,
+				Floatzel: 77,
 				
 				// A+ Rank
-				Golem: 78, Kecleon: 78, Mareanie: 78, Monferno: 78, Pinsir: 78,
+				Golem: 78, Kecleon: 78, Komala: 78, Mareanie: 78, Monferno: 78, Pinsir: 78,
 				
 				// A Rank
-				Abomasnow: 79, Bronzor: 79, Chatot: 79, Combusken: 79, Crustle: 79, Grumpig: 79, Kadabra: 79,
+				Abomasnow: 79, Altaria: 79, Bronzor: 79, Chatot: 79, Combusken: 79, Crustle: 79, "Gourgeist-Super": 79, Grumpig: 79, Kadabra: 79,
 				"Mr. Mime": 79, Muk: 79, Probopass: 79, Rapidash: 79, "Silvally-Fighting": 79, Vigoroth: 79,
 				
 				// A- Rank
-				Beheeyem: 80, Bouffalant: 80, "Dugtrio-Alola": 80, Electivire: 80, Oricorio: 80, "Silvally-Dragon": 80,
-				"Silvally-Water": 80, Simipour: 80, Tangela: 80, Zebstrika: 80,
+				Beheeyem: 80, Bouffalant: 80, "Dugtrio-Alola": 80, Electivire: 80, Oricorio: 80, Pyukumuku: 80, "Silvally-Dragon": 80,
+				"Silvally-Water": 80, Simipour: 80, Swanna: 80, Tangela: 80, Zebstrika: 80,
 				
 				// B+ Rank
 				Gabite: 81, "Gourgeist-Large": 81, Granbull: 81, Leafeon: 81, Lickilicky: 81, Machoke: 81, Mawile: 81, Metang: 81, Misdreavus: 81,

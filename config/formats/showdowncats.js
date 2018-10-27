@@ -11,8 +11,9 @@ exports.Columns = {
 };
 
 exports.Sections = {
-	"SM Singles": { column: 1, sort: 1, },
-	"SM Doubles": { column: 1, sort: 2, },
+	"US/UM Singles": { column: 1, sort: 1, },
+	"US/UM Doubles": { column: 1, sort: 2, },
+	"US/UM Triples": { column: 1, sort: 3, },
 	
 	"ORAS Singles":			{ column: 2, sort: 1, },
 	"ORAS Doubles/Triples":	{ column: 2, sort: 2, },
@@ -23,6 +24,8 @@ exports.Sections = {
 	"BW2 Doubles":		{ column: 2, sort: 6, },
 	"B2/W2 Singles":	{ column: 2, sort: 5, },
 	"B2/W2 Doubles":	{ column: 2, sort: 6, },
+	"DPP Singles":		{ column: 2, sort: 7, },
+	"DPP Doubles":		{ column: 2, sort: 8, },
 	"Past Gens OU":		{ column: 2, sort: 9, },
 	"Past Generations":	{ column: 2, sort: 10, },
 	"RoA Spotlight":	{ column: 2, sort: 10, },

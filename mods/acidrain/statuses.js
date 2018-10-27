@@ -1,50 +1,30 @@
 "use strict";
 
 exports.BattleStatuses = {
-	raindance: {
+	primordialsea: {
 		effectType: 'Weather',
-		duration: 5,
-		onBasePower: function (basePower, attacker, defender, move) {
-			if (move.type === 'Water') {
-				this.debug('acid rain water supress');
-				return this.chainModify(0.75);
-			}
-			if (move.type === 'Fire') {
-				this.debug('acid rain fire suppress');
-				return this.chainModify(0.75);
-			}
+		duration: 0,
+		onImmunity: function (type) {
+			if (type == 'frz') return false;
 		},
 		onModifySpDPriority: 10,
 		onModifySpD: function (spd, pokemon) {
-			if (pokemon.hasType('Rock') && this.isWeather('RainDance')) {
-				return this.modify(spd, 1.5);
-			}
+			if (pokemon.hasType('Rock')) return this.modify(spd, 1.5);
 		},
-		onImmunity: function (type) {
-			if (type === 'frz') return false;
-		},
-		onStart: function (battle, source, effect) {
-			if (effect && effect.effectType === 'Ability' && this.gen <= 5) {
-				this.effectData.duration = 0;
-				this.add('-weather', 'RainDance', '[from] ability: ' + effect, '[of] ' + source);
-			} else {
-				this.add('-weather', 'RainDance');
-			}
+		onWeatherModifyDamage: function (damage, attacker, defender, move) {
+			if (move.type === 'Water' || move.type == 'Fire') return this.chainModify(0.75);
 		},
 		onResidualOrder: 1,
 		onResidual: function () {
-			this.add('-weather', 'RainDance', '[upkeep]');
+			this.add('-weather', 'PrimordialSea', '[upkeep]');
 			this.eachEvent('Weather');
 		},
-		onWeather: function (target) {
-			if (target.runImmunity('sandstorm') && target.runImmunity('hail')) {
-				this.damage(target.maxhp / 8);
-			} else if ((!target.runImmunity('sandstorm') && target.runImmunity('hail')) || (target.runImmunity('sandstorm') && !target.runImmunity('hail'))) {
-				this.damage(target.maxhp / 16);
-			}
+		onStart: function (battle, source, effect) {
+			this.add('-weather', 'PrimordialSea');
 		},
-		onEnd: function () {
-			this.add('-weather', 'none');
+		onWeather: function (target) {
+			this.damage(target.maxhp / 16, target, null, "sandstorm");
+			this.damage(target.maxhp / 16, target, null, "hail");
 		},
 	},
 };

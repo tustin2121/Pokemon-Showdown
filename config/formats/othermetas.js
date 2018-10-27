@@ -2,6 +2,61 @@
 
 exports.Formats = [
 	
+	// Triples
+	///////////////////////////////////////////////////////////////////
+	
+	{
+		name: "[Gen 7] Random Triples Battle",
+		section: "US/UM Triples",
+		threads: [`&bullet; <a href="https://www.smogon.com/forums/threads/3601525/">Sets and Suggestions</a>`],
+		
+		mod: 'gen7',
+		gameType: 'triples',
+		team: 'random',
+		ruleset: ['PotD', 'Pokemon', 'HP Percentage Mod', 'Cancel Mod'],
+	},
+	{
+		name: "[Gen 7] Triples OU",
+		section: "US/UM Triples",
+		threads: [
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3634611/">Triples OU Metagame Discussion</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3623347/">Triples OU Viability Rankings</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3590987/">Triples OU Sample Teams</a>`,
+		],
+
+		mod: 'gen7',
+		gameType: 'triples',
+		ruleset: ['Pokemon', 'Standard Doubles', 'Swagger Clause', 'Team Preview'],
+		banlist: ['DUber', 'Power Construct', 'Eevium Z', 'Dark Void', 'Gravity ++ Grass Whistle', 'Gravity ++ Hypnosis', 'Gravity ++ Lovely Kiss', 'Gravity ++ Sing', 'Gravity ++ Sleep Powder'],
+	},
+	{
+		name: "[Gen 7] Triples Ubers",
+		section: "US/UM Triples",
+		
+		mod: 'gen7',
+		gameType: 'triples',
+		ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
+		banlist: ['Dark Void'],
+	},
+	{
+		name: "[Gen 7] Triples UU",
+		section: "US/UM Triples",
+		threads: [`&bullet; <a href="https://www.smogon.com/forums/threads/3598014/">Triples UU Metagame Discussion</a>`],
+		
+		mod: 'gen7',
+		gameType: 'triples',
+		ruleset: ['[Gen 7] Triples OU'],
+		banlist: ['DOU', 'DBL'],
+	},
+	{
+		name: "[Gen 7] Triples Anything Goes",
+		section: "US/UM Triples",
+
+		mod: 'gen7',
+		gameType: 'triples',
+		ruleset: ['Pokemon Plus', 'Endless Battle Clause', 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Allow Fake'],
+	},
+	
 	// Recategorize Metas
 	///////////////////////////////////////////////////////////////////
 	
@@ -46,17 +101,24 @@ exports.Formats = [
 	///////////////////////////////////////////////////////////////////
 	
 	{
-		name: "[Gen 0] Acid Rain",
+		name: "[Gen 7] Acid Rain",
+        desc: "All four types of weather are active 100% of the time.",
+        threads: [
+            "&bullet; <a href=\"https://www.smogon.com/forums/threads/3518506/\">Acid Rain</a>",
+        ],
 		section: "Other Metagames",
 
 		mod: 'acidrain',
+		ruleset: ['[Gen 7] Ubers'],
+        banlist: ['Weather Ball', 'Castform'],
+		
 		onBegin: function () {
-			this.setWeather('raindance');
-			delete this.weatherData.duration;
-			this.add('-message', "Eh, close enough.");
-		},
-		ruleset: ['OU'],
-		banlist: ['Weather Ball', 'Castform'],
+            this.setWeather('primordialsea');
+            this.add('-message', 'The pH of this heavy rain seems to be quite low!');
+        },
+        onSetWeather: function (target, source, weather) {
+            return weather.id === 'primordialsea';
+        },
 		
 		__subsort: -1,
 	},
@@ -64,7 +126,7 @@ exports.Formats = [
 		name: "[Gen 0] Old School Machops",
 		section: "Other Metagames",
 		
-		ruleset: ['Ubers'],
+		ruleset: ['[Gen 7] Ubers'],
 		banlist: [],
 		onValidateSet: function (set) {
 			let moves = set.moves;
@@ -83,7 +145,7 @@ exports.Formats = [
 		name: "[Gen 0] 5 Star Battalion",
 		section: "Other Metagames",
 		
-		ruleset: ['Ubers Plus', 'Allow More Moves'],
+		ruleset: ['[Gen 7] Ubers', 'Allow More Moves'],
 		onValidateSet: function (set) {
 			if (set.moves && set.moves.length > 5) {
 				return [(set.name || set.species) + ' has more than five moves.'];
@@ -96,7 +158,7 @@ exports.Formats = [
 		section: "Other Metagames",
 
 		mod: 'extremetiershift',
-		ruleset: ['Ubers'],
+		ruleset: ['[Gen 7] Ubers'],
 		banlist: ['Eviolite'],
 	},
 	{
@@ -105,7 +167,7 @@ exports.Formats = [
 		section: "Other Metagames",
 
 		gameType: 'doubles',
-		ruleset: ['Balanced Hackmons'],
+		ruleset: ['[Gen 7] Balanced Hackmons'],
 		banlist: [],
 		
 		// __subsort: subSortOf => subSortOf("Balanced Hackmons")+0.1,
@@ -118,7 +180,7 @@ exports.Formats = [
 		],
 		section: "Other Metagames",
 
-		ruleset: ['OU'],
+		ruleset: ['[Gen 7] OU'],
 		banlist: ['Pinsirite'],
 		onModifyMovePriority: 2,
 		onModifyMove: function (move, pokemon) {
@@ -228,7 +290,7 @@ exports.Formats = [
 		section: "Other Metagames",
 
 		mod: 'accessorize',
-		ruleset: ['Ubers'],
+		ruleset: ['[Gen 7] Ubers'],
 		onValidateSet: function (set) {
 			let template = this.getTemplate(set.species || set.name);
 			let item = this.getItem(set.item);
@@ -459,7 +521,8 @@ exports.Formats = [
 		name: "[Gen 7] Ubers Plus",
 		mod: 'gen7',
 		section: "US/UM Singles",
-		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
+		ruleset: ['Pokemon Plus', 'Standard', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
+		banlist: ['Baton Pass'],
 		__subsort: subSortOf => subSortOf("[Gen 7] Ubers")+0.1,
 	},
 	{
@@ -469,7 +532,86 @@ exports.Formats = [
 		],
 		section: "Other Metagames",
 		mod: 'reverse',
-		ruleset: ['Pokemon Plus', 'Standard', 'Swagger Clause', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
+		ruleset: ['Pokemon Plus', 'Standard', 'Team Preview', 'Mega Rayquaza Clause', 'Allow Fake'],
+		banlist: ['Baton Pass'],
+	},
+	/**
+	Code:
+	- formats.js https://github.com/XpRienzo/DragonHeaven/blob/master/config/formats.js#L3663
+	- /mods/pic https://github.com/XpRienzo/DragonHeaven/tree/master/mods/pic
+	
+	Status:
+	- Everything works as intended
+	*/
+	{
+		name: "[Gen 7] Partners in Crime",
+		section: "Other Metagames",
+		desc: [
+			"Doubles-based metagame where both active ally Pok&eacute;mon share abilities and moves.",
+			"&bullet; <a href=\"http://www.smogon.com/forums/threads/3618488/\">Partners in Crime</a>",
+		],
+
+		mod: 'pic',
+		gameType: 'doubles',
+		ruleset: ['[Gen 7] Doubles OU', 'Sleep Clause Mod'],
+		banlist: ['Huge Power', 'Imposter', 'Parental Bond', 'Pure Power', 'Wonder Guard', 'Kangaskhanite', 'Mawilite', 'Medichamite', 'Mimic', 'Sketch', 'Transform'],
+		onDisableMovePriority: -1,
+		onSwitchInPriority: 2,
+		onSwitchIn: function (pokemon) {
+			if (this.p1.active.every(ally => ally && !ally.fainted)) {
+				let p1a = this.p1.active[0], p1b = this.p1.active[1];
+				if (p1a.ability !== p1b.ability) {
+					let p1a_innate = 'ability' + p1b.ability;
+					p1a.volatiles[p1a_innate] = {id: p1a_innate, target: p1a};
+					let p1b_innate = 'ability' + p1a.ability;
+					p1b.volatiles[p1b_innate] = {id: p1b_innate, target: p1b};
+				}
+			}
+			if (this.p2.active.every(ally => ally && !ally.fainted)) {
+				let p2a = this.p2.active[0], p2b = this.p2.active[1];
+				if (p2a.ability !== p2b.ability) {
+					let p2a_innate = 'ability' + p2b.ability;
+					p2a.volatiles[p2a_innate] = {id: p2a_innate, target: p2a};
+					let p2b_innate = 'ability' + p2a.ability;
+					p2b.volatiles[p2b_innate] = {id: p2b_innate, target: p2b};
+				}
+			}
+			let ally = pokemon.side.active.find(ally => ally && ally !== pokemon && !ally.fainted);
+			if (ally && ally.ability !== pokemon.ability) {
+				if (!pokemon.innate) {
+					pokemon.innate = 'ability' + ally.ability;
+					delete pokemon.volatiles[pokemon.innate];
+					pokemon.addVolatile(pokemon.innate);
+				}
+				if (!ally.innate) {
+					ally.innate = 'ability' + pokemon.ability;
+					delete ally.volatiles[ally.innate];
+					ally.addVolatile(ally.innate);
+				}
+			}
+		},
+		onSwitchOut: function (pokemon) {
+			if (pokemon.innate) {
+				pokemon.removeVolatile(pokemon.innate);
+				delete pokemon.innate;
+			}
+			let ally = pokemon.side.active.find(ally => ally && ally !== pokemon && !ally.fainted);
+			if (ally && ally.innate) {
+				ally.removeVolatile(ally.innate);
+				delete ally.innate;
+			}
+		},
+		onFaint: function (pokemon) {
+			if (pokemon.innate) {
+				pokemon.removeVolatile(pokemon.innate);
+				delete pokemon.innate;
+			}
+			let ally = pokemon.side.active.find(ally => ally && ally !== pokemon && !ally.fainted);
+			if (ally && ally.innate) {
+				ally.removeVolatile(ally.innate);
+				delete ally.innate;
+			}
+		},
 	},
 	{
 		name: '[Gen 7] Snowball Fight',
@@ -502,6 +644,34 @@ exports.Formats = [
 					this.win(this.p2);
 				}
 			}
+		},
+	},
+	{
+		name: "[Gen 7] Scalemons",
+		section: "Other Metagames",
+		desc: `Every Pok&eacute;mon's stats, barring HP, are scaled to give them a BST as close to 600 as possible.`,
+		threads: [
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3607934/">Scalemons</a>`,
+		],
+		
+		mod: 'gen7',
+		ruleset: ['Pokemon', 'Standard', 'Team Preview'],
+		banlist: [
+			'Carvanha', 'Gengar-Mega', 'Mawile-Mega', 'Medicham-Mega', 'Shedinja', 'Arena Trap', 'Shadow Tag', 'Deep Sea Scale',
+			'Deep Sea Tooth', 'Eevium Z', 'Eviolite', 'Light Ball', 'Thick Club', 'Baton Pass',
+		],
+		onModifyTemplate: function (template, target, source) {
+			template = Object.assign({}, template);
+			template.baseStats = Object.assign({}, template.baseStats);
+			let stats = ['atk', 'def', 'spa', 'spd', 'spe'];
+			// @ts-ignore
+			let pst = stats.map(stat => template.baseStats[stat]).reduce((x, y) => x + y);
+			let scale = 600 - template.baseStats['hp'];
+			for (const stat of stats) {
+				// @ts-ignore
+				template.baseStats[stat] = this.clampIntRange(template.baseStats[stat] * scale / pst, 1, 255);
+			}
+			return template;
 		},
 	},
 	/*

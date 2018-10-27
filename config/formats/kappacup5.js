@@ -382,7 +382,7 @@ exports.Formats = [
 		desc: ["&bullet; <a href=\"http://www.smogon.com/forums/threads/3588652/\">Pokebilities</a>: A Pokemon has all of its abilities active at the same time."],
 		mod: 'pokebilities',
 		ruleset: ["[Gen 7] Ubers"],
-		banlist: ["Blaziken"],
+		banlist: ["Blaziken", "Moody"],
 		onSwitchInPriority: 1,
 		onBegin: function() {
 			// let statusability = {
@@ -403,7 +403,8 @@ exports.Formats = [
 					let pokemon = this.sides[p].pokemon[i];
 					let template = this.getTemplate(pokemon.species);
 					pokemon.innates = [];
-					let banned = this.data.Formats[toId("[Gen 7] OU")].banlist.concat("Battle Bond").map(x=>toId(x));
+					let banned = this.data.Formats[toId("[Gen 7] OU")].banlist
+						.concat("Battle Bond", "Moody").map(x=>toId(x));
 					for (let a in template.abilities) {
 						let abilityid = toId(template.abilities[a]);
 						if (banned.includes(abilityid)) continue;
