@@ -103,7 +103,7 @@ exports.BattleMovedex = {
 				}
 			},
 		},
-		secondary: false,
+		secondary: null,
 		target: "any",
 		type: "Flying",
 		zMovePower: 175,
@@ -124,6 +124,7 @@ exports.BattleMovedex = {
 		onModifyMove: function (move, source) {
 			if (!source.volatiles['skydrop']) {
 				move.accuracy = true;
+				move.flags.contact = 0;
 			}
 		},
 		onMoveFail: function (target, source) {
@@ -140,7 +141,6 @@ exports.BattleMovedex = {
 
 				if (target.hasType('Flying')) {
 					this.add('-immune', target, '[msg]');
-					this.add('-end', target, 'Sky Drop');
 					return null;
 				}
 			} else {
@@ -162,10 +162,6 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			duration: 2,
-			onStart: function () {
-				this.effectData.source.removeVolatile('followme');
-				this.effectData.source.removeVolatile('ragepowder');
-			},
 			onAnyDragOut: function (pokemon) {
 				if (pokemon === this.effectData.target || pokemon === this.effectData.source) return false;
 			},
@@ -177,6 +173,7 @@ exports.BattleMovedex = {
 			onFoeBeforeMovePriority: 12,
 			onFoeBeforeMove: function (attacker, defender, move) {
 				if (attacker === this.effectData.source) {
+					this.effectData.source.activeTurns--;
 					this.debug('Sky drop nullifying.');
 					return null;
 				}
@@ -187,7 +184,7 @@ exports.BattleMovedex = {
 				if (this.effectData.source.fainted) return;
 				return this.effectData.source;
 			},
-			onAnyAccuracy: function (accuracy, target, source, move) {
+			onAnyTryImmunity: function (target, source, move) {
 				if (target !== this.effectData.target && target !== this.effectData.source) {
 					return;
 				}
@@ -204,7 +201,7 @@ exports.BattleMovedex = {
 					return;
 				}
 				if (source.volatiles['lockon'] && target === source.volatiles['lockon'].source) return;
-				return 0;
+				return false;
 			},
 			onAnyBasePower: function (basePower, target, source, move) {
 				if (target !== this.effectData.target && target !== this.effectData.source) {
@@ -223,7 +220,7 @@ exports.BattleMovedex = {
 				}
 			},
 		},
-		secondary: false,
+		secondary: null,
 		target: "any",
 		type: "Flying",
 		zMovePower: 120,
@@ -234,7 +231,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "Raises the user's evasiveness by 2 stages. Whether or not the user's evasiveness was changed, Body Slam, Dragon Rush, Flying Press, Heat Crash, Heavy Slam, Phantom Force, Shadow Force, Steamroller, Stomp, T-Body Slam, T-Stomp and Shadow Dive will not check accuracy and have their damage doubled if used against the user while it is active.",
+		desc: "Raises the user's evasiveness by 2 stages. Whether or not the user's evasiveness was changed, Body Slam, Dragon Rush, Flying Press, Heat Crash, Heavy Slam, Malicious Moonsault, Steamroller, Stomp, T-Body Slam and T-Stomp will not check accuracy and have their damage doubled if used against the user while it is active.",
 		shortDesc: "Raises the user's evasiveness by 2.",
 		id: "minimize",
 		name: "Minimize",
@@ -245,12 +242,12 @@ exports.BattleMovedex = {
 		effect: {
 			noCopy: true,
 			onSourceModifyDamage: function (damage, source, target, move) {
-				if (move.id in {'stomp':1, 'steamroller':1, 'bodyslam':1, 'flyingpress':1, 'dragonrush':1, 'phantomforce':1, 'heatcrash':1, 'shadowforce':1, 'heavyslam':1, 'tbodyslam':1, 'tstomp':1, 'shadowdive':1}) {
+				if (['stomp', 'steamroller', 'bodyslam', 'flyingpress', 'dragonrush', 'heatcrash', 'heavyslam', 'maliciousmoonsault', 'tbodyslam', 'tstomp'].includes(move.id)) {
 					return this.chainModify(2);
 				}
 			},
 			onAccuracy: function (accuracy, target, source, move) {
-				if (move.id in {'stomp':1, 'steamroller':1, 'bodyslam':1, 'flyingpress':1, 'dragonrush':1, 'phantomforce':1, 'heatcrash':1, 'shadowforce':1, 'heavyslam':1, 'tbodyslam':1, 'tstomp':1}) {
+				if (['stomp', 'steamroller', 'bodyslam', 'flyingpress', 'dragonrush', 'heatcrash', 'heavyslam', 'maliciousmoonsault', 'tbodyslam', 'tstomp'].includes(move.id)) {
 					return true;
 				}
 				return accuracy;
@@ -259,7 +256,7 @@ exports.BattleMovedex = {
 		boosts: {
 			evasion: 2,
 		},
-		secondary: false,
+		secondary: null,
 		target: "self",
 		type: "Normal",
 		zMoveEffect: 'clearnegativeboost',
@@ -289,7 +286,7 @@ exports.BattleMovedex = {
 		onHit: function (target) {
 			this.add('-message', "Unknown opcode fc at " + (63784 + this.random(150)).toString(16));
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Cooltrainer♀",
 	},
@@ -311,7 +308,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Vine Whip');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Type 64",
 	},
@@ -335,7 +332,7 @@ exports.BattleMovedex = {
 		boosts: {
 			evasion: 2,
 		},
-		secondary: false,
+		secondary: null,
 		target: "self",
 		type: "Type 81",
 	},
@@ -355,7 +352,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Cut');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Ghost",
 	},
@@ -380,7 +377,7 @@ exports.BattleMovedex = {
 			this.faint(source);
 		},
 		selfdestruct: "always",
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Type 53",
 	},
@@ -400,7 +397,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove("[still]");
 		},
-		secondary: false,
+		secondary: null,
 		target: "self",
 		type: "Normal",
 	},
@@ -420,7 +417,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[still]');
 		},
-		secondary: false,
+		secondary: null,
 		target: "self",
 		type: "Normal",
 	},
@@ -441,7 +438,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Scratch');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Type 83",
 	},
@@ -463,7 +460,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Fly');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Type 35",
 	},
@@ -479,6 +476,7 @@ exports.BattleMovedex = {
 		desc: "Damage doubles if the target is using Bounce, Fly, or Sky Drop.",
 		shortDesc: "Power doubles during Fly, Bounce, and Sky Drop.",
 		id: "tgust",
+		isNonstandard: true,
 		name: "T-Gust",
 		pp: 35,
 		priority: 0,
@@ -486,7 +484,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Gust');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Electric",
 		zMovePower: 100,
@@ -500,6 +498,7 @@ exports.BattleMovedex = {
 		desc: "This move does not check accuracy.",
 		shortDesc: "This move does not check accuracy.",
 		id: "decision",
+		isNonstandard: true,
 		name: "Decision",
 		pp: 20,
 		priority: 0,
@@ -507,7 +506,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Judgment');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Dragon",
 		zMovePower: 120,
@@ -521,6 +520,7 @@ exports.BattleMovedex = {
 		desc: "This move does not check accuracy.",
 		shortDesc: "This move does not check accuracy.",
 		id: "trazorwind",
+		isNonstandard: true,
 		name: "T-Razor Wind",
 		pp: 20,
 		priority: 0,
@@ -528,7 +528,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Razor Wind');
 		},
-		secondary: false,
+		secondary: null,
 		target: "any",
 		type: "Flying",
 		zMovePower: 120,
@@ -542,6 +542,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to paralyze the target. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
 		shortDesc: "30% chance to paralyze the target.",
 		id: "tbodyslam",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Body Slam",
 		pp: 15,
@@ -567,6 +568,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to paralyze the target.",
 		shortDesc: "30% chance to paralyze the target.",
 		id: "tforcepalm",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Force Palm",
 		pp: 15,
@@ -592,6 +594,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to flinch the target.",
 		shortDesc: "20% chance to flinch the target.",
 		id: "textrasensory",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Extrasensory",
 		pp: 15,
@@ -617,6 +620,7 @@ exports.BattleMovedex = {
 		desc: "If this move is successful and the user has not fainted, the effects of Leech Seed and partial-trapping moves end for the user, and all hazards are removed from the user's side of the field.",
 		shortDesc: "Frees user from hazards/partial trap/Leech Seed.",
 		id: "ttwister",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Twister",
 		pp: 30,
@@ -641,7 +645,7 @@ exports.BattleMovedex = {
 				}
 			},
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Electric",
 		zMovePower: 100,
@@ -655,6 +659,7 @@ exports.BattleMovedex = {
 		desc: "Has a higher chance for a critical hit.",
 		shortDesc: "High critical hit ratio.",
 		id: "taeroblast",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Aeroblast",
 		pp: 10,
@@ -664,7 +669,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Aeroblast');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Electric",
 		zMovePower: 175,
@@ -678,6 +683,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to lower the target's Speed by 1 stage.",
 		shortDesc: "30% chance to lower the target's Speed by 1.",
 		id: "tsilverwind",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Silver Wind",
 		pp: 5,
@@ -705,6 +711,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to lower the target's Accuracy by 1 stage.",
 		shortDesc: "30% chance to lower the target's Accuracy by 1.",
 		id: "tflash",
+		isNonstandard: true,
 		name: "T-Flash",
 		pp: 15,
 		priority: 0,
@@ -731,6 +738,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to lower the target's Speed by 1 stage.",
 		shortDesc: "30% chance to lower the target's Speed by 1.",
 		id: "tmeteormash",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Meteor Mash",
 		pp: 5,
@@ -758,6 +766,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to lower the target's Defense by 1 stage.",
 		shortDesc: "30% chance to lower the target's Defense by 1.",
 		id: "steelfist",
+		isNonstandard: true,
 		isViable: true,
 		name: "Steel Fist",
 		pp: 10,
@@ -785,6 +794,7 @@ exports.BattleMovedex = {
 		desc: "Has a 10% chance to raise the user's Attack by 1 stage.",
 		shortDesc: "10% chance to raise the user's Attack by 1.",
 		id: "tstrength",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Strength",
 		pp: 15,
@@ -814,6 +824,7 @@ exports.BattleMovedex = {
 		desc: "No additional effect.",
 		shortDesc: "No additional effect.",
 		id: "tscratch",
+		isNonstandard: true,
 		name: "T-Scratch",
 		pp: 40,
 		priority: 0,
@@ -821,7 +832,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Scratch');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Steel",
 		zMovePower: 100,
@@ -835,6 +846,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to flinch the target.",
 		shortDesc: "30% chance to flinch the target.",
 		id: "tbite",
+		isNonstandard: true,
 		name: "T-Bite",
 		pp: 25,
 		priority: 0,
@@ -859,6 +871,7 @@ exports.BattleMovedex = {
 		desc: "Has a 70% chance to burn the user.",
 		shortDesc: "70% chance to burn the user.",
 		id: "trage",
+		isNonstandard: true,
 		name: "T-Rage",
 		pp: 15,
 		priority: 0,
@@ -885,6 +898,7 @@ exports.BattleMovedex = {
 		desc: "This move does not check accuracy.",
 		shortDesc: "This move does not check accuracy.",
 		id: "tcut",
+		isNonstandard: true,
 		name: "T-Cut",
 		pp: 20,
 		priority: 0,
@@ -892,7 +906,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Cut');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Steel",
 		zMovePower: 120,
@@ -906,6 +920,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to lower the target's Defense by 1 stage.",
 		shortDesc: "20% chance to lower the target's Defense by 1.",
 		id: "tcrunch",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Crunch",
 		pp: 15,
@@ -945,6 +960,7 @@ exports.BattleMovedex = {
 		desc: "If this move is successful, the user is locked into this move and cannot make another move until it misses, 5 turns have passed, or the attack cannot be used. Power doubles with each successful hit of this move and doubles again if Defense Curl was used previously by the user. If this move is called by Sleep Talk, the move is used for one turn.",
 		shortDesc: "Power doubles with each hit. Repeats for 5 turns.",
 		id: "tfurycutter",
+		isNonstandard: true,
 		name: "T-Fury Cutter",
 		pp: 20,
 		priority: 0,
@@ -971,7 +987,7 @@ exports.BattleMovedex = {
 				}
 			},
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Steel",
 		zMovePower: 100,
@@ -985,6 +1001,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to flinch the target.",
 		shortDesc: "20% chance to flinch the target.",
 		id: "killingbite",
+		isNonstandard: true,
 		isViable: true,
 		name: "Killing Bite",
 		pp: 10,
@@ -1010,6 +1027,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to lower the target's Defense by 1 stage.",
 		shortDesc: "20% chance to lower the target's Defense by 1.",
 		id: "braver",
+		isNonstandard: true,
 		isViable: true,
 		name: "Braver",
 		pp: 5,
@@ -1056,6 +1074,7 @@ exports.BattleMovedex = {
 		desc: "Deals damage to the target based on its weight. Power is 20 if less than 10kg, 40 if less than 25kg, 60 if less than 50kg, 80 if less than 100kg, 100 if less than 200kg, and 120 if greater than or equal to 200kg.",
 		shortDesc: "More power the heavier the target.",
 		id: "heatclaw",
+		isNonstandard: true,
 		isViable: true,
 		name: "Heat Claw",
 		pp: 20,
@@ -1065,7 +1084,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-animcustom', source, target, 'crushclaw', '{delay}300', '{status:tt}brn');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Rock",
 		zMovePower: 160,
@@ -1079,6 +1098,7 @@ exports.BattleMovedex = {
 		desc: "Hits two to five times. Has a 1/3 chance to hit two or three times, and a 1/6 chance to hit four or five times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Ability Skill Link, this move will always hit five times.",
 		shortDesc: "Hits 2-5 times in one turn.",
 		id: "tfuryswipes",
+		isNonstandard: true,
 		name: "T-Fury Swipes",
 		pp: 15,
 		priority: 0,
@@ -1087,7 +1107,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[anim] Fury Swipes');
 		},
 		multihit: [2, 5],
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Rock",
 		zMovePower: 100,
@@ -1101,6 +1121,7 @@ exports.BattleMovedex = {
 		desc: "Has a 50% chance to lower the target's Defense by 1 stage.",
 		shortDesc: "50% chance to lower the target's Defense by 1.",
 		id: "tcrushclaw",
+		isNonstandard: true,
 		name: "T-Crush Claw",
 		pp: 10,
 		priority: 0,
@@ -1127,6 +1148,7 @@ exports.BattleMovedex = {
 		desc: "No additional effect.",
 		shortDesc: "Usually goes first.",
 		id: "bladeflash",
+		isNonstandard: true,
 		isViable: true,
 		name: "Blade Flash",
 		pp: 30,
@@ -1136,7 +1158,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-animcustom', source, target, 'quickattack', '{delay}180', 'psychocut');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Steel",
 		zMovePower: 100,
@@ -1150,6 +1172,7 @@ exports.BattleMovedex = {
 		desc: "No additional effect.",
 		shortDesc: "Usually goes first.",
 		id: "tquickattack",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Quick Attack",
 		pp: 30,
@@ -1158,7 +1181,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Quick Attack');
 		},
-		secondary: false,
+		secondary: null,
 		target: "any",
 		type: "Flying",
 		zMovePower: 100,
@@ -1172,6 +1195,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to paralyze the target. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
 		shortDesc: "30% chance to paralyze the target.",
 		id: "tstomp",
+		isNonstandard: true,
 		name: "T-Stomp",
 		pp: 20,
 		priority: 0,
@@ -1196,6 +1220,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to flinch the target.",
 		shortDesc: "30% chance to flinch the target.",
 		id: "twingattack",
+		isNonstandard: true,
 		name: "T-Wing Attack",
 		pp: 25,
 		priority: 0,
@@ -1220,6 +1245,7 @@ exports.BattleMovedex = {
 		desc: "No additional effect.",
 		shortDesc: "No additional effect.",
 		id: "heartbreak",
+		isNonstandard: true,
 		isViable: true,
 		name: "Heart Break",
 		pp: 15,
@@ -1229,7 +1255,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-animcustom', source, target, 'shadowpunch', '{delay}350', '{status:tt}flinch');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Dark",
 		zMovePower: 120,
@@ -1262,6 +1288,7 @@ exports.BattleMovedex = {
 		desc: "Deals damage to the target based on its weight. Power is 20 if less than 10kg, 40 if less than 25kg, 60 if less than 50kg, 80 if less than 100kg, 100 if less than 200kg, and 120 if greater than or equal to 200kg.",
 		shortDesc: "More power the heavier the target.",
 		id: "mindbomb",
+		isNonstandard: true,
 		isViable: true,
 		name: "Mind Bomb",
 		pp: 20,
@@ -1271,7 +1298,7 @@ exports.BattleMovedex = {
 			this.attrLastMove('[still]');
 			this.add('-animcustom', source, target, "magnetbomb", "{delay}300", "{status:tt}confused");
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Bug",
 		zMovePower: 160,
@@ -1285,6 +1312,7 @@ exports.BattleMovedex = {
 		desc: "Has a 100% chance to flinch the target. Fails unless it is the user's first turn on the field.",
 		shortDesc: "Hits first. First turn out only. 100% flinch chance.",
 		id: "tfakeout",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Fake Out",
 		pp: 10,
@@ -1317,6 +1345,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to raise the user's Defense by 1 stage.",
 		shortDesc: "20% chance to raise the user's Defense by 1.",
 		id: "tancientpower",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Ancient Power",
 		pp: 5,
@@ -1346,6 +1375,7 @@ exports.BattleMovedex = {
 		desc: "This move can hit a target using Bounce, Fly, or Sky Drop.",
 		shortDesc: "Can hit Pokemon using Bounce, Fly, or Sky Drop.",
 		id: "soar",
+		isNonstandard: true,
 		isViable: true,
 		name: "Soar",
 		pp: 15,
@@ -1354,7 +1384,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Fly');
 		},
-		secondary: false,
+		secondary: null,
 		target: "any",
 		type: "Flying",
 		zMovePower: 175,
@@ -1368,6 +1398,7 @@ exports.BattleMovedex = {
 		desc: "Has a higher chance for a critical hit.",
 		shortDesc: "High critical hit ratio.",
 		id: "tslash",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Slash",
 		pp: 10,
@@ -1377,7 +1408,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Slash');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Rock",
 		zMovePower: 195,
@@ -1391,6 +1422,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to lower the target's accuracy by 1 stage.",
 		shortDesc: "30% chance to lower the target's accuracy by 1.",
 		id: "tmirrorshot",
+		isNonstandard: true,
 		name: "T-Mirror Shot",
 		pp: 10,
 		priority: 0,
@@ -1417,6 +1449,7 @@ exports.BattleMovedex = {
 		desc: "Has a 10% chance to confuse the target.",
 		shortDesc: "10% chance to confuse the target.",
 		id: "tsignalbeam",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Signal Beam",
 		pp: 15,
@@ -1442,6 +1475,7 @@ exports.BattleMovedex = {
 		desc: "Prevents the target from switching out. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Parting Shot, U-turn, or Volt Switch. If the target leaves the field using Baton Pass, the replacement will remain trapped. The effect ends if the user leaves the field.",
 		shortDesc: "The target cannot switch out.",
 		id: "jamming",
+		isNonstandard: true,
 		name: "Jamming",
 		pp: 5,
 		priority: 0,
@@ -1455,7 +1489,7 @@ exports.BattleMovedex = {
 				this.add('-fail', target);
 			}
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Bug",
 		zMoveBoost: {spd: 1},
@@ -1469,6 +1503,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to lower the target's accuracy by 1 stage.",
 		shortDesc: "30% chance to lower the target's accuracy by 1.",
 		id: "tmistball",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Mist Ball",
 		pp: 5,
@@ -1496,6 +1531,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to lower the target's Special Defense by 1 stage.",
 		shortDesc: "20% chance to lower the target's Sp. Def by 1.",
 		id: "tlusterpurge",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Luster Purge",
 		pp: 5,
@@ -1523,6 +1559,7 @@ exports.BattleMovedex = {
 		desc: "If the target lost HP, the user takes recoil damage equal to 33% the HP lost by the target, rounded half up, but not less than 1 HP.",
 		shortDesc: "Has 33% recoil.",
 		id: "tdoubleedge",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Double-Edge",
 		pp: 10,
@@ -1532,7 +1569,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Double-Edge');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Rock",
 		zMovePower: 190,
@@ -1546,6 +1583,7 @@ exports.BattleMovedex = {
 		desc: "This attack charges on the first turn and executes on the second. Raises the user's Defense by 1 stage on the first turn. If the user is holding a Power Herb, the move completes in one turn.",
 		shortDesc: "Raises user's Defense by 1 on turn 1. Hits turn 2.",
 		id: "tskullbash",
+		isNonstandard: true,
 		name: "T-Skull Bash",
 		pp: 10,
 		priority: 0,
@@ -1567,7 +1605,7 @@ exports.BattleMovedex = {
 		onPrepareHit: function (target, source, move) { // animation
 			this.attrLastMove('[anim] Skull Bash');
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Steel",
 		zMovePower: 195,
@@ -1581,6 +1619,7 @@ exports.BattleMovedex = {
 		desc: "Has a 10% chance to lower the target's Defense by 1 stage.",
 		shortDesc: "10% chance to lower the target's Defense by 1.",
 		id: "ticeball",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Ice Ball",
 		pp: 10,
@@ -1608,6 +1647,7 @@ exports.BattleMovedex = {
 		desc: "Has a 30% chance to flinch the target.",
 		shortDesc: "30% chance to flinch the target.",
 		id: "tastonish",
+		isNonstandard: true,
 		name: "T-Astonish",
 		pp: 25,
 		priority: 0,
@@ -1632,6 +1672,7 @@ exports.BattleMovedex = {
 		desc: "Has a 10% chance to lower the target's Special Defense by 1 stage.",
 		shortDesc: "10% chance to lower the target's Sp. Def by 1.",
 		id: "tshadowball",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Shadow Ball",
 		pp: 15,
@@ -1659,6 +1700,7 @@ exports.BattleMovedex = {
 		desc: "Has a 10% chance to confuse the target.",
 		shortDesc: "10% chance to confuse the target.",
 		id: "psyshot",
+		isNonstandard: true,
 		name: "Psyshot",
 		pp: 25,
 		priority: 0,
@@ -1683,6 +1725,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to paralyze the target.",
 		shortDesc: "20% chance to paralyze the target.",
 		id: "blackripple",
+		isNonstandard: true,
 		name: "Black Ripple",
 		pp: 25,
 		priority: 0,
@@ -1707,6 +1750,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to lower the target's Special Defense by 1 stage.",
 		shortDesc: "20% chance to lower the target's Sp. Def by 1.",
 		id: "thyperbeam",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Hyper Beam",
 		pp: 5,
@@ -1734,6 +1778,7 @@ exports.BattleMovedex = {
 		desc: "If this move is successful, it breaks through the target's Baneful Bunker, Detect, King's Shield, Protect, or Spiky Shield for this turn, allowing other Pokemon to attack the target normally. If the target's side is protected by Crafty Shield, Mat Block, Quick Guard, or Wide Guard, that protection is also broken for this turn and other Pokemon may attack the target's side normally. This attack charges on the first turn and executes on the second. On the first turn, the user avoids all attacks. If the user is holding a Power Herb, the move completes in one turn. Damage doubles and no accuracy check is done if the target has used Minimize while active.",
 		shortDesc: "Disappears turn 1. Hits turn 2. Breaks protection.",
 		id: "shadowdive",
+		isNonstandard: true,
 		isViable: true,
 		name: "Shadow Dive",
 		pp: 5,
@@ -1767,7 +1812,7 @@ exports.BattleMovedex = {
 				return 0;
 			},
 		},
-		secondary: false,
+		secondary: null,
 		target: "normal",
 		type: "Ghost",
 		zMovePower: 200,
@@ -1781,6 +1826,7 @@ exports.BattleMovedex = {
 		desc: "No additional effect.",
 		shortDesc: "Usually goes first.",
 		id: "gale",
+		isNonstandard: true,
 		isViable: true,
 		name: "Gale",
 		pp: 30,
@@ -1803,6 +1849,7 @@ exports.BattleMovedex = {
 		desc: "Raises the user's Special Attack by 1 stage.",
 		shortDesc: "Raises the user's Sp. Atk by 1.",
 		id: "batterycharge",
+		isNonstandard: true,
 		name: "Battery Charge",
 		pp: 40,
 		priority: 0,
@@ -1827,6 +1874,7 @@ exports.BattleMovedex = {
 		desc: "Prevents the target from switching for four or five turns (seven turns if the user is holding Grip Claw). Causes damage to the target equal to 1/8 of its maximum HP (1/6 if the user is holding Binding Band), rounded down, at the end of each turn during effect. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Parting Shot, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field, or if the target uses Rapid Spin or Substitute successfully. This effect is not stackable or reset by using this or another binding move.",
 		shortDesc: "Traps and damages the target for 4-5 turns.",
 		id: "twhirlpool",
+		isNonstandard: true,
 		name: "T-Whirlpool",
 		pp: 15,
 		priority: 0,
@@ -1849,6 +1897,7 @@ exports.BattleMovedex = {
 		desc: "If this move is successful and the user has not fainted, the effects of Leech Seed and binding moves end for the user, and all hazards are removed from the user's side of the field.",
 		shortDesc: "Frees user from hazards, binding, Leech Seed.",
 		id: "trapidspin",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Rapid Spin",
 		pp: 30,
@@ -1887,6 +1936,7 @@ exports.BattleMovedex = {
 		desc: "Lowers the user's Special Attack by 2 stages.",
 		shortDesc: "Lowers the user's Sp. Atk by 2.",
 		id: "thydrocannon",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Hydro Cannon",
 		pp: 5,
@@ -1914,6 +1964,7 @@ exports.BattleMovedex = {
 		desc: "Has a 20% chance to flinch the target.",
 		shortDesc: "20% chance to flinch the target.",
 		id: "tneedlearm",
+		isNonstandard: true,
 		isViable: true,
 		name: "T-Needle Arm",
 		pp: 15,
@@ -1936,6 +1987,7 @@ exports.BattleMovedex = {
 		desc: "If this attack was successful and the user has not fainted, it steals the target's held item if the user is not holding one. The target's item is not stolen if it is a Mail or Z-Crystal, or if the target is a Kyogre holding a Blue Orb, a Groudon holding a Red Orb, a Giratina holding a Griseous Orb, an Arceus holding a Plate, a Genesect holding a Drive, a Silvally holding a Memory, or a Pokemon that can Mega Evolve holding the Mega Stone for its species. Items lost to this move cannot be regained with Recycle or the Harvest Ability.",
 		shortDesc: "If the user has no item, it steals the target's.",
 		id: "wanting",
+		isNonstandard: true,
 		name: "Wanting",
 		pp: 25,
 		priority: 0,
@@ -1968,6 +2020,7 @@ exports.BattleMovedex = {
 		desc: "Has a 70% chance to raise the user's Special Attack by 1 stage.",
 		shortDesc: "70% chance to raise the user's Sp. Atk by 1.",
 		id: "tcharge",
+		isNonstandard: true,
 		name: "T-Charge",
 		pp: 10,
 		priority: 0,
@@ -1996,6 +2049,7 @@ exports.BattleMovedex = {
 		desc: "Lowers the target's Special Attack by 2 stages.",
 		shortDesc: "Lowers the target's Sp. Atk by 2.",
 		id: "tfaketears",
+		isNonstandard: true,
 		name: "T-Fake Tears",
 		pp: 20,
 		priority: 0,
@@ -2030,6 +2084,7 @@ exports.BattleMovedex = {
 		desc: "Power doubles if the user was hit by the target this turn.",
 		shortDesc: "Power doubles if user is damaged by the target.",
 		id: "splashing",
+		isNonstandard: true,
 		name: "Splashing",
 		pp: 10,
 		priority: -4,
@@ -2051,10 +2106,14 @@ exports.BattleMovedex = {
 		desc: "Prevents the target from switching for four or five turns (seven turns if the user is holding Grip Claw). Causes damage to the target equal to 1/8 of its maximum HP (1/6 if the user is holding Binding Band), rounded down, at the end of each turn during effect. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Parting Shot, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field, or if the target uses Rapid Spin or Substitute successfully. This effect is not stackable or reset by using this or another binding move.",
 		shortDesc: "Traps and damages the target for 4-5 turns.",
 		id: "twrap",
+		isNonstandard: true,
 		name: "T-Wrap",
 		pp: 15,
 		priority: 0,
 		flags: {contact: 1, protect: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Wrap');
+		},
 		volatileStatus: 'partiallytrapped',
 		secondary: null,
 		target: "normal",
@@ -2070,11 +2129,15 @@ exports.BattleMovedex = {
 		desc: "Burns the target.",
 		shortDesc: "Burns the target.",
 		id: "burnpowder",
+		isNonstandard: true,
 		isViable: true,
 		name: "Burn Powder",
 		pp: 15,
 		priority: 0,
 		flags: {powder: 1, protect: 1, reflectable: 1, mirror: 1},
+		onPrepareHit: function (target, source, move) { // animation
+			this.attrLastMove('[anim] Sleep Powder');
+		},
 		status: 'brn',
 		secondary: null,
 		target: "normal",

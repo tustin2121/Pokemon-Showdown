@@ -428,4 +428,282 @@ exports.Formats = [
 		},
 	},
 	
+	
+	// Playoffs
+	
+	// Wild Card Round: Commewnism
+	{
+		name: "[Gen 7] Wild Card: Commewnism",
+		section: "Kappa Kup Season 5 Playoffs",
+		threads: [
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3637068/">Ubers Metagame Discussion</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3623296/">Ubers Viability Rankings</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3639330/">Ubers Sample Teams</a>`,
+		],
+
+		mod: 'gen7',
+		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Baton Pass'],
+	},
+	
+	// Semifinals: CrossEvo
+	{
+		name: "[Gen 7] Semifinal: Cross Evolution",
+		section: "Kappa Kup Season 5 Playoffs",
+		threads: ["&bullet; <a href=\"https://www.smogon.com/forums/threads/3594854/\">Cross Evolution</a>"],
+
+		mod: 'gen7',
+		ruleset: ['[Gen 7] Ubers', 'Ignore Illegal Abilities'],
+		banlist: [],
+		onValidateTeam: function (team) {
+			let nameTable = {};
+			for (let i = 0; i < team.length; i++) {
+				let name = team[i].name;
+				if (name) {
+					if (nameTable[name]) {
+						return ["Your Pokémon must have different nicknames.", "(You have more than one " + name + ")"];
+					}
+					nameTable[name] = true;
+				}
+			}
+		},
+		checkLearnset: function (move, template, lsetData, set) {
+			if (!set.template) return this.checkLearnset(move, template, lsetData, set);
+			let problem = this.checkLearnset(move, set.template);
+			if (!problem) return false;
+			if (!set.crossMovesLeft) return problem;
+			if (this.checkLearnset(move, set.crossTemplate)) return problem;
+			set.crossMovesLeft--;
+			return false;
+		},
+		validateSet: function (set, teamHas) {
+			let crossTemplate = this.dex.getTemplate(set.name);
+			let problems = this.dex.getFormat('Pokemon').onChangeSet.call(this.dex, set, this.format) || [];
+			if (problems.length) return problems;
+			if (!crossTemplate.exists || crossTemplate.isNonstandard) return this.validateSet(set, teamHas);
+			let template = this.dex.getTemplate(set.species);
+			if (!template.exists || template.isNonstandard || template === crossTemplate) return this.validateSet(set, teamHas);
+			if (!template.nfe) return ["" + template.species + " cannot cross evolve because it doesn't evolve."];
+			if (crossTemplate.battleOnly || crossTemplate.isUnreleased || !crossTemplate.prevo) return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it isn't an evolution."];
+			if (template.species === 'Sneasel' || crossTemplate.species === 'Shedinja' || crossTemplate.species === 'Solgaleo' || crossTemplate.species === 'Lunala') return ["" + template.species + " cannot cross evolve into " + crossTemplate.species + " because it is banned."];
+			let crossPrevoTemplate = this.dex.getTemplate(crossTemplate.prevo);
+			if (!crossPrevoTemplate.prevo !== !template.prevo) return ["" + template.species + " cannot cross into " + crossTemplate.species + " because they are not consecutive evolutionary stages."];
+
+			// Make sure no stat is too high/low to cross evolve to
+			let stats = {'hp': 'HP', 'atk': 'Attack', 'def': 'Defense', 'spa': 'Special Attack', 'spd': 'Special Defense', 'spe': 'Speed'};
+			for (let statid in template.baseStats) {
+				let evoStat = template.baseStats[statid] + crossTemplate.baseStats[statid] - crossPrevoTemplate.baseStats[statid];
+				if (evoStat < 1) {
+					return ["" + template.species + " cannot cross evolve to " + crossTemplate.species + " because its " + stats[statid] + " would be too low."];
+				} else if (evoStat > 255) {
+					return ["" + template.species + " cannot cross evolve to " + crossTemplate.species + " because its " + stats[statid] + " would be too high."];
+				}
+			}
+
+			// Ability test
+			let ability = this.dex.getAbility(set.ability);
+			if ((ability.name !== 'Huge Power' && ability.name !== 'Pure Power' && ability.name !== 'Shadow Tag') || Object.values(template.abilities).includes(ability.name)) set.species = crossTemplate.species;
+			
+			set.template = template;
+			set.crossTemplate = crossTemplate;
+			set.crossMovesLeft = 2;
+			problems = this.validateSet(set, teamHas);
+			set.name = crossTemplate.species;
+			set.species = template.species;
+			return problems;
+		},
+		onModifyTemplate: function (template, target, effect) {
+			if (!effect) return;
+			if (target.set.name === target.set.species) return;
+			let crossTemplate = this.getTemplate(target.set.name);
+			if (!crossTemplate.exists) return;
+			if (template.battleOnly || !template.nfe) return;
+			if (crossTemplate.battleOnly || crossTemplate.isUnreleased || !crossTemplate.prevo) return;
+			let crossPrevoTemplate = this.getTemplate(crossTemplate.prevo);
+			if (!crossPrevoTemplate.prevo !== !template.prevo) return;
+
+			let mixedTemplate = Object.assign({}, template);
+			mixedTemplate.baseSpecies = mixedTemplate.species = template.species + '-' + crossTemplate.species;
+			mixedTemplate.weightkg = Math.max(0.1, (template.weightkg + crossTemplate.weightkg - crossPrevoTemplate.weightkg).toFixed(1));
+			mixedTemplate.nfe = false;
+			mixedTemplate.evos = [];
+			mixedTemplate.eggGroups = crossTemplate.eggGroups;
+			mixedTemplate.abilities = crossTemplate.abilities;
+
+			mixedTemplate.baseStats = {};
+			for (let statid in template.baseStats) {
+				mixedTemplate.baseStats[statid] = template.baseStats[statid] + crossTemplate.baseStats[statid] - crossPrevoTemplate.baseStats[statid];
+				if (mixedTemplate.baseStats[statid] < 1 || mixedTemplate.baseStats[statid] > 255) return;
+			}
+
+			mixedTemplate.types = template.types.slice();
+			if (crossTemplate.types[0] !== crossPrevoTemplate.types[0]) mixedTemplate.types[0] = crossTemplate.types[0];
+			if (crossTemplate.types[1] !== crossPrevoTemplate.types[1]) mixedTemplate.types[1] = crossTemplate.types[1] || crossTemplate.types[0];
+			if (mixedTemplate.types[0] === mixedTemplate.types[1]) mixedTemplate.types.length = 1;
+
+			target.crossEvolved = true;
+			return mixedTemplate;
+		},
+		onBegin: function () {
+			let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
+			for (let i = 0, len = allPokemon.length; i < len; i++) {
+				allPokemon[i].baseTemplate = allPokemon[i].template;
+			}
+		},
+	},
+	
+	// Semifinals: Partners in Crime
+	{
+		name: "[Gen 7] Semifinals: Partners in Crime",
+		section: "Kappa Kup Season 5 Playoffs",
+		desc: [
+			"Doubles-based metagame where both active ally Pok&eacute;mon share abilities and moves.",
+			"&bullet; <a href=\"http://www.smogon.com/forums/threads/3618488/\">Partners in Crime</a>",
+		],
+
+		mod: 'pic',
+		gameType: 'doubles',
+		ruleset: ['[Gen 7] Doubles OU', 'Sleep Clause Mod'],
+		banlist: ['Huge Power', 'Imposter', 'Parental Bond', 'Pure Power', 'Wonder Guard', 'Kangaskhanite', 'Mawilite', 'Medichamite', 'Mimic', 'Sketch', 'Transform'],
+		onDisableMovePriority: -1,
+		onSwitchInPriority: 2,
+		onSwitchIn: function (pokemon) {
+			if (this.p1.active.every(ally => ally && !ally.fainted)) {
+				let p1a = this.p1.active[0], p1b = this.p1.active[1];
+				if (p1a.ability !== p1b.ability) {
+					let p1a_innate = 'ability' + p1b.ability;
+					p1a.volatiles[p1a_innate] = {id: p1a_innate, target: p1a};
+					let p1b_innate = 'ability' + p1a.ability;
+					p1b.volatiles[p1b_innate] = {id: p1b_innate, target: p1b};
+				}
+			}
+			if (this.p2.active.every(ally => ally && !ally.fainted)) {
+				let p2a = this.p2.active[0], p2b = this.p2.active[1];
+				if (p2a.ability !== p2b.ability) {
+					let p2a_innate = 'ability' + p2b.ability;
+					p2a.volatiles[p2a_innate] = {id: p2a_innate, target: p2a};
+					let p2b_innate = 'ability' + p2a.ability;
+					p2b.volatiles[p2b_innate] = {id: p2b_innate, target: p2b};
+				}
+			}
+			let ally = pokemon.side.active.find(ally => ally && ally !== pokemon && !ally.fainted);
+			if (ally && ally.ability !== pokemon.ability) {
+				if (!pokemon.innate) {
+					pokemon.innate = 'ability' + ally.ability;
+					delete pokemon.volatiles[pokemon.innate];
+					pokemon.addVolatile(pokemon.innate);
+				}
+				if (!ally.innate) {
+					ally.innate = 'ability' + pokemon.ability;
+					delete ally.volatiles[ally.innate];
+					ally.addVolatile(ally.innate);
+				}
+			}
+		},
+		onSwitchOut: function (pokemon) {
+			if (pokemon.innate) {
+				pokemon.removeVolatile(pokemon.innate);
+				delete pokemon.innate;
+			}
+			let ally = pokemon.side.active.find(ally => ally && ally !== pokemon && !ally.fainted);
+			if (ally && ally.innate) {
+				ally.removeVolatile(ally.innate);
+				delete ally.innate;
+			}
+		},
+		onFaint: function (pokemon) {
+			if (pokemon.innate) {
+				pokemon.removeVolatile(pokemon.innate);
+				delete pokemon.innate;
+			}
+			let ally = pokemon.side.active.find(ally => ally && ally !== pokemon && !ally.fainted);
+			if (ally && ally.innate) {
+				ally.removeVolatile(ally.innate);
+				delete ally.innate;
+			}
+		},
+	},
+	
+	// Semifinals: Scalemons
+	{
+		name: "[Gen 7] Semifinals: Scalemons",
+		section: "Kappa Kup Season 5 Playoffs",
+		desc: `Every Pok&eacute;mon's stats, barring HP, are scaled to give them a BST as close to 600 as possible.`,
+		threads: [
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3607934/">Scalemons</a>`,
+		],
+		
+		mod: 'gen7',
+		ruleset: ['Pokemon', 'Standard', 'Team Preview'],
+		banlist: [
+			'Carvanha', 'Gengar-Mega', 'Mawile-Mega', 'Medicham-Mega', 'Shedinja', 'Arena Trap', 'Shadow Tag', 'Deep Sea Scale',
+			'Deep Sea Tooth', 'Eevium Z', 'Eviolite', 'Light Ball', 'Thick Club', 'Baton Pass',
+		],
+		onModifyTemplate: function (template, target, source) {
+			template = Object.assign({}, template);
+			template.baseStats = Object.assign({}, template.baseStats);
+			let stats = ['atk', 'def', 'spa', 'spd', 'spe'];
+			// @ts-ignore
+			let pst = stats.map(stat => template.baseStats[stat]).reduce((x, y) => x + y);
+			let scale = 600 - template.baseStats['hp'];
+			for (const stat of stats) {
+				// @ts-ignore
+				template.baseStats[stat] = this.clampIntRange(template.baseStats[stat] * scale / pst, 1, 255);
+			}
+			return template;
+		},
+	},
+	
+	// Finals: Ubers
+	{
+		name: "[Gen 7] Finals: Ubers",
+		section: "Kappa Kup Season 5 Playoffs",
+		threads: [
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3637068/">Ubers Metagame Discussion</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3623296/">Ubers Viability Rankings</a>`,
+			`&bullet; <a href="https://www.smogon.com/forums/threads/3639330/">Ubers Sample Teams</a>`,
+		],
+
+		mod: 'gen7',
+		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Mega Rayquaza Clause'],
+		banlist: ['Baton Pass'],
+	},
+	
+	// Finals: Alphabet Cup
+	{
+		name: "[Gen 7] Finals: Alphabet Cup",
+		section: "Kappa Kup Season 5 Playoffs",
+		desc: "Pok&eacute;mon may learn any move that starts with the same letter as their species.",
+		threads: [
+			"&bullet; <a href=\"https://www.smogon.com/forums/threads/3617977/\">Alphabet Cup</a>",
+		],
+
+		mod: 'gen7',
+		ruleset: ['[Gen 7] OU'],
+		banlist: ['Geomancy'],
+		restrictedMoves: ['Shell Smash', 'Sketch'],
+		checkLearnset: function (move, template, lsetData, set) {
+			if (!move.isZ && !this.format.restrictedMoves.includes(move.name) && move.id[0] === template.speciesid[0]) return false;
+			return this.checkLearnset(move, template, lsetData, set);
+		},
+		onValidateTeam: function (team) {
+			let nameTable = {};
+			for (let i = 0; i < team.length; i++) {
+				let species = team[i].species;
+				if (nameTable[species[0]]) return ["You are limited to one Pokemon per letter."];
+				nameTable[species[0]] = true;
+			}
+		},
+	},
+	
+	// Finals: Double Ubers
+	{
+		name: "[Gen 7] Finals: Doubles Ubers",
+		section: "Kappa Kup Season 5 Playoffs",
+
+		mod: 'gen7',
+		gameType: 'doubles',
+		ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
+		banlist: ['Dark Void'],
+	},
 ];

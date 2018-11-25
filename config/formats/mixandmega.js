@@ -10,6 +10,13 @@ function create(base, mod) {
 // Mix and Mega Expansion
 // Courtesy of https://github.com/urkerab/Pokemon-Showdown
 
+let restrictedStones = ['Beedrillite', 'Blazikenite', 'Kangaskhanite', 'Mawilite', 'Medichamite', 'Pidgeotite', 'Ultranecrozium Z'];
+let cannotMega = [
+	'Arceus', 'Deoxys', 'Deoxys-Attack', 'Deoxys-Speed', 'Dialga', 'Dragonite', 'Giratina', 'Groudon', 'Ho-Oh', 'Kyogre',
+	'Kyurem-Black', 'Kyurem-White', 'Lugia', 'Lunala', 'Marshadow', 'Mewtwo', 'Naganadel', 'Necrozma-Dawn-Wings', 'Necrozma-Dusk-Mane',
+	'Palkia', 'Pheromosa', 'Rayquaza', 'Regigigas', 'Reshiram', 'Slaking', 'Solgaleo', 'Xerneas', 'Yveltal', 'Zekrom',
+];
+
 let mmFormat = {
 	name: "[Gen 7] Mix and Mega",
 	section: "Mix and Mega",
@@ -26,38 +33,34 @@ let mmFormat = {
 	tournamentShow: false,
 	ruleset: ['Pokemon', 'Standard', 'Swagger Clause', 'Mega Rayquaza Clause', 'Team Preview'],
 	banlist: ['Baton Pass', 'Electrify'],
+	restrictedStones, //unaltered
+	cannotMega, //unaltered
 	onValidateTeam: function (team) {
 		let itemTable = {};
 		for (let i = 0; i < team.length; i++) {
 			let item = this.getItem(team[i].item);
 			if (!item) continue;
-			/* // Old rules:
-			if (!(item in itemTable)) {
-				itemTable[item] = 1;
-			} else if (itemTable[item] < 2) {
-				itemTable[item]++;
-			} else {
-				if (item.megaStone) return ["You are limited to two of each Mega Stone.", "(You have more than two " + this.getItem(item).name + ")"];
-				if (item.id === 'blueorb' || item.id === 'redorb') return ["You are limited to two of each Primal Orb.", "(You have more than two " + this.getItem(item).name + ")"];
-			}
-			/*/ // New rules:
+			/* //Old Rules:
 			if (!itemTable[item]) itemTable[item] = 0;
 			if (++itemTable[item] < 3) continue;
 			if (item.megaStone) return ["You are limited to one of each Mega Stone.", "(You have more than one " + item.name + ".)"];
 			if (item.id === 'blueorb' || item.id === 'redorb') return ["You are limited to one of each Primal Orb.", "(You have more than one " + item.name + ".)"];
+			/*/ // New Rules:
+			if (itemTable[item.id] && item.megaStone) return ["You are limited to one of each Mega Stone.", "(You have more than one " + this.getItem(item).name + ")"];
+			if (itemTable[item.id] && ['blueorb', 'redorb'].includes(item.id)) return ["You are limited to one of each Primal Orb.", "(You have more than one " + this.getItem(item).name + ")"];
+			itemTable[item.id] = true;
 			//*/
 		}
 	},
-	onValidateSet: function (set) {
+	onValidateSet: function (set, format) {
 		let template = this.getTemplate(set.species || set.name);
 		let item = this.getItem(set.item);
 		if (!item.megaEvolves && item.id !== 'blueorb' && item.id !== 'redorb' && item !== 'ultranecroziumz') return;
-		if (template.baseSpecies === item.megaEvolves || (template.baseSpecies === 'Groudon' && item.id === 'redorb') || (template.baseSpecies === 'Kyogre' && item.id === 'blueorb') || (template.baseSpecies === 'Necrozma' && item.id === 'ultranecroziumz')) return;
-		/* // Old rules:
-		if (template.evos.length) return ["" + template.species + " is not allowed to hold " + item.name + " because it's not fully evolved."];
-		let uberStones = ['beedrillite', 'blazikenite', 'gengarite', 'kangaskhanite', 'mawilite', 'medichamite'];
-		if (template.tier === 'Uber' || set.ability === 'Power Construct' || uberStones.includes(item.id)) return ["" + template.species + " is not allowed to hold " + item.name + "."];
-		/*/ // New rules:
+		if (template.baseSpecies === item.megaEvolves) return;
+		if (template.baseSpecies === 'Groudon' && item.id === 'redorb') return;
+		if (template.baseSpecies === 'Kyogre' && item.id === 'blueorb') return;
+		if (template.species.substr(0, 9) === 'Necrozma-' && item.id === 'ultranecroziumz') return;
+		/* // Old Rules:
 		if (template.nfe) return ["" + template.species + " is not allowed to hold " + item.name + " because it's not fully evolved."];
 		if (template.tier.endsWith('Uber') || set.ability === 'Power Construct') {
 			return [template.species + " is not allowed to hold a Mega Stone."];
@@ -75,12 +78,14 @@ let mmFormat = {
 			case 'ultranecroziumz':
 				return ["Ultranecrozium Z is only allowed to be held by Necrozma-Dawn-Wings or Necrozma-Dusk-Mane."];
 		}
+		/*/ //New Rules:
+		let uberStones = format.restrictedStones || [];
+		let uberPokemon = format.cannotMega || [];
+		if (uberPokemon.includes(template.name) || set.ability === 'Power Construct' || uberStones.includes(item.name)) return ["" + template.species + " is not allowed to hold " + item.name + "."];
 		//*/
 	},
 	onBegin: function () {
-		let allPokemon = this.p1.pokemon.concat(this.p2.pokemon);
-		for (let i = 0, len = allPokemon.length; i < len; i++) {
-			let pokemon = allPokemon[i];
+		for (const pokemon of this.p1.pokemon.concat(this.p2.pokemon)) {
 			pokemon.originalSpecies = pokemon.baseTemplate.species;
 		}
 	},

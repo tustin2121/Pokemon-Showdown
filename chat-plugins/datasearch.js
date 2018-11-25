@@ -129,7 +129,7 @@ exports.commands = {
 			if (Number.isInteger(num)) {
 				if (qty) return this.errorReply("Only specify the number of Pok\u00e9mon once.");
 				qty = num;
-				if (qty < 1 || 15 < qty) return this.errorReply("Number of random Pok\u00e9mon must be between 1 and 15.");
+				if (qty < 1 || 100 < qty) return this.errorReply("Number of random Pok\u00e9mon must be between 1 and 100.");
 				targetsBuffer.push(`random${qty}`);
 			} else {
 				targetsBuffer.push(arg);
@@ -271,7 +271,7 @@ exports.commands = {
 
 function runDexsearch(target, cmd, canAll, message) {
 	let searches = [];
-	let allTiers = {'uber': 'Uber', 'ubers': 'Uber', 'ou': 'OU', 'uubl': 'UUBL', 'uu': 'UU', 'rubl': 'RUBL', 'ru': 'RU', 'nubl': 'NUBL', 'nu': 'NU', 'publ': 'PUBL', 'pu': 'PU', 'zubl': 'ZUBL', 'zu': 'ZU', 'touhou': 'Touhou', 'prism': 'Prism', 'glitch': 'Glitch', 'nfe': 'NFE', 'lcuber': 'LC Uber', 'lcubers': 'LC Uber', 'lc': 'LC', 'cap': 'CAP', 'caplc': 'CAP LC', 'capnfe': 'CAP NFE', __proto__: null};
+	let allTiers = {'uber': 'Uber', 'ubers': 'Uber', 'ou': 'OU', 'uubl': 'UUBL', 'uu': 'UU', 'rubl': 'RUBL', 'ru': 'RU', 'nubl': 'NUBL', 'nu': 'NU', 'publ': 'PUBL', 'pu': 'PU', 'zubl': 'ZUBL', 'zu': 'ZU', 'touhou': 'Touhou', 'prism': 'Prism', 'glitch': 'Glitch', 'tppleague': 'TPPLeague', 'nfe': 'NFE', 'lcuber': 'LC Uber', 'lcubers': 'LC Uber', 'lc': 'LC', 'cap': 'CAP', 'caplc': 'CAP LC', 'capnfe': 'CAP NFE', __proto__: null};
 	let allDoublesTiers = {'doublesubers': 'DUber', 'doublesuber': 'DUber', 'duber': 'DUber', 'dubers': 'DUber', 'doublesou': 'DOU', 'dou': 'DOU', 'doublesbl': 'DBL', 'dbl': 'DBL', 'doublesuu': 'DUU', 'duu': 'DUU', __proto__: null};
 	let allTypes = Object.create(null);
 	for (let i in Dex.data.TypeChart) {

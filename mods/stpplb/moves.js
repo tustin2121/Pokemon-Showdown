@@ -286,7 +286,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "2-5 random moves are selected for use, other than After You, Assist, Belch, Celebrate, Copycat, Counter, Crafty Shield, Destiny Bond, Detect, Endure, Follow Me, Happy Hour, Helping Hand, Hold Hands, Hyperspace Fury, King's Shield, Mat Block, Me First, Mimic, Mirror Coat, Mirror Move, Nature Power, Protect, Quash, Quick Guard, Rage Powder, Relic Song, Sketch, Sleep Talk, Snatch, Snore, Spiky Shield, Struggle, Transform, or Wide Guard.",
+		desc: "2-5 random moves are selected for use, other than After You, Belch, Celebrate, Counter, Dark Void, Endure, Follow Me, Happy Hour, Helping Hand, Hold Hands, Hyperspace Fury, Me First, Mimic, Mirror Coat, Mirror Move, Quash, Quick Guard, Rage Powder, Sketch, Sleep Talk, Snatch, Snore, Transform, or Wide Guard.",
 		shortDesc: "Picks 2-5 random moves.",
 		id: "superglitch",
 		name: "(Super Glitch)",
@@ -333,9 +333,9 @@ exports.BattleMovedex = {
 			for (let i in exports.BattleMovedex) {
 				let move = exports.BattleMovedex[i];
 				if (i !== move.id) continue;
-				if (move.isNonstandard) continue;
+				// if (move.isNonstandard) continue;
 				let noMetronome = {
-					afteryou:1, assist:1, belch:1, celebrate:1, copycat:1, counter:1, craftyshield:1, destinybond:1, detect:1, endure:1, followme:1, happyhour:1, helpinghand:1, holdhands:1, hyperspacefury:1, kingsshield:1, matblock:1, mefirst:1, mimic:1, mirrorcoat:1, mirrormove:1, naturepower:1, protect:1, quash:1, quickguard:1, ragepowder:1, relicsong:1, sketch:1, sleeptalk:1, snatch:1, snore:1, spikyshield:1, struggle:1, transform:1, wideguard:1,
+					afteryou:1, belch:1, celebrate:1, counter:1, darkvoid:1, endure:1, followme:1, happyhour:1, helpinghand:1, holdhands:1, hyperspacefury:1, mefirst:1, mimic:1, mirrorcoat:1, mirrormove:1, quash:1, quickguard:1, ragepowder:1, sketch:1, sleeptalk:1, snatch:1, snore:1, transform:1, wideguard:1,
 				};
 				if (!noMetronome[move.id]) {
 					moves.push(move);

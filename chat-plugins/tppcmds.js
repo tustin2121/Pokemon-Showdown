@@ -8,7 +8,7 @@ exports.commands = {
 	
 	rollpkmn: 'rollpokemon',		
 	rollpokemon: function(target, room, user) {		
-		let number = Math.floor(Math.random() * 721) + 1;		
+		let number = Math.floor(Math.random() * 807) + 1;		
 		return this.parse("/dt "+number);		
 	},		
 	rollpokemonhelp: ["/rollpokemon - Randomly picks a pokemon from all possible pokemon, and displays its stats. The equivilant of '/roll 721', then '/dt <result>'."],

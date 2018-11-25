@@ -10,6 +10,14 @@ exports.BattleFormatsData = {
 		isNonstandard: true,
 		tier: "TPPLeague",
 	},
+	unownswarm: {
+		isNonstandard: true,
+		tier: "TPPLeague",
+	},
+	swarmofunown: {
+		isNonstandard: true,
+		tier: "TPPLeague",
+	},
 	
 	////////////////////////////////////
 	// Prism Fakemon

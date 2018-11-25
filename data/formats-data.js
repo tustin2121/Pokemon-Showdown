@@ -5246,7 +5246,7 @@ let BattleFormatsData = {
 	carracosta: {
 		randomBattleMoves: ["shellsmash", "aquajet", "liquidation", "stoneedge", "earthquake", "stealthrock"],
 		randomDoubleBattleMoves: ["shellsmash", "aquajet", "liquidation", "stoneedge", "earthquake", "protect", "wideguard", "rockslide"],
-		tier: "(PU)",
+		tier: "PU",
 		doublesTier: "DUU",
 	},
 	archen: {
@@ -6593,7 +6593,7 @@ let BattleFormatsData = {
 	crabominable: {
 		randomBattleMoves: ["icehammer", "closecombat", "earthquake", "stoneedge"],
 		randomDoubleBattleMoves: ["icehammer", "closecombat", "stoneedge", "protect", "wideguard", "earthquake"],
-		tier: "(PU)",
+		tier: "PU",
 		doublesTier: "DUU",
 	},
 	oricorio: {

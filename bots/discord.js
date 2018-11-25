@@ -304,7 +304,7 @@ class DiscordBot extends Bot {
 			return `${obj.name} | ${obj.desc}`;
 		});
 		// Move Search
-		message = message.replace(/<span style="color:#999999;">&#x2f;ms(.+)/g, (match) => {
+		message = message.replace(/<span style="color:#999999;">&#x2f;(ms|movesearch).+/g, (match) => {
 			let obj = {};
 			obj.command = find(match, /<span style="color:#999999;">&#x2f;(.+)<\/span><br \/>/g, '*/$1*\n');
 			obj.values = [];
@@ -312,8 +312,8 @@ class DiscordBot extends Bot {
 			obj.more = find(match, /, and (\d+) more/g, ", and $1 more. Redo the search with ', all' at the end to show all results.");
 			return `${obj.command}${obj.values.join(', ')}${obj.more}`;
 		});
-		// Dex Search, Item Search
-		message = message.replace(/<span style="color:#999999;">&#x2f;(?:d|i)s(.+)/g, (match) => {
+		// Dex Search, Item Search, Random Pokemon
+		message = message.replace(/<span style="color:#999999;">&#x2f;(ds|dexsearch|is|itemsearch|rollpokemon|randpoke|randompokemon).+/g, (match) => {
 			let obj = {};
 			obj.command = find(match, /<span style="color:#999999;">&#x2f;(.+)<\/span><br \/>/g, '*/$1*\n');
 			obj.values = [];

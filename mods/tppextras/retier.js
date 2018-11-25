@@ -2,6 +2,7 @@
 // This overrides all tiers defined in formats-data.js
 
 module.exports = {
+	
 	// Gen 6 FU Tier Overrides
 	/*
 	butterfree: 'FU',
@@ -267,7 +268,7 @@ module.exports = {
 	basculinbluestriped: 'ZU',
 	maractus: 'ZU',
 	crustle: 'ZU',
-	carracosta: 'ZUBL',
+	// carracosta: 'ZUBL',
 	gothitelle: 'ZU',
 	swanna: 'ZU',
 	sawsbuck: 'ZU',
@@ -291,7 +292,7 @@ module.exports = {
 	avalugg: 'ZU',
 	toucannon: 'ZU',
 	gumshoos: 'ZU',
-	crabominable: 'ZU',
+	// crabominable: 'ZU',
 	oricorio: 'ZU',
 	oricoriopompom: 'ZU',
 	oricoriopau: 'ZU',
