@@ -116,7 +116,7 @@ class BattleStream extends Streams.ObjectReadWriteStream {
 			this.battle.tiebreak();
 			break;
 		case 'stadium':
-			this.runEvent('StadiumRequest', null, null, null, JSON.parse(message));
+			this.battle.runEvent('StadiumRequest', null, null, null, JSON.parse(message));
 			break;
 		case 'eval':
 			/* eslint-disable no-eval, no-unused-vars */

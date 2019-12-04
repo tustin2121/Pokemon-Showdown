@@ -444,20 +444,17 @@ class ModdedDex {
 	 * Ensure we're working on a copy of a move (and make a copy if we aren't)
 	 *
 	 * Remember: "ensure" - by default, it won't make a copy of a copy:
-	 *     moveCopy === Dex.getMoveCopy(moveCopy)
+	 *     moveCopy === Dex.getActiveMove(moveCopy)
 	 *
 	 * If you really want to, use:
-	 *     moveCopyCopy = Dex.getMoveCopy(moveCopy.id)
-	 *
-	 * @param {Move | string} move - Move ID, move object, or movecopy object describing move to copy
-	 * @return {Move} movecopy object
+	 *     moveCopyCopy = Dex.getActiveMove(moveCopy.id)
 	 */
-	getMoveCopy(move) {
+	getActiveMove(move) {
 		// @ts-ignore
-		if (move && move.isCopy) return move;
+		if (move && typeof move.hit === 'number') return move;
 		move = this.getMove(move);
 		let moveCopy = this.deepClone(move);
-		moveCopy.isCopy = true;
+		moveCopy.hit = 0;
 		return moveCopy;
 	}
 	/**
@@ -1586,6 +1583,18 @@ class ModdedDex {
 			// @ts-ignore
 			if (dexes['base'].dataCache) dexes['base'].dataCache.Formats[id] = format;
 		}
+	}
+	
+	/**
+	* Clone of getActiveMove for our legacy code
+	*/
+	getMoveCopy(move) {
+		// @ts-ignore
+		if (move && typeof move.hit === 'number') return move;
+		move = this.getMove(move);
+		let moveCopy = this.deepClone(move);
+		moveCopy.hit = 0;
+		return moveCopy;
 	}
 }
 

@@ -1,8 +1,8 @@
 "use strict";
 
 exports.BattleScripts = {
-  inherit: 'gen6',
-  gen: 6,
+  inherit: 'gen7',
+  gen: 7,
 };
 
 // Import the Mix and Mega scripts

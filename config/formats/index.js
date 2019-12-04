@@ -46,6 +46,7 @@ let sublists = [
 	'tpp.js',
 	'stpplb.js',
 	'kappacup5.js',
+	'premierleague2.js',
 ];
 
 for (let i = 0; i < sublists.length; i++) {

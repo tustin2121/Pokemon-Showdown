@@ -550,6 +550,9 @@ exports.Formats = [
 				allPokemon[i].baseTemplate = allPokemon[i].template;
 			}
 		},
+		onSwitchIn: function (pokemon) {
+			this.add('-start', pokemon, 'typechange', pokemon.types.join('/'), '[silent]');
+		},
 	},
 	
 	// Semifinals: Partners in Crime
@@ -679,9 +682,9 @@ exports.Formats = [
 		],
 
 		mod: 'gen7',
-		ruleset: ['[Gen 7] OU'],
-		banlist: ['Geomancy'],
-		restrictedMoves: ['Shell Smash', 'Sketch'],
+		ruleset: ['[Gen 7] Ubers'],
+		banlist: [],
+		restrictedMoves: ['Geomancy', 'Shell Smash', 'Sketch'],
 		checkLearnset: function (move, template, lsetData, set) {
 			if (!move.isZ && !this.format.restrictedMoves.includes(move.name) && move.id[0] === template.speciesid[0]) return false;
 			return this.checkLearnset(move, template, lsetData, set);
@@ -705,5 +708,20 @@ exports.Formats = [
 		gameType: 'doubles',
 		ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'],
 		banlist: ['Dark Void'],
+	},
+	
+	{
+		name: "[Gen 7] Finals: 24v24 OU Singles",
+		section: "Kappa Kup Season 5 Playoffs",
+
+		mod: 'twentyfour',
+		teamLength: {
+			validate: [1, 24],
+			battle: 24,
+		},
+
+		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Stadium Theatrics'],
+		banlist: ['Uber', 'Arena Trap', 'Power Construct', 'Shadow Tag', 'Baton Pass', 'Beat Up'],
+		unbanlist: ['Zygarde'],
 	},
 ];

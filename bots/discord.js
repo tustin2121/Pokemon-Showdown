@@ -312,6 +312,14 @@ class DiscordBot extends Bot {
 			obj.more = find(match, /, and (\d+) more/g, ", and $1 more. Redo the search with ', all' at the end to show all results.");
 			return `${obj.command}${obj.values.join(', ')}${obj.more}`;
 		});
+		message = message.replace(/<span style="color:#999999;">Matching moves found in learnset for<\/span>.+/g, (match) => {
+			let obj = {};
+			obj.command = find(match, /(Matching moves found in learnset for)<\/span> (.+):<br \/>/g, '*$1 $2:*\n');
+			obj.values = [];
+			obj.values.push(...find(match, /<a href="([^"]*)"(?:[^>]*)>([^<]*)<\/a>/g, '$2'));
+			obj.more = find(match, /, and (\d+) more/g, ", and $1 more. Redo the search with ', all' at the end to show all results.");
+			return `${obj.command}${obj.values.join(', ')}${obj.more}`;
+		});
 		// Dex Search, Item Search, Random Pokemon
 		message = message.replace(/<span style="color:#999999;">&#x2f;(ds|dexsearch|is|itemsearch|rollpokemon|randpoke|randompokemon).+/g, (match) => {
 			let obj = {};

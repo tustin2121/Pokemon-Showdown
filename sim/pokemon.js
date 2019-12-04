@@ -739,7 +739,7 @@ class Pokemon {
 		if (!template.abilities || (pokemon && pokemon.transformed && this.battle.gen >= 2) || (user && user.transformed && this.battle.gen >= 5)) {
 			return false;
 		}
-		if (!this.formeChange(template, pokemon)) {
+		if (!this.formeChange(template, null)) {
 			return false;
 		}
 		this.transformed = true;

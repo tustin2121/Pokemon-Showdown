@@ -238,7 +238,7 @@ exports.commands = {
 			buf += `<span class="col pokemonnamecol" style="white-space:nowrap"><a href="https://pokemonshowdown.com/dex/items/${stone.id}" target="_blank">${stone.name}</a></span> `;
 		}
 		if (deltas.type) {
-			buf += `<span class="col typecol"><img src="https://play.pokemonshowdown.com/sprites/types/${deltas.type}.png" alt="${deltas.type}" height="14" width="32"></span> `;
+			buf += `<span class="col typecol"><img src="/sprites/types/${deltas.type}.png" alt="${deltas.type}" height="14" width="32"></span> `;
 		} else {
 			buf += `<span class="col typecol"></span>`;
 		}
@@ -277,7 +277,7 @@ exports.commands = {
 			newStats[i] = template.baseStats[i] * (bst <= 350 ? 2 : 1);
 		}
 		template.baseStats = Object.assign({}, newStats);
-		this.sendReply(`|html|${Chat.getDataPokemonHTML(template)}`);
+		this.sendReply(`|raw|${Chat.getDataPokemonHTML(template)}`);
 	},
 	'350cuphelp': [`/350 OR /350cup <pokemon> - Shows the base stats that a Pokemon would have in 350 Cup.`],
 
@@ -289,6 +289,7 @@ exports.commands = {
 		let template = Object.assign({}, Dex.getTemplate(target));
 		if (!template.exists) return this.errorReply("Error: Pokemon not found.");
 		let boosts = {
+			'Uber': -10,
 			'UU': 10,
 			'RUBL': 10,
 			'RU': 20,
@@ -296,14 +297,17 @@ exports.commands = {
 			'NU': 30,
 			'PUBL': 30,
 			'PU': 40,
-			'NFE': 40,
-			'LC Uber': 40,
-			'LC': 40,
+			'ZUBL': 40,
+			'ZU': 50,
+			'NFE': 50,
+			'LC Uber': 50,
+			'LC': 50,
 		};
-		if (!(template.tier in boosts)) return this.sendReply(`|html|${Chat.getDataPokemonHTML(template)}`);
+		if (!(template.tier in boosts)) return this.sendReply(`|raw|${Chat.getDataPokemonHTML(template)}`);
 		let boost = boosts[template.tier];
 		let newStats = Object.assign({}, template.baseStats);
 		for (let statName in template.baseStats) {
+			if (statName === 'hp') continue;
 			newStats[statName] = Dex.clampIntRange(newStats[statName] + boost, 1, 255);
 		}
 		template.baseStats = Object.assign({}, newStats);

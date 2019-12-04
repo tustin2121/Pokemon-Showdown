@@ -113,7 +113,8 @@ const dataParsers = {
 const remoteCommands = {
 	dexsearch:1, movesearch:1, itemsearch:1, learn:1, randompokemon:1,
 	data:1, details:1, weakness:1, effectiveness:1, coverage:1, statcalc:1, 
-	uptime:1, servertime:1, calc:1, pickrandom:1, 
+	uptime:1, servertime:1, calc:1, pickrandom:1, mixandmega:1, stone:1, "350cup":1,
+	tiershift:1, scalemons:1,
 };
 
 // Conforms to classes in users.js

@@ -3637,6 +3637,31 @@ let BattleMovedex = {
 		zMovePower: 190,
 		contestType: "Tough",
 	},
+	"doubleironbash": {
+		num: 742,
+		accuracy: 100,
+		basePower: 60,
+		category: "Physical",
+		desc: "Hits twice. If the first hit breaks the target's substitute, it will take damage for the second hit. Has a 30% chance to flinch the target.",
+		shortDesc: "Hits twice. 30% chance to flinch.",
+		id: "doubleironbash",
+		isNonstandard: true,
+		isUnreleased: true,
+		isViable: true,
+		name: "Double Iron Bash",
+		pp: 5,
+		priority: 0,
+		flags: {contact: 1, protect: 1, mirror: 1, punch: 1},
+		multihit: 2,
+		secondary: {
+			chance: 30,
+			volatileStatus: 'flinch',
+		},
+		target: "normal",
+		type: "Steel",
+		zMovePower: 180,
+		contestType: "Clever",
+	},
 	"doublehit": {
 		num: 458,
 		accuracy: 90,
@@ -4267,8 +4292,10 @@ let BattleMovedex = {
 			},
 			onModifyMovePriority: -2,
 			onModifyMove: function (move) {
-				this.debug('Electrify making move type electric');
-				move.type = 'Electric';
+				if (move.id !== 'struggle') {
+					this.debug('Electrify making move type electric');
+					move.type = 'Electric';
+				}
 			},
 		},
 		secondary: null,

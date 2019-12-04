@@ -21,9 +21,7 @@ exports.Sections = {
 exports.Formats = [];
 
 function create(base, mod) {
-	let f = Object.assign({}, base, mod);
-	exports.Formats.push(f);
-	return f;
+	exports.Formats.push(Object.assign({}, base, mod));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,11 +36,11 @@ let leagueFormat = {
 	tournamentShow: false,
 	
 	mod: 'tppleague',
-	ruleset: ['Pokemon Plus', 'Team Preview'],
+	ruleset: ['Pokemon', 'Standard Doubles', 'Team Preview'], //'Mega Rayquaza Clause'
 	
 	additionalRulesets: {
-		'singles': ['Standard', 'Mega Rayquaza Clause', '-Baton Pass'],
-		'doubles': ['Standard Doubles', '-Dark Void'],
+		'singles': ['Swagger Clause', 'Sleep Clause Mod',],
+		'doubles': [],
 		'triples:': [],
 		'trial': [],
 	},
@@ -109,25 +107,15 @@ let leagueFormat = {
 	},
 };
 create(leagueFormat, {
-	name: "[Gen 7] TPPLeague",
-	searchShow: false,
-	challengeShow: false,
-	tournamentShow: false,
-	gameType: 'singles',
-});
-create(leagueFormat, {
-	name: "[Gen 7] TPPLeague Doubles",
-	searchShow: false,
-	challengeShow: false,
-	tournamentShow: false,
-	gameType: 'doubles',
+	searchShow: true,
+	challengeShow: true,
+	tournamentShow: true,
+	
 });
 
-let gymFormat = 
 create(leagueFormat, {
 	name: "[Gen 7] TPPLeague (Gym)",
 	desc: ["The Format used by TPPLeague Gym and Trial fights."],
-	gameType: 'singles',
 	
 	// Custom PseudoEvent called before anything is sent to the client (save for join messages)
 	onPreSetup : function() {
@@ -174,7 +162,6 @@ create(leagueFormat, {
 	},
 });
 
-let eliteFormat =
 create(leagueFormat, {
 	name: "[Gen 7] TPPLeague (Elite Four)",
 	desc: ["The Format used by TPPLeague Elite Four fights."],
@@ -232,7 +219,6 @@ create(leagueFormat, {
 	},
 });
 
-let champFormat =
 create(leagueFormat, {
 	name: "[Gen 7] TPPLeague (Champion)",
 	desc: ["The Format used by TPPLeague Champion fights."],
@@ -309,57 +295,27 @@ create(leagueFormat, {
 		}
 	},
 });
-
-create(gymFormat, {
-	name: "[Gen 7] TPPLeague Doubles (Gym)",
-	gameType: 'doubles',
-});
-
-create(eliteFormat, {
-	name: "[Gen 7] TPPLeague Doubles (Elite Four)",
-	gameType: 'doubles',
-});
-
-create(champFormat, {
-	name: "[Gen 7] TPPLeague Doubles (Champion)",
-	gameType: 'doubles',
-});
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TPP League Adventures
 	
 let tppla = {
-	name: "[Gen 7] TPPLA",
+	name: "TPPLA",
 	section: "TPPLA",
 	mod: 'tppla',
 	column: 4,
-	
-	maxLevel: 9999,
-	defaultLevel: 100,
-	teamLength: {
-		validate: [1, 24],
-		battle: 24,
-	},
-	
-	ruleset: ['Team Preview', 'Cancel Mod', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Mod', 'Stadium Selection'],
+
+	ruleset: ['Custom Game', 'Sleep Clause Mod', 'HP Percentage Mod', 'Mix and Mega Mod', 'Stadium Selection'],
 };
 create(tppla);
 
 create(tppla, {
-	name: "[Gen 7] TPPLA Doubles",
+	name: "TPPLA Doubles",
 	gameType: 'doubles',
-	teamLength: {
-		validate: [2, 24],
-		battle: 24,
-	},
 });
 
 create(tppla, {
-	name: "[Gen 7] TPPLA Triples",
+	name: "TPPLA Triples",
 	gameType: 'triples',
-	teamLength: {
-		validate: [3, 24],
-		battle: 24,
-	},
 });
 	

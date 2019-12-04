@@ -121,8 +121,8 @@ exports.BattleAbilities = { // define custom abilities here.
 				}
 				if (species !== '' && source.template.speciesid !== toId(species)) { // don't transform if type is not an eeveelution type or you are already that eeveelution.
 					source.formeChange(species);
-					this.add('-formechange', source, species, '[msg]', '[from] ability: Proteon');
-					source.setAbility('proteon');
+					// this.add('-formechange', source, species, '[msg]', '[from] ability: Proteon');
+					// source.setAbility('proteon');
 				}
 			}
 		},

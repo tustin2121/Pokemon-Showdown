@@ -29,37 +29,38 @@ exports.BattleFormats = {
 			}
 		},
 		onStadiumRequest: function(request) {
-			this.debug("StadiumRequest: "+request.join('|'));
+			// this.debug("StadiumRequest: "+request.join('|'));
 			if (!this.stadium || !this.stadium.request || !request) return;
+			request = request.split('|');
 			try {
 				let bgmindex = Config.stadium.music();
 				let bgiindex = Config.stadium.background();
 				
-				switch (request[1]) {
+				switch (request[0]) {
 					case 'field': 
-						let id = bgiindex.convertToId(request[2]);
+						let id = bgiindex.convertToId(request[1]);
 						this.stadium.update({ bgimg: id });
 						break;
 					case 'music': 
-						if (!bgmindex.isValidBattle(request[2])) {
-							this.add('error', `'${request[2]}' is an invalid battle music id.`);
+						if (!bgmindex.isValidBattle(request[1])) {
+							this.add('error', `'${request[1]}' is an invalid battle music id.`);
 							break;
 						}
-						this.stadium.update({ m_battle: request[2] });
+						this.stadium.update({ m_battle: request[1] });
 						break;
 					case 'vmusic': 
-						if (!bgmindex.isValidVictory(request[2])) {
-							this.add('error', `'${request[2]}' is an invalid victory music id.`);
+						if (!bgmindex.isValidVictory(request[1])) {
+							this.add('error', `'${request[1]}' is an invalid victory music id.`);
 							break;
 						}
-						this.stadium.update({ m_victory: request[2] });
+						this.stadium.update({ m_victory: request[1] });
 						break;
 					case 'premusic': 
-						if (!bgmindex.isValid(request[2])) {
-							this.add('error', `'${request[2]}' is an invalid music id.`);
+						if (!bgmindex.isValid(request[1])) {
+							this.add('error', `'${request[1]}' is an invalid music id.`);
 							break;
 						}
-						this.stadium.update({ m_pre: request[2] });
+						this.stadium.update({ m_pre: request[1] });
 						break;
 				}
 			} catch (e) {
@@ -118,44 +119,45 @@ exports.BattleFormats = {
 				this.stadium = {};
 				this.stadium.update = this.effect.updateStadium.bind(this);
 				this.stadium.update({
-					ready: false,
+					ready: true,
 					m_battle: bgmindex.randBattle(),
 					bgimg: bgiindex.convertToId(bgiindex.getRandomBG(this.gen)),
 				});
 				
-				this.add('rule', "Stadium Selection: Combatants can use the Battle Options before battle to choose battle music and background selection.");
+				this.add('rule', "Stadium Theatrics: Combatant(s) may use the Battle Options during battle to choose battle music and background selection.");
 			} catch (e) {
 				console.error("Stadium Selection rule failed."+
 					"The following error occurred while loading music and backgrounds:\n", e);
 				this.add('error', 'Stadium Selection rule failed. Please see console.');
 			}
 		},
-		onStadiumRequest: function(request) {
-			this.debug("StadiumRequest: "+request.join('|'));
+		onStadiumRequest: function(request, battle) {
+			console.log("StadiumRequest: "+Array.prototype.join.call(arguments, ', '));//request.join('|'));
 			if (!this.stadium || !this.stadium.ready || !request) return;
-			if (request[0] !== 'p1') return;
+			request = request.split('|');
+			// if (request[0] !== 'p1') return;
 			try {
 				let bgmindex = Config.stadium.music();
 				let bgiindex = Config.stadium.background();
 				
-				switch (request[1]) {
+				switch (request[0]) {
 					case 'field': 
-						let id = bgiindex.convertToId(request[2]);
+						let id = bgiindex.convertToId(request[1]);
 						this.stadium.update({ bgimg: id });
 						break;
 					case 'music': 
-						if (!bgmindex.isValidBattle(request[2])) {
-							this.add('error', `'${request[2]}' is an invalid battle music id.`);
+						if (!bgmindex.isValidBattle(request[1])) {
+							this.add('error', `'${request[1]}' is an invalid battle music id.`);
 							break;
 						}
-						this.stadium.update({ m_battle: request[2] });
+						this.stadium.update({ m_battle: request[1] });
 						break;
 					case 'vmusic': 
-						if (!bgmindex.isValidVictory(request[2])) {
-							this.add('error', `'${request[2]}' is an invalid victory music id.`);
+						if (!bgmindex.isValidVictory(request[1])) {
+							this.add('error', `'${request[1]}' is an invalid victory music id.`);
 							break;
 						}
-						this.stadium.update({ m_victory: request[2] });
+						this.stadium.update({ m_victory: request[1] });
 						break;
 					case 'premusic': 
 						this.add('error', `Pre-music is no longer relevant after battle has begun.`);

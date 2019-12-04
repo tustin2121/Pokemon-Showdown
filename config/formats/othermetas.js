@@ -526,6 +526,15 @@ exports.Formats = [
 		__subsort: subSortOf => subSortOf("[Gen 7] Ubers")+0.1,
 	},
 	{
+		name: "[Gen 7] Doubles Ubers Plus",
+		mod: 'gen7',
+		gameType: 'doubles',
+		section: "US/UM Doubles",
+		ruleset: ['Pokemon Plus', 'Standard Doubles', 'Team Preview', 'Allow Fake'],
+		banlist: ['Dark Void'],
+		__subsort: subSortOf => subSortOf("[Gen 7] Doubles Ubers")+0.1,
+	},
+	{
 		name: "[Gen 7] Reverse Type Matchup",
 		desc: [
 			"The Attackers and Defenders on the type chart are reversed.",
@@ -693,4 +702,22 @@ exports.Formats = [
 		],
 	},
 	*/
+	{
+		name: "[Gen 7] 24v24 Random Battle",
+		desc: [
+			"Random Battle, but with 24 Pokemon on each side",
+		],
+		section: "US/UM Singles",
+
+		mod: 'twentyfour',
+		team: 'random',
+		teamLength: {
+            validate: [24, 24],
+            battle: 24,
+        },
+		
+		ruleset: ['Pokemon', 'Sleep Clause Mod', 'HP Percentage Mod', 'Cancel Mod', 'Standard', 'Stadium Theatrics'],
+		
+		__subsort: subSortOf => subSortOf("[Gen 7] Monotype")-0.02,
+	},
 ];

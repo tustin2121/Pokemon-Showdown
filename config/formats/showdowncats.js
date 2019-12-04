@@ -8,6 +8,7 @@ exports.Columns = {
 	3: { name: "Other Metas", style:'-' },
 	4: { name: "TPP", style:'=' },
 	5: { name: "Kappa Cup", style:'+' },
+	6: { name: "Premier League", style:'=' },
 };
 
 exports.Sections = {
